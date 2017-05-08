@@ -41,6 +41,7 @@ public class SocketLauncher<T> implements Launcher<T> {
 
 			MessageConsumer writer = new StreamMessageConsumer(socket.getOutputStream(), jsonHandler);
 			this.remoteEndpoint = new RemoteEndpoint(writer, ServiceEndpoints.toEndpoint(localService));
+			jsonHandler.setMethodProvider(this.remoteEndpoint);
 			this.remoteProxy = ServiceEndpoints.toServiceObject(this.remoteEndpoint, remoteInterface);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

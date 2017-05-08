@@ -10,13 +10,18 @@ import io.typefox.lsp4j.chat.typed.shared.UserMessage;
 
 public class ChatServerImpl implements ChatServer {
 	
+	private final List<UserMessage> messages = new CopyOnWriteArrayList<>();
 	private final List<ChatClient> clients = new CopyOnWriteArrayList<>();
 
-	public CompletableFuture<Object> postMessage(UserMessage message) {
+	public CompletableFuture<List<UserMessage>> fetchMessages() {
+		return CompletableFuture.completedFuture(messages);
+	}
+
+	public void postMessage(UserMessage message) {
+		messages.add(message);
 		for (ChatClient client : clients) {
 			client.didPostMessage(message);
 		}
-		return CompletableFuture.completedFuture(new Object());
 	}
 
 	public Runnable addClient(ChatClient client) {
