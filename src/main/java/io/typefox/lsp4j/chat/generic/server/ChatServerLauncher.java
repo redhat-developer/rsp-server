@@ -15,10 +15,11 @@ public class ChatServerLauncher {
 
 		Integer port = Integer.valueOf(args[0]);
 		try (ServerSocket serverSocket = new ServerSocket(port)) {
+			System.out.println("The chat server is running on port " + port);
 			while (true) {
 				Socket socket = serverSocket.accept();
 				SocketLauncher launcher = new SocketLauncher(socket, chatServer, threadPool);
-				
+
 				Runnable removeClient = chatServer.addClient(launcher.getRemoteProxy());
 				launcher.startListening().thenRun(removeClient);
 			}
