@@ -6,7 +6,14 @@ package io.typefox.lsp4j.chat.shared;
 
 public class UserMessage {
 
+	/**
+	 * A user posted this message.
+	 */
 	private String user;
+
+	/**
+	 * A content of this message.
+	 */
 	private String content;
 
 	public UserMessage(String user, String message) {
