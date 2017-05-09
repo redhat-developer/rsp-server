@@ -1,3 +1,7 @@
+/* --------------------------------------------------------------------------------------------
+ * Copyright (c) 2017 TypeFox GmbH (http://www.typefox.io). All rights reserved.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * ------------------------------------------------------------------------------------------ */
 package io.typefox.lsp4j.chat.typed.shared;
 
 import java.net.Socket;
@@ -35,14 +39,15 @@ public class SocketLauncher<T> implements Launcher<T> {
 			Map<String, JsonRpcMethod> supportedMethods = new LinkedHashMap<String, JsonRpcMethod>();
 			supportedMethods.putAll(ServiceEndpoints.getSupportedMethods(remoteInterface));
 			supportedMethods.putAll(ServiceEndpoints.getSupportedMethods(localService.getClass()));
-
 			MessageJsonHandler jsonHandler = new MessageJsonHandler(supportedMethods);
-			this.reader = new StreamMessageProducer(socket.getInputStream(), jsonHandler);
 
+			this.reader = new StreamMessageProducer(socket.getInputStream(), jsonHandler);
 			MessageConsumer writer = new StreamMessageConsumer(socket.getOutputStream(), jsonHandler);
+
 			this.remoteEndpoint = new RemoteEndpoint(writer, ServiceEndpoints.toEndpoint(localService));
-			jsonHandler.setMethodProvider(this.remoteEndpoint);
 			this.remoteProxy = ServiceEndpoints.toServiceObject(this.remoteEndpoint, remoteInterface);
+
+			jsonHandler.setMethodProvider(this.remoteEndpoint);			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
