@@ -9,30 +9,16 @@ dependencies {
 	compile 'org.eclipse.lsp4j:org.eclipse.lsp4j:0.2.0-SNAPSHOT'
 }
 
-task startGenericServer(type: JavaExec) {
+task startServer(type: JavaExec) {
 	classpath = sourceSets.main.runtimeClasspath
-	main = 'io.typefox.lsp4j.chat.generic.server.ChatServerLauncher'
+	main = 'io.typefox.lsp4j.chat.server.ChatServerLauncher'
 	args '3000'
 	standardInput = System.in
 }
 
-task startGenericClient(type: JavaExec) {
+task startClient(type: JavaExec) {
 	classpath = sourceSets.main.runtimeClasspath
-	main = 'io.typefox.lsp4j.chat.generic.client.ChatClientLauncher'
-	args 'localhost', '3000'
-	standardInput = System.in
-}
-
-task startTypedServer(type: JavaExec) {
-	classpath = sourceSets.main.runtimeClasspath
-	main = 'io.typefox.lsp4j.chat.typed.server.ChatServerLauncher'
-	args '3000'
-	standardInput = System.in
-}
-
-task startTypedClient(type: JavaExec) {
-	classpath = sourceSets.main.runtimeClasspath
-	main = 'io.typefox.lsp4j.chat.typed.client.ChatClientLauncher'
+	main = 'io.typefox.lsp4j.chat.client.ChatClientLauncher'
 	args 'localhost', '3000'
 	standardInput = System.in
 }
