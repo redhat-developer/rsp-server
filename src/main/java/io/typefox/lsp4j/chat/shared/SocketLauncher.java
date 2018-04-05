@@ -5,6 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 
 import org.eclipse.lsp4j.jsonrpc.Launcher;
+import org.eclipse.lsp4j.jsonrpc.RemoteEndpoint;
 
 public class SocketLauncher<T> implements Launcher<T> {
 
@@ -18,7 +19,7 @@ public class SocketLauncher<T> implements Launcher<T> {
 		}
 	}
 
-	public CompletableFuture<?> startListening() {
+	public CompletableFuture<Void> startListening() {
 		return CompletableFuture.runAsync(() -> {
 			try {
 				this.launcher.startListening().get();
@@ -30,6 +31,12 @@ public class SocketLauncher<T> implements Launcher<T> {
 
 	public T getRemoteProxy() {
 		return this.launcher.getRemoteProxy();
+	}
+
+
+	@Override
+	public RemoteEndpoint getRemoteEndpoint() {
+		return this.launcher.getRemoteEndpoint();
 	}
 
 }

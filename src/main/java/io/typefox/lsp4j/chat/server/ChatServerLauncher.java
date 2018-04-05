@@ -4,6 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 package io.typefox.lsp4j.chat.server;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -23,8 +24,9 @@ public class ChatServerLauncher {
 		// create the socket server
 		try (ServerSocket serverSocket = new ServerSocket(port)) {
 			System.out.println("The chat server is running on port " + port);
-			threadPool.submit(() -> {
+			threadPool.submit( (Runnable) () -> {
 				while (true) {
+					try {
 					// wait for clients to connect
 					Socket socket = serverSocket.accept();
 					// create a JSON-RPC connection for the accepted socket
@@ -37,6 +39,9 @@ public class ChatServerLauncher {
                      * disconnect the remote client from the chat server.
                      */
 					launcher.startListening().thenRun(removeClient);
+					} catch(IOException ioe) {
+						// Log it
+					}
 				}
 			});
 			System.out.println("Enter any character to stop");
