@@ -2,13 +2,13 @@
  * Copyright (c) 2017 TypeFox GmbH (http://www.typefox.io). All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
-package io.typefox.lsp4j.chat.client;
+package org.jboss.tools.ssp.chat.client;
 
 import java.util.Scanner;
 
-import io.typefox.lsp4j.chat.shared.ChatClient;
-import io.typefox.lsp4j.chat.shared.ChatServer;
-import io.typefox.lsp4j.chat.shared.UserMessage;
+import org.jboss.tools.ssp.chat.shared.ChatClient;
+import org.jboss.tools.ssp.chat.shared.ChatServer;
+import org.jboss.tools.ssp.chat.shared.UserMessage;
 
 public class ChatClientImpl implements ChatClient {
 	

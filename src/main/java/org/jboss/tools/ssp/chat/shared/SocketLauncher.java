@@ -1,4 +1,4 @@
-package io.typefox.lsp4j.chat.shared;
+package org.jboss.tools.ssp.chat.shared;
 
 import java.net.Socket;
 import java.util.concurrent.CompletableFuture;
