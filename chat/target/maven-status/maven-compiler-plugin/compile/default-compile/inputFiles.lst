@@ -1,0 +1,8 @@
+/home/rob/code/eclipse/lsp/lsp4j-chat-app/src/main/java/io/typefox/lsp4j/chat/shared/UserMessage.java
+/home/rob/code/eclipse/lsp/lsp4j-chat-app/src/main/java/io/typefox/lsp4j/chat/client/ChatClientLauncher.java
+/home/rob/code/eclipse/lsp/lsp4j-chat-app/src/main/java/io/typefox/lsp4j/chat/server/ChatServerImpl.java
+/home/rob/code/eclipse/lsp/lsp4j-chat-app/src/main/java/io/typefox/lsp4j/chat/server/ChatServerLauncher.java
+/home/rob/code/eclipse/lsp/lsp4j-chat-app/src/main/java/io/typefox/lsp4j/chat/shared/ChatServer.java
+/home/rob/code/eclipse/lsp/lsp4j-chat-app/src/main/java/io/typefox/lsp4j/chat/shared/ChatClient.java
+/home/rob/code/eclipse/lsp/lsp4j-chat-app/src/main/java/io/typefox/lsp4j/chat/shared/SocketLauncher.java
+/home/rob/code/eclipse/lsp/lsp4j-chat-app/src/main/java/io/typefox/lsp4j/chat/client/ChatClientImpl.java
