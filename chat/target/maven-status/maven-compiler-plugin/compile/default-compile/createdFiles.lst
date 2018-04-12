@@ -1,8 +1,0 @@
-io/typefox/lsp4j/chat/shared/SocketLauncher.class
-io/typefox/lsp4j/chat/shared/ChatServer.class
-io/typefox/lsp4j/chat/server/ChatServerLauncher.class
-io/typefox/lsp4j/chat/shared/ChatClient.class
-io/typefox/lsp4j/chat/client/ChatClientLauncher.class
-io/typefox/lsp4j/chat/shared/UserMessage.class
-io/typefox/lsp4j/chat/client/ChatClientImpl.class
-io/typefox/lsp4j/chat/server/ChatServerImpl.class
