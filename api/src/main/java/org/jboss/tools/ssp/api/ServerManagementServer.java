@@ -6,6 +6,8 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
+import org.jboss.tools.ssp.api.beans.DiscoveryPath;
+import org.jboss.tools.ssp.api.beans.ServerBean;
 
 @JsonSegment("server")
 public interface ServerManagementServer {
@@ -16,6 +18,15 @@ public interface ServerManagementServer {
 	 */
 	@JsonRequest
 	CompletableFuture<List<DiscoveryPath>> getDiscoveryPaths();
+	
+	
+	/**
+	 * The `server/findServerBeans` request is sent by the client to fetch 
+	 * a list of server beans for the given path 
+	 */
+	@JsonRequest
+	CompletableFuture<List<ServerBean>> findServerBeans(DiscoveryPath path);
+	
 	
 	/**
 	 * The `server/addDiscoveryPath` notification is sent by the client to add a new path

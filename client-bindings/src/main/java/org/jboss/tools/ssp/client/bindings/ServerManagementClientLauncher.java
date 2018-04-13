@@ -15,6 +15,7 @@ public class ServerManagementClientLauncher {
 	
 	
 	private ServerManagementClientImpl myClient;
+	private SocketLauncher<ServerManagementServer> launcher;
 	private Socket socket;
 	private String host;
 	private int port;
@@ -28,9 +29,9 @@ public class ServerManagementClientLauncher {
 		// create the chat client
 		ServerManagementClientImpl client = new ServerManagementClientImpl();
 		// connect to the server
-		socket = new Socket(host, port);
+		this.socket = new Socket(host, port);
 		// open a JSON-RPC connection for the opened socket
-		SocketLauncher<ServerManagementServer> launcher = new SocketLauncher<>(client, ServerManagementServer.class, socket);
+		this.launcher = new SocketLauncher<>(client, ServerManagementServer.class, socket);
 		/*
          * Start listening for incoming message.
          * When the JSON-RPC connection is closed, 
@@ -50,13 +51,8 @@ public class ServerManagementClientLauncher {
 	}
 	
 	public void closeConnection() {
-		if( socket != null ) {
-			try {
-				socket.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		if( launcher != null ) {
+			launcher.close();
 		}
 	}
 	

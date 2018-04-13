@@ -3,7 +3,8 @@ package org.jboss.tools.ssp.client.cli;
 import java.util.List;
 import java.util.Scanner;
 
-import org.jboss.tools.ssp.api.DiscoveryPath;
+import org.jboss.tools.ssp.api.beans.DiscoveryPath;
+import org.jboss.tools.ssp.api.beans.ServerBean;
 import org.jboss.tools.ssp.client.bindings.ServerManagementClientLauncher;
 
 public class ServerManagementCLI {
@@ -67,6 +68,18 @@ public class ServerManagementCLI {
 			String suffix = s.substring("remove path ".length());
 			DiscoveryPath dp = new DiscoveryPath(suffix);
 			launcher.getServerProxy().addDiscoveryPath(dp);
+		} else if( s.startsWith("search path ")) {
+			String suffix = s.substring("remove path ".length());
+			DiscoveryPath dp = new DiscoveryPath(suffix);
+			List<ServerBean> beans = launcher.getServerProxy().findServerBeans(dp).get();
+			System.out.println("Beans:");
+			if( beans != null ) {
+				for( ServerBean b : beans) {
+					System.out.println("   " + b.toString());
+				}
+			}
+			
+
 		} else if( s.startsWith("exit")) {
 			launcher.closeConnection();
 			System.exit(0);

@@ -3,6 +3,7 @@ package org.jboss.tools.ssp.api;
 import java.net.Socket;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.jsonrpc.RemoteEndpoint;
@@ -10,6 +11,8 @@ import org.eclipse.lsp4j.jsonrpc.RemoteEndpoint;
 public class SocketLauncher<T> implements Launcher<T> {
 
 	private final Launcher<T> launcher;
+	private Future<Void> startListeningResult;
+	
 
 	public SocketLauncher(Object localService, Class<T> remoteInterface, Socket socket) {
 		try {
@@ -22,7 +25,8 @@ public class SocketLauncher<T> implements Launcher<T> {
 	public CompletableFuture<Void> startListening() {
 		return CompletableFuture.runAsync(() -> {
 			try {
-				this.launcher.startListening().get();
+				this.startListeningResult = this.launcher.startListening();
+				startListeningResult.get();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -39,4 +43,10 @@ public class SocketLauncher<T> implements Launcher<T> {
 		return this.launcher.getRemoteEndpoint();
 	}
 
+	public void close() {
+		if( startListeningResult != null ) {
+			startListeningResult.cancel(true);
+		}
+	}
+	
 }

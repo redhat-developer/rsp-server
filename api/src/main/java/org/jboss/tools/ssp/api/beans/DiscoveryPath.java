@@ -1,4 +1,4 @@
-package org.jboss.tools.ssp.api;
+package org.jboss.tools.ssp.api.beans;
 
 public class DiscoveryPath {
 	private String filepath;

@@ -1,12 +1,14 @@
 package org.jboss.tools.ssp.server;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.jboss.tools.ssp.api.DiscoveryPath;
 import org.jboss.tools.ssp.api.ServerManagementClient;
 import org.jboss.tools.ssp.api.ServerManagementServer;
+import org.jboss.tools.ssp.api.beans.DiscoveryPath;
+import org.jboss.tools.ssp.api.beans.ServerBean;
 import org.jboss.tools.ssp.server.model.ServerManagementModel;
 
 public class ServerManagementServerImpl implements ServerManagementServer {
@@ -47,6 +49,15 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	public void removeDiscoveryPath(DiscoveryPath path) {
 		model.getRuntimePathModel().removePath(path);
 		
+	}
+
+	@Override
+	public CompletableFuture<List<ServerBean>> findServerBeans(DiscoveryPath path) {
+		// TODO Auto-generated method stub
+		ServerBean example = new ServerBean(path.getFilepath(), "someName", "AS", "DV", "10.1.0.abcde", "10.1", "o.j.t.wst.server.core.as");
+		List<ServerBean> ret = new ArrayList<>();
+		ret.add(example);
+		return CompletableFuture.completedFuture(ret);
 	}
 
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.jboss.tools.ssp.api.DiscoveryPath;
+import org.jboss.tools.ssp.api.beans.DiscoveryPath;
 
 public class RuntimePathModel {
 	public List<DiscoveryPath> paths;
