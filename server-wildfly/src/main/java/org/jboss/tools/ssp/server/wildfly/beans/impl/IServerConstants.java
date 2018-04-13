@@ -24,7 +24,15 @@ public interface IServerConstants {
 	public static final String SERVER_EAP_70 = "org.jboss.ide.eclipse.as.eap.70"; //$NON-NLS-1$
 	public static final String SERVER_EAP_71 = "org.jboss.ide.eclipse.as.eap.71"; //$NON-NLS-1$
 
+	public static final String[] ALL_JBOSS_SERVERS = new String[] {
+			SERVER_AS_32,SERVER_AS_40,SERVER_AS_42,SERVER_AS_50,SERVER_AS_51,
+			SERVER_AS_60,SERVER_AS_70,SERVER_AS_71,
+			SERVER_WILDFLY_80,SERVER_WILDFLY_90,SERVER_WILDFLY_100,SERVER_WILDFLY_110,SERVER_WILDFLY_120,
+			SERVER_EAP_43,SERVER_EAP_50,SERVER_EAP_60, SERVER_EAP_61, SERVER_EAP_70, SERVER_EAP_71
+		};
+		// NEW_SERVER_ADAPTER Add the new server id above this line
 
+	// TODO move elsewhere
 	public static final String EXT_JAR = ".jar";
 
 

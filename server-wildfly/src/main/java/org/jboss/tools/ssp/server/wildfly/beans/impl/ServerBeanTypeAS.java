@@ -16,7 +16,7 @@ import org.jboss.tools.ssp.server.discovery.serverbeans.util.ManifestUtility;
 
 public class ServerBeanTypeAS extends JBossServerBeanType {
 
-	protected ServerBeanTypeAS() {
+	public ServerBeanTypeAS() {
 		super(ID_AS,NAME_AS, BIN_TWIDDLE_PATH);
 	}
 	
@@ -39,13 +39,13 @@ public class ServerBeanTypeAS extends JBossServerBeanType {
 	@Override
 	public String getServerAdapterTypeId(String version) {
 		// V6_0, V6_1, V5_1, V5_0, V4_2, V4_0, V3_2
-		if( version.equals("3.2")) return IServerConstants.SERVER_AS_32;
-		if( version.equals("4.0")) return IServerConstants.SERVER_AS_40;
-		if( version.equals("4.2")) return IServerConstants.SERVER_AS_42;
-		if( version.equals("5.0")) return IServerConstants.SERVER_AS_50;
-		if( version.equals("5.1")) return IServerConstants.SERVER_AS_51;
-		if( version.equals("6.0")) return IServerConstants.SERVER_AS_60;
-		if( version.equals("6.1")) return IServerConstants.SERVER_AS_60;
+		if( version.startsWith("3.2.")) return IServerConstants.SERVER_AS_32;
+		if( version.startsWith("4.0.")) return IServerConstants.SERVER_AS_40;
+		if( version.startsWith("4.2.")) return IServerConstants.SERVER_AS_42;
+		if( version.startsWith("5.0.")) return IServerConstants.SERVER_AS_50;
+		if( version.startsWith("5.1.")) return IServerConstants.SERVER_AS_51;
+		if( version.startsWith("6.0.")) return IServerConstants.SERVER_AS_60;
+		if( version.startsWith("6.1.")) return IServerConstants.SERVER_AS_60;
 		return null;
 	}
 }

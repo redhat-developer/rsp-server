@@ -16,7 +16,7 @@ import org.jboss.tools.ssp.server.wildfly.impl.util.JBossManifestUtility;
 
 
 public class ServerBeanTypeAS7 extends JBossServerBeanType {
-	protected ServerBeanTypeAS7() {
+	public ServerBeanTypeAS7() {
 		super(ID_AS,NAME_AS,AS7_MODULE_SERVER_MAIN);
 	}
 	public boolean isServerRoot(File location) {

@@ -18,7 +18,7 @@ public abstract class JBossServerBeanType extends ServerBeanType implements ISer
 
 	@Override
 	public String getUnderlyingTypeId(File root) {
-		return null;
+		return getId();
 	}
 
 	@Override

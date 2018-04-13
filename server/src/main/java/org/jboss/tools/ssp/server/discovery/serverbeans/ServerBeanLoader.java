@@ -53,14 +53,16 @@ public class ServerBeanLoader {
 	}
 	
 	private ServerBeanType loadTypeInternal(File location) {
-		ServerBeanType[] all = ServerManagementModel.getDefault()
-				.getServerBeanTypeManager().getAllRegisteredTypes();
+		ServerBeanType[] all = getServerBeanTypeManager().getAllRegisteredTypes();
 		for( int i = 0; i < all.length; i++ ) {
 			if( all[i].isServerRoot(location))
 				return all[i];
 		}
 		return new ServerBeanTypeUnknown();
-		
+	}
+	
+	protected ServerBeanTypeManager getServerBeanTypeManager() {
+		return ServerManagementModel.getDefault().getServerBeanTypeManager();
 	}
 
 	public String getFullServerVersion() {

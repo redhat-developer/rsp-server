@@ -19,7 +19,7 @@ import org.jboss.tools.ssp.server.wildfly.impl.util.JBossManifestUtility;
 
 public class ServerBeanTypeAS7GateIn extends JBossServerBeanType {
 
-	protected ServerBeanTypeAS7GateIn() {
+	public ServerBeanTypeAS7GateIn() {
 		super(ID_GATEIN, NAME_GATEIN,AS7_MODULE_SERVER_MAIN);
 	}
 	

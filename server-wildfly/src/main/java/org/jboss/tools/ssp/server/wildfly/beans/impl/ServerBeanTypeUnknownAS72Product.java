@@ -16,10 +16,12 @@ import org.jboss.tools.ssp.server.wildfly.impl.util.JBossManifestUtility;
 
 public class ServerBeanTypeUnknownAS72Product extends ServerBeanTypeUnknownAS71Product {
 	public ServerBeanTypeUnknownAS72Product() {
-		super("EAP-Product", "EAP-Based Product", 
-				asPath("modules","system","layers","base","org","jboss","as","server","main"));
+		super("EAP-Product", "EAP-Based Product", AS7_MODULE_LAYERED_SERVER_MAIN);
 	}
-	
+	protected ServerBeanTypeUnknownAS72Product(String id, String desc, String path) {
+		super( id, desc, path);
+	}
+
 
 	@Override
 	public boolean isServerRoot(File location) {

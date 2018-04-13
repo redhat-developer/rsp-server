@@ -1,0 +1,3 @@
+JBoss-Product-Release-Name: Portal Platform
+JBoss-Product-Release-Version: 6.1.0.ER03
+JBoss-Product-Console-Slot: jpp

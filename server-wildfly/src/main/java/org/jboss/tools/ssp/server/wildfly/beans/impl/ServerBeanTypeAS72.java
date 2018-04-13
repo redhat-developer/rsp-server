@@ -14,7 +14,7 @@ import java.io.File;
 
 
 public class ServerBeanTypeAS72 extends JBossServerBeanType {
-	protected ServerBeanTypeAS72() {
+	public ServerBeanTypeAS72() {
 		super(ID_AS, NAME_AS, AS7_MODULE_LAYERED_SERVER_MAIN);
 	}
 
