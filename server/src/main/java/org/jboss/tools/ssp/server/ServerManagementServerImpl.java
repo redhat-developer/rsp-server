@@ -1,5 +1,6 @@
 package org.jboss.tools.ssp.server;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -9,6 +10,7 @@ import org.jboss.tools.ssp.api.ServerManagementClient;
 import org.jboss.tools.ssp.api.ServerManagementServer;
 import org.jboss.tools.ssp.api.beans.DiscoveryPath;
 import org.jboss.tools.ssp.api.beans.ServerBean;
+import org.jboss.tools.ssp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.ssp.server.model.ServerManagementModel;
 
 public class ServerManagementServerImpl implements ServerManagementServer {
@@ -58,10 +60,10 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 
 	@Override
 	public CompletableFuture<List<ServerBean>> findServerBeans(DiscoveryPath path) {
-		// TODO Auto-generated method stub
-		ServerBean example = new ServerBean(path.getFilepath(), "someName", "AS", "DV", "10.1.0.abcde", "10.1", "o.j.t.wst.server.core.as");
+		ServerBeanLoader loader = new ServerBeanLoader(new File(path.getFilepath()));
+		ServerBean bean = loader.getServerBean();
 		List<ServerBean> ret = new ArrayList<>();
-		ret.add(example);
+		ret.add(bean);
 		return CompletableFuture.completedFuture(ret);
 	}
 
