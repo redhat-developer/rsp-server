@@ -25,9 +25,12 @@ public class ServerManagementServerLauncher {
 		launch(Integer.parseInt(portString));
 	}
 	public void launch(int port) throws Exception {
-
 		// create the chat server
-		ServerManagementServerImpl chatServer = new ServerManagementServerImpl();
+		ServerManagementServerImpl server = new ServerManagementServerImpl();
+		startListening(port, server);
+	}
+	
+	protected void startListening(int port, ServerManagementServerImpl server) throws IOException {
 		ExecutorService threadPool = Executors.newCachedThreadPool();
 
 		// create the socket server
@@ -39,9 +42,9 @@ public class ServerManagementServerLauncher {
 					// wait for clients to connect
 					Socket socket = serverSocket.accept();
 					// create a JSON-RPC connection for the accepted socket
-					SocketLauncher<ServerManagementClient> launcher = new SocketLauncher<>(chatServer, ServerManagementClient.class, socket);
-					// connect a remote chat client proxy to the chat server
-					Runnable removeClient = chatServer.addClient(launcher.getRemoteProxy());
+					SocketLauncher<ServerManagementClient> launcher = new SocketLauncher<>(server, ServerManagementClient.class, socket);
+					// connect a remote client proxy to the server
+					Runnable removeClient = server.addClient(launcher.getRemoteProxy());
                     /*
                      * Start listening for incoming messages.
                      * When the JSON-RPC connection is closed

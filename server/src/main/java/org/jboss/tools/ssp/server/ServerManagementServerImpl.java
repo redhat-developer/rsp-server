@@ -31,6 +31,11 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 		return () -> this.clients.remove(client);
 	}
 
+	
+	public ServerManagementModel getModel() {
+		return model;
+	}
+	
 	/**
 	 * Return existing messages.
 	 */
