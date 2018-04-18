@@ -68,28 +68,29 @@ The CLI is a proof-of-concept only, currently demonstrating only that the LSP co
     4) search path /some/path
 
 See this example session:
+
         list paths
-    Paths:
-    add path /home/rob/garbage
-    list paths
-    Paths:
-       /home/rob/garbage
-    search path /home/rob/garbage
-    Beans:
-       garbage,UNKNOWN,,/home/rob/garbage
-    add path /home/rob/apps/jboss/unzipped/wildfly-11.0.0.Final.zip.expanded/
-    list paths
-    Paths:
-       /home/rob/garbage
-       /home/rob/apps/jboss/unzipped/wildfly-11.0.0.Final.zip.expanded/
-    search path /home/rob/apps/jboss/unzipped/wildfly-11.0.0.Final.zip.expanded/
-    Beans:
-       wildfly-11.0.0.Final.zip.expanded,WildFly,11.0,/home/rob/apps/jboss/unzipped/wildfly-11.0.0.Final.zip.expanded
-    remove path /home/rob/apps/jboss/unzipped/wildfly-11.0.0.Final.zip.expanded/
-    remove path /home/rob/garbage
-    list paths
-    Paths:
-    exit
+        Paths:
+        add path /home/rob/garbage
+        list paths
+        Paths:
+           /home/rob/garbage
+        search path /home/rob/garbage
+        Beans:
+           garbage,UNKNOWN,,/home/rob/garbage
+        add path /home/rob/apps/jboss/unzipped/wildfly-11.0.0.Final.zip.expanded/
+        list paths
+        Paths:
+           /home/rob/garbage
+           /home/rob/apps/jboss/unzipped/wildfly-11.0.0.Final.zip.expanded/
+        search path /home/rob/apps/jboss/unzipped/wildfly-11.0.0.Final.zip.expanded/
+        Beans:
+           wildfly-11.0.0.Final.zip.expanded,WildFly,11.0,/home/rob/apps/jboss/unzipped/wildfly-11.0.0.Final.zip.expanded
+        remove path /home/rob/apps/jboss/unzipped/wildfly-11.0.0.Final.zip.expanded/
+        remove path /home/rob/garbage
+        list paths
+        Paths:
+        exit
 
 
 
