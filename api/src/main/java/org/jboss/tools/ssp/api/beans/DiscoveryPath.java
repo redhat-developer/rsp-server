@@ -20,4 +20,14 @@ public class DiscoveryPath {
 		return filepath.hashCode();
 	}
 	
+	public boolean equals(Object other) {
+		if( other instanceof DiscoveryPath) {
+			String fp = ((DiscoveryPath)other).getFilepath();
+			if( this.getFilepath() == null ) 
+				return fp == null;
+			return this.getFilepath().equals(fp);
+		}
+		return false;
+	}
+	
 }

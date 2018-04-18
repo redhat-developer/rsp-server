@@ -24,6 +24,25 @@
             <testFailureIgnore>true</testFailureIgnore>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>1.6.0</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>java</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <mainClass>org.jboss.tools.ssp.client.cli.ServerManagementCLI</mainClass>
+            <arguments>
+              <argument>localhost</argument>
+              <argument>27511</argument>
+            </arguments>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement> 
   </build>

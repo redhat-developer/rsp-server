@@ -67,7 +67,7 @@ public class ServerManagementCLI {
 		} else if( s.startsWith("remove path ")) {
 			String suffix = s.substring("remove path ".length());
 			DiscoveryPath dp = new DiscoveryPath(suffix);
-			launcher.getServerProxy().addDiscoveryPath(dp);
+			launcher.getServerProxy().removeDiscoveryPath(dp);
 		} else if( s.startsWith("search path ")) {
 			String suffix = s.substring("remove path ".length());
 			DiscoveryPath dp = new DiscoveryPath(suffix);
