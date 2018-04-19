@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IFlushableStreamMonitor;
+import org.jboss.tools.ssp.server.model.ServerManagementModel;
 
 /**
  * Monitors the output stream of a system process and notifies
@@ -281,6 +282,6 @@ public class OutputStreamMonitor implements IFlushableStreamMonitor {
 	}
 	
 	private void log(Throwable t) {
-		
+		ServerManagementModel.log(t);
 	}
 }

@@ -58,4 +58,19 @@ public class FileUtil {
 		s = s.substring(0, s.length() - 1);
 		return s;
 	}
+	
+	public static boolean deleteDirectory(File dir, boolean tld) { 
+		if (dir.isDirectory()) { 
+			File[] children = dir.listFiles(); 
+			for (int i = 0; i < children.length; i++) { 
+				boolean success = deleteDirectory(children[i], true); 
+				if (!success) { 
+					return false; 
+				} 
+			} 
+		}
+		if( tld )
+			return dir.delete();
+		return true;
+	}
 }

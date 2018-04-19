@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.core.runtime;
 
+import org.jboss.tools.ssp.server.model.ServerManagementModel;
+
 /**
  * Runs the given ISafeRunnable in a protected mode: exceptions and certain
  * errors thrown in the runnable are logged and passed to the runnable's
@@ -48,8 +50,8 @@ public final class SafeRunner {
 
 	private static void handleException(ISafeRunnable code, Throwable e) {
 		// TODO handle this exception. 
-		e.printStackTrace();
-		
+		//e.printStackTrace();
+		ServerManagementModel.log(e);
 		
 		
 //		if (!(e instanceof OperationCanceledException)) {

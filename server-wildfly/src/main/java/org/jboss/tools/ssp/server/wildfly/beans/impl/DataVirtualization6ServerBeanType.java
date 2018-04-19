@@ -15,7 +15,6 @@ public class DataVirtualization6ServerBeanType extends ServerBeanTypeUnknownAS72
 	
 	@Override
 	public String getServerBeanName(File root) {
-		// TODO bug in upstream; ICondition is not public (??) 
 		return "JBoss Data Virtualization " + getFullVersion(root, null);
 	}
 	

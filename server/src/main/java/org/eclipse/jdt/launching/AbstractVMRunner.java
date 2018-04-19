@@ -13,7 +13,6 @@ package org.eclipse.jdt.launching;
 
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,9 +21,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.IProcessFactory;
 import org.eclipse.debug.core.model.IProcess;
-import org.eclipse.debug.core.model.RuntimeProcess;
+import org.jboss.tools.ssp.server.launch.internal.util.ExecUtil;
 import org.jboss.tools.ssp.server.launch.internal.util.OSUtils;
 
 /**
@@ -36,9 +34,7 @@ import org.jboss.tools.ssp.server.launch.internal.util.OSUtils;
  * @since 2.0
  */
 public abstract class AbstractVMRunner implements IVMRunner {
-	public static final int ERROR = 125;
 	public static final String AbstractVMRunner_0="An IProcess could not be created for the launch";
-	public static final String DebugPlugin_0="Exception occurred executing command line.";
 
 	/**
 	 * Throws a core exception with an error status object built from
@@ -61,36 +57,6 @@ public abstract class AbstractVMRunner implements IVMRunner {
 	 * @return plug-in identifier
 	 */
 	protected abstract String getPluginIdentifier();
-
-	/**
-	 * Executes the given command line using the given working directory
-	 *
-	 * @param cmdLine the command line
-	 * @param workingDirectory the working directory
-	 * @return the {@link Process}
-	 * @throws CoreException if the execution fails
-	 * @see DebugPlugin#exec(String[], File)
-	 */
-	protected Process exec(String[] cmdLine, File workingDirectory) throws CoreException {
-		cmdLine = quoteWindowsArgs(cmdLine);
-		return exec2(cmdLine, workingDirectory);
-	}
-
-	/**
-	 * Executes the given command line using the given working directory and environment
-	 *
-	 * @param cmdLine the command line
-	 * @param workingDirectory the working directory
-	 * @param envp the environment
-	 * @return the {@link Process}
-	 * @throws CoreException is the execution fails
-	 * @since 3.0
-	 * @see DebugPlugin#exec(String[], File, String[])
-	 */
-	protected Process exec(String[] cmdLine, File workingDirectory, String[] envp) throws CoreException {
-		cmdLine = quoteWindowsArgs(cmdLine);
-		return exec2(cmdLine, workingDirectory, envp);
-	}
 
 	private static String[] quoteWindowsArgs(String[] cmdLine) {
 		// see https://bugs.eclipse.org/387504 , workaround for http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6511002
@@ -168,7 +134,7 @@ public abstract class AbstractVMRunner implements IVMRunner {
 	 * @since 3.0
 	 */
 	protected IProcess newProcess(ILaunch launch, Process p, String label, Map<String, String> attributes) throws CoreException {
-		IProcess process= newProcess2(launch, p, label, attributes);
+		IProcess process= ExecUtil.newProcess(launch, p, label, attributes);
 		if (process == null) {
 			p.destroy();
 			abort(AbstractVMRunner_0, null, IJavaLaunchConfigurationConstants.ERR_INTERNAL_ERROR);
@@ -180,18 +146,6 @@ public abstract class AbstractVMRunner implements IVMRunner {
 		return newProcess(launch, process, label, null);
 	}
 	
-
-	protected IProcess newProcess2(ILaunch launch, Process p, String label, Map<String, String> attributes) {
-		IProcessFactory fact = getProcessFactory(launch, p, label, attributes);
-		if( fact != null ) {
-			return fact.newProcess(launch, p, label, attributes);
-		}
-		return new RuntimeProcess(launch, p, label, attributes);
-	}
-	
-	protected IProcessFactory getProcessFactory(ILaunch launch, Process p, String label, Map<String, String> attributes) {
-		return null;
-	}
 	
 	/**
 	 * Combines and returns VM arguments specified by the runner configuration,
@@ -232,60 +186,34 @@ public abstract class AbstractVMRunner implements IVMRunner {
 		return allVMArgs;
 	}
 
-
 	/**
-	 * Convenience method that performs a runtime exec on the given command line
-	 * in the context of the specified working directory, and returns the
-	 * resulting process. If the current runtime does not support the
-	 * specification of a working directory, the status handler for error code
-	 * <code>ERR_WORKING_DIRECTORY_NOT_SUPPORTED</code> is queried to see if the
-	 * exec should be re-executed without specifying a working directory.
+	 * Executes the given command line using the given working directory
 	 *
 	 * @param cmdLine the command line
-	 * @param workingDirectory the working directory, or <code>null</code>
-	 * @return the resulting process or <code>null</code> if the exec is
-	 *  canceled
-	 * @exception CoreException if the exec fails
-	 * @see Runtime
-	 *
-	 * @since 2.1
+	 * @param workingDirectory the working directory
+	 * @return the {@link Process}
+	 * @throws CoreException if the execution fails
+	 * @see DebugPlugin#exec(String[], File)
 	 */
-	public static Process exec2(String[] cmdLine, File workingDirectory) throws CoreException {
-		return exec2(cmdLine, workingDirectory, null);
+	protected Process exec(String[] cmdLine, File workingDirectory) throws CoreException {
+		cmdLine = quoteWindowsArgs(cmdLine);
+		return ExecUtil.exec(cmdLine, workingDirectory);
 	}
 
 	/**
-	 * Convenience method that performs a runtime exec on the given command line
-	 * in the context of the specified working directory, and returns the
-	 * resulting process. If the current runtime does not support the
-	 * specification of a working directory, the status handler for error code
-	 * <code>ERR_WORKING_DIRECTORY_NOT_SUPPORTED</code> is queried to see if the
-	 * exec should be re-executed without specifying a working directory.
+	 * Executes the given command line using the given working directory and environment
 	 *
 	 * @param cmdLine the command line
-	 * @param workingDirectory the working directory, or <code>null</code>
-	 * @param envp the environment variables set in the process, or <code>null</code>
-	 * @return the resulting process or <code>null</code> if the exec is
-	 *  canceled
-	 * @exception CoreException if the exec fails
-	 * @see Runtime
-	 *
+	 * @param workingDirectory the working directory
+	 * @param envp the environment
+	 * @return the {@link Process}
+	 * @throws CoreException is the execution fails
 	 * @since 3.0
+	 * @see DebugPlugin#exec(String[], File, String[])
 	 */
-	public static Process exec2(String[] cmdLine, File workingDirectory, String[] envp) throws CoreException {
-		Process p= null;
-		try {
-			if (workingDirectory == null) {
-				p= Runtime.getRuntime().exec(cmdLine, envp);
-			} else {
-				p= Runtime.getRuntime().exec(cmdLine, envp, workingDirectory);
-			}
-		} catch (IOException e) {
-		    Status status = new Status(IStatus.ERROR, DebugPlugin.getUniqueIdentifier(), ERROR, DebugPlugin_0, e);
-		    throw new CoreException(status);
-		} 
-		return p;
+	protected Process exec(String[] cmdLine, File workingDirectory, String[] envp) throws CoreException {
+		cmdLine = quoteWindowsArgs(cmdLine);
+		return ExecUtil.exec(cmdLine, workingDirectory, envp);
 	}
-
 	
 }

@@ -31,10 +31,13 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.jdt.launching.AbstractVMRunner;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jdt.launching.IVMInstall;
+import org.eclipse.jdt.launching.IVMInstall2;
+import org.eclipse.jdt.launching.StandardVMType;
 import org.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.eclipse.osgi.util.NLS;
 import org.jboss.tools.ssp.server.launch.internal.util.NativeEnvironmentUtil;
 import org.jboss.tools.ssp.server.launch.internal.util.OSUtils;
+import org.jboss.tools.ssp.server.model.ServerManagementModel;
 
 import com.ibm.icu.text.DateFormat;
 
@@ -75,26 +78,29 @@ public class StandardVMRunner extends AbstractVMRunner {
 		fVMInstance= vmInstance;
 	}
 
-	// TODO
 	protected String getJavaVersion() {
-//		if (fVMInstance instanceof IVMInstall2) {
-//			IVMInstall2 vm = (IVMInstall2) fVMInstance;
-//			String javaVersion = vm.getJavaVersion();
+		if (fVMInstance instanceof IVMInstall2) {
+			IVMInstall2 vm = (IVMInstall2) fVMInstance;
+			String javaVersion = vm.getJavaVersion();
+			return javaVersion;
+		}
+		
 		return null;
 	}
-	
+
+	// TODO Implement this
 	protected File findJavaExecutable() {
-//		if (fVMInstance instanceof StandardVM) {
-//			exe = ((StandardVM)fVMInstance).getJavaExecutable();
-//		} else {
-//			exe = StandardVMType.findJavaExecutable(fVMInstance.getInstallLocation());
-//		}
-		return null;
+		File exe = null;
+		if (fVMInstance instanceof StandardVM) {
+			exe = ((StandardVM)fVMInstance).getJavaExecutable();
+		} else {
+			exe = StandardVMType.findJavaExecutable(fVMInstance.getInstallLocation());
+		}
+		return exe;
 	}
 	
 	protected String getJavaInstallLocation() {
-		//return fVMInstance.getInstallLocation().getAbsolutePath() + File.separatorChar;
-		return null;
+		return fVMInstance.getInstallLocation().getAbsolutePath() + File.separatorChar;
 	}
 	
 	public String getVMName() {
@@ -164,8 +170,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 			return wrap(configuration, cmdLine);
 		}
 		catch(CoreException ce) {
-			// TODO Log
-			//LaunchingPlugin.log(ce);
+			ServerManagementModel.log(ce);
 		}
 		return cmdLine;
 	}

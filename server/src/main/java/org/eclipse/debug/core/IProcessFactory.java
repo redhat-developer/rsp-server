@@ -45,7 +45,7 @@ import org.eclipse.debug.core.model.IProcess;
  * </p>
  * @since 3.0
  */
-
+// TODO maybe delete this? Maybe don't need it
 public interface IProcessFactory {
 
 	/**

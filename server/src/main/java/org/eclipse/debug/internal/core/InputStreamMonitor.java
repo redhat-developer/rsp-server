@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Vector;
 
+import org.jboss.tools.ssp.server.model.ServerManagementModel;
+
 /**
  * Writes to the input stream of a system process,
  * queueing output if the stream is blocked.
@@ -174,7 +176,7 @@ public class InputStreamMonitor {
     }
     
     private void log(Throwable t) {
-    	// TODO 
+    	ServerManagementModel.log(t);
     }
 }
 

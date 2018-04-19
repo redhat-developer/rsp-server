@@ -22,25 +22,21 @@ public class ServerBeanTypeUnknown extends ServerBeanType {
 
 	@Override
 	public boolean isServerRoot(File location) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public String getFullVersion(File root) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getUnderlyingTypeId(File root) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getServerAdapterTypeId(String version) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
