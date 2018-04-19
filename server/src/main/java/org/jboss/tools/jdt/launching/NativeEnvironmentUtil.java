@@ -1,4 +1,4 @@
-package org.jboss.tools.ssp.server.launch.internal.util;
+package org.jboss.tools.jdt.launching;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -10,6 +10,9 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.jboss.tools.ssp.server.launch.internal.util.OSUtils;
+
 import java.util.Properties;
 
 public class NativeEnvironmentUtil {

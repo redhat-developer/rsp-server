@@ -1,4 +1,4 @@
-package org.jboss.tools.ssp.server.launch.internal.util;
+package org.jboss.tools.jdt.launching;
 
 import java.io.File;
 import java.net.URL;

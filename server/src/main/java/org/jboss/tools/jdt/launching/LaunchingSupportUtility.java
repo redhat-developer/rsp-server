@@ -33,7 +33,6 @@ import org.eclipse.jdt.launching.IVMRunner;
 import org.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.eclipse.osgi.util.NLS;
 import org.jboss.tools.ssp.server.launch.internal.util.ExecUtil;
-import org.jboss.tools.ssp.server.launch.internal.util.NativeEnvironmentUtil;
 import org.jboss.tools.ssp.server.launch.internal.util.OSUtils;
 import org.jboss.tools.ssp.server.model.ServerManagementModel;
 import org.w3c.dom.Document;

@@ -44,8 +44,8 @@ import org.eclipse.jdt.internal.launching.StandardVM;
 import org.eclipse.osgi.util.NLS;
 import org.jboss.tools.jdt.launching.LaunchingSupportUtility;
 import org.jboss.tools.jdt.launching.LibraryInfoCache;
+import org.jboss.tools.jdt.launching.NativeEnvironmentUtil;
 import org.jboss.tools.ssp.server.launch.internal.util.ExecUtil;
-import org.jboss.tools.ssp.server.launch.internal.util.NativeEnvironmentUtil;
 import org.jboss.tools.ssp.server.launch.internal.util.OSUtils;
 import org.jboss.tools.ssp.server.model.ServerManagementModel;
 
