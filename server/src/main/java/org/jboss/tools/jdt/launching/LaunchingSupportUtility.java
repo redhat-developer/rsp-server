@@ -92,7 +92,6 @@ public class LaunchingSupportUtility {
 			}
 			File launchingSupport = new File(libs, "launchingsupport.jar");
 			if( !launchingSupport.exists()) {
-				// TODO extract to launchingSupport location
 				ClassLoader classLoader = getClass().getClassLoader();
 				InputStream is = classLoader.getResourceAsStream("launchingsupport.jar");
 				try {

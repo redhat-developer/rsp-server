@@ -49,7 +49,7 @@ public final class SafeRunner {
 	}
 
 	private static void handleException(ISafeRunnable code, Throwable e) {
-		// TODO handle this exception. 
+		// TODO handle this exception better? Depends on our logging implementation I guess. 
 		//e.printStackTrace();
 		ServerManagementModel.log(e);
 		

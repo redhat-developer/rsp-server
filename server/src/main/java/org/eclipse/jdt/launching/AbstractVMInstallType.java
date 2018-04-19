@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.osgi.util.NLS;
+import org.jboss.tools.jdt.launching.VMInstallModel;
 
 /**
  * Abstract implementation of a VM install type.
@@ -77,7 +78,7 @@ public abstract class AbstractVMInstallType implements IVMInstallType {
 	}
 
 	protected void fireVMRemoved(IVMInstall install) {
-		// TODO FIX THIS
+		VMInstallModel.getDefault().removeVMInstall(install);
 	}
 	
 	
