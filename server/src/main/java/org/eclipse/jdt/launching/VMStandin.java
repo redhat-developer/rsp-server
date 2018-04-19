@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jboss.tools.jdt.launching.VMInstallModel;
+
 /**
  * An implementation of IVMInstall that is used for manipulating VMs without necessarily
  * committing changes.
@@ -162,8 +164,6 @@ public class VMStandin extends AbstractVMInstall {
     }
     
     private void fireVMAdded(IVMInstall realVM) {
-    	// TODO implement this
-    	// JavaRuntime.fireVMAdded(realVM);
-
+    	VMInstallModel.getDefault().addVMInstall(realVM);
     }
 }

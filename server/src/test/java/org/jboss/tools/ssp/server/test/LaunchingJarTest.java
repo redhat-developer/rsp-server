@@ -1,6 +1,9 @@
 package org.jboss.tools.ssp.server.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.Map;
@@ -8,7 +11,8 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.internal.launching.LibraryInfo;
-import org.eclipse.jdt.internal.launching.StandardVM;
+import org.eclipse.jdt.launching.IVMInstall;
+import org.eclipse.jdt.launching.IVMInstall3;
 import org.eclipse.jdt.launching.StandardVMType;
 import org.jboss.tools.jdt.launching.LaunchingSupportUtility;
 import org.jboss.tools.ssp.server.io.FileUtil;
@@ -77,8 +81,13 @@ public class LaunchingJarTest {
 		assertTrue(launchingJar.exists());
 
 		
-		StandardVM svm = new StandardVM(new StandardVMType(), "testId");
-		svm.setInstallLocation(javaHomeFile);
+		IVMInstall svmTmp = StandardVMType.getDefault().createVMInstall("testId");
+		assertNotNull(svmTmp);
+		svmTmp.setInstallLocation(javaHomeFile);
+		
+		assertTrue(svmTmp instanceof IVMInstall3);
+		IVMInstall3 svm = (IVMInstall3)svmTmp;
+		
 		
 		String[] props = new String[] {"java.specification.name", "java.specification.version"};
 		try {

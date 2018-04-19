@@ -27,7 +27,6 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.jdt.internal.launching.LibraryInfo;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
-import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.IVMInstallChangedListener;
 import org.eclipse.jdt.launching.IVMRunner;
 import org.eclipse.jdt.launching.VMRunnerConfiguration;
@@ -109,7 +108,7 @@ public class LaunchingSupportUtility {
 	}
 
 	private IProcess runLaunchingSupportSysprops(
-			IVMInstall install, File launchingSupportFile, 
+			File launchingSupportFile, 
 			IVMRunner runner, String[] properties, 
 			IProgressMonitor monitor) throws CoreException {
 		VMRunnerConfiguration config = new VMRunnerConfiguration("org.eclipse.jdt.internal.launching.support.LegacySystemProperties", 
@@ -226,14 +225,13 @@ public class LaunchingSupportUtility {
 	}
 	
 	public Map<String, String> runAndParseLaunchingSupportSysprops(
-			IVMInstall install,
 			IVMRunner runner, String[] properties, 
 			IProgressMonitor monitor) throws CoreException {
 		HashMap<String, String> map = new HashMap<String, String>();
 		// launch VM to evaluate properties
 		File file = getLaunchingSupportFile();
 		if (file != null && file.exists()) {
-			IProcess process = runLaunchingSupportSysprops(install, file, runner, properties, monitor);
+			IProcess process = runLaunchingSupportSysprops(file, runner, properties, monitor);
 			if( process == null || monitor.isCanceled()) {
 				return map;
 			}

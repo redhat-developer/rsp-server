@@ -76,6 +76,7 @@ public class StandardVMType extends AbstractVMInstallType {
 	public static final String ID_STANDARD_VM_TYPE = "org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType"; //$NON-NLS-1$
 
 
+
 	/**
 	 * Name filter for files ending in .jar or .zip
 	 *
@@ -87,11 +88,8 @@ public class StandardVMType extends AbstractVMInstallType {
 			return arg1.endsWith(".zip") || arg1.endsWith(".jar");  //$NON-NLS-1$//$NON-NLS-2$
 		}
 	};
-
-	/**
-	 * The root path for the attached source
-	 */
-	private String fDefaultRootPath = ""; //$NON-NLS-1$
+	
+	
 
 	/**
 	 * Map of the install path for which we were unable to generate
@@ -171,6 +169,30 @@ public class StandardVMType extends AbstractVMInstallType {
 //		return fgLibraryLocationResolvers;
 //	}
 
+	
+	
+	private static final StandardVMType INSTANCE = new StandardVMType();
+	public static StandardVMType getDefault() {
+		return INSTANCE;
+	}
+	
+	/**
+	 * The root path for the attached source
+	 */
+	private String fDefaultRootPath = ""; //$NON-NLS-1$
+
+	public StandardVMType getStandardType() {
+		return INSTANCE;
+	}
+	
+
+	private StandardVMType() {
+		
+	}
+	
+	
+	
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.jdt.launching.IVMInstallType#getName()
 	 */

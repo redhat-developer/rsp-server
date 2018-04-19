@@ -8,9 +8,26 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 import org.jboss.tools.ssp.api.beans.DiscoveryPath;
 import org.jboss.tools.ssp.api.beans.ServerBean;
+import org.jboss.tools.ssp.api.beans.VMDescription;
 
 @JsonSegment("server")
 public interface ServerManagementServer {
+	
+	/**
+	 * The `server/getVMs` request is sent by the client to fetch 
+	 * a list of VMs that are able to be used 
+	 */
+	@JsonRequest
+	CompletableFuture<List<VMDescription>> getVMs();
+
+	@JsonNotification
+	void addVM(String id, String absolutePath);
+
+	@JsonNotification
+	public void removeVM(String id);
+	
+	
+	
 	
 	/**
 	 * The `server/getDiscoveryPaths` request is sent by the client to fetch 
@@ -18,7 +35,7 @@ public interface ServerManagementServer {
 	 */
 	@JsonRequest
 	CompletableFuture<List<DiscoveryPath>> getDiscoveryPaths();
-	
+
 	
 	/**
 	 * The `server/findServerBeans` request is sent by the client to fetch 

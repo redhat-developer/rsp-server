@@ -23,6 +23,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.jboss.tools.jdt.launching.LaunchingSupportUtility;
+import org.jboss.tools.jdt.launching.RunningVMSyspropCache;
+import org.jboss.tools.jdt.launching.VMInstallModel;
 /**
  * Abstract implementation of a VM install.
  * <p>
@@ -330,21 +332,11 @@ public abstract class AbstractVMInstall implements IVMInstall, IVMInstall2, IVMI
 
     
     private Map<String, String> loadSyspropsFromCache(String[] properties) {
-    	// TODO 
-    	return null;
+    	return RunningVMSyspropCache.getDefault().getCachedValues(properties);
     }
     
     private void saveSyspropsInCache(Map<String, String> map) {
-    	// TODO 
-		// TODO find somewhere to cache
-		// cache for future reference
-//		Iterator<String> keys = map.keySet().iterator();
-//		while (keys.hasNext()) {
-//			String property = keys.next();
-//			String value = map.get(property);
-//			String key = getSystemPropertyKey(property);
-//			prefs.put(key, value);
-//		}
+    	RunningVMSyspropCache.getDefault().setCachedValues(map);
     }
 
     	
@@ -363,7 +355,7 @@ public abstract class AbstractVMInstall implements IVMInstall, IVMInstall2, IVMI
 			IVMRunner runner = getVMRunner("run");
 			LaunchingSupportUtility util = new LaunchingSupportUtility();
 			map = util.runAndParseLaunchingSupportSysprops(
-					this, runner, properties, monitor);
+					runner, properties, monitor);
 			saveSyspropsInCache(map);
 		}
 		monitor.done();
@@ -459,7 +451,6 @@ public abstract class AbstractVMInstall implements IVMInstall, IVMInstall2, IVMI
 	
 	
 	private void fireVMChanged(PropertyChangeEvent event) {
-		// TODO
-		//JavaRuntime.fireVMChanged(event);
+		VMInstallModel.getDefault().fireVMChanged(event);
 	}
 }
