@@ -26,7 +26,6 @@ import org.eclipse.debug.core.Launch;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.jdt.internal.launching.LibraryInfo;
-import org.eclipse.jdt.internal.launching.Standard11xVM;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.IVMInstallChangedListener;
@@ -118,10 +117,6 @@ public class LaunchingSupportUtility {
 				new String[] { launchingSupportFile.getAbsolutePath() });//$NON-NLS-1$
 		if (runner == null) {
 			abort(NLS.bind(AbstractVMInstall_0, ""), null, IJavaLaunchConfigurationConstants.ERR_INTERNAL_ERROR); //$NON-NLS-1$
-		}
-		
-		if (!(install instanceof Standard11xVM)) {
-			config.setVMArguments(new String[] { MIN_VM_SIZE });
 		}
 		config.setProgramArguments(properties);
 		Launch launch = new Launch(null, "run", null);
