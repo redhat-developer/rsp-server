@@ -1,9 +1,5 @@
 package org.jboss.tools.ssp.server.wildfly.impl;
 
-import java.io.File;
-
-import org.eclipse.jdt.internal.launching.LibraryInfo;
-import org.eclipse.jdt.launching.StandardVMType;
 import org.jboss.tools.ssp.server.ServerManagementServerImpl;
 import org.jboss.tools.ssp.server.ServerManagementServerLauncher;
 
@@ -14,8 +10,8 @@ import org.jboss.tools.ssp.server.ServerManagementServerLauncher;
  */
 public class WildflyServerMain extends ServerManagementServerLauncher {
 	public static void main(String[] args) throws Exception {
-		WildflyServerMain xi = new WildflyServerMain();
-		xi.launch(args[0]);
+		instance = new WildflyServerMain();
+		instance.launch(args[0]);
 	}
 	
 	public void launch(int port) throws Exception {

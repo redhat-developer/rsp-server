@@ -52,6 +52,7 @@ public class ServerManagementCLI {
 		}
 	}
 
+	private static final String SHUTDOWN = "shutdown";
 	private static final String LIST_VM = "list vm";
 	private static final String ADD_VM = "add vm ";
 	private static final String REMOVE_VM = "remove vm ";
@@ -67,7 +68,11 @@ public class ServerManagementCLI {
 	};
 	
 	private void processCommand(String s) throws Exception {
-		if( s.trim().equals(LIST_VM)) {
+		if( s.trim().equals(SHUTDOWN)) {
+			launcher.getServerProxy().shutdown();
+			System.out.println("The server has been shutdown");
+			System.exit(0);
+		} else if( s.trim().equals(LIST_VM)) {
 			List<VMDescription> list = launcher.getServerProxy().getVMs().get();
 			System.out.println("VMs:");
 			if( list != null ) {
@@ -112,7 +117,7 @@ public class ServerManagementCLI {
 			}
 			
 
-		} else if( s.startsWith(EXIT)) {
+		} else if( s.trim().equals(EXIT)) {
 			launcher.closeConnection();
 			System.exit(0);
 		} else {

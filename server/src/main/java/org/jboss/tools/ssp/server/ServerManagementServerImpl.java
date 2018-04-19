@@ -13,6 +13,7 @@ import org.eclipse.jdt.launching.StandardVMType;
 import org.jboss.tools.jdt.launching.VMInstallModel;
 import org.jboss.tools.ssp.api.ServerManagementClient;
 import org.jboss.tools.ssp.api.ServerManagementServer;
+import org.jboss.tools.ssp.api.SocketLauncher;
 import org.jboss.tools.ssp.api.beans.DiscoveryPath;
 import org.jboss.tools.ssp.api.beans.ServerBean;
 import org.jboss.tools.ssp.api.beans.VMDescription;
@@ -22,7 +23,8 @@ import org.jboss.tools.ssp.server.model.ServerManagementModel;
 public class ServerManagementServerImpl implements ServerManagementServer {
 	
 	private final List<ServerManagementClient> clients = new CopyOnWriteArrayList<>();
-
+	private final List<SocketLauncher<ServerManagementClient>> launchers 
+		= new CopyOnWriteArrayList<>();
 	
 	private final ServerManagementModel model = new ServerManagementModel();
 
@@ -34,11 +36,22 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	 * Connect the given chat client.
      * Return a runnable which should be executed to disconnect the client.
 	 */
-	public Runnable addClient(ServerManagementClient client) {
+	public Runnable addClient(SocketLauncher<ServerManagementClient> launcher) {
+		this.launchers.add(launcher);
+		ServerManagementClient client = launcher.getRemoteProxy();
 		this.clients.add(client);
-		return () -> this.clients.remove(client);
+		return () -> this.removeClient(launcher);
 	}
 
+	private void removeClient(SocketLauncher<ServerManagementClient> launcher) {
+		this.launchers.add(launcher);
+		this.clients.remove(launcher.getRemoteProxy());
+		
+	}
+	
+	public List<SocketLauncher<ServerManagementClient>> getActiveLaunchers() {
+		return new ArrayList<SocketLauncher<ServerManagementClient>>(launchers);
+	}
 	
 	public ServerManagementModel getModel() {
 		return model;
@@ -52,6 +65,7 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	 * Get a list of VMs currently registered
 	 * @return
 	 */
+	@Override
 	public CompletableFuture<List<VMDescription>> getVMs() {
 		IVMInstall[] arr = VMInstallModel.getDefault().getVMs();
 		VMDescription[] vmd = new VMDescription[arr.length];
@@ -62,6 +76,7 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 		return CompletableFuture.completedFuture(Arrays.asList(vmd));
 	}
 	
+	@Override
 	public void addVM(String id, String absolutePath) {
 		// TODO Check that the vm doesn't already exist
 		IVMInstall vmi = StandardVMType.getDefault().createVMInstall(id);
@@ -69,6 +84,7 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 		VMInstallModel.getDefault().addVMInstall(vmi);
 	}
 
+	@Override
 	public void removeVM(String id) {
 		VMInstallModel.getDefault().removeVMInstall(id);
 	}
@@ -78,6 +94,7 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	/**
 	 * Return existing messages.
 	 */
+	@Override
 	public CompletableFuture<List<DiscoveryPath>> getDiscoveryPaths() {
 		return CompletableFuture.completedFuture(model.getRuntimePathModel().getPaths());
 	}
@@ -85,6 +102,7 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	/**
 	 * Add a path to our list of discovery paths
 	 */
+	@Override
 	public void addDiscoveryPath(DiscoveryPath path) {
 		model.getRuntimePathModel().addPath(path);
 	}
@@ -103,8 +121,11 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 		return CompletableFuture.completedFuture(ret);
 	}
 
+	@Override
+	public void shutdown() {
+		ServerManagementServerLauncher.getDefault().shutdown();
+	}
 	
 	
-	
-	
+
 }

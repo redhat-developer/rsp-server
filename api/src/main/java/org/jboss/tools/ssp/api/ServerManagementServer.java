@@ -61,4 +61,11 @@ public interface ServerManagementServer {
 	
 	
 
+	/**
+	 * The `server/shutdown` notification is sent by the client to 
+	 * shut down the server
+	 */
+	@JsonNotification
+	void shutdown();
+	
 }
