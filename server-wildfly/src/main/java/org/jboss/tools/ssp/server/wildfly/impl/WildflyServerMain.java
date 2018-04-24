@@ -2,6 +2,7 @@ package org.jboss.tools.ssp.server.wildfly.impl;
 
 import org.jboss.tools.ssp.server.ServerManagementServerImpl;
 import org.jboss.tools.ssp.server.ServerManagementServerLauncher;
+import org.jboss.tools.ssp.server.wildfly.servertype.impl.JBossServerTypeFactory;
 
 /**
  * This class is for testing purposes until a definitive structure
@@ -23,6 +24,8 @@ public class WildflyServerMain extends ServerManagementServerLauncher {
 	
 	protected void addExtensionsToModel(ServerManagementServerImpl server) {
 		server.getModel().getServerBeanTypeManager().addTypeProvider(new JBossServerBeanTypeProvider());
+		server.getModel().getServerModel().addServerFactory(new JBossServerTypeFactory());
+		
 	}
 	
 

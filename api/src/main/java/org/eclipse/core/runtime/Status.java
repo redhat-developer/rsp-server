@@ -68,6 +68,10 @@ public class Status implements IStatus {
 	 */
 	private static final IStatus[] theEmptyStatusArray = new IStatus[0];
 
+	
+	public Status() {
+	}
+	
 	/**
 	 * Creates a new status object.  The created status has no children.
 	 *
@@ -180,7 +184,7 @@ public class Status implements IStatus {
 	 *
 	 * @param code the plug-in-specific status code, or <code>OK</code>
 	 */
-	protected void setCode(int code) {
+	public void setCode(int code) {
 		this.code = code;
 	}
 
@@ -190,7 +194,7 @@ public class Status implements IStatus {
 	 * @param exception a low-level exception, or <code>null</code> if not
 	 *    applicable 
 	 */
-	protected void setException(Throwable exception) {
+	public void setException(Throwable exception) {
 		this.exception = exception;
 	}
 
@@ -201,7 +205,7 @@ public class Status implements IStatus {
 	 * @param message a human-readable message, localized to the
 	 *    current locale
 	 */
-	protected void setMessage(String message) {
+	public void setMessage(String message) {
 		if (message == null)
 			this.message = ""; //$NON-NLS-1$
 		else
@@ -213,7 +217,7 @@ public class Status implements IStatus {
 	 *
 	 * @param pluginId the unique identifier of the relevant plug-in
 	 */
-	protected void setPlugin(String pluginId) {
+	public void setPlugin(String pluginId) {
 		Assert.isLegal(pluginId != null && pluginId.length() > 0);
 		this.pluginId = pluginId;
 	}
@@ -224,7 +228,7 @@ public class Status implements IStatus {
 	 * @param severity the severity; one of <code>OK</code>, <code>ERROR</code>, 
 	 * <code>INFO</code>, <code>WARNING</code>,  or <code>CANCEL</code>
 	 */
-	protected void setSeverity(int severity) {
+	public void setSeverity(int severity) {
 		Assert.isLegal(severity == OK || severity == ERROR || severity == WARNING || severity == INFO || severity == CANCEL);
 		this.severity = severity;
 	}

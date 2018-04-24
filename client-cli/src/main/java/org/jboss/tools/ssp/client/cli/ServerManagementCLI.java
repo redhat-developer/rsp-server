@@ -1,10 +1,16 @@
 package org.jboss.tools.ssp.client.cli;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
+import org.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.api.beans.DiscoveryPath;
+import org.jboss.tools.ssp.api.beans.SSPAttributes;
 import org.jboss.tools.ssp.api.beans.ServerBean;
+import org.jboss.tools.ssp.api.beans.ServerHandle;
 import org.jboss.tools.ssp.api.beans.VMDescription;
 import org.jboss.tools.ssp.client.bindings.ServerManagementClientLauncher;
 
@@ -61,6 +67,12 @@ public class ServerManagementCLI {
 	private static final String ADD_PATH = "add path ";
 	private static final String REMOVE_PATH = "remove path ";
 	private static final String SEARCH_PATH = "search path ";
+	
+	
+	private static final String LIST_SERVERS = "list servers";
+	private static final String ADD_SERVER = "add server";
+	private static final String REMOVE_SERVER = "remove server ";
+	
 	private static final String EXIT = "exit";
 	
 	private static final String[] CMD_ARR = new String[] {
@@ -115,14 +127,76 @@ public class ServerManagementCLI {
 					System.out.println("   " + b.toString());
 				}
 			}
-			
-
+		} else if( s.trim().equals(LIST_SERVERS)) {
+			List<ServerHandle> handles = launcher.getServerProxy().getServerHandles().get();
+			for( ServerHandle sh : handles ) {
+				System.out.println("   " + sh.getType() + ":" + sh.getId());
+			}
+		} else if( s.trim().startsWith(REMOVE_SERVER)) {
+			String suffix = s.substring(REMOVE_PATH.length());
+			launcher.getServerProxy().deleteServer(suffix);
+		} else if( s.trim().equals(ADD_SERVER)) {
+			runAddServer();
 		} else if( s.trim().equals(EXIT)) {
 			launcher.closeConnection();
 			System.exit(0);
 		} else {
 			showCommands();
 		}
+	}
+	
+	
+	private void runAddServer() {
+		List<String> types = null;
+		try {
+			types = launcher.getServerProxy().getServerTypes().get();
+			System.out.println("What type of server do you want to create?");
+			for( String it : types ) {
+				System.out.println("   " + it);
+			}
+			String type = scanner.nextLine();
+			
+			System.out.println("Please choose a unique name: ");
+			String name = scanner.nextLine();
+			
+			SSPAttributes required = launcher.getServerProxy().getRequiredAttributes(type).get();
+			HashMap<String, Object> toSend = new HashMap<>();
+			if( required != null ) {
+				Set<String> keys = required.listAttributes();
+				for( String k : keys ) {
+					String reqType = required.getAttributeType(k).getName();
+					String reqDesc = required.getAttributeDescription(k);
+					Object defVal = required.getAttributeDefaultValue(k);
+					StringBuffer sb = new StringBuffer();
+					sb.append("Key: ");
+					sb.append(k);
+					sb.append("\nType: ");
+					sb.append(reqType);
+					sb.append("\nDescription: ");
+					sb.append(reqDesc);
+					if( defVal != null ) {
+						sb.append("\nDefault Value: ");
+						sb.append(defVal.toString());
+					}
+					sb.append("\nPlease enter a value: ");
+					System.out.println(sb.toString());
+					String val = scanner.nextLine();
+					toSend.put(k, val);
+				}
+				
+				IStatus result = launcher.getServerProxy().createServer(type, 
+						name, toSend).get();
+				if( result.isOK()) {
+					System.out.println("Server Added");
+				} else {
+					System.out.println("Error adding server: " + result.getMessage());
+				}
+			}
+			
+		} catch(InterruptedException | ExecutionException ioe) {
+			ioe.printStackTrace();
+		}
+		
 	}
 	
 	private void showCommands() {

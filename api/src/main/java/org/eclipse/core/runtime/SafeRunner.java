@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.core.runtime;
 
-import org.jboss.tools.ssp.launching.LaunchingCore;
-
 /**
  * Runs the given ISafeRunnable in a protected mode: exceptions and certain
  * errors thrown in the runnable are logged and passed to the runnable's
@@ -48,10 +46,17 @@ public final class SafeRunner {
 		}
 	}
 
+	private static void log(Throwable t) {
+		t.printStackTrace();
+	}
+	private static void log(String bind) {
+		System.out.println(bind);
+	}
+	
 	private static void handleException(ISafeRunnable code, Throwable e) {
 		// TODO handle this exception better? Depends on our logging implementation I guess. 
 		//e.printStackTrace();
-		LaunchingCore.log(e);
+		log(e);
 		
 		
 //		if (!(e instanceof OperationCanceledException)) {

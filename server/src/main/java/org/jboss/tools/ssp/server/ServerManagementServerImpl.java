@@ -4,9 +4,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.IVMInstall2;
 import org.eclipse.jdt.launching.StandardVMType;
@@ -14,7 +17,9 @@ import org.jboss.tools.ssp.api.ServerManagementClient;
 import org.jboss.tools.ssp.api.ServerManagementServer;
 import org.jboss.tools.ssp.api.SocketLauncher;
 import org.jboss.tools.ssp.api.beans.DiscoveryPath;
+import org.jboss.tools.ssp.api.beans.SSPAttributes;
 import org.jboss.tools.ssp.api.beans.ServerBean;
+import org.jboss.tools.ssp.api.beans.ServerHandle;
 import org.jboss.tools.ssp.api.beans.VMDescription;
 import org.jboss.tools.ssp.launching.VMInstallModel;
 import org.jboss.tools.ssp.server.discovery.serverbeans.ServerBeanLoader;
@@ -125,7 +130,40 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	public void shutdown() {
 		ServerManagementServerLauncher.getDefault().shutdown();
 	}
-	
-	
 
+	@Override
+	public CompletableFuture<List<ServerHandle>> getServerHandles() {
+		ServerHandle[] all = model.getServerModel().getServerHandles();
+		return CompletableFuture.completedFuture(Arrays.asList(all));
+	}
+
+	@Override
+	public void deleteServer(String serverId) {
+		model.getServerModel().removeServer(serverId);
+	}
+
+	@Override
+	public CompletableFuture<SSPAttributes> getRequiredAttributes(String serverType) {
+		SSPAttributes sspa = model.getServerModel().getRequiredAttributes(serverType);
+		return CompletableFuture.completedFuture(sspa);
+	}
+
+	@Override
+	public CompletableFuture<SSPAttributes> getOptionalAttributes(String serverType) {
+		SSPAttributes sspa = model.getServerModel().getOptionalAttributes(serverType);
+		return CompletableFuture.completedFuture(sspa);
+	}
+
+	@Override
+	public CompletableFuture<Status> createServer(String serverType, String id, Map<String, Object> attributes) {
+		IStatus ret = model.getServerModel().createServer(serverType, id, attributes);
+		return CompletableFuture.completedFuture((Status)ret);
+	}
+
+	@Override
+	public CompletableFuture<List<String>> getServerTypes() {
+		String[] types = model.getServerModel().getServerTypes();
+		List<String> asList = Arrays.asList(types);
+		return CompletableFuture.completedFuture(asList);
+	}
 }

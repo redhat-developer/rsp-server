@@ -12,7 +12,7 @@ package org.eclipse.core.runtime;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import org.eclipse.core.internal.runtime.PrintStackUtil;
+
 
 /**
  * A checked exception representing a failure.
@@ -101,7 +101,7 @@ public class CoreException extends Exception {
 	public void printStackTrace(PrintStream output) {
 		synchronized (output) {
 			super.printStackTrace(output);
-			PrintStackUtil.printChildren(status, output);
+			printChildren(status, output);
 		}
 	}
 
@@ -116,7 +116,36 @@ public class CoreException extends Exception {
 	public void printStackTrace(PrintWriter output) {
 		synchronized (output) {
 			super.printStackTrace(output);
-			PrintStackUtil.printChildren(status, output);
+			printChildren(status, output);
 		}
 	}
+	
+
+	static public void printChildren(IStatus status, PrintStream output) {
+		IStatus[] children = status.getChildren();
+		if (children == null || children.length == 0)
+			return;
+		for (int i = 0; i < children.length; i++) {
+			output.println("Contains: " + children[i].getMessage()); //$NON-NLS-1$
+			Throwable exception = children[i].getException();
+			if (exception != null)
+				exception.printStackTrace(output);
+			printChildren(children[i], output);
+		}
+	}
+
+	static public void printChildren(IStatus status, PrintWriter output) {
+		IStatus[] children = status.getChildren();
+		if (children == null || children.length == 0)
+			return;
+		for (int i = 0; i < children.length; i++) {
+			output.println("Contains: " + children[i].getMessage()); //$NON-NLS-1$
+			output.flush(); // call to synchronize output
+			Throwable exception = children[i].getException();
+			if (exception != null)
+				exception.printStackTrace(output);
+			printChildren(children[i], output);
+		}
+	}
+
 }
