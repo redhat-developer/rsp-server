@@ -39,12 +39,17 @@
        <groupId>org.jboss.tools.ssp</groupId>
        <artifactId>api</artifactId>
        <version>0.8-SNAPSHOT</version>
+    </dependency>
+     <dependency>
+       <groupId>org.jboss.tools.ssp</groupId>
+       <artifactId>launching</artifactId>
+       <version>0.8-SNAPSHOT</version>
     </dependency>    
      <dependency>
        <groupId>org.jboss.tools.ssp</groupId>
        <artifactId>server.spi</artifactId>
        <version>0.8-SNAPSHOT</version>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>

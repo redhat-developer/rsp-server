@@ -1,6 +1,6 @@
 package org.jboss.tools.ssp.server.wildfly.beans.impl;
 
-import org.jboss.tools.ssp.server.io.FileUtil;
+import org.jboss.tools.ssp.launching.util.FileUtil;
 
 /**
  * Constants having to do with resources, folder paths, 

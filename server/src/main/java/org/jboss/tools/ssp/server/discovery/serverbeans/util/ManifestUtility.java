@@ -11,7 +11,7 @@ import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.jboss.tools.ssp.server.io.FileUtil;
+import org.jboss.tools.ssp.launching.util.FileUtil;
 
 public class ManifestUtility {
 

@@ -2,7 +2,7 @@ package org.jboss.tools.ssp.server.wildfly.beans.impl;
 
 import java.io.File;
 
-import org.jboss.tools.ssp.server.io.FileUtil;
+import org.jboss.tools.ssp.launching.util.FileUtil;
 import org.jboss.tools.ssp.server.spi.discovery.ServerBeanType;
 import org.jboss.tools.ssp.server.wildfly.impl.util.JBossManifestUtility;
 

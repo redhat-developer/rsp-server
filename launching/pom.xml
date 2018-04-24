@@ -9,10 +9,10 @@
     <artifactId>parent</artifactId>
     <version>0.8-SNAPSHOT</version>
   </parent>
-  <artifactId>server.wildfly</artifactId>
+  <artifactId>launching</artifactId>
   <packaging>jar</packaging>
 
-  <name>Server Server Protocol : Server WildFly Implementation</name>
+  <name>Server Server Protocol : jdt.launching</name>
 
   <build>
     <pluginManagement>
@@ -24,50 +24,22 @@
             <testFailureIgnore>true</testFailureIgnore>
           </configuration>
         </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>exec-maven-plugin</artifactId>
-          <version>1.6.0</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>java</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-            <mainClass>org.jboss.tools.ssp.server.wildfly.impl.WildflyServerMain</mainClass>
-            <arguments>
-              <argument>27511</argument>
-            </arguments>
-          </configuration>
-        </plugin>
       </plugins>
     </pluginManagement> 
   </build>
 
   <dependencies>
-    <dependency>
+	<dependency>
+		<groupId>org.eclipse.lsp4j</groupId>
+		<artifactId>org.eclipse.lsp4j</artifactId>
+		<version>0.4.0.M6</version>
+		<scope>compile</scope>
+	</dependency>
+     <dependency>
        <groupId>org.jboss.tools.ssp</groupId>
        <artifactId>api</artifactId>
        <version>0.8-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-       <groupId>org.jboss.tools.ssp</groupId>
-       <artifactId>server</artifactId>
-       <version>0.8-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-       <groupId>org.jboss.tools.ssp</groupId>
-       <artifactId>launching</artifactId>
-       <version>0.8-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-       <groupId>org.jboss.tools.ssp</groupId>
-       <artifactId>server.spi</artifactId>
-       <version>0.8-SNAPSHOT</version>
-    </dependency>
-
+    </dependency>    
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
