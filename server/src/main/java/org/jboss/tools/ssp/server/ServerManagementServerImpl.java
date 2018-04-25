@@ -9,7 +9,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.IVMInstall2;
 import org.eclipse.jdt.launching.StandardVMType;
@@ -20,8 +19,10 @@ import org.jboss.tools.ssp.api.beans.DiscoveryPath;
 import org.jboss.tools.ssp.api.beans.SSPAttributes;
 import org.jboss.tools.ssp.api.beans.ServerBean;
 import org.jboss.tools.ssp.api.beans.ServerHandle;
+import org.jboss.tools.ssp.api.beans.Status;
 import org.jboss.tools.ssp.api.beans.VMDescription;
 import org.jboss.tools.ssp.launching.VMInstallModel;
+import org.jboss.tools.ssp.server.core.internal.StatusConverter;
 import org.jboss.tools.ssp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.ssp.server.model.ServerManagementModel;
 
@@ -157,7 +158,7 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	@Override
 	public CompletableFuture<Status> createServer(String serverType, String id, Map<String, Object> attributes) {
 		IStatus ret = model.getServerModel().createServer(serverType, id, attributes);
-		return CompletableFuture.completedFuture((Status)ret);
+		return CompletableFuture.completedFuture(StatusConverter.convert(ret));
 	}
 
 	@Override

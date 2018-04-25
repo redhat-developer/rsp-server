@@ -8,11 +8,11 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-import org.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.api.beans.DiscoveryPath;
 import org.jboss.tools.ssp.api.beans.SSPAttributes;
 import org.jboss.tools.ssp.api.beans.ServerBean;
 import org.jboss.tools.ssp.api.beans.ServerHandle;
+import org.jboss.tools.ssp.api.beans.Status;
 import org.jboss.tools.ssp.api.beans.VMDescription;
 import org.jboss.tools.ssp.client.bindings.ServerManagementClientLauncher;
 
@@ -220,7 +220,7 @@ public class ServerManagementCLI {
 					
 				}
 				System.out.println("Adding Server...");
-				IStatus result = launcher.getServerProxy().createServer(type, 
+				Status result = launcher.getServerProxy().createServer(type, 
 						name, toSend).get();
 				if( result.isOK()) {
 					System.out.println("Server Added");
