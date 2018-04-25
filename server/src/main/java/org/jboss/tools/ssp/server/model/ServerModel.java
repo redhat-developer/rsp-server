@@ -3,6 +3,8 @@ package org.jboss.tools.ssp.server.model;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,12 +22,24 @@ public class ServerModel {
 	private HashMap<String, IServerType> factories;
 	private HashMap<String, IServer> servers;
 	private HashMap<String, IServerDelegate> serverDelegates;
-	
+	private Set<Class> approvedAttributeTypes;
 	
 	public ServerModel() {
 		factories = new HashMap<String, IServerType>();
 		servers = new HashMap<String, IServer>();
 		serverDelegates = new HashMap<String, IServerDelegate>();
+		
+		
+		// Server attributes must be one of the following types
+		approvedAttributeTypes = new HashSet<Class>();
+		approvedAttributeTypes.add(Integer.class);
+		approvedAttributeTypes.add(Boolean.class);
+		approvedAttributeTypes.add(String.class);
+		// List must be List<String>
+		approvedAttributeTypes.add(List.class);
+		// Map must be Map<String, String>
+		approvedAttributeTypes.add(Map.class);
+		
 		// TODO load / save of servers?
 	}
 	
@@ -60,18 +74,36 @@ public class ServerModel {
 	private IStatus validateAttributes(IServerType type, Map<String, Object> attrs) {
 		SSPAttributes a = type.getRequiredAttributes();
 		Set<String> required = a.listAttributes();
-		for( String str : required ) {
-			if( attrs.get(str) == null ) {
-				return Status.CANCEL_STATUS; // TODO fix this
+		for( String attrKey : required ) {
+			if( attrs.get(attrKey) == null ) {
+				return new Status(IStatus.ERROR, "org.jboss.tools.ssp.server", "Attribute " + attrKey + " must not be null");
 			}
-			Object v = attrs.get(str);
+			Object v = attrs.get(attrKey);
 			Class actual = v.getClass();
-			Class expected = a.getAttributeType(str);
+			Class expected = a.getAttributeType(attrKey);
 			if( !actual.equals(expected)) {
-				return Status.CANCEL_STATUS;
+				// Something's different than expectations based on json transfer
+				// Try to convert it
+				Object converted = convertJSonTransfer(v, expected);
+				if( converted == null ) {
+					return new Status(IStatus.ERROR, "org.jboss.tools.ssp.server", 
+							"Attribute " + attrKey + " must be of type " + expected.getName() 
+							+ " but is of type " + actual.getName());
+				} else {
+					attrs.put(attrKey, converted);
+				}
 			}
 		}
 		return Status.OK_STATUS;
+	}
+	
+	
+	private Object convertJSonTransfer(Object value, Class expected) {
+		// TODO check more things here for errors in the transfer
+		if( Integer.class.equals(expected) && Double.class.equals(value.getClass())) {
+			return new Integer(((Double)value).intValue());
+		}
+		return null;
 	}
 	
 	private Server createServer2(String serverType, String id, Map<String, Object> attributes) {
@@ -83,6 +115,26 @@ public class ServerModel {
 		// TODO check for duplicates
 		File thisServer = new File(servers, id);
 		Server s = new Server(thisServer, serverType);
+		s.setAttribute("id", id);
+		
+		Set<String> keys = attributes.keySet();
+		for( String k : keys) {
+			Object val = attributes.get(k);
+			if( val instanceof Integer) {
+				s.setAttribute(k, ((Integer)val).intValue());
+			} else if( val instanceof Boolean) {
+				s.setAttribute(k, ((Boolean)val).booleanValue());
+			} else if( val instanceof String ) {
+				s.setAttribute(k, (String)val);
+			} else if( val instanceof List) {
+				s.setAttribute(k, (List)val);
+			} else if( val instanceof Map) {
+				s.setAttribute(k, (Map)val);
+			}
+		}
+		
+		
+		
 		return s;
 	}
 	
@@ -116,11 +168,26 @@ public class ServerModel {
 	
 	public SSPAttributes getRequiredAttributes(String type) {
 		IServerType t = factories.get(type);
-		return t == null ? null : t.getRequiredAttributes();
+		SSPAttributes ret = t == null ? null : t.getRequiredAttributes();
+		return validateAttributes(ret, type);
+	}
+	
+	private SSPAttributes validateAttributes(SSPAttributes ret, String serverType) {
+		if( ret != null ) {
+			Set<String> all = ret.listAttributes();
+			for( String all1 : all ) {
+				Class attrType = ret.getAttributeType(all1);
+				if( !approvedAttributeTypes.contains(attrType)) {
+					LaunchingCore.log("Extension for servertype " + serverType + " is invalid and requires an attribute of an invalid class.");
+				}
+			}
+		}
+		return ret;
 	}
 	
 	public SSPAttributes getOptionalAttributes(String type) {
 		IServerType t = factories.get(type);
-		return t == null ? null : t.getOptionalAttributes();
+		SSPAttributes ret = t == null ? null : t.getOptionalAttributes();
+		return validateAttributes(ret, type);
 	}
 }

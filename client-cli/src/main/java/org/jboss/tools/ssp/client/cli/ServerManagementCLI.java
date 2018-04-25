@@ -1,7 +1,9 @@
 package org.jboss.tools.ssp.client.cli;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -133,8 +135,8 @@ public class ServerManagementCLI {
 				System.out.println("   " + sh.getType() + ":" + sh.getId());
 			}
 		} else if( s.trim().startsWith(REMOVE_SERVER)) {
-			String suffix = s.substring(REMOVE_PATH.length());
-			launcher.getServerProxy().deleteServer(suffix);
+			String suffix = s.substring(REMOVE_SERVER.length());
+			launcher.getServerProxy().deleteServer(suffix.trim());
 		} else if( s.trim().equals(ADD_SERVER)) {
 			runAddServer();
 		} else if( s.trim().equals(EXIT)) {
@@ -154,7 +156,7 @@ public class ServerManagementCLI {
 			for( String it : types ) {
 				System.out.println("   " + it);
 			}
-			String type = scanner.nextLine();
+			String type = scanner.nextLine().trim();
 			
 			System.out.println("Please choose a unique name: ");
 			String name = scanner.nextLine();
@@ -164,7 +166,8 @@ public class ServerManagementCLI {
 			if( required != null ) {
 				Set<String> keys = required.listAttributes();
 				for( String k : keys ) {
-					String reqType = required.getAttributeType(k).getName();
+					Class c = required.getAttributeType(k);
+					String reqType = c.getName();
 					String reqDesc = required.getAttributeDescription(k);
 					Object defVal = required.getAttributeDefaultValue(k);
 					StringBuffer sb = new StringBuffer();
@@ -178,12 +181,45 @@ public class ServerManagementCLI {
 						sb.append("\nDefault Value: ");
 						sb.append(defVal.toString());
 					}
-					sb.append("\nPlease enter a value: ");
-					System.out.println(sb.toString());
-					String val = scanner.nextLine();
-					toSend.put(k, val);
+					
+					if( Integer.class.equals(c) || Boolean.class.equals(c) || String.class.equals(c)) {
+						// Simple
+						sb.append("\nPlease enter a value: ");
+						System.out.println(sb.toString());
+						String val = scanner.nextLine();
+						toSend.put(k, convertType(val, required.getAttributeType(k)));
+					} else if( List.class.equals(c)) {
+						sb.append("\nPlease enter a list value. Send a blank line to end the list.");
+						System.out.println(sb.toString());
+						List<String> arr = new ArrayList<String>();
+						String tmp = scanner.nextLine();
+						while(!tmp.trim().isEmpty()) {
+							arr.add(tmp);
+							tmp = scanner.nextLine();
+						}
+						toSend.put(k, arr);
+					} else if( Map.class.equals(c)) {
+						sb.append("\nPlease enter a map value. Each line should read some.key=some.val.\nSend a blank line to end the map.");
+						System.out.println(sb.toString());
+						Map<String, String> map = new HashMap<String, String>();
+						String tmp = scanner.nextLine();
+						while(!tmp.trim().isEmpty()) {
+							int ind = tmp.indexOf("=");
+							if( ind == -1 ) {
+								System.out.println("Invalid map entry. Please try again");
+							} else {
+								String k1 = tmp.substring(0,  ind);
+								String v1 = tmp.substring(ind+1);
+								map.put(k1,v1);
+							}
+							tmp = scanner.nextLine();
+						}
+						toSend.put(k, map);
+					}
+					
+					
 				}
-				
+				System.out.println("Adding Server...");
 				IStatus result = launcher.getServerProxy().createServer(type, 
 						name, toSend).get();
 				if( result.isOK()) {
@@ -197,6 +233,18 @@ public class ServerManagementCLI {
 			ioe.printStackTrace();
 		}
 		
+	}
+	
+	
+	private Object convertType(String input, Class type) {
+		if( Integer.class.equals(type)) {
+			return Integer.parseInt(input);
+		} else if( String.class.equals(type)) {
+			return input;
+		} else if( Boolean.class.equals(type)) {
+			return Boolean.parseBoolean(input);
+		}
+		return null;
 	}
 	
 	private void showCommands() {

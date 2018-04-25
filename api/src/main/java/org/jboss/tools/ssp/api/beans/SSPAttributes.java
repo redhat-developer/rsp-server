@@ -38,7 +38,16 @@ public class SSPAttributes {
 	}
 	
 	public Object getAttributeDefaultValue(String key) {
-		return defaultVals.get(key);
+		Object actual = defaultVals.get(key);
+		if( actual == null )
+			return null;
+		
+		// Workaround for the problems with json transfer
+		Class intended = getAttributeType(key);
+		if( Integer.class.equals(intended) && Double.class.equals(actual.getClass())) {
+			return new Integer(((Double)actual).intValue());
+		}
+		return actual;
 	}
 	
 	public void addAttribute(String key, Class t, String d, Object defaultVal) {
