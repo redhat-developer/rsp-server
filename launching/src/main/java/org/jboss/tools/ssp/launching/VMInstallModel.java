@@ -43,6 +43,16 @@ public class VMInstallModel {
 		return (IVMInstall[]) vms.toArray(new IVMInstall[vms.size()]);
 	}
 	
+	public IVMInstall findVMInstall(String id) {
+		ArrayList<IVMInstall> vms =  new ArrayList<IVMInstall>(map.values());
+		for( IVMInstall vm1 : vms) {
+			if( vm1.getId().equals(id)) {
+				return vm1;
+			}
+		}
+		return null;
+	}
+	
 	public void removeVMInstall(IVMInstall vm) {
 		removeVMInstall(vm.getId());
 	}

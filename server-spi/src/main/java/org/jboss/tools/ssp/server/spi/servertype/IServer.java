@@ -1,6 +1,6 @@
 package org.jboss.tools.ssp.server.spi.servertype;
 
-public interface IServer {
+public interface IServer extends IServerAttributes {
 	public String getId();
 	
 	public String getTypeId();

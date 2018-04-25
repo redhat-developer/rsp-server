@@ -64,6 +64,11 @@ public class ServerModel {
 			}
 			IServer server = createServer2(serverType, id, attributes);
 			IServerDelegate del = fact.createServerDelegate(server);
+
+			valid = del.validate();
+			if( !valid.isOK()) {
+				return valid;
+			}
 			addServer(server, del);
 			return Status.OK_STATUS;
 		} else {

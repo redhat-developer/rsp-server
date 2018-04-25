@@ -18,15 +18,17 @@ public class JBossServerTypeFactory implements IServerType{
 	@Override
 	public IServerDelegate createServerDelegate(IServer server) {
 		// TODO Auto-generated method stub
-		return new IServerDelegate() {};
+		return new JBossServerDelegate(server);
 	}
 
 	@Override
 	public SSPAttributes getRequiredAttributes() {
 		if( required == null ) {
 			SSPAttributes attrs = new SSPAttributes();
-			attrs.addAttribute("TEST1", Integer.class, "a test", new Integer(5));
-			attrs.addAttribute("TEST2", String.class, "a test 2", null);
+			attrs.addAttribute(IJBossServerAttributes.SERVER_HOME, 
+					String.class, "A filesystem path pointing to a WildFly installation", null);
+			attrs.addAttribute(IJBossServerAttributes.VM_INSTALL_ID, 
+					String.class, "A vm id referencing a virtual machine already in this model.", null);
 			// TODO add some
 			required = attrs;
 		}

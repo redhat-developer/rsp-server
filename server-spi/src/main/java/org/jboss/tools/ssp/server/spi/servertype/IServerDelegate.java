@@ -1,5 +1,7 @@
 package org.jboss.tools.ssp.server.spi.servertype;
 
-public interface IServerDelegate {
+import org.eclipse.core.runtime.IStatus;
 
+public interface IServerDelegate {
+	public IStatus validate();
 }

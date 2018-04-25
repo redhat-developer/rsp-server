@@ -60,7 +60,6 @@ public class ServerManagementCLI {
 		}
 	}
 
-	private static final String SHUTDOWN = "shutdown";
 	private static final String LIST_VM = "list vm";
 	private static final String ADD_VM = "add vm ";
 	private static final String REMOVE_VM = "remove vm ";
@@ -76,9 +75,13 @@ public class ServerManagementCLI {
 	private static final String REMOVE_SERVER = "remove server ";
 	
 	private static final String EXIT = "exit";
-	
+	private static final String SHUTDOWN = "shutdown";
+
 	private static final String[] CMD_ARR = new String[] {
-			LIST_PATHS, ADD_PATH, REMOVE_PATH, SEARCH_PATH, EXIT
+			LIST_PATHS, ADD_PATH, REMOVE_PATH, SEARCH_PATH, 
+			LIST_VM, ADD_VM, REMOVE_VM,
+			LIST_SERVERS, ADD_SERVER, REMOVE_SERVER,
+			EXIT, SHUTDOWN
 	};
 	
 	private void processCommand(String s) throws Exception {
@@ -94,12 +97,18 @@ public class ServerManagementCLI {
 					System.out.println(d.getId() + ": " + d.getVersion() + " @ " + d.getInstallLocation());
 				}
 			}
+		} else if( s.equals(ADD_VM.trim())) {
+			System.out.println("Syntax: add vm someName /some/path");
 		} else if( s.startsWith(ADD_VM)) {
 			String suffix = s.substring(ADD_VM.length()).trim();
 			int firstSpace = suffix.indexOf(" ");
-			launcher.getServerProxy().addVM(
-					suffix.substring(0, firstSpace).trim(), 
-					suffix.substring(firstSpace).trim());
+			if( firstSpace == -1 ) {
+				System.out.println("Syntax: add vm someName /some/path");
+			} else {
+				launcher.getServerProxy().addVM(
+						suffix.substring(0, firstSpace).trim(), 
+						suffix.substring(firstSpace).trim());
+			}
 		} else if( s.startsWith(REMOVE_VM)) {
 			String suffix = s.substring(REMOVE_VM.length()).trim();
 			launcher.getServerProxy().removeVM(suffix);
