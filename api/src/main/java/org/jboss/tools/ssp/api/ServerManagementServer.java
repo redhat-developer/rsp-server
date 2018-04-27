@@ -113,6 +113,11 @@ public interface ServerManagementServer {
 	CompletableFuture<Status> createServer(String serverType, String id, Map<String, Object> attributes);
 	
 	
+	@JsonRequest
+	CompletableFuture<Status> startServerAsync(String id, String mode);
+	
+	
+	
 	/**
 	 * The `server/shutdown` notification is sent by the client to 
 	 * shut down the server

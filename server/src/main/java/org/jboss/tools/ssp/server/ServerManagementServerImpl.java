@@ -25,6 +25,9 @@ import org.jboss.tools.ssp.launching.VMInstallModel;
 import org.jboss.tools.ssp.server.core.internal.StatusConverter;
 import org.jboss.tools.ssp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.ssp.server.model.ServerManagementModel;
+import org.jboss.tools.ssp.server.model.ServerModel;
+import org.jboss.tools.ssp.server.spi.servertype.IServer;
+import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 
 public class ServerManagementServerImpl implements ServerManagementServer {
 	
@@ -166,5 +169,13 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 		String[] types = model.getServerModel().getServerTypes();
 		List<String> asList = Arrays.asList(types);
 		return CompletableFuture.completedFuture(asList);
+	}
+
+	@Override
+	public CompletableFuture<Status> startServerAsync(String id, String mode) {
+		IServer server = model.getServerModel().getServer(id);
+		IServerDelegate del = server.getDelegate();
+		IStatus ret = del.start(mode);
+		return CompletableFuture.completedFuture(StatusConverter.convert(ret));
 	}
 }

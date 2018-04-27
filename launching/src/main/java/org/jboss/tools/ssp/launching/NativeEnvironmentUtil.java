@@ -7,7 +7,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -185,7 +187,26 @@ public class NativeEnvironmentUtil {
 	}
 
 	
+	public String[] getEnvironment(Map<String, String> configEnv, boolean appendNativeEnv) {
+		if (configEnv == null) {
+			return null;
+		}
+		Map<String, String> env = new HashMap<String, String>();
+		if (appendNativeEnv) {
+			env.putAll(NativeEnvironmentUtil.getDefault().getNativeEnvironmentCasePreserved());
+		}
+		List<String> strings = new ArrayList<String>(env.size());
+		StringBuffer buffer = null;
+		for (Entry<String, String> entry : env.entrySet()) {
+			buffer = new StringBuffer(entry.getKey());
+			buffer.append('=').append(entry.getValue());
+			strings.add(buffer.toString());
+		}
+		return strings.toArray(new String[strings.size()]);
+	}
+	
+	
 	private static String getStateLocation() {
-		return new File(".").getAbsolutePath();
+		return LaunchingCore.getDataLocation().getAbsolutePath();
 	}
 }

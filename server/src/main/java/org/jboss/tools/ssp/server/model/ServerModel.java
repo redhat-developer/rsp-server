@@ -55,6 +55,10 @@ public class ServerModel {
 		}
 	}
 	
+	public IServer getServer(String id) {
+		return servers.get(id);
+	}
+	
 	public IStatus createServer(String serverType, String id, Map<String, Object> attributes) {
 		IServerType fact = factories.get(serverType);
 		if( fact != null ) {
@@ -62,9 +66,10 @@ public class ServerModel {
 			if( !valid.isOK()) {
 				return valid;
 			}
-			IServer server = createServer2(serverType, id, attributes);
+			Server server = createServer2(serverType, id, attributes);
 			IServerDelegate del = fact.createServerDelegate(server);
-
+			server.setDelegate(del);
+			
 			valid = del.validate();
 			if( !valid.isOK()) {
 				return valid;
