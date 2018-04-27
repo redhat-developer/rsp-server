@@ -178,4 +178,12 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 		IStatus ret = del.start(mode);
 		return CompletableFuture.completedFuture(StatusConverter.convert(ret));
 	}
+
+	@Override
+	public CompletableFuture<Status> stopServerAsync(String id, boolean force) {
+		IServer server = model.getServerModel().getServer(id);
+		IServerDelegate del = server.getDelegate();
+		IStatus ret = del.stop(force);
+		return CompletableFuture.completedFuture(StatusConverter.convert(ret));
+	}
 }

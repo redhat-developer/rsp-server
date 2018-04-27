@@ -124,6 +124,10 @@ public class ServerManagementCLI {
 			String suffix = s.substring("start server ".length()).trim();
 			Status stat = launcher.getServerProxy().startServerAsync(suffix, "run").get();
 			System.out.println(stat.toString());
+		} else if( s.startsWith("stop server ")) {
+			String suffix = s.substring("stop server ".length()).trim();
+			Status stat = launcher.getServerProxy().stopServerAsync(suffix, false).get();
+			System.out.println(stat.toString());
 		} else if( s.startsWith(ADD_PATH)) {
 			String suffix = s.substring(ADD_PATH.length());
 			DiscoveryPath dp = new DiscoveryPath(suffix.trim());

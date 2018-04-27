@@ -116,6 +116,9 @@ public interface ServerManagementServer {
 	@JsonRequest
 	CompletableFuture<Status> startServerAsync(String id, String mode);
 	
+	@JsonRequest
+	CompletableFuture<Status> stopServerAsync(String id, boolean force);
+	
 	
 	
 	/**

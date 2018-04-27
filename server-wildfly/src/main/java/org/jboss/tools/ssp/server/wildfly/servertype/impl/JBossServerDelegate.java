@@ -5,9 +5,13 @@ import java.io.File;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.jdt.launching.IVMInstall;
+import org.jboss.tools.ssp.launching.LaunchingCore;
 import org.jboss.tools.ssp.launching.VMInstallModel;
 import org.jboss.tools.ssp.server.model.internal.AbstractServerDelegate;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
@@ -69,12 +73,58 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 		} catch(CoreException ce) {
 			if( launch != null ) {
 				IProcess[] processes = launch.getProcesses();
-				// TODO terminate them all!
+				for( int i = 0; i < processes.length; i++ ) {
+					try {
+						processes[i].terminate();
+					} catch(DebugException de) {
+						LaunchingCore.log(de);
+					}
+				}
 			}
 			setServerState(IServerDelegate.STATE_STOPPED);
 			return ce.getStatus();
 		}
 		return Status.OK_STATUS;
+	}
+
+	@Override
+	public IStatus stop(boolean force) {
+		setServerState(IServerDelegate.STATE_STOPPING);
+		ILaunch stopLaunch = null;
+		try {
+			stopLaunch = new JBossStopLauncher(this).launch(force);
+			// TODO launch poller
+			IProcess p = launch.getProcesses()[0];
+			p.getStreamsProxy().getOutputStreamMonitor().addListener(new IStreamListener() {
+				@Override
+				public void streamAppended(String text, IStreamMonitor monitor) {
+					System.out.println(text);
+				}
+			});
+			p.getStreamsProxy().getErrorStreamMonitor().addListener(new IStreamListener() {
+				@Override
+				public void streamAppended(String text, IStreamMonitor monitor) {
+					System.out.println(text);
+				}
+			});
+			
+			setServerState(IServerDelegate.STATE_STOPPED);
+		} catch(CoreException ce) {
+			if( stopLaunch != null ) {
+				IProcess[] processes = launch.getProcesses();
+				for( int i = 0; i < processes.length; i++ ) {
+					try {
+						processes[i].terminate();
+					} catch(DebugException de) {
+						LaunchingCore.log(de);
+					}
+				}
+			}
+			setServerState(IServerDelegate.STATE_STARTED);
+			return ce.getStatus();
+		}
+		return Status.OK_STATUS;
+
 	}
 	
 }

@@ -139,4 +139,6 @@ public interface IServerDelegate {
 	public IStatus start(String mode);
 	
 	public IStatus validate();
+
+	public IStatus stop(boolean force);
 }
