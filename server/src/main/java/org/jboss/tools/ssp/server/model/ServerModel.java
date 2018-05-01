@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.ssp.api.beans.SSPAttributes;
 import org.jboss.tools.ssp.api.beans.ServerHandle;
 import org.jboss.tools.ssp.launching.LaunchingCore;
@@ -23,12 +24,13 @@ public class ServerModel {
 	private HashMap<String, IServer> servers;
 	private HashMap<String, IServerDelegate> serverDelegates;
 	private Set<Class> approvedAttributeTypes;
+	private List<IServerModelListener> listeners;
 	
 	public ServerModel() {
 		factories = new HashMap<String, IServerType>();
 		servers = new HashMap<String, IServer>();
 		serverDelegates = new HashMap<String, IServerDelegate>();
-		
+		listeners = new ArrayList<IServerModelListener>();
 		
 		// Server attributes must be one of the following types
 		approvedAttributeTypes = new HashSet<Class>();
@@ -43,6 +45,14 @@ public class ServerModel {
 		// TODO load / save of servers?
 	}
 	
+	public void addServerModelListener(IServerModelListener l) {
+		listeners.add(l);
+	}
+
+	public void removeServerModelListener(IServerModelListener l) {
+		listeners.remove(l);
+	}
+
 	public void addServerFactory(IServerType fact) {
 		if( fact != null && fact.getServerTypeId() != null ) {
 			factories.put(fact.getServerTypeId(), fact);
@@ -152,14 +162,55 @@ public class ServerModel {
 	private void addServer(IServer server, IServerDelegate del) {
 		servers.put(server.getId(), server);
 		serverDelegates.put(server.getId(), del);
-		// TODO fire events?
+		fireServerAdded(server);
 	}
-	public void removeServer(String serverId) {
-		servers.remove(serverId);
-		serverDelegates.remove(serverId);
-		// TODO fire events?
+	private void fireServerAdded(IServer server) {
+		for( IServerModelListener l : listeners ) {
+			l.serverAdded(toHandle(server));
+		}
+	}
+	public void fireServerProcessTerminated(IServer server, String processId) {
+		for( IServerModelListener l : listeners ) {
+			l.serverProcessTerminated(toHandle(server), processId);
+		}
+	}
+	public void fireServerProcessCreated(IServer server, String processId) {
+		for( IServerModelListener l : listeners ) {
+			l.serverProcessCreated(toHandle(server), processId);
+		}
+	}
+
+	public void fireServerStreamAppended(IServer server, String processId, int streamType, String text) {
+		for( IServerModelListener l : listeners ) {
+			l.serverProcessOutputAppended(toHandle(server), processId, streamType, text);
+		}
 	}
 	
+	public void fireServerStateChanged(IServer server, int state) {
+		for( IServerModelListener l : listeners ) {
+			l.serverStateChanged(toHandle(server), state);
+		}
+	}
+	
+	private void fireServerRemoved(IServer server) {
+		for( IServerModelListener l : listeners ) {
+			l.serverRemoved(toHandle(server));
+		}
+	}
+	
+	private ServerHandle toHandle(IServer s) {
+		return new ServerHandle(s.getId(), s.getTypeId());
+	}
+	public void removeServer(String serverId) {
+		IServer toRemove = servers.get(serverId);
+		servers.remove(serverId);
+		IServerDelegate s = serverDelegates.get(serverId);
+		serverDelegates.remove(serverId);
+		s.dispose();
+		fireServerRemoved(toRemove);
+	}
+	
+
 	public ServerHandle[] getServerHandles() {
 		Set<String> s = servers.keySet();
 		ArrayList<ServerHandle> handles = new ArrayList<>();
@@ -200,4 +251,5 @@ public class ServerModel {
 		SSPAttributes ret = t == null ? null : t.getOptionalAttributes();
 		return validateAttributes(ret, type);
 	}
+
 }

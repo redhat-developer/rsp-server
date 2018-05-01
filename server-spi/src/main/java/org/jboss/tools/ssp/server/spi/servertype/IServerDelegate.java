@@ -1,6 +1,7 @@
 package org.jboss.tools.ssp.server.spi.servertype;
 
 import org.eclipse.core.runtime.IStatus;
+import org.jboss.tools.ssp.api.ServerManagementClient;
 
 public interface IServerDelegate {
 
@@ -11,7 +12,7 @@ public interface IServerDelegate {
 	 * @see #getServerState()
 	 * @see #getModuleState(IModule[])
 	 */
-	public static final int STATE_UNKNOWN = 0;
+	public static final int STATE_UNKNOWN = ServerManagementClient.STATE_UNKNOWN;
 
 	/**
 	 * Server state constant (value 1) indicating that the
@@ -20,7 +21,7 @@ public interface IServerDelegate {
 	 * @see #getServerState()
 	 * @see #getModuleState(IModule[])
 	 */
-	public static final int STATE_STARTING = 1;
+	public static final int STATE_STARTING = ServerManagementClient.STATE_STARTING;
 
 	/**
 	 * Server state constant (value 2) indicating that the
@@ -29,7 +30,7 @@ public interface IServerDelegate {
 	 * @see #getServerState()
 	 * @see #getModuleState(IModule[])
 	 */
-	public static final int STATE_STARTED = 2;
+	public static final int STATE_STARTED = ServerManagementClient.STATE_STARTED;
 
 	/**
 	 * Server state constant (value 3) indicating that the
@@ -38,7 +39,7 @@ public interface IServerDelegate {
 	 * @see #getServerState()
 	 * @see #getModuleState(IModule[])
 	 */
-	public static final int STATE_STOPPING = 3;
+	public static final int STATE_STOPPING = ServerManagementClient.STATE_STOPPING;
 
 	/**
 	 * Server state constant (value 4) indicating that the
@@ -47,7 +48,7 @@ public interface IServerDelegate {
 	 * @see #getServerState()
 	 * @see #getModuleState(IModule[])
 	 */
-	public static final int STATE_STOPPED = 4;
+	public static final int STATE_STOPPED = ServerManagementClient.STATE_STOPPED;
 
 	/**
 	 * Publish state constant (value 0) indicating that it's
@@ -56,7 +57,7 @@ public interface IServerDelegate {
 	 * @see #getServerPublishState()
 	 * @see #getModulePublishState(IModule[])
 	 */
-	public static final int PUBLISH_STATE_UNKNOWN = 0;
+	public static final int PUBLISH_STATE_UNKNOWN = ServerManagementClient.PUBLISH_STATE_UNKNOWN;
 
 	/**
 	 * Publish state constant (value 1) indicating that there
@@ -65,7 +66,7 @@ public interface IServerDelegate {
 	 * @see #getServerPublishState()
 	 * @see #getModulePublishState(IModule[])
 	 */
-	public static final int PUBLISH_STATE_NONE = 1;
+	public static final int PUBLISH_STATE_NONE = ServerManagementClient.PUBLISH_STATE_NONE;
 
 	/**
 	 * Publish state constant (value 2) indicating that an
@@ -74,7 +75,7 @@ public interface IServerDelegate {
 	 * @see #getServerPublishState()
 	 * @see #getModulePublishState(IModule[])
 	 */
-	public static final int PUBLISH_STATE_INCREMENTAL = 2;
+	public static final int PUBLISH_STATE_INCREMENTAL = ServerManagementClient.PUBLISH_STATE_INCREMENTAL;
 
 	/**
 	 * Publish state constant (value 3) indicating that a
@@ -83,35 +84,35 @@ public interface IServerDelegate {
 	 * @see #getServerPublishState()
 	 * @see #getModulePublishState(IModule[])
 	 */
-	public static final int PUBLISH_STATE_FULL = 3;
+	public static final int PUBLISH_STATE_FULL = ServerManagementClient.PUBLISH_STATE_FULL;
 
 	/**
 	 * Publish kind constant (value 1) indicating an incremental publish request.
 	 * 
 	 * @see #publish(int, IProgressMonitor)
 	 */
-	public static final int PUBLISH_INCREMENTAL = 1;
+	public static final int PUBLISH_INCREMENTAL = ServerManagementClient.PUBLISH_INCREMENTAL;
 
 	/**
 	 * Publish kind constant (value 2) indicating a full publish request.
 	 * 
 	 * @see #publish(int, IProgressMonitor)
 	 */
-	public static final int PUBLISH_FULL = 2;
+	public static final int PUBLISH_FULL = ServerManagementClient.PUBLISH_FULL;
 
 	/**
 	 * Publish kind constant (value 3) indicating an automatic publish request.
 	 * 
 	 * @see #publish(int, IProgressMonitor)
 	 */
-	public static final int PUBLISH_AUTO = 3;
+	public static final int PUBLISH_AUTO = ServerManagementClient.PUBLISH_AUTO;
 
 	/**
 	 * Publish kind constant (value 4) indicating a publish clean request
 	 * 
 	 * @see #publish(int, IProgressMonitor)
 	 */
-	public static final int PUBLISH_CLEAN = 4;
+	public static final int PUBLISH_CLEAN = ServerManagementClient.PUBLISH_CLEAN;
 
 	/**
 	 * Returns the current state of this server.
@@ -141,4 +142,6 @@ public interface IServerDelegate {
 	public IStatus validate();
 
 	public IStatus stop(boolean force);
+	
+	public void dispose();
 }

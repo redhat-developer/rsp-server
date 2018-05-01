@@ -26,6 +26,11 @@ public class ServerManagementServerLauncher {
 	public ServerManagementServerLauncher() {
 		serverImpl = new ServerManagementServerImpl();
 	}
+	
+	public List<ServerManagementClient> getClients() {
+		return serverImpl.getClients();
+	}
+	
 	public void launch(String portString) throws Exception {
 		launch(Integer.parseInt(portString));
 	}

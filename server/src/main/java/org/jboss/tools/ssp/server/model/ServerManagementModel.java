@@ -1,6 +1,7 @@
 package org.jboss.tools.ssp.server.model;
 
-import org.jboss.tools.ssp.server.discovery.RuntimePathModel;
+import org.jboss.tools.ssp.launching.VMInstallModel;
+import org.jboss.tools.ssp.server.discovery.DiscoveryPathModel;
 import org.jboss.tools.ssp.server.discovery.serverbeans.ServerBeanTypeManager;
 
 public class ServerManagementModel {
@@ -9,18 +10,18 @@ public class ServerManagementModel {
 		return instance;
 	}
 	
-	private RuntimePathModel rpm;
+	private DiscoveryPathModel rpm;
 	private ServerBeanTypeManager serverBeanTypeManager;
 	private ServerModel serverModel;
 	
 	public ServerManagementModel() {
-		rpm = new RuntimePathModel();
+		rpm = new DiscoveryPathModel();
 		serverBeanTypeManager = new ServerBeanTypeManager();
 		serverModel = new ServerModel();
 		instance = this;
 	}
 	
-	public RuntimePathModel getRuntimePathModel() {
+	public DiscoveryPathModel getDiscoveryPathModel() {
 		return rpm;
 	}
 	
@@ -30,5 +31,9 @@ public class ServerManagementModel {
 	
 	public ServerModel getServerModel() {
 		return serverModel;
+	}
+
+	public VMInstallModel getVMInstallModel() {
+		return VMInstallModel.getDefault();
 	}
 }

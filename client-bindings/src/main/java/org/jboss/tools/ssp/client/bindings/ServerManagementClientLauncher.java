@@ -1,6 +1,5 @@
 package org.jboss.tools.ssp.client.bindings;
 
-import java.io.IOException;
 import java.net.Socket;
 
 import org.jboss.tools.ssp.api.ServerManagementServer;

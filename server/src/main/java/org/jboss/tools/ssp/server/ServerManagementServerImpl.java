@@ -21,11 +21,12 @@ import org.jboss.tools.ssp.api.beans.ServerBean;
 import org.jboss.tools.ssp.api.beans.ServerHandle;
 import org.jboss.tools.ssp.api.beans.Status;
 import org.jboss.tools.ssp.api.beans.VMDescription;
+import org.jboss.tools.ssp.launching.LaunchingCore;
 import org.jboss.tools.ssp.launching.VMInstallModel;
 import org.jboss.tools.ssp.server.core.internal.StatusConverter;
 import org.jboss.tools.ssp.server.discovery.serverbeans.ServerBeanLoader;
+import org.jboss.tools.ssp.server.model.RemoteEventManager;
 import org.jboss.tools.ssp.server.model.ServerManagementModel;
-import org.jboss.tools.ssp.server.model.ServerModel;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 
@@ -36,9 +37,14 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 		= new CopyOnWriteArrayList<>();
 	
 	private final ServerManagementModel model = new ServerManagementModel();
+	private final RemoteEventManager eventManager = new RemoteEventManager(this);
 
 	public ServerManagementServerImpl() {
 		// Intentionally empty. Can be changed.
+	}
+	
+	public List<ServerManagementClient> getClients() {
+		return new ArrayList<ServerManagementClient>(clients);
 	}
 	
 	/**
@@ -79,18 +85,25 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 		IVMInstall[] arr = VMInstallModel.getDefault().getVMs();
 		VMDescription[] vmd = new VMDescription[arr.length];
 		for( int i = 0; i < arr.length; i++ ) {
-			String vers = arr[i] instanceof IVMInstall2 ? ((IVMInstall2)arr[i]).getJavaVersion() : null;
-			vmd[i] = new VMDescription(arr[i].getId(), arr[i].getInstallLocation().getAbsolutePath(), vers);
+			vmd[i] = getDescription(arr[i]);
 		}
 		return CompletableFuture.completedFuture(Arrays.asList(vmd));
 	}
 	
+	private VMDescription getDescription(IVMInstall vmi) {
+		String vers = vmi instanceof IVMInstall2 ? ((IVMInstall2)vmi).getJavaVersion() : null;
+		return new VMDescription(vmi.getId(), vmi.getInstallLocation().getAbsolutePath(), vers);
+	}
+	
 	@Override
 	public void addVM(String id, String absolutePath) {
-		// TODO Check that the vm doesn't already exist
-		IVMInstall vmi = StandardVMType.getDefault().createVMInstall(id);
-		vmi.setInstallLocation(new File(absolutePath));
-		VMInstallModel.getDefault().addVMInstall(vmi);
+		try {
+			IVMInstall vmi = StandardVMType.getDefault().createVMInstall(id);
+			vmi.setInstallLocation(new File(absolutePath));
+			VMInstallModel.getDefault().addVMInstall(vmi);
+		} catch(IllegalArgumentException arg) {
+			LaunchingCore.log(arg);
+		}
 	}
 
 	@Override
@@ -105,7 +118,7 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	 */
 	@Override
 	public CompletableFuture<List<DiscoveryPath>> getDiscoveryPaths() {
-		return CompletableFuture.completedFuture(model.getRuntimePathModel().getPaths());
+		return CompletableFuture.completedFuture(model.getDiscoveryPathModel().getPaths());
 	}
 
 	/**
@@ -113,12 +126,12 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	 */
 	@Override
 	public void addDiscoveryPath(DiscoveryPath path) {
-		model.getRuntimePathModel().addPath(path);
+		model.getDiscoveryPathModel().addPath(path);
 	}
 
 	@Override
 	public void removeDiscoveryPath(DiscoveryPath path) {
-		model.getRuntimePathModel().removePath(path);
+		model.getDiscoveryPathModel().removePath(path);
 	}
 
 	@Override

@@ -7,18 +7,16 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IProcess;
-import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.ssp.launching.LaunchingCore;
 import org.jboss.tools.ssp.launching.VMInstallModel;
-import org.jboss.tools.ssp.server.model.internal.AbstractServerDelegate;
+import org.jboss.tools.ssp.server.model.AbstractServerDelegate;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 
 public class JBossServerDelegate extends AbstractServerDelegate {
-	private ILaunch launch;
+	private ILaunch startLaunch;
 	
 	public JBossServerDelegate(IServer server) {
 		super(server);
@@ -67,12 +65,13 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 		setServerState(IServerDelegate.STATE_STARTING);
 		
 		try {
-			launch = new JBossStartLauncher(this).launch(mode);
+			startLaunch = new JBossStartLauncher(this).launch(mode);
+			registerLaunch(startLaunch);
 			// TODO fire poller or similar
 			setServerState(IServerDelegate.STATE_STARTED);
 		} catch(CoreException ce) {
-			if( launch != null ) {
-				IProcess[] processes = launch.getProcesses();
+			if( startLaunch != null ) {
+				IProcess[] processes = startLaunch.getProcesses();
 				for( int i = 0; i < processes.length; i++ ) {
 					try {
 						processes[i].terminate();
@@ -87,31 +86,19 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 		return Status.OK_STATUS;
 	}
 
+	
 	@Override
 	public IStatus stop(boolean force) {
 		setServerState(IServerDelegate.STATE_STOPPING);
 		ILaunch stopLaunch = null;
 		try {
 			stopLaunch = new JBossStopLauncher(this).launch(force);
-			// TODO launch poller
-			IProcess p = launch.getProcesses()[0];
-			p.getStreamsProxy().getOutputStreamMonitor().addListener(new IStreamListener() {
-				@Override
-				public void streamAppended(String text, IStreamMonitor monitor) {
-					System.out.println(text);
-				}
-			});
-			p.getStreamsProxy().getErrorStreamMonitor().addListener(new IStreamListener() {
-				@Override
-				public void streamAppended(String text, IStreamMonitor monitor) {
-					System.out.println(text);
-				}
-			});
+			registerLaunch(stopLaunch);
 			
 			setServerState(IServerDelegate.STATE_STOPPED);
 		} catch(CoreException ce) {
 			if( stopLaunch != null ) {
-				IProcess[] processes = launch.getProcesses();
+				IProcess[] processes = startLaunch.getProcesses();
 				for( int i = 0; i < processes.length; i++ ) {
 					try {
 						processes[i].terminate();
@@ -125,6 +112,22 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 		}
 		return Status.OK_STATUS;
 
+	}
+	
+	@Override
+	protected void processTerminated(IProcess p, ILaunch l) {
+		if( l == startLaunch ) {
+			IProcess[] all = l.getProcesses();
+			boolean allTerminated = true;
+			for( int i = 0; i < all.length; i++ ) {
+				allTerminated &= all[i].isTerminated();
+			}
+			if( allTerminated ) {
+				setServerState(IServerDelegate.STATE_STOPPED);
+				startLaunch = null;
+			}
+		}
+		fireServerProcessTerminated(getProcessId(p));
 	}
 	
 }

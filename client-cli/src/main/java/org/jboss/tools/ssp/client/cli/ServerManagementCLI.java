@@ -85,6 +85,9 @@ public class ServerManagementCLI {
 	};
 	
 	private void processCommand(String s) throws Exception {
+		if( s.trim().isEmpty())
+			return;
+		
 		if( s.trim().equals(SHUTDOWN)) {
 			launcher.getServerProxy().shutdown();
 			System.out.println("The server has been shutdown");
