@@ -247,7 +247,7 @@ public class ServerModel {
 		if( ret != null ) {
 			Set<String> all = ret.listAttributes();
 			for( String all1 : all ) {
-				Class attrType = getAttributeTypeAsClass(all1);
+				String attrType = ret.getAttributeType(all1);
 				if( !approvedAttributeTypes.contains(attrType)) {
 					LaunchingCore.log("Extension for servertype " + serverType + " is invalid and requires an attribute of an invalid class.");
 				}
