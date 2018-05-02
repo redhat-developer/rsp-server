@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.ssp.client.cli;
 
 import java.util.ArrayList;
@@ -8,58 +16,19 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
+import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
 import org.jboss.tools.ssp.api.beans.DiscoveryPath;
 import org.jboss.tools.ssp.api.beans.SSPAttributes;
 import org.jboss.tools.ssp.api.beans.ServerBean;
 import org.jboss.tools.ssp.api.beans.ServerHandle;
+import org.jboss.tools.ssp.api.beans.StartServerAttributes;
 import org.jboss.tools.ssp.api.beans.Status;
+import org.jboss.tools.ssp.api.beans.StopServerAttributes;
 import org.jboss.tools.ssp.api.beans.VMDescription;
 import org.jboss.tools.ssp.client.bindings.ServerManagementClientLauncher;
 
 public class ServerManagementCLI {
-
-	public static void main(String[] args) {
-		ServerManagementCLI cli = new ServerManagementCLI();
-		cli.connect(args[0], args[1]);
-		cli.readStandardIn();
-	}
-	
-	
-	
-	
-	private final Scanner scanner = new Scanner(System.in);
-	private ServerManagementClientLauncher launcher;
-	
-	public void connect(String host, String port) {
-		if( host == null ) {
-			System.out.print("Enter server host: ");
-			host = scanner.nextLine();
-		}
-		if( port == null ) {
-			System.out.print("Enter server port: ");
-			port = scanner.nextLine();
-		}
-		
-		try {
-			launcher = new ServerManagementClientLauncher(host, Integer.parseInt(port));
-			launcher.launch();
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private void readStandardIn() {
-		while (true) {
-			String content = scanner.nextLine();
-			try {
-				processCommand(content);
-			} catch(Exception e) {
-				e.printStackTrace();
-				return;
-			}
-		}
-	}
-
 	private static final String LIST_VM = "list vm";
 	private static final String ADD_VM = "add vm ";
 	private static final String REMOVE_VM = "remove vm ";
@@ -74,16 +43,71 @@ public class ServerManagementCLI {
 	private static final String ADD_SERVER = "add server";
 	private static final String REMOVE_SERVER = "remove server ";
 	
+	private static final String START_SERVER = "start server ";
+	private static final String STOP_SERVER = "stop server ";
+	
+	
 	private static final String EXIT = "exit";
 	private static final String SHUTDOWN = "shutdown";
 
 	private static final String[] CMD_ARR = new String[] {
 			LIST_PATHS, ADD_PATH, REMOVE_PATH, SEARCH_PATH, 
 			LIST_VM, ADD_VM, REMOVE_VM,
-			LIST_SERVERS, ADD_SERVER, REMOVE_SERVER,
+			LIST_SERVERS, ADD_SERVER, REMOVE_SERVER, START_SERVER, STOP_SERVER,
 			EXIT, SHUTDOWN
 	};
 	
+	
+	public static void main(String[] args) {
+		ServerManagementCLI cli = new ServerManagementCLI();
+		cli.connect(args[0], args[1]);
+		cli.readCommands();
+	}
+	
+	
+	
+	
+	private Scanner scanner = null;
+	private ServerManagementClientLauncher launcher;
+	
+	public void connect(String host, String port) {
+		if( host == null ) {
+			System.out.print("Enter server host: ");
+			host = nextLine();
+		}
+		if( port == null ) {
+			System.out.print("Enter server port: ");
+			port = nextLine();
+		}
+		
+		try {
+			launcher = new ServerManagementClientLauncher(host, Integer.parseInt(port));
+			launcher.launch();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	protected String nextLine() {
+		if( scanner == null ) {
+			 scanner = new Scanner(System.in);
+		}
+		return scanner.nextLine();
+	}
+	
+	private void readCommands() {
+		while (true) {
+			String content = nextLine();
+			try {
+				processCommand(content);
+			} catch(Exception e) {
+				e.printStackTrace();
+				return;
+			}
+		}
+	}
+
+
 	private void processCommand(String s) throws Exception {
 		if( s.trim().isEmpty())
 			return;
@@ -108,9 +132,9 @@ public class ServerManagementCLI {
 			if( firstSpace == -1 ) {
 				System.out.println("Syntax: add vm someName /some/path");
 			} else {
-				launcher.getServerProxy().addVM(
-						suffix.substring(0, firstSpace).trim(), 
-						suffix.substring(firstSpace).trim());
+				VMDescription desc = new VMDescription(suffix.substring(0, firstSpace).trim(), 
+						suffix.substring(firstSpace).trim(), null);
+				launcher.getServerProxy().addVM(desc);
 			}
 		} else if( s.startsWith(REMOVE_VM)) {
 			String suffix = s.substring(REMOVE_VM.length()).trim();
@@ -123,13 +147,15 @@ public class ServerManagementCLI {
 					System.out.println("   " + dp.getFilepath());
 				}
 			}
-		} else if( s.startsWith("start server ")) {
-			String suffix = s.substring("start server ".length()).trim();
-			Status stat = launcher.getServerProxy().startServerAsync(suffix, "run").get();
+		} else if( s.startsWith(START_SERVER)) {
+			String suffix = s.substring(START_SERVER.length()).trim();
+			StartServerAttributes ssa = new StartServerAttributes(suffix, "run");
+			Status stat = launcher.getServerProxy().startServerAsync(ssa).get();
 			System.out.println(stat.toString());
-		} else if( s.startsWith("stop server ")) {
-			String suffix = s.substring("stop server ".length()).trim();
-			Status stat = launcher.getServerProxy().stopServerAsync(suffix, false).get();
+		} else if( s.startsWith(STOP_SERVER)) {
+			String suffix = s.substring(STOP_SERVER.length()).trim();
+			StopServerAttributes ssa = new StopServerAttributes(suffix, false);
+			Status stat = launcher.getServerProxy().stopServerAsync(ssa).get();
 			System.out.println(stat.toString());
 		} else if( s.startsWith(ADD_PATH)) {
 			String suffix = s.substring(ADD_PATH.length());
@@ -176,20 +202,26 @@ public class ServerManagementCLI {
 			for( String it : types ) {
 				System.out.println("   " + it);
 			}
-			String type = scanner.nextLine().trim();
+			String type = nextLine().trim();
 			
 			System.out.println("Please choose a unique name: ");
-			String name = scanner.nextLine();
+			String name = nextLine();
 			
 			SSPAttributes required = launcher.getServerProxy().getRequiredAttributes(type).get();
 			HashMap<String, Object> toSend = new HashMap<>();
 			if( required != null ) {
 				Set<String> keys = required.listAttributes();
 				for( String k : keys ) {
-					Class c = required.getAttributeType(k);
+					String attrType = required.getAttributeType(k);
+					Class c = getAttributeTypeAsClass(attrType);
 					String reqType = c.getName();
 					String reqDesc = required.getAttributeDescription(k);
 					Object defVal = required.getAttributeDefaultValue(k);
+					
+					// Workaround to sending integers over json
+					defVal = workaroundDoubles(defVal, attrType);
+					
+					
 					StringBuffer sb = new StringBuffer();
 					sb.append("Key: ");
 					sb.append(k);
@@ -206,23 +238,23 @@ public class ServerManagementCLI {
 						// Simple
 						sb.append("\nPlease enter a value: ");
 						System.out.println(sb.toString());
-						String val = scanner.nextLine();
+						String val = nextLine();
 						toSend.put(k, convertType(val, required.getAttributeType(k)));
 					} else if( List.class.equals(c)) {
 						sb.append("\nPlease enter a list value. Send a blank line to end the list.");
 						System.out.println(sb.toString());
 						List<String> arr = new ArrayList<String>();
-						String tmp = scanner.nextLine();
+						String tmp = nextLine();
 						while(!tmp.trim().isEmpty()) {
 							arr.add(tmp);
-							tmp = scanner.nextLine();
+							tmp = nextLine();
 						}
 						toSend.put(k, arr);
 					} else if( Map.class.equals(c)) {
 						sb.append("\nPlease enter a map value. Each line should read some.key=some.val.\nSend a blank line to end the map.");
 						System.out.println(sb.toString());
 						Map<String, String> map = new HashMap<String, String>();
-						String tmp = scanner.nextLine();
+						String tmp = nextLine();
 						while(!tmp.trim().isEmpty()) {
 							int ind = tmp.indexOf("=");
 							if( ind == -1 ) {
@@ -232,7 +264,7 @@ public class ServerManagementCLI {
 								String v1 = tmp.substring(ind+1);
 								map.put(k1,v1);
 							}
-							tmp = scanner.nextLine();
+							tmp = nextLine();
 						}
 						toSend.put(k, map);
 					}
@@ -240,8 +272,8 @@ public class ServerManagementCLI {
 					
 				}
 				System.out.println("Adding Server...");
-				Status result = launcher.getServerProxy().createServer(type, 
-						name, toSend).get();
+				CreateServerAttributes csa = new CreateServerAttributes(type, name, toSend);
+				Status result = launcher.getServerProxy().createServer(csa).get();
 				if( result.isOK()) {
 					System.out.println("Server Added");
 				} else {
@@ -255,13 +287,37 @@ public class ServerManagementCLI {
 		
 	}
 	
+	private Object workaroundDoubles(Object defaultVal, String attrType) {
+
+		// Workaround for the problems with json transfer
+		Class intended = getAttributeTypeAsClass(attrType);
+		if( Integer.class.equals(intended) && Double.class.equals(defaultVal.getClass())) {
+			return new Integer(((Double)defaultVal).intValue());
+		}
+		return defaultVal;
+	}
 	
-	private Object convertType(String input, Class type) {
-		if( Integer.class.equals(type)) {
+	private Class getAttributeTypeAsClass(String type) {
+		if( ServerManagementAPIConstants.ATTR_TYPE_INT.equals(type)) {
+			return Integer.class;
+		} else if( ServerManagementAPIConstants.ATTR_TYPE_BOOL.equals(type)) {
+			return Boolean.class;
+		} else if( ServerManagementAPIConstants.ATTR_TYPE_STRING.equals(type)) {
+			return String.class;
+		} else if( ServerManagementAPIConstants.ATTR_TYPE_LIST.equals(type)) {
+			return List.class;
+		} else if( ServerManagementAPIConstants.ATTR_TYPE_MAP.equals(type)) {
+			return Map.class;
+		}
+		return null;
+	}
+	
+	private Object convertType(String input, String type) {
+		if( ServerManagementAPIConstants.ATTR_TYPE_INT.equals(type)) {
 			return Integer.parseInt(input);
-		} else if( String.class.equals(type)) {
+		} else if(ServerManagementAPIConstants.ATTR_TYPE_STRING.equals(type)) {
 			return input;
-		} else if( Boolean.class.equals(type)) {
+		} else if( ServerManagementAPIConstants.ATTR_TYPE_BOOL.equals(type)) {
 			return Boolean.parseBoolean(input);
 		}
 		return null;

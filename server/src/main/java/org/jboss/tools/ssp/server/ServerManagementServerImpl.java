@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.ssp.server;
 
 import java.io.File;
@@ -15,11 +23,14 @@ import org.eclipse.jdt.launching.StandardVMType;
 import org.jboss.tools.ssp.api.ServerManagementClient;
 import org.jboss.tools.ssp.api.ServerManagementServer;
 import org.jboss.tools.ssp.api.SocketLauncher;
+import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
 import org.jboss.tools.ssp.api.beans.DiscoveryPath;
 import org.jboss.tools.ssp.api.beans.SSPAttributes;
 import org.jboss.tools.ssp.api.beans.ServerBean;
 import org.jboss.tools.ssp.api.beans.ServerHandle;
+import org.jboss.tools.ssp.api.beans.StartServerAttributes;
 import org.jboss.tools.ssp.api.beans.Status;
+import org.jboss.tools.ssp.api.beans.StopServerAttributes;
 import org.jboss.tools.ssp.api.beans.VMDescription;
 import org.jboss.tools.ssp.launching.LaunchingCore;
 import org.jboss.tools.ssp.launching.VMInstallModel;
@@ -96,10 +107,11 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	}
 	
 	@Override
-	public void addVM(String id, String absolutePath) {
+	public void addVM(VMDescription desc) {
+		
 		try {
-			IVMInstall vmi = StandardVMType.getDefault().createVMInstall(id);
-			vmi.setInstallLocation(new File(absolutePath));
+			IVMInstall vmi = StandardVMType.getDefault().createVMInstall(desc.getId());
+			vmi.setInstallLocation(new File(desc.getInstallLocation()));
 			VMInstallModel.getDefault().addVMInstall(vmi);
 		} catch(IllegalArgumentException arg) {
 			LaunchingCore.log(arg);
@@ -172,7 +184,11 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	}
 
 	@Override
-	public CompletableFuture<Status> createServer(String serverType, String id, Map<String, Object> attributes) {
+	public CompletableFuture<Status> createServer(CreateServerAttributes attr) {
+		String serverType = attr.getServerType();
+		String id = attr.getId();
+		Map<String, Object> attributes = attr.getAttributes();
+		
 		IStatus ret = model.getServerModel().createServer(serverType, id, attributes);
 		return CompletableFuture.completedFuture(StatusConverter.convert(ret));
 	}
@@ -185,18 +201,18 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	}
 
 	@Override
-	public CompletableFuture<Status> startServerAsync(String id, String mode) {
-		IServer server = model.getServerModel().getServer(id);
+	public CompletableFuture<Status> startServerAsync(StartServerAttributes attr) {
+		IServer server = model.getServerModel().getServer(attr.getId());
 		IServerDelegate del = server.getDelegate();
-		IStatus ret = del.start(mode);
+		IStatus ret = del.start(attr.getMode());
 		return CompletableFuture.completedFuture(StatusConverter.convert(ret));
 	}
 
 	@Override
-	public CompletableFuture<Status> stopServerAsync(String id, boolean force) {
-		IServer server = model.getServerModel().getServer(id);
+	public CompletableFuture<Status> stopServerAsync(StopServerAttributes attr) {
+		IServer server = model.getServerModel().getServer(attr.getId());
 		IServerDelegate del = server.getDelegate();
-		IStatus ret = del.stop(force);
+		IStatus ret = del.stop(attr.isForce());
 		return CompletableFuture.completedFuture(StatusConverter.convert(ret));
 	}
 }

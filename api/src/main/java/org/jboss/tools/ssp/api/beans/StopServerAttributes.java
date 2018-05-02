@@ -6,25 +6,25 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.server.wildfly.servertype.impl;
+package org.jboss.tools.ssp.api.beans;
 
-public interface IJBossServerAttributes {
-	/*
-	 * Required attributes
-	 */
-	public static final String VM_INSTALL_ID = "vm.install.id";
-	public static final String SERVER_HOME = "server.home.dir";
-	
-	
-	
-	/*
-	 * Optional Attributes
-	 */
-	
-	
-	/*
-	 * Launch attributes
-	 */
-	
-	
+public class StopServerAttributes {
+	private String id;
+	private boolean force;
+	public StopServerAttributes(String id, boolean force) {
+		this.id = id;
+		this.force = force;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public boolean isForce() {
+		return force;
+	}
+	public void setForce(boolean force) {
+		this.force = force;
+	}
 }

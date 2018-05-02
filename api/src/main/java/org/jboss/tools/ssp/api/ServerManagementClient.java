@@ -1,13 +1,20 @@
-/* --------------------------------------------------------------------------------------------
- * Copyright (c) 2017 TypeFox GmbH (http://www.typefox.io). All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for license information.
- * ------------------------------------------------------------------------------------------ */
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.ssp.api;
 
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 import org.jboss.tools.ssp.api.beans.DiscoveryPath;
 import org.jboss.tools.ssp.api.beans.ServerHandle;
+import org.jboss.tools.ssp.api.beans.ServerProcess;
+import org.jboss.tools.ssp.api.beans.ServerProcessOutput;
+import org.jboss.tools.ssp.api.beans.ServerStateChange;
 import org.jboss.tools.ssp.api.beans.VMDescription;
 
 @JsonSegment("client")
@@ -40,16 +47,16 @@ public interface ServerManagementClient {
 	void serverAttributesChanged(ServerHandle server);
 	
 	@JsonNotification
-	void serverStateChanged(ServerHandle server, int state);
+	void serverStateChanged(ServerStateChange stateChange);
 	
 	@JsonNotification
-	void serverProcessCreated(ServerHandle server, String processId);
+	void serverProcessCreated(ServerProcess process);
 
 	@JsonNotification
-	void serverProcessTerminated(ServerHandle server, String processId);
+	void serverProcessTerminated(ServerProcess process);
 	
 
 	@JsonNotification
-	void serverProcessOutputAppended(ServerHandle server, String processId, int streamType, String text);
+	void serverProcessOutputAppended(ServerProcessOutput output);
 	
 }

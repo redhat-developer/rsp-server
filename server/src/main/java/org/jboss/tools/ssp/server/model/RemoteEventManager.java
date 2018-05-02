@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.ssp.server.model;
 
 import java.util.List;
@@ -9,6 +17,9 @@ import org.eclipse.jdt.launching.PropertyChangeEvent;
 import org.jboss.tools.ssp.api.ServerManagementClient;
 import org.jboss.tools.ssp.api.beans.DiscoveryPath;
 import org.jboss.tools.ssp.api.beans.ServerHandle;
+import org.jboss.tools.ssp.api.beans.ServerProcess;
+import org.jboss.tools.ssp.api.beans.ServerProcessOutput;
+import org.jboss.tools.ssp.api.beans.ServerStateChange;
 import org.jboss.tools.ssp.api.beans.VMDescription;
 import org.jboss.tools.ssp.server.ServerManagementServerImpl;
 import org.jboss.tools.ssp.server.discovery.IDiscoveryPathListener;
@@ -78,28 +89,29 @@ public class RemoteEventManager implements IDiscoveryPathListener, IVMInstallCha
 	public void serverStateChanged(ServerHandle server, int state) {
 		List<ServerManagementClient> l = this.server.getClients();
 		for( ServerManagementClient c : l) {
-			c.serverStateChanged(server, state);
+			c.serverStateChanged(new ServerStateChange(server, state));
 		}
 	}
 	
 	public void serverProcessCreated(ServerHandle server, String processId) {
 		List<ServerManagementClient> l = this.server.getClients();
 		for( ServerManagementClient c : l) {
-			c.serverProcessCreated(server, processId);
+			c.serverProcessCreated(new ServerProcess(server, processId));
 		}
 	}
 	
 	public void serverProcessTerminated(ServerHandle server, String processId) {
 		List<ServerManagementClient> l = this.server.getClients();
 		for( ServerManagementClient c : l) {
-			c.serverProcessTerminated(server, processId);
+			c.serverProcessTerminated(new ServerProcess(server, processId));
 		}
 	}
 	
 	public void serverProcessOutputAppended(ServerHandle server, String processId, int streamType, String text) {
 		List<ServerManagementClient> l = this.server.getClients();
 		for( ServerManagementClient c : l) {
-			c.serverProcessOutputAppended(server, processId, streamType, text);
+			c.serverProcessOutputAppended(new ServerProcessOutput(
+					server, processId, streamType, text));
 		}
 	}
 	

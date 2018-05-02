@@ -1,15 +1,24 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.ssp.client.bindings;
 /* --------------------------------------------------------------------------------------------
- * Copyright (c) 2017 TypeFox GmbH (http://www.typefox.io). All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
-
 
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
 import org.jboss.tools.ssp.api.ServerManagementClient;
 import org.jboss.tools.ssp.api.ServerManagementServer;
 import org.jboss.tools.ssp.api.beans.DiscoveryPath;
 import org.jboss.tools.ssp.api.beans.ServerHandle;
+import org.jboss.tools.ssp.api.beans.ServerProcess;
+import org.jboss.tools.ssp.api.beans.ServerProcessOutput;
+import org.jboss.tools.ssp.api.beans.ServerStateChange;
 import org.jboss.tools.ssp.api.beans.VMDescription;
 
 public class ServerManagementClientImpl implements ServerManagementClient {
@@ -61,9 +70,9 @@ public class ServerManagementClientImpl implements ServerManagementClient {
 	}
 
 	@Override
-	public void serverStateChanged(ServerHandle server, int state) {
+	public void serverStateChanged(ServerStateChange state) {
 		String stateString = null;
-		switch(state) {
+		switch(state.getState()) {
 		case ServerManagementAPIConstants.STATE_STARTED:
 			stateString = "started";
 			break;
@@ -78,21 +87,28 @@ public class ServerManagementClientImpl implements ServerManagementClient {
 			break;
 			
 		}
-		System.out.println("Server state changed: " + server.getType() + ":" + server.getId() + " to " + stateString);
+		System.out.println("Server state changed: " + state.getServer().getType() + ":" + state.getServer().getId() + " to " + stateString);
 	}
 
 	@Override
-	public void serverProcessCreated(ServerHandle server, String processId) {
-		System.out.println("Server process created: " + server.getType() + ":" + server.getId() + " @ " + processId);
+	public void serverProcessCreated(ServerProcess process) {
+		System.out.println("Server process created: " + 
+				process.getServer().getType() + ":" + process.getServer().getId() + " @ " 
+				+ process.getProcessId());
 	}
 
 	@Override
-	public void serverProcessTerminated(ServerHandle server, String processId) {
-		System.out.println("Server process terminated: " + server.getType() + ":" + server.getId() + " @ " + processId);
+	public void serverProcessTerminated(ServerProcess process) {
+		System.out.println("Server process terminated: " 
+				+ process.getServer().getType() + ":" + process.getServer().getId() + " @ " 
+				+ process.getProcessId());
 	}
 
 	@Override
-	public void serverProcessOutputAppended(ServerHandle server, String processId, int streamType, String text) {
-		System.out.println("ServerOutput: " + server.toString() + " ["+ processId + "][" + streamType + "] " + text);
+	public void serverProcessOutputAppended(ServerProcessOutput out) {
+		System.out.println("ServerOutput: " 
+				+ out.getServer().toString() + " ["
+				+ out.getProcessId() + "][" 
+				+ out.getStreamType() + "] " + out.getText());
 	}
 }

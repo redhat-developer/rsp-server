@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.ssp.api.beans;
 
 public class Status {
@@ -62,9 +70,11 @@ public class Status {
 	 */
 	private String message;
 
-	/** Wrapped exception, or <code>null</code> if none.
+	/** 
+	 * A more detailed technical output of the failing, 
+	 * such as a stacktrace
 	 */
-	private Throwable exception = null;
+	private String trace = null;
 
 	/** Constant to avoid generating garbage.
 	 */
@@ -86,12 +96,12 @@ public class Status {
 	 * @param exception a low-level exception, or <code>null</code> if not
 	 *    applicable 
 	 */
-	public Status(int severity, String pluginId, int code, String message, Throwable exception) {
+	public Status(int severity, String pluginId, int code, String message, String trace) {
 		setSeverity(severity);
 		setPlugin(pluginId);
 		setCode(code);
 		setMessage(message);
-		setException(exception);
+		setTrace(trace);
 	}
 
 	/**
@@ -108,11 +118,11 @@ public class Status {
 	 *     
 	 * @since org.eclipse.equinox.common 3.3
 	 */
-	public Status(int severity, String pluginId, String message, Throwable exception) {
+	public Status(int severity, String pluginId, String message, String trace) {
 		setSeverity(severity);
 		setPlugin(pluginId);
 		setMessage(message);
-		setException(exception);
+		setTrace(trace);
 		setCode(OK);
 	}
 
@@ -133,7 +143,7 @@ public class Status {
 		setPlugin(pluginId);
 		setMessage(message);
 		setCode(OK);
-		setException(null);
+		setTrace(null);
 	}
 
 	public Status[] getChildren() {
@@ -144,8 +154,8 @@ public class Status {
 		return code;
 	}
 
-	public Throwable getException() {
-		return exception;
+	public String getTrace() {
+		return trace;
 	}
 
 	public String getMessage() {
@@ -187,8 +197,8 @@ public class Status {
 	 * @param exception a low-level exception, or <code>null</code> if not
 	 *    applicable 
 	 */
-	public void setException(Throwable exception) {
-		this.exception = exception;
+	public void setTrace(String trace) {
+		this.trace = trace;
 	}
 
 	/**
@@ -253,7 +263,7 @@ public class Status {
 		buf.append(' ');
 		buf.append(message);
 		buf.append(' ');
-		buf.append(exception);
+		buf.append(trace);
 		return buf.toString();
 	}
 	

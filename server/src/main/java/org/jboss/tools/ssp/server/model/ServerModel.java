@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.ssp.server.model;
 
 import java.io.File;
@@ -10,7 +18,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.debug.core.model.IProcess;
+import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
 import org.jboss.tools.ssp.api.beans.SSPAttributes;
 import org.jboss.tools.ssp.api.beans.ServerHandle;
 import org.jboss.tools.ssp.launching.LaunchingCore;
@@ -23,8 +31,10 @@ public class ServerModel {
 	private HashMap<String, IServerType> factories;
 	private HashMap<String, IServer> servers;
 	private HashMap<String, IServerDelegate> serverDelegates;
-	private Set<Class> approvedAttributeTypes;
 	private List<IServerModelListener> listeners;
+	
+	private Set<String> approvedAttributeTypes;
+
 	
 	public ServerModel() {
 		factories = new HashMap<String, IServerType>();
@@ -33,14 +43,14 @@ public class ServerModel {
 		listeners = new ArrayList<IServerModelListener>();
 		
 		// Server attributes must be one of the following types
-		approvedAttributeTypes = new HashSet<Class>();
-		approvedAttributeTypes.add(Integer.class);
-		approvedAttributeTypes.add(Boolean.class);
-		approvedAttributeTypes.add(String.class);
+		approvedAttributeTypes = new HashSet<String>();
+		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_INT);
+		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_BOOL);
+		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_STRING);
 		// List must be List<String>
-		approvedAttributeTypes.add(List.class);
+		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_LIST);
 		// Map must be Map<String, String>
-		approvedAttributeTypes.add(Map.class);
+		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_MAP);
 		
 		// TODO load / save of servers?
 	}
@@ -100,7 +110,7 @@ public class ServerModel {
 			}
 			Object v = attrs.get(attrKey);
 			Class actual = v.getClass();
-			Class expected = a.getAttributeType(attrKey);
+			Class expected = getAttributeTypeAsClass(a.getAttributeType(attrKey));
 			if( !actual.equals(expected)) {
 				// Something's different than expectations based on json transfer
 				// Try to convert it
@@ -237,13 +247,28 @@ public class ServerModel {
 		if( ret != null ) {
 			Set<String> all = ret.listAttributes();
 			for( String all1 : all ) {
-				Class attrType = ret.getAttributeType(all1);
+				Class attrType = getAttributeTypeAsClass(all1);
 				if( !approvedAttributeTypes.contains(attrType)) {
 					LaunchingCore.log("Extension for servertype " + serverType + " is invalid and requires an attribute of an invalid class.");
 				}
 			}
 		}
 		return ret;
+	}
+	
+	private Class getAttributeTypeAsClass(String type) {
+		if( ServerManagementAPIConstants.ATTR_TYPE_INT.equals(type)) {
+			return Integer.class;
+		} else if( ServerManagementAPIConstants.ATTR_TYPE_BOOL.equals(type)) {
+			return Boolean.class;
+		} else if( ServerManagementAPIConstants.ATTR_TYPE_STRING.equals(type)) {
+			return String.class;
+		} else if( ServerManagementAPIConstants.ATTR_TYPE_LIST.equals(type)) {
+			return List.class;
+		} else if( ServerManagementAPIConstants.ATTR_TYPE_MAP.equals(type)) {
+			return Map.class;
+		}
+		return null;
 	}
 	
 	public SSPAttributes getOptionalAttributes(String type) {

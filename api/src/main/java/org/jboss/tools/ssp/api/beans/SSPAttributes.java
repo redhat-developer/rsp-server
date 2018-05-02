@@ -1,9 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.ssp.api.beans;
 
 import java.util.HashMap;
 import java.util.Set;
-
-import org.eclipse.lsp4j.jsonrpc.Launcher;
 
 public class SSPAttributes {
 	private HashMap<String, String> types;
@@ -20,17 +26,8 @@ public class SSPAttributes {
 		return types.keySet();
 	}
 	
-	public Class getAttributeType(String key) {
-		String ret1 = types.get(key);
-		if( ret1 != null ) {
-			try {
-				return Class.forName(ret1);
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return null;
+	public String getAttributeType(String key) {
+		return types.get(key);
 	}
 	
 	public String getAttributeDescription(String key) {
@@ -38,20 +35,11 @@ public class SSPAttributes {
 	}
 	
 	public Object getAttributeDefaultValue(String key) {
-		Object actual = defaultVals.get(key);
-		if( actual == null )
-			return null;
-		
-		// Workaround for the problems with json transfer
-		Class intended = getAttributeType(key);
-		if( Integer.class.equals(intended) && Double.class.equals(actual.getClass())) {
-			return new Integer(((Double)actual).intValue());
-		}
-		return actual;
+		return defaultVals.get(key);
 	}
 	
-	public void addAttribute(String key, Class t, String d, Object defaultVal) {
-		types.put(key,  t.getName());
+	public void addAttribute(String key, String type, String d, Object defaultVal) {
+		types.put(key,  type);
 		if( d != null ) {
 			descriptions.put(key,  d);
 		}

@@ -1,17 +1,27 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.ssp.api;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
+import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
 import org.jboss.tools.ssp.api.beans.DiscoveryPath;
 import org.jboss.tools.ssp.api.beans.SSPAttributes;
 import org.jboss.tools.ssp.api.beans.ServerBean;
 import org.jboss.tools.ssp.api.beans.ServerHandle;
+import org.jboss.tools.ssp.api.beans.StartServerAttributes;
 import org.jboss.tools.ssp.api.beans.Status;
+import org.jboss.tools.ssp.api.beans.StopServerAttributes;
 import org.jboss.tools.ssp.api.beans.VMDescription;
 
 @JsonSegment("server")
@@ -25,7 +35,7 @@ public interface ServerManagementServer {
 	CompletableFuture<List<VMDescription>> getVMs();
 
 	@JsonNotification
-	void addVM(String id, String absolutePath);
+	void addVM(VMDescription description);
 
 	@JsonNotification
 	public void removeVM(String id);
@@ -110,14 +120,14 @@ public interface ServerManagementServer {
 	 * add a server to the model.
 	 */
 	@JsonRequest
-	CompletableFuture<Status> createServer(String serverType, String id, Map<String, Object> attributes);
+	CompletableFuture<Status> createServer(CreateServerAttributes csa);
 	
 	
 	@JsonRequest
-	CompletableFuture<Status> startServerAsync(String id, String mode);
+	CompletableFuture<Status> startServerAsync(StartServerAttributes attr);
 	
 	@JsonRequest
-	CompletableFuture<Status> stopServerAsync(String id, boolean force);
+	CompletableFuture<Status> stopServerAsync(StopServerAttributes attr);
 	
 	
 	
