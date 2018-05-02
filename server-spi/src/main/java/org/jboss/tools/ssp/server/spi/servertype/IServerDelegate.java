@@ -1,6 +1,7 @@
 package org.jboss.tools.ssp.server.spi.servertype;
 
 import org.eclipse.core.runtime.IStatus;
+import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
 import org.jboss.tools.ssp.api.ServerManagementClient;
 
 public interface IServerDelegate {
@@ -12,7 +13,7 @@ public interface IServerDelegate {
 	 * @see #getServerState()
 	 * @see #getModuleState(IModule[])
 	 */
-	public static final int STATE_UNKNOWN = ServerManagementClient.STATE_UNKNOWN;
+	public static final int STATE_UNKNOWN = ServerManagementAPIConstants.STATE_UNKNOWN;
 
 	/**
 	 * Server state constant (value 1) indicating that the
@@ -21,7 +22,7 @@ public interface IServerDelegate {
 	 * @see #getServerState()
 	 * @see #getModuleState(IModule[])
 	 */
-	public static final int STATE_STARTING = ServerManagementClient.STATE_STARTING;
+	public static final int STATE_STARTING = ServerManagementAPIConstants.STATE_STARTING;
 
 	/**
 	 * Server state constant (value 2) indicating that the
@@ -30,7 +31,7 @@ public interface IServerDelegate {
 	 * @see #getServerState()
 	 * @see #getModuleState(IModule[])
 	 */
-	public static final int STATE_STARTED = ServerManagementClient.STATE_STARTED;
+	public static final int STATE_STARTED = ServerManagementAPIConstants.STATE_STARTED;
 
 	/**
 	 * Server state constant (value 3) indicating that the
@@ -39,7 +40,7 @@ public interface IServerDelegate {
 	 * @see #getServerState()
 	 * @see #getModuleState(IModule[])
 	 */
-	public static final int STATE_STOPPING = ServerManagementClient.STATE_STOPPING;
+	public static final int STATE_STOPPING = ServerManagementAPIConstants.STATE_STOPPING;
 
 	/**
 	 * Server state constant (value 4) indicating that the
@@ -48,7 +49,7 @@ public interface IServerDelegate {
 	 * @see #getServerState()
 	 * @see #getModuleState(IModule[])
 	 */
-	public static final int STATE_STOPPED = ServerManagementClient.STATE_STOPPED;
+	public static final int STATE_STOPPED = ServerManagementAPIConstants.STATE_STOPPED;
 
 	/**
 	 * Publish state constant (value 0) indicating that it's
@@ -57,7 +58,7 @@ public interface IServerDelegate {
 	 * @see #getServerPublishState()
 	 * @see #getModulePublishState(IModule[])
 	 */
-	public static final int PUBLISH_STATE_UNKNOWN = ServerManagementClient.PUBLISH_STATE_UNKNOWN;
+	public static final int PUBLISH_STATE_UNKNOWN = ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN;
 
 	/**
 	 * Publish state constant (value 1) indicating that there
@@ -66,7 +67,7 @@ public interface IServerDelegate {
 	 * @see #getServerPublishState()
 	 * @see #getModulePublishState(IModule[])
 	 */
-	public static final int PUBLISH_STATE_NONE = ServerManagementClient.PUBLISH_STATE_NONE;
+	public static final int PUBLISH_STATE_NONE = ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 
 	/**
 	 * Publish state constant (value 2) indicating that an
@@ -75,7 +76,7 @@ public interface IServerDelegate {
 	 * @see #getServerPublishState()
 	 * @see #getModulePublishState(IModule[])
 	 */
-	public static final int PUBLISH_STATE_INCREMENTAL = ServerManagementClient.PUBLISH_STATE_INCREMENTAL;
+	public static final int PUBLISH_STATE_INCREMENTAL = ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL;
 
 	/**
 	 * Publish state constant (value 3) indicating that a
@@ -84,35 +85,35 @@ public interface IServerDelegate {
 	 * @see #getServerPublishState()
 	 * @see #getModulePublishState(IModule[])
 	 */
-	public static final int PUBLISH_STATE_FULL = ServerManagementClient.PUBLISH_STATE_FULL;
+	public static final int PUBLISH_STATE_FULL = ServerManagementAPIConstants.PUBLISH_STATE_FULL;
 
 	/**
 	 * Publish kind constant (value 1) indicating an incremental publish request.
 	 * 
 	 * @see #publish(int, IProgressMonitor)
 	 */
-	public static final int PUBLISH_INCREMENTAL = ServerManagementClient.PUBLISH_INCREMENTAL;
+	public static final int PUBLISH_INCREMENTAL = ServerManagementAPIConstants.PUBLISH_INCREMENTAL;
 
 	/**
 	 * Publish kind constant (value 2) indicating a full publish request.
 	 * 
 	 * @see #publish(int, IProgressMonitor)
 	 */
-	public static final int PUBLISH_FULL = ServerManagementClient.PUBLISH_FULL;
+	public static final int PUBLISH_FULL = ServerManagementAPIConstants.PUBLISH_FULL;
 
 	/**
 	 * Publish kind constant (value 3) indicating an automatic publish request.
 	 * 
 	 * @see #publish(int, IProgressMonitor)
 	 */
-	public static final int PUBLISH_AUTO = ServerManagementClient.PUBLISH_AUTO;
+	public static final int PUBLISH_AUTO = ServerManagementAPIConstants.PUBLISH_AUTO;
 
 	/**
 	 * Publish kind constant (value 4) indicating a publish clean request
 	 * 
 	 * @see #publish(int, IProgressMonitor)
 	 */
-	public static final int PUBLISH_CLEAN = ServerManagementClient.PUBLISH_CLEAN;
+	public static final int PUBLISH_CLEAN = ServerManagementAPIConstants.PUBLISH_CLEAN;
 
 	/**
 	 * Returns the current state of this server.

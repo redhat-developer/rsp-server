@@ -59,7 +59,7 @@ public class VMInstallModel {
 	public void removeVMInstall(String vmId) {
 		IVMInstall vm = map.get(vmId);
 		if( vm != null ) {
-			map.put(vmId, null);
+			map.remove(vmId);
 			fireVMRemoved(vm);
 		}
 	}

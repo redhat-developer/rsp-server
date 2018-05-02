@@ -12,6 +12,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamMonitor;
+import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
 import org.jboss.tools.ssp.api.ServerManagementClient;
 import org.jboss.tools.ssp.launching.RuntimeProcessEventManager;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
@@ -219,9 +220,9 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 					+ ":" + ctime + ":p" + i;
 			all[i].setAttribute(PROCESS_ID_KEY, pName);
 			IStreamListener out = new ServerStreamListener(
-					getServer(), all[i], ServerManagementClient.STREAM_TYPE_SYSOUT);
+					getServer(), all[i], ServerManagementAPIConstants.STREAM_TYPE_SYSOUT);
 			IStreamListener err = new ServerStreamListener(
-					getServer(), all[i], ServerManagementClient.STREAM_TYPE_SYSERR);
+					getServer(), all[i], ServerManagementAPIConstants.STREAM_TYPE_SYSERR);
 			all[i].getStreamsProxy().getOutputStreamMonitor().addListener(out);
 			all[i].getStreamsProxy().getErrorStreamMonitor().addListener(err);
 			fireServerProcessCreated(pName);

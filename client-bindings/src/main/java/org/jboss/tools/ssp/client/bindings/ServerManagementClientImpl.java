@@ -5,6 +5,7 @@ package org.jboss.tools.ssp.client.bindings;
  * ------------------------------------------------------------------------------------------ */
 
 
+import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
 import org.jboss.tools.ssp.api.ServerManagementClient;
 import org.jboss.tools.ssp.api.ServerManagementServer;
 import org.jboss.tools.ssp.api.beans.DiscoveryPath;
@@ -63,16 +64,16 @@ public class ServerManagementClientImpl implements ServerManagementClient {
 	public void serverStateChanged(ServerHandle server, int state) {
 		String stateString = null;
 		switch(state) {
-		case ServerManagementClient.STATE_STARTED:
+		case ServerManagementAPIConstants.STATE_STARTED:
 			stateString = "started";
 			break;
-		case ServerManagementClient.STATE_STARTING:
+		case ServerManagementAPIConstants.STATE_STARTING:
 			stateString = "starting";
 			break;
-		case ServerManagementClient.STATE_STOPPED:
+		case ServerManagementAPIConstants.STATE_STOPPED:
 			stateString = "stopped";
 			break;
-		case ServerManagementClient.STATE_STOPPING:
+		case ServerManagementAPIConstants.STATE_STOPPING:
 			stateString = "stopping";
 			break;
 			
