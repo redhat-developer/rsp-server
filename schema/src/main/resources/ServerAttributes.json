@@ -1,0 +1,18 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:org:jboss:tools:ssp:api:beans:ServerAttributes",
+  "properties" : {
+    "serverType" : {
+      "type" : "string"
+    },
+    "id" : {
+      "type" : "string"
+    },
+    "attributes" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "any"
+      }
+    }
+  }
+}

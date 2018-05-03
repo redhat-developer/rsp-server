@@ -14,9 +14,9 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
-import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
+import org.jboss.tools.ssp.api.beans.ServerAttributes;
 import org.jboss.tools.ssp.api.beans.DiscoveryPath;
-import org.jboss.tools.ssp.api.beans.SSPAttributes;
+import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
 import org.jboss.tools.ssp.api.beans.ServerBean;
 import org.jboss.tools.ssp.api.beans.ServerHandle;
 import org.jboss.tools.ssp.api.beans.StartServerAttributes;
@@ -105,14 +105,14 @@ public interface ServerManagementServer {
 	 * list the server adapters currently configured.
 	 */
 	@JsonRequest
-	CompletableFuture<SSPAttributes> getRequiredAttributes(String serverType);
+	CompletableFuture<CreateServerAttributes> getRequiredAttributes(String serverType);
 	
 	/**
 	 * The `server/getOptionalAttributes` request is sent by the client to 
 	 * list the server adapters currently configured.
 	 */
 	@JsonRequest
-	CompletableFuture<SSPAttributes> getOptionalAttributes(String serverType);
+	CompletableFuture<CreateServerAttributes> getOptionalAttributes(String serverType);
 	
 	
 	/**
@@ -120,7 +120,7 @@ public interface ServerManagementServer {
 	 * add a server to the model.
 	 */
 	@JsonRequest
-	CompletableFuture<Status> createServer(CreateServerAttributes csa);
+	CompletableFuture<Status> createServer(ServerAttributes csa);
 	
 	
 	@JsonRequest

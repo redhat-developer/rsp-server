@@ -1,0 +1,12 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:org:jboss:tools:ssp:api:beans:StartServerAttributes",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "mode" : {
+      "type" : "string"
+    }
+  }
+}

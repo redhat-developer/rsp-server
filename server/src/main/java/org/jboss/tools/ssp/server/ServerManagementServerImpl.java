@@ -23,9 +23,9 @@ import org.eclipse.jdt.launching.StandardVMType;
 import org.jboss.tools.ssp.api.ServerManagementClient;
 import org.jboss.tools.ssp.api.ServerManagementServer;
 import org.jboss.tools.ssp.api.SocketLauncher;
-import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
+import org.jboss.tools.ssp.api.beans.ServerAttributes;
 import org.jboss.tools.ssp.api.beans.DiscoveryPath;
-import org.jboss.tools.ssp.api.beans.SSPAttributes;
+import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
 import org.jboss.tools.ssp.api.beans.ServerBean;
 import org.jboss.tools.ssp.api.beans.ServerHandle;
 import org.jboss.tools.ssp.api.beans.StartServerAttributes;
@@ -172,19 +172,19 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	}
 
 	@Override
-	public CompletableFuture<SSPAttributes> getRequiredAttributes(String serverType) {
-		SSPAttributes sspa = model.getServerModel().getRequiredAttributes(serverType);
+	public CompletableFuture<CreateServerAttributes> getRequiredAttributes(String serverType) {
+		CreateServerAttributes sspa = model.getServerModel().getRequiredAttributes(serverType);
 		return CompletableFuture.completedFuture(sspa);
 	}
 
 	@Override
-	public CompletableFuture<SSPAttributes> getOptionalAttributes(String serverType) {
-		SSPAttributes sspa = model.getServerModel().getOptionalAttributes(serverType);
+	public CompletableFuture<CreateServerAttributes> getOptionalAttributes(String serverType) {
+		CreateServerAttributes sspa = model.getServerModel().getOptionalAttributes(serverType);
 		return CompletableFuture.completedFuture(sspa);
 	}
 
 	@Override
-	public CompletableFuture<Status> createServer(CreateServerAttributes attr) {
+	public CompletableFuture<Status> createServer(ServerAttributes attr) {
 		String serverType = attr.getServerType();
 		String id = attr.getId();
 		Map<String, Object> attributes = attr.getAttributes();

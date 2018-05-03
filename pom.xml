@@ -12,6 +12,7 @@
  
   <modules>
 	  <module>api</module>
+	  <module>schema</module>
 	  <module>client-bindings</module>
 	  <module>client-cli</module>
 	  <module>launching</module>

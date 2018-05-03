@@ -1,0 +1,15 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:org:jboss:tools:ssp:api:beans:VMDescription",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "installLocation" : {
+      "type" : "string"
+    },
+    "version" : {
+      "type" : "string"
+    }
+  }
+}

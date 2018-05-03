@@ -17,15 +17,16 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
-import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
+import org.jboss.tools.ssp.api.beans.ServerAttributes;
 import org.jboss.tools.ssp.api.beans.DiscoveryPath;
-import org.jboss.tools.ssp.api.beans.SSPAttributes;
+import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
 import org.jboss.tools.ssp.api.beans.ServerBean;
 import org.jboss.tools.ssp.api.beans.ServerHandle;
 import org.jboss.tools.ssp.api.beans.StartServerAttributes;
 import org.jboss.tools.ssp.api.beans.Status;
 import org.jboss.tools.ssp.api.beans.StopServerAttributes;
 import org.jboss.tools.ssp.api.beans.VMDescription;
+import org.jboss.tools.ssp.api.beans.util.CreateServerAttributesUtility;
 import org.jboss.tools.ssp.client.bindings.ServerManagementClientLauncher;
 
 public class ServerManagementCLI {
@@ -207,7 +208,8 @@ public class ServerManagementCLI {
 			System.out.println("Please choose a unique name: ");
 			String name = nextLine();
 			
-			SSPAttributes required = launcher.getServerProxy().getRequiredAttributes(type).get();
+			CreateServerAttributes required2 = launcher.getServerProxy().getRequiredAttributes(type).get();
+			CreateServerAttributesUtility required = new CreateServerAttributesUtility(required2);
 			HashMap<String, Object> toSend = new HashMap<>();
 			if( required != null ) {
 				Set<String> keys = required.listAttributes();
@@ -272,7 +274,7 @@ public class ServerManagementCLI {
 					
 				}
 				System.out.println("Adding Server...");
-				CreateServerAttributes csa = new CreateServerAttributes(type, name, toSend);
+				ServerAttributes csa = new ServerAttributes(type, name, toSend);
 				Status result = launcher.getServerProxy().createServer(csa).get();
 				if( result.isOK()) {
 					System.out.println("Server Added");

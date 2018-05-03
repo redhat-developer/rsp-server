@@ -8,33 +8,24 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.api.beans;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class CreateServerAttributes {
-	private String serverType;
-	private String id; 
-	private Map<String, Object> attributes;
-	public CreateServerAttributes(String type, String id, Map<String, Object> attr) {
-		this.serverType = type;
-		this.id = id;
-		this.attributes = attr;
+	private HashMap<String, CreateServerAttribute> attributes;
+	
+	public CreateServerAttributes() {
+		attributes = new HashMap<>();
 	}
-	public String getServerType() {
-		return serverType;
+	public CreateServerAttributes(Map<String, CreateServerAttribute> a) {
+		attributes = new HashMap<>(a);
 	}
-	public void setServerType(String serverType) {
-		this.serverType = serverType;
-	}
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
-	public Map<String, Object> getAttributes() {
+
+	public HashMap<String, CreateServerAttribute> getAttributes() {
 		return attributes;
 	}
-	public void setAttributes(Map<String, Object> attributes) {
-		this.attributes = attributes;
+
+	public void setAttributes(HashMap<String, CreateServerAttribute> attrs) {
+		this.attributes = attrs;
 	}
 }

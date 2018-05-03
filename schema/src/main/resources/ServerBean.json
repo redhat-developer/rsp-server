@@ -1,0 +1,27 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:org:jboss:tools:ssp:api:beans:ServerBean",
+  "properties" : {
+    "location" : {
+      "type" : "string"
+    },
+    "typeCategory" : {
+      "type" : "string"
+    },
+    "specificType" : {
+      "type" : "string"
+    },
+    "name" : {
+      "type" : "string"
+    },
+    "version" : {
+      "type" : "string"
+    },
+    "fullVersion" : {
+      "type" : "string"
+    },
+    "serverAdapterTypeId" : {
+      "type" : "string"
+    }
+  }
+}

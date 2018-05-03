@@ -1,0 +1,12 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:org:jboss:tools:ssp:api:beans:StopServerAttributes",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "force" : {
+      "type" : "boolean"
+    }
+  }
+}

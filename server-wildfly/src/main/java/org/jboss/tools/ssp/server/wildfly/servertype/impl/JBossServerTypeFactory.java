@@ -9,15 +9,16 @@
 package org.jboss.tools.ssp.server.wildfly.servertype.impl;
 
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
-import org.jboss.tools.ssp.api.beans.SSPAttributes;
+import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
+import org.jboss.tools.ssp.api.beans.util.CreateServerAttributesUtility;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.ssp.server.spi.servertype.IServerType;
 import org.jboss.tools.ssp.server.wildfly.beans.impl.IServerConstants;
 
 public class JBossServerTypeFactory implements IServerType{
-	private SSPAttributes required = null;
-	private SSPAttributes optional = null;
+	private CreateServerAttributes required = null;
+	private CreateServerAttributes optional = null;
 	
 	@Override
 	public String getServerTypeId() {
@@ -31,9 +32,9 @@ public class JBossServerTypeFactory implements IServerType{
 	}
 
 	@Override
-	public SSPAttributes getRequiredAttributes() {
+	public CreateServerAttributes getRequiredAttributes() {
 		if( required == null ) {
-			SSPAttributes attrs = new SSPAttributes();
+			CreateServerAttributesUtility attrs = new CreateServerAttributesUtility();
 			attrs.addAttribute(IJBossServerAttributes.SERVER_HOME, 
 					ServerManagementAPIConstants.ATTR_TYPE_STRING, 
 					"A filesystem path pointing to a WildFly installation", null);
@@ -41,15 +42,15 @@ public class JBossServerTypeFactory implements IServerType{
 					ServerManagementAPIConstants.ATTR_TYPE_STRING, 
 					"A vm id referencing a virtual machine already in this model.", null);
 			// TODO add some
-			required = attrs;
+			required = attrs.toPojo();
 		}
 		return required;
 	}
 
 	@Override
-	public SSPAttributes getOptionalAttributes() {
+	public CreateServerAttributes getOptionalAttributes() {
 		if( optional == null ) {
-			SSPAttributes attrs = new SSPAttributes();
+			CreateServerAttributes attrs = new CreateServerAttributes();
 			// TODO add some
 			optional = attrs;
 		}

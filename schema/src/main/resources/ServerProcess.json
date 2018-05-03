@@ -1,0 +1,21 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:org:jboss:tools:ssp:api:beans:ServerProcess",
+  "properties" : {
+    "server" : {
+      "type" : "object",
+      "id" : "urn:jsonschema:org:jboss:tools:ssp:api:beans:ServerHandle",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "string"
+        }
+      }
+    },
+    "processId" : {
+      "type" : "string"
+    }
+  }
+}

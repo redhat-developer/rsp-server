@@ -19,8 +19,9 @@ import java.util.Set;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
-import org.jboss.tools.ssp.api.beans.SSPAttributes;
+import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
 import org.jboss.tools.ssp.api.beans.ServerHandle;
+import org.jboss.tools.ssp.api.beans.util.CreateServerAttributesUtility;
 import org.jboss.tools.ssp.launching.LaunchingCore;
 import org.jboss.tools.ssp.server.model.internal.Server;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
@@ -101,16 +102,17 @@ public class ServerModel {
 		}
 	}
 	
-	private IStatus validateAttributes(IServerType type, Map<String, Object> attrs) {
-		SSPAttributes a = type.getRequiredAttributes();
-		Set<String> required = a.listAttributes();
+	private IStatus validateAttributes(IServerType type, Map<String, Object> map) {
+		CreateServerAttributes attr = type.getRequiredAttributes();
+		CreateServerAttributesUtility util = new CreateServerAttributesUtility(attr);
+		Set<String> required = util.listAttributes();
 		for( String attrKey : required ) {
-			if( attrs.get(attrKey) == null ) {
+			if( map.get(attrKey) == null ) {
 				return new Status(IStatus.ERROR, "org.jboss.tools.ssp.server", "Attribute " + attrKey + " must not be null");
 			}
-			Object v = attrs.get(attrKey);
+			Object v = map.get(attrKey);
 			Class actual = v.getClass();
-			Class expected = getAttributeTypeAsClass(a.getAttributeType(attrKey));
+			Class expected = getAttributeTypeAsClass(util.getAttributeType(attrKey));
 			if( !actual.equals(expected)) {
 				// Something's different than expectations based on json transfer
 				// Try to convert it
@@ -120,7 +122,7 @@ public class ServerModel {
 							"Attribute " + attrKey + " must be of type " + expected.getName() 
 							+ " but is of type " + actual.getName());
 				} else {
-					attrs.put(attrKey, converted);
+					map.put(attrKey, converted);
 				}
 			}
 		}
@@ -237,17 +239,18 @@ public class ServerModel {
 		return (String[]) types.toArray(new String[types.size()]);
 	}
 	
-	public SSPAttributes getRequiredAttributes(String type) {
+	public CreateServerAttributes getRequiredAttributes(String type) {
 		IServerType t = factories.get(type);
-		SSPAttributes ret = t == null ? null : t.getRequiredAttributes();
+		CreateServerAttributes ret = t == null ? null : t.getRequiredAttributes();
 		return validateAttributes(ret, type);
 	}
 	
-	private SSPAttributes validateAttributes(SSPAttributes ret, String serverType) {
+	private CreateServerAttributes validateAttributes(CreateServerAttributes ret, String serverType) {
 		if( ret != null ) {
-			Set<String> all = ret.listAttributes();
+			CreateServerAttributesUtility util = new CreateServerAttributesUtility(ret);
+			Set<String> all = util.listAttributes();
 			for( String all1 : all ) {
-				String attrType = ret.getAttributeType(all1);
+				String attrType = util.getAttributeType(all1);
 				if( !approvedAttributeTypes.contains(attrType)) {
 					LaunchingCore.log("Extension for servertype " + serverType + " is invalid and requires an attribute of an invalid class.");
 				}
@@ -271,9 +274,9 @@ public class ServerModel {
 		return null;
 	}
 	
-	public SSPAttributes getOptionalAttributes(String type) {
+	public CreateServerAttributes getOptionalAttributes(String type) {
 		IServerType t = factories.get(type);
-		SSPAttributes ret = t == null ? null : t.getOptionalAttributes();
+		CreateServerAttributes ret = t == null ? null : t.getOptionalAttributes();
 		return validateAttributes(ret, type);
 	}
 
