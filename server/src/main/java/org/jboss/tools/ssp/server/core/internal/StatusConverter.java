@@ -13,7 +13,7 @@ import java.io.StringWriter;
 
 public class StatusConverter {
 	public static org.jboss.tools.ssp.api.beans.Status convert(
-			org.eclipse.core.runtime.IStatus status) {
+			org.jboss.tools.ssp.eclipse.core.runtime.IStatus status) {
 		int sev = status.getSeverity();
 		String plugin = status.getPlugin();
 		String msg = status.getMessage();

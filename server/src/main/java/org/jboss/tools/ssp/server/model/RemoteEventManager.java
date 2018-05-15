@@ -10,10 +10,6 @@ package org.jboss.tools.ssp.server.model;
 
 import java.util.List;
 
-import org.eclipse.jdt.launching.IVMInstall;
-import org.eclipse.jdt.launching.IVMInstall2;
-import org.eclipse.jdt.launching.IVMInstallChangedListener;
-import org.eclipse.jdt.launching.PropertyChangeEvent;
 import org.jboss.tools.ssp.api.ServerManagementClient;
 import org.jboss.tools.ssp.api.beans.DiscoveryPath;
 import org.jboss.tools.ssp.api.beans.ServerHandle;
@@ -21,6 +17,10 @@ import org.jboss.tools.ssp.api.beans.ServerProcess;
 import org.jboss.tools.ssp.api.beans.ServerProcessOutput;
 import org.jboss.tools.ssp.api.beans.ServerStateChange;
 import org.jboss.tools.ssp.api.beans.VMDescription;
+import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
+import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall2;
+import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstallChangedListener;
+import org.jboss.tools.ssp.eclipse.jdt.launching.PropertyChangeEvent;
 import org.jboss.tools.ssp.server.ServerManagementServerImpl;
 import org.jboss.tools.ssp.server.discovery.IDiscoveryPathListener;
 

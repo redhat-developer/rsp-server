@@ -13,9 +13,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-import org.eclipse.jdt.launching.IVMInstall;
-import org.eclipse.jdt.launching.IVMInstallChangedListener;
-import org.eclipse.jdt.launching.PropertyChangeEvent;
+import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
+import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstallChangedListener;
+import org.jboss.tools.ssp.eclipse.jdt.launching.PropertyChangeEvent;
 
 public class VMInstallModel {
 	public static VMInstallModel model = new VMInstallModel();

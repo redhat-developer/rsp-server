@@ -11,8 +11,8 @@ package org.jboss.tools.ssp.launching;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.debug.core.DebugEvent;
-import org.eclipse.debug.core.IDebugEventSetListener;
+import org.jboss.tools.ssp.eclipse.debug.core.DebugEvent;
+import org.jboss.tools.ssp.eclipse.debug.core.IDebugEventSetListener;
 
 public class RuntimeProcessEventManager {
 	private static RuntimeProcessEventManager instance = new RuntimeProcessEventManager();

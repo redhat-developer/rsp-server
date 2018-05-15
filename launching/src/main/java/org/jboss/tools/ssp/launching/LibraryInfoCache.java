@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.eclipse.jdt.internal.launching.LibraryInfo;
+import org.jboss.tools.ssp.eclipse.jdt.internal.launching.LibraryInfo;
 
 public class LibraryInfoCache {
 	private static LibraryInfoCache instance = new LibraryInfoCache();

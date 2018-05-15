@@ -11,16 +11,16 @@ package org.jboss.tools.ssp.server.wildfly.servertype.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.Launch;
-import org.eclipse.jdt.launching.ExecutionArguments;
-import org.eclipse.jdt.launching.IVMInstall;
-import org.eclipse.jdt.launching.IVMRunner;
-import org.eclipse.jdt.launching.VMRunnerConfiguration;
+import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
+import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
+import org.jboss.tools.ssp.eclipse.core.runtime.NullProgressMonitor;
+import org.jboss.tools.ssp.eclipse.core.runtime.Status;
+import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
+import org.jboss.tools.ssp.eclipse.debug.core.Launch;
+import org.jboss.tools.ssp.eclipse.jdt.launching.ExecutionArguments;
+import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
+import org.jboss.tools.ssp.eclipse.jdt.launching.IVMRunner;
+import org.jboss.tools.ssp.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.jboss.tools.ssp.launching.NativeEnvironmentUtil;
 import org.jboss.tools.ssp.launching.VMInstallModel;
 

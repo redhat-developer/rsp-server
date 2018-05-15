@@ -10,13 +10,13 @@ package org.jboss.tools.ssp.server.wildfly.servertype.impl;
 
 import java.io.File;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.debug.core.DebugException;
-import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.model.IProcess;
-import org.eclipse.jdt.launching.IVMInstall;
+import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
+import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
+import org.jboss.tools.ssp.eclipse.core.runtime.Status;
+import org.jboss.tools.ssp.eclipse.debug.core.DebugException;
+import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
+import org.jboss.tools.ssp.eclipse.debug.core.model.IProcess;
+import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.ssp.launching.LaunchingCore;
 import org.jboss.tools.ssp.launching.VMInstallModel;
 import org.jboss.tools.ssp.server.model.AbstractServerDelegate;

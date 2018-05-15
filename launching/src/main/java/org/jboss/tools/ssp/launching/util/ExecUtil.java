@@ -12,15 +12,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.IProcessFactory;
-import org.eclipse.debug.core.model.IProcess;
-import org.eclipse.debug.core.model.RuntimeProcess;
-import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
+import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
+import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
+import org.jboss.tools.ssp.eclipse.core.runtime.Status;
+import org.jboss.tools.ssp.eclipse.debug.core.DebugPlugin;
+import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
+import org.jboss.tools.ssp.eclipse.debug.core.IProcessFactory;
+import org.jboss.tools.ssp.eclipse.debug.core.model.IProcess;
+import org.jboss.tools.ssp.eclipse.debug.core.model.RuntimeProcess;
+import org.jboss.tools.ssp.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 
 public class ExecUtil {
 	public static final int ERROR = 125;

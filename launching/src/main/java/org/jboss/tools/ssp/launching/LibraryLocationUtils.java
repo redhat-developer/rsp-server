@@ -11,10 +11,10 @@ package org.jboss.tools.ssp.launching;
 import java.io.File;
 import java.net.URL;
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.jdt.launching.IVMInstall;
-import org.eclipse.jdt.launching.LibraryLocation;
+import org.jboss.tools.ssp.eclipse.core.runtime.IPath;
+import org.jboss.tools.ssp.eclipse.core.runtime.Path;
+import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
+import org.jboss.tools.ssp.eclipse.jdt.launching.LibraryLocation;
 
 public class LibraryLocationUtils {
 

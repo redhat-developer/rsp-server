@@ -8,12 +8,12 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.util.Map;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jdt.internal.launching.LibraryInfo;
-import org.eclipse.jdt.launching.IVMInstall;
-import org.eclipse.jdt.launching.IVMInstall3;
-import org.eclipse.jdt.launching.StandardVMType;
+import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
+import org.jboss.tools.ssp.eclipse.core.runtime.NullProgressMonitor;
+import org.jboss.tools.ssp.eclipse.jdt.internal.launching.LibraryInfo;
+import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
+import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall3;
+import org.jboss.tools.ssp.eclipse.jdt.launching.StandardVMType;
 import org.jboss.tools.ssp.launching.LaunchingSupportUtility;
 import org.jboss.tools.ssp.launching.util.FileUtil;
 import org.junit.Test;
