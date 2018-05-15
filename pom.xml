@@ -8,7 +8,7 @@
   <artifactId>parent</artifactId>
   <version>0.8-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>Server Server Protocol</name>
+  <name>Simple Server Protocol</name>
  
   <modules>
 	  <module>api</module>

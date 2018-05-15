@@ -12,7 +12,7 @@
   <artifactId>server.wildfly</artifactId>
   <packaging>jar</packaging>
 
-  <name>Server Server Protocol : Server WildFly Implementation</name>
+  <name>Simple Server Protocol : Server WildFly Implementation</name>
 
   <build>
     <pluginManagement>

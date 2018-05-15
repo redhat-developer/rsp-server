@@ -76,11 +76,6 @@ public class Status {
 	 */
 	private String trace = null;
 
-	/** Constant to avoid generating garbage.
-	 */
-	private static final Status[] theEmptyStatusArray = new Status[0];
-
-	
 	public Status() {
 	}
 	
@@ -146,10 +141,6 @@ public class Status {
 		setTrace(null);
 	}
 
-	public Status[] getChildren() {
-		return theEmptyStatusArray;
-	}
-
 	public int getCode() {
 		return code;
 	}
@@ -168,10 +159,6 @@ public class Status {
 
 	public int getSeverity() {
 		return severity;
-	}
-
-	public boolean isMultiStatus() {
-		return false;
 	}
 
 	public boolean isOK() {

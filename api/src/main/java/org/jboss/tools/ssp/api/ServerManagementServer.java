@@ -14,15 +14,17 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
-import org.jboss.tools.ssp.api.beans.ServerAttributes;
-import org.jboss.tools.ssp.api.beans.DiscoveryPath;
 import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
+import org.jboss.tools.ssp.api.beans.DiscoveryPath;
+import org.jboss.tools.ssp.api.beans.ServerAttributes;
 import org.jboss.tools.ssp.api.beans.ServerBean;
 import org.jboss.tools.ssp.api.beans.ServerHandle;
+import org.jboss.tools.ssp.api.beans.ServerType;
 import org.jboss.tools.ssp.api.beans.StartServerAttributes;
 import org.jboss.tools.ssp.api.beans.Status;
 import org.jboss.tools.ssp.api.beans.StopServerAttributes;
 import org.jboss.tools.ssp.api.beans.VMDescription;
+import org.jboss.tools.ssp.api.beans.VMHandle;
 
 @JsonSegment("server")
 public interface ServerManagementServer {
@@ -34,14 +36,21 @@ public interface ServerManagementServer {
 	@JsonRequest
 	CompletableFuture<List<VMDescription>> getVMs();
 
+	/**
+	 * The `server/addVM` request is sent by the client to add
+	 * a new java virtual machine to the server's list of VMs for 
+	 * use by any java-based server.
+	 */
 	@JsonNotification
 	void addVM(VMDescription description);
 
+	/**
+	 * The `server/removeVM` request is sent by the client to remove
+	 * a java virtual machine from the server's list of VMs for 
+	 * use by any java-based server.
+	 */
 	@JsonNotification
-	public void removeVM(String id);
-	
-	
-	
+	public void removeVM(VMHandle vm);
 	
 	/**
 	 * The `server/getDiscoveryPaths` request is sent by the client to fetch 
@@ -58,7 +67,6 @@ public interface ServerManagementServer {
 	@JsonRequest
 	CompletableFuture<List<ServerBean>> findServerBeans(DiscoveryPath path);
 	
-	
 	/**
 	 * The `server/addDiscoveryPath` notification is sent by the client to add a new path
 	 * to search when discovering servers.
@@ -72,9 +80,6 @@ public interface ServerManagementServer {
 	 */
 	@JsonNotification
 	void removeDiscoveryPath(DiscoveryPath path);
-	
-	
-
 	
 	/**
 	 * The `server/getServerHandles` request is sent by the client to 
@@ -97,23 +102,21 @@ public interface ServerManagementServer {
 	 * delete a server from the model.
 	 */
 	@JsonNotification
-	void deleteServer(String server);
-	
+	void deleteServer(ServerHandle handle);
 	
 	/**
 	 * The `server/getRequiredAttributes` request is sent by the client to 
 	 * list the server adapters currently configured.
 	 */
 	@JsonRequest
-	CompletableFuture<CreateServerAttributes> getRequiredAttributes(String serverType);
+	CompletableFuture<CreateServerAttributes> getRequiredAttributes(ServerType type);
 	
 	/**
 	 * The `server/getOptionalAttributes` request is sent by the client to 
 	 * list the server adapters currently configured.
 	 */
 	@JsonRequest
-	CompletableFuture<CreateServerAttributes> getOptionalAttributes(String serverType);
-	
+	CompletableFuture<CreateServerAttributes> getOptionalAttributes(ServerType type);
 	
 	/**
 	 * The `server/createServer` request is sent by the client to 
@@ -122,14 +125,18 @@ public interface ServerManagementServer {
 	@JsonRequest
 	CompletableFuture<Status> createServer(ServerAttributes csa);
 	
-	
+	/**
+	 * The `server/startServerAsync` request is sent by the client to 
+	 * the server to start an existing server in the model.
+	 */	
 	@JsonRequest
 	CompletableFuture<Status> startServerAsync(StartServerAttributes attr);
 	
-	@JsonRequest
+	/**
+	 * The `server/stopServerAsync` request is sent by the client to 
+	 * the server to stop an existing server in the model.
+	 */		@JsonRequest
 	CompletableFuture<Status> stopServerAsync(StopServerAttributes attr);
-	
-	
 	
 	/**
 	 * The `server/shutdown` notification is sent by the client to 
@@ -137,7 +144,4 @@ public interface ServerManagementServer {
 	 */
 	@JsonNotification
 	void shutdown();
-	
-	
-	
 }

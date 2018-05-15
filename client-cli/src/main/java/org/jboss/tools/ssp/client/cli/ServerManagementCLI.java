@@ -22,10 +22,12 @@ import org.jboss.tools.ssp.api.beans.DiscoveryPath;
 import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
 import org.jboss.tools.ssp.api.beans.ServerBean;
 import org.jboss.tools.ssp.api.beans.ServerHandle;
+import org.jboss.tools.ssp.api.beans.ServerType;
 import org.jboss.tools.ssp.api.beans.StartServerAttributes;
 import org.jboss.tools.ssp.api.beans.Status;
 import org.jboss.tools.ssp.api.beans.StopServerAttributes;
 import org.jboss.tools.ssp.api.beans.VMDescription;
+import org.jboss.tools.ssp.api.beans.VMHandle;
 import org.jboss.tools.ssp.api.beans.util.CreateServerAttributesUtility;
 import org.jboss.tools.ssp.client.bindings.ServerManagementClientLauncher;
 
@@ -139,7 +141,7 @@ public class ServerManagementCLI {
 			}
 		} else if( s.startsWith(REMOVE_VM)) {
 			String suffix = s.substring(REMOVE_VM.length()).trim();
-			launcher.getServerProxy().removeVM(suffix);
+			launcher.getServerProxy().removeVM(new VMHandle(suffix));
 		} else if( s.trim().equals(LIST_PATHS)) {
 			List<DiscoveryPath> list = launcher.getServerProxy().getDiscoveryPaths().get();
 			System.out.println("Paths:");
@@ -183,7 +185,11 @@ public class ServerManagementCLI {
 			}
 		} else if( s.trim().startsWith(REMOVE_SERVER)) {
 			String suffix = s.substring(REMOVE_SERVER.length());
-			launcher.getServerProxy().deleteServer(suffix.trim());
+			ServerHandle sh = findServer(suffix.trim());
+			if( sh != null )
+				launcher.getServerProxy().deleteServer(sh);
+			else
+				System.out.println("Server not found: " + suffix.trim());
 		} else if( s.trim().equals(ADD_SERVER)) {
 			runAddServer();
 		} else if( s.trim().equals(EXIT)) {
@@ -194,6 +200,14 @@ public class ServerManagementCLI {
 		}
 	}
 	
+	private ServerHandle findServer(String id) throws Exception {
+		List<ServerHandle> handles = launcher.getServerProxy().getServerHandles().get();
+		for( ServerHandle sh : handles ) {
+			if( sh.getId().equals(id)) 
+				return sh;
+		}
+		return null;
+	}
 	
 	private void runAddServer() {
 		List<String> types = null;
@@ -208,7 +222,8 @@ public class ServerManagementCLI {
 			System.out.println("Please choose a unique name: ");
 			String name = nextLine();
 			
-			CreateServerAttributes required2 = launcher.getServerProxy().getRequiredAttributes(type).get();
+			CreateServerAttributes required2 = launcher.getServerProxy()
+					.getRequiredAttributes(new ServerType(type)).get();
 			CreateServerAttributesUtility required = new CreateServerAttributesUtility(required2);
 			HashMap<String, Object> toSend = new HashMap<>();
 			if( required != null ) {

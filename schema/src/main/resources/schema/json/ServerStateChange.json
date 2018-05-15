@@ -1,10 +1,8 @@
 {
   "type" : "object",
-  "id" : "urn:jsonschema:org:jboss:tools:ssp:api:beans:ServerProcessOutput",
   "properties" : {
     "server" : {
       "type" : "object",
-      "id" : "urn:jsonschema:org:jboss:tools:ssp:api:beans:ServerHandle",
       "properties" : {
         "id" : {
           "type" : "string"
@@ -14,14 +12,8 @@
         }
       }
     },
-    "processId" : {
-      "type" : "string"
-    },
-    "streamType" : {
+    "state" : {
       "type" : "integer"
-    },
-    "text" : {
-      "type" : "string"
     }
   }
 }

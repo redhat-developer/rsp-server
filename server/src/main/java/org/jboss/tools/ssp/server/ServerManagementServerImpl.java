@@ -23,15 +23,17 @@ import org.eclipse.jdt.launching.StandardVMType;
 import org.jboss.tools.ssp.api.ServerManagementClient;
 import org.jboss.tools.ssp.api.ServerManagementServer;
 import org.jboss.tools.ssp.api.SocketLauncher;
-import org.jboss.tools.ssp.api.beans.ServerAttributes;
-import org.jboss.tools.ssp.api.beans.DiscoveryPath;
 import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
+import org.jboss.tools.ssp.api.beans.DiscoveryPath;
+import org.jboss.tools.ssp.api.beans.ServerAttributes;
 import org.jboss.tools.ssp.api.beans.ServerBean;
 import org.jboss.tools.ssp.api.beans.ServerHandle;
+import org.jboss.tools.ssp.api.beans.ServerType;
 import org.jboss.tools.ssp.api.beans.StartServerAttributes;
 import org.jboss.tools.ssp.api.beans.Status;
 import org.jboss.tools.ssp.api.beans.StopServerAttributes;
 import org.jboss.tools.ssp.api.beans.VMDescription;
+import org.jboss.tools.ssp.api.beans.VMHandle;
 import org.jboss.tools.ssp.launching.LaunchingCore;
 import org.jboss.tools.ssp.launching.VMInstallModel;
 import org.jboss.tools.ssp.server.core.internal.StatusConverter;
@@ -119,8 +121,8 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	}
 
 	@Override
-	public void removeVM(String id) {
-		VMInstallModel.getDefault().removeVMInstall(id);
+	public void removeVM(VMHandle handle) {
+		VMInstallModel.getDefault().removeVMInstall(handle.getId());
 	}
 
 	
@@ -167,19 +169,19 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	}
 
 	@Override
-	public void deleteServer(String serverId) {
-		model.getServerModel().removeServer(serverId);
+	public void deleteServer(ServerHandle handle) {
+		model.getServerModel().removeServer(handle.getId());
 	}
 
 	@Override
-	public CompletableFuture<CreateServerAttributes> getRequiredAttributes(String serverType) {
-		CreateServerAttributes sspa = model.getServerModel().getRequiredAttributes(serverType);
+	public CompletableFuture<CreateServerAttributes> getRequiredAttributes(ServerType type) {
+		CreateServerAttributes sspa = model.getServerModel().getRequiredAttributes(type.getId());
 		return CompletableFuture.completedFuture(sspa);
 	}
 
 	@Override
-	public CompletableFuture<CreateServerAttributes> getOptionalAttributes(String serverType) {
-		CreateServerAttributes sspa = model.getServerModel().getOptionalAttributes(serverType);
+	public CompletableFuture<CreateServerAttributes> getOptionalAttributes(ServerType type) {
+		CreateServerAttributes sspa = model.getServerModel().getOptionalAttributes(type.getId());
 		return CompletableFuture.completedFuture(sspa);
 	}
 

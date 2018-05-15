@@ -1,6 +1,5 @@
 {
   "type" : "object",
-  "id" : "urn:jsonschema:org:jboss:tools:ssp:api:beans:ServerBean",
   "properties" : {
     "location" : {
       "type" : "string"

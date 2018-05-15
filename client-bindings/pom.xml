@@ -12,7 +12,7 @@
   <artifactId>client.bindings</artifactId>
   <packaging>jar</packaging>
 
-  <name>Server Server Protocol : Client Bindings</name>
+  <name>Simple Server Protocol : Client Bindings</name>
 
   <build>
     <pluginManagement>

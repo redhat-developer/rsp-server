@@ -1,12 +1,10 @@
 {
   "type" : "object",
-  "id" : "urn:jsonschema:org:jboss:tools:ssp:api:beans:CreateServerAttributes",
   "properties" : {
     "attributes" : {
       "type" : "object",
       "additionalProperties" : {
         "type" : "object",
-        "id" : "urn:jsonschema:org:jboss:tools:ssp:api:beans:CreateServerAttribute",
         "properties" : {
           "type" : {
             "type" : "string"

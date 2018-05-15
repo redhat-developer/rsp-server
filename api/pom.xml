@@ -12,7 +12,7 @@
   <artifactId>api</artifactId>
   <packaging>jar</packaging>
 
-  <name>Server Server Protocol : API</name>
+  <name>Simple Server Protocol : API</name>
 
   <build>
     <pluginManagement>

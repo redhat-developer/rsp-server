@@ -12,7 +12,7 @@
   <artifactId>launching</artifactId>
   <packaging>jar</packaging>
 
-  <name>Server Server Protocol : jdt.launching</name>
+  <name>Simple Server Protocol : jdt.launching</name>
 
   <build>
     <pluginManagement>
