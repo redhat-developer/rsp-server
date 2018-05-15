@@ -1,10 +1,12 @@
-# The (horribly named) Stack Server Protocol 
+# The Simple Server Protocol 
 
 ## Summary
 
-This protocol will allow an IDE or other client to control various types of application servers. The IDE will communicate solely with a single server whose job is to discover, start, stop, and eventually publish to these application servers. 
+This protocol will allow an IDE or other client to control various types of application servers. The IDE will communicate with any number of servers whose job is to discover, start, stop, and eventually publish to these application servers. 
 
-The protocol is based on LSP4J, though the messages that can be sent or received are completely unrelated to the language server protocol itself. In short, the communication method is the same as LSP, but the specification of the messages is entirely different. 
+The protocol is based on LSP4J, though the messages that can be sent or received are completely unrelated to the language server protocol itself. In short, the base protocol is the same as LSP, but the specification of the messages is different. 
+
+The base protocol of LSP can be found [here](https://microsoft.github.io/language-server-protocol/specification). 
 
 ## Install
 
@@ -51,16 +53,20 @@ Next, run the following command to launch the server:
     [org.jboss.tools.ssp] $ cd server-wildfly
     [server-wildfly] $ mvn exec:java
 
-To run the client, in a new shell, run the following:
-
-    [org.jboss.tools.ssp] $ cd server-wildfly
-    [server-wildfly] $ mvn exec:java
-
 To customize the hosts or ports, you can either edit the pom.xml for these modules or pass flags. See https://www.mojohaus.org/exec-maven-plugin/usage.html  for more information. 
 
 ## Using the CLI
 
-The CLI is a proof-of-concept only, currently demonstrating only that the LSP connection and ability to pass communications back and forth works as expected. The following commands are supported:
+The CLI is a proof-of-concept only, currently demonstrating only that the SSP connection and ability to pass communications back and forth works as expected. 
+
+
+To run the client, in a new shell, run the following:
+
+    [org.jboss.tools.ssp] $ cd client-cli
+    [client-cli] $ mvn exec:java
+
+
+The following commands are supported:
 
     1) list paths
     2) add path /some/path
