@@ -63,9 +63,11 @@ public class GenerateSchemaMain {
 	public static void main(String[] args) throws Exception {
 		Class[] daos = getDAOClasses();
 		JSONUtility json = new JSONUtility();
+		json.cleanFolder();
 		json.writeJsonDAOSchemas(daos);
 		
 		TypescriptUtility ts = new TypescriptUtility();
+		ts.cleanFolder();
 		ts.writeTypescriptSchemas(daos);
 
 		SpecificationGenerator generator = new SpecificationGenerator(json, ts);

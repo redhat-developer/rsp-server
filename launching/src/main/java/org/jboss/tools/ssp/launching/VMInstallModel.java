@@ -8,16 +8,22 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.launching;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstallChangedListener;
 import org.jboss.tools.ssp.eclipse.jdt.launching.PropertyChangeEvent;
+import org.jboss.tools.ssp.eclipse.jdt.launching.StandardVMType;
 
 public class VMInstallModel {
+	private static final String JAVA_HOME = "JAVA_HOME";
+	private static final String RUNNING_VM_ID = "running";
+	
 	public static VMInstallModel model = new VMInstallModel();
 	public static final VMInstallModel getDefault() {
 		return model;
@@ -28,6 +34,21 @@ public class VMInstallModel {
 	public VMInstallModel() {
 		map = new HashMap<String, IVMInstall>();
 		list = new ArrayList<IVMInstallChangedListener>();
+	}
+	
+	public void addActiveVM() {
+		try {
+			Map<String,String> env = System.getenv();
+			String home = env.get(JAVA_HOME);
+			File f = new File(home);
+			if( f.exists()) {
+				IVMInstall vmi = StandardVMType.getDefault().createVMInstall(RUNNING_VM_ID);
+				vmi.setInstallLocation(f);
+				VMInstallModel.getDefault().addVMInstall(vmi);
+			}
+		} catch(IllegalArgumentException arg) {
+			LaunchingCore.log(arg);
+		}
 	}
 	
 	public void addVMInstall(IVMInstall vm) throws IllegalArgumentException {
@@ -55,6 +76,16 @@ public class VMInstallModel {
 		ArrayList<IVMInstall> vms =  new ArrayList<IVMInstall>(map.values());
 		for( IVMInstall vm1 : vms) {
 			if( vm1.getId().equals(id)) {
+				return vm1;
+			}
+		}
+		return null;
+	}
+	
+	public IVMInstall findVMInstall(File installLocation) {
+		ArrayList<IVMInstall> vms =  new ArrayList<IVMInstall>(map.values());
+		for( IVMInstall vm1 : vms) {
+			if( vm1.getInstallLocation().equals(installLocation)) {
 				return vm1;
 			}
 		}
@@ -98,6 +129,10 @@ public class VMInstallModel {
 			l.vmChanged(event);
 		}
 		
+	}
+
+	public IVMInstall getDefaultVMInstall() {
+		return findVMInstall(RUNNING_VM_ID);
 	}
 	
 }

@@ -55,7 +55,7 @@ public class ServerManagementCLI {
 
 	private static final String[] CMD_ARR = new String[] {
 			LIST_PATHS, ADD_PATH, REMOVE_PATH, SEARCH_PATH, 
-			LIST_VM, ADD_VM, REMOVE_VM,
+			// LIST_VM, ADD_VM, REMOVE_VM,
 			LIST_SERVERS, ADD_SERVER, REMOVE_SERVER, START_SERVER, STOP_SERVER,
 			EXIT, SHUTDOWN
 	};
@@ -119,29 +119,29 @@ public class ServerManagementCLI {
 			launcher.getServerProxy().shutdown();
 			System.out.println("The server has been shutdown");
 			System.exit(0);
-		} else if( s.trim().equals(LIST_VM)) {
-			List<VMDescription> list = launcher.getServerProxy().getVMs().get();
-			System.out.println("VMs:");
-			if( list != null ) {
-				for( VMDescription d : list ) {
-					System.out.println(d.getId() + ": " + d.getVersion() + " @ " + d.getInstallLocation());
-				}
-			}
-		} else if( s.equals(ADD_VM.trim())) {
-			System.out.println("Syntax: add vm someName /some/path");
-		} else if( s.startsWith(ADD_VM)) {
-			String suffix = s.substring(ADD_VM.length()).trim();
-			int firstSpace = suffix.indexOf(" ");
-			if( firstSpace == -1 ) {
-				System.out.println("Syntax: add vm someName /some/path");
-			} else {
-				VMDescription desc = new VMDescription(suffix.substring(0, firstSpace).trim(), 
-						suffix.substring(firstSpace).trim(), null);
-				launcher.getServerProxy().addVM(desc);
-			}
-		} else if( s.startsWith(REMOVE_VM)) {
-			String suffix = s.substring(REMOVE_VM.length()).trim();
-			launcher.getServerProxy().removeVM(new VMHandle(suffix));
+//		} else if( s.trim().equals(LIST_VM)) {
+//			List<VMDescription> list = launcher.getServerProxy().getVMs().get();
+//			System.out.println("VMs:");
+//			if( list != null ) {
+//				for( VMDescription d : list ) {
+//					System.out.println(d.getId() + ": " + d.getVersion() + " @ " + d.getInstallLocation());
+//				}
+//			}
+//		} else if( s.equals(ADD_VM.trim())) {
+//			System.out.println("Syntax: add vm someName /some/path");
+//		} else if( s.startsWith(ADD_VM)) {
+//			String suffix = s.substring(ADD_VM.length()).trim();
+//			int firstSpace = suffix.indexOf(" ");
+//			if( firstSpace == -1 ) {
+//				System.out.println("Syntax: add vm someName /some/path");
+//			} else {
+//				VMDescription desc = new VMDescription(suffix.substring(0, firstSpace).trim(), 
+//						suffix.substring(firstSpace).trim(), null);
+//				launcher.getServerProxy().addVM(desc);
+//			}
+//		} else if( s.startsWith(REMOVE_VM)) {
+//			String suffix = s.substring(REMOVE_VM.length()).trim();
+//			launcher.getServerProxy().removeVM(new VMHandle(suffix));
 		} else if( s.trim().equals(LIST_PATHS)) {
 			List<DiscoveryPath> list = launcher.getServerProxy().getDiscoveryPaths().get();
 			System.out.println("Paths:");

@@ -27,8 +27,8 @@ public class JBossServerTypeFactory implements IServerType{
 
 	@Override
 	public IServerDelegate createServerDelegate(IServer server) {
-		// TODO Auto-generated method stub
-		return new JBossServerDelegate(server);
+		JBossServerDelegate ret = new JBossServerDelegate(server);
+		return ret;
 	}
 
 	@Override
@@ -38,10 +38,6 @@ public class JBossServerTypeFactory implements IServerType{
 			attrs.addAttribute(IJBossServerAttributes.SERVER_HOME, 
 					ServerManagementAPIConstants.ATTR_TYPE_STRING, 
 					"A filesystem path pointing to a WildFly installation", null);
-			attrs.addAttribute(IJBossServerAttributes.VM_INSTALL_ID, 
-					ServerManagementAPIConstants.ATTR_TYPE_STRING, 
-					"A vm id referencing a virtual machine already in this model.", null);
-			// TODO add some
 			required = attrs.toPojo();
 		}
 		return required;
@@ -50,9 +46,11 @@ public class JBossServerTypeFactory implements IServerType{
 	@Override
 	public CreateServerAttributes getOptionalAttributes() {
 		if( optional == null ) {
-			CreateServerAttributes attrs = new CreateServerAttributes();
-			// TODO add some
-			optional = attrs;
+			CreateServerAttributesUtility attrs = new CreateServerAttributesUtility();
+			attrs.addAttribute(IJBossServerAttributes.VM_INSTALL_PATH, 
+					ServerManagementAPIConstants.ATTR_TYPE_STRING, 
+					"A string representation pointing to a java home. If not set, $JAVA_HOME will be used instead.", null);
+			optional = attrs.toPojo();
 		}
 		return optional;
 	}

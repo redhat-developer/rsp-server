@@ -15,7 +15,6 @@ import org.jboss.tools.ssp.api.beans.ServerHandle;
 import org.jboss.tools.ssp.api.beans.ServerProcess;
 import org.jboss.tools.ssp.api.beans.ServerProcessOutput;
 import org.jboss.tools.ssp.api.beans.ServerStateChange;
-import org.jboss.tools.ssp.api.beans.VMDescription;
 
 @JsonSegment("client")
 public interface ServerManagementClient {
@@ -33,20 +32,20 @@ public interface ServerManagementClient {
 	 */
 	@JsonNotification
 	void discoveryPathRemoved(DiscoveryPath message);
-
-	/**
-	 * The `client/vmAdded` is sent by the server to all clients 
-	 * in a response to the `server/addVM` notification.
-	 */
-	@JsonNotification
-	void vmAdded(VMDescription vmd);
-	
-	/**
-	 * The `client/vmRemoved` is sent by the server to all clients 
-	 * in a response to the `server/removeVM` notification.
-	 */
-	@JsonNotification
-	void vmRemoved(VMDescription vmd);
+//
+//	/**
+//	 * The `client/vmAdded` is sent by the server to all clients 
+//	 * in a response to the `server/addVM` notification.
+//	 */
+//	@JsonNotification
+//	void vmAdded(VMDescription vmd);
+//	
+//	/**
+//	 * The `client/vmRemoved` is sent by the server to all clients 
+//	 * in a response to the `server/removeVM` notification.
+//	 */
+//	@JsonNotification
+//	void vmRemoved(VMDescription vmd);
 	
 	/**
 	 * The `client/serverAdded` is sent by the server to all clients 

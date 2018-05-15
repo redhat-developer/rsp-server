@@ -41,13 +41,19 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 			return new Status(IStatus.ERROR, "org.jboss.tools.ssp.server.wildfly", "Server home must exist");
 		}
 		
-		String vmId = getServer().getAttribute(IJBossServerAttributes.VM_INSTALL_ID, (String)null);
-		if( vmId == null ) {
-			return new Status(IStatus.ERROR, "org.jboss.tools.ssp.server.wildfly", "VM id must not be null");
+		String vmPath = getServer().getAttribute(IJBossServerAttributes.VM_INSTALL_PATH, (String)null);
+		IVMInstall vmi = null;
+		if( vmPath != null && !vmPath.isEmpty()) {
+			File vmFile = new File(vmPath);
+			if( !vmFile.exists()) {
+				return new Status(IStatus.ERROR, "org.jboss.tools.ssp.server.wildfly", "VM file location does not exist: " + vmPath);
+			}
+			vmi = VMInstallModel.getDefault().findVMInstall(vmFile);
+		} else {
+			vmi = VMInstallModel.getDefault().getDefaultVMInstall();
 		}
-		IVMInstall vmi = VMInstallModel.getDefault().findVMInstall(vmId);
 		if( vmi == null ) {
-			return new Status(IStatus.ERROR, "org.jboss.tools.ssp.server.wildfly", "VM " + vmId + " is not found in the VM model");
+			return new Status(IStatus.ERROR, "org.jboss.tools.ssp.server.wildfly", "VM " + vmPath + " is not found in the VM model");
 		}
 		return Status.OK_STATUS;
 	}

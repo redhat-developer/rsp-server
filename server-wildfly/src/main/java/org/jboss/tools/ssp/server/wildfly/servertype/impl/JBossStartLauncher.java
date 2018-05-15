@@ -8,6 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.server.wildfly.servertype.impl;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,11 +80,12 @@ public class JBossStartLauncher {
 		return new Launch(this, mode, null);
 	}
 	private IStatus checkPrereqs(String mode) {
-		String vmId = delegate.getServer().getAttribute(IJBossServerAttributes.VM_INSTALL_ID, (String)null);
-		if( vmId == null ) {
-			return Status.CANCEL_STATUS;
+		String vmPath = delegate.getServer().getAttribute(IJBossServerAttributes.VM_INSTALL_PATH, (String)null);
+		if( vmPath == null ) {
+			vmi = VMInstallModel.getDefault().getDefaultVMInstall();
+		} else {
+			vmi = VMInstallModel.getDefault().findVMInstall(new File(vmPath));
 		}
-		vmi = VMInstallModel.getDefault().findVMInstall(vmId);
 		if( vmi == null ) {
 			return Status.CANCEL_STATUS;
 		}
@@ -147,5 +149,4 @@ public class JBossStartLauncher {
 	private Map<String, String>  getEnvironmentFromServer() {
 		return new HashMap<String, String>();
 	}
-
 }

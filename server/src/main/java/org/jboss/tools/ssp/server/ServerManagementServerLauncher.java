@@ -30,7 +30,7 @@ public class ServerManagementServerLauncher {
 		return instance;
 	}
 
-	private ServerManagementServerImpl serverImpl;
+	protected ServerManagementServerImpl serverImpl;
 	public ServerManagementServerLauncher() {
 		serverImpl = new ServerManagementServerImpl();
 	}

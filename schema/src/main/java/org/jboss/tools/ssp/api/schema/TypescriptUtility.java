@@ -25,7 +25,14 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.TypeScriptOutputKind;
 
 public class TypescriptUtility {
-
+	public static void cleanFolder() {
+		Path folder = getDaoTypescriptFolder();
+		File[] ts = folder.toFile().listFiles();
+		for( int i = 0; i < ts.length; i++ ) {
+			ts[i].delete();
+		}
+	}
+	
 	public static void writeTypescriptSchemas(Class[] daoClasses) throws Exception {
 		File daoFolder = getDaoTypescriptFolder().toFile();
 		if (!daoFolder.exists()) {

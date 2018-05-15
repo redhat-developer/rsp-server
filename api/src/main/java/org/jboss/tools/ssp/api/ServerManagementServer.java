@@ -23,34 +23,32 @@ import org.jboss.tools.ssp.api.beans.ServerType;
 import org.jboss.tools.ssp.api.beans.StartServerAttributes;
 import org.jboss.tools.ssp.api.beans.Status;
 import org.jboss.tools.ssp.api.beans.StopServerAttributes;
-import org.jboss.tools.ssp.api.beans.VMDescription;
-import org.jboss.tools.ssp.api.beans.VMHandle;
 
 @JsonSegment("server")
 public interface ServerManagementServer {
-	
-	/**
-	 * The `server/getVMs` request is sent by the client to fetch 
-	 * a list of VMs that are able to be used 
-	 */
-	@JsonRequest
-	CompletableFuture<List<VMDescription>> getVMs();
-
-	/**
-	 * The `server/addVM` request is sent by the client to add
-	 * a new java virtual machine to the server's list of VMs for 
-	 * use by any java-based server.
-	 */
-	@JsonNotification
-	void addVM(VMDescription description);
-
-	/**
-	 * The `server/removeVM` request is sent by the client to remove
-	 * a java virtual machine from the server's list of VMs for 
-	 * use by any java-based server.
-	 */
-	@JsonNotification
-	public void removeVM(VMHandle vm);
+//	
+//	/**
+//	 * The `server/getVMs` request is sent by the client to fetch 
+//	 * a list of VMs that are able to be used 
+//	 */
+//	@JsonRequest
+//	CompletableFuture<List<VMDescription>> getVMs();
+//
+//	/**
+//	 * The `server/addVM` request is sent by the client to add
+//	 * a new java virtual machine to the server's list of VMs for 
+//	 * use by any java-based server.
+//	 */
+//	@JsonNotification
+//	void addVM(VMDescription description);
+//
+//	/**
+//	 * The `server/removeVM` request is sent by the client to remove
+//	 * a java virtual machine from the server's list of VMs for 
+//	 * use by any java-based server.
+//	 */
+//	@JsonNotification
+//	public void removeVM(VMHandle vm);
 	
 	/**
 	 * The `server/getDiscoveryPaths` request is sent by the client to fetch 

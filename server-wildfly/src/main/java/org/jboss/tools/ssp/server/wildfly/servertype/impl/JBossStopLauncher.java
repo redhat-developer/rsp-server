@@ -80,7 +80,7 @@ public class JBossStopLauncher {
 		return new Launch(this, mode, null);
 	}
 	private IStatus checkPrereqs(String mode) {
-		String vmId = delegate.getServer().getAttribute(IJBossServerAttributes.VM_INSTALL_ID, (String)null);
+		String vmId = delegate.getServer().getAttribute(IJBossServerAttributes.VM_INSTALL_PATH, (String)null);
 		if( vmId == null ) {
 			return Status.CANCEL_STATUS;
 		}

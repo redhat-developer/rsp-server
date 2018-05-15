@@ -164,9 +164,6 @@ public class ServerModel {
 				s.setAttribute(k, (Map)val);
 			}
 		}
-		
-		
-		
 		return s;
 	}
 	

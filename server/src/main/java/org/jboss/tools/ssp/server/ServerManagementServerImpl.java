@@ -28,13 +28,7 @@ import org.jboss.tools.ssp.api.beans.ServerType;
 import org.jboss.tools.ssp.api.beans.StartServerAttributes;
 import org.jboss.tools.ssp.api.beans.Status;
 import org.jboss.tools.ssp.api.beans.StopServerAttributes;
-import org.jboss.tools.ssp.api.beans.VMDescription;
-import org.jboss.tools.ssp.api.beans.VMHandle;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
-import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
-import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall2;
-import org.jboss.tools.ssp.eclipse.jdt.launching.StandardVMType;
-import org.jboss.tools.ssp.launching.LaunchingCore;
 import org.jboss.tools.ssp.launching.VMInstallModel;
 import org.jboss.tools.ssp.server.core.internal.StatusConverter;
 import org.jboss.tools.ssp.server.discovery.serverbeans.ServerBeanLoader;
@@ -49,11 +43,15 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	private final List<SocketLauncher<ServerManagementClient>> launchers 
 		= new CopyOnWriteArrayList<>();
 	
-	private final ServerManagementModel model = new ServerManagementModel();
-	private final RemoteEventManager eventManager = new RemoteEventManager(this);
+	private final VMInstallModel vmModel;
+	private final ServerManagementModel model;
+	private final RemoteEventManager eventManager;
 
 	public ServerManagementServerImpl() {
-		// Intentionally empty. Can be changed.
+		vmModel = VMInstallModel.getDefault();
+		vmModel.addActiveVM();
+		model = new ServerManagementModel();
+		eventManager = new RemoteEventManager(this);
 	}
 	
 	public List<ServerManagementClient> getClients() {
@@ -89,43 +87,43 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	 * Some methods for adding or removing VMs
 	 */
 	
-	/**
-	 * Get a list of VMs currently registered
-	 * @return
-	 */
-	@Override
-	public CompletableFuture<List<VMDescription>> getVMs() {
-		IVMInstall[] arr = VMInstallModel.getDefault().getVMs();
-		VMDescription[] vmd = new VMDescription[arr.length];
-		for( int i = 0; i < arr.length; i++ ) {
-			vmd[i] = getDescription(arr[i]);
-		}
-		return CompletableFuture.completedFuture(Arrays.asList(vmd));
-	}
-	
-	private VMDescription getDescription(IVMInstall vmi) {
-		String vers = vmi instanceof IVMInstall2 ? ((IVMInstall2)vmi).getJavaVersion() : null;
-		return new VMDescription(vmi.getId(), vmi.getInstallLocation().getAbsolutePath(), vers);
-	}
-	
-	@Override
-	public void addVM(VMDescription desc) {
-		
-		try {
-			IVMInstall vmi = StandardVMType.getDefault().createVMInstall(desc.getId());
-			vmi.setInstallLocation(new File(desc.getInstallLocation()));
-			VMInstallModel.getDefault().addVMInstall(vmi);
-		} catch(IllegalArgumentException arg) {
-			LaunchingCore.log(arg);
-		}
-	}
-
-	@Override
-	public void removeVM(VMHandle handle) {
-		VMInstallModel.getDefault().removeVMInstall(handle.getId());
-	}
-
-	
+//	/**
+//	 * Get a list of VMs currently registered
+//	 * @return
+//	 */
+//	@Override
+//	public CompletableFuture<List<VMDescription>> getVMs() {
+//		IVMInstall[] arr = VMInstallModel.getDefault().getVMs();
+//		VMDescription[] vmd = new VMDescription[arr.length];
+//		for( int i = 0; i < arr.length; i++ ) {
+//			vmd[i] = getDescription(arr[i]);
+//		}
+//		return CompletableFuture.completedFuture(Arrays.asList(vmd));
+//	}
+//	
+//	private VMDescription getDescription(IVMInstall vmi) {
+//		String vers = vmi instanceof IVMInstall2 ? ((IVMInstall2)vmi).getJavaVersion() : null;
+//		return new VMDescription(vmi.getId(), vmi.getInstallLocation().getAbsolutePath(), vers);
+//	}
+//	
+//	@Override
+//	public void addVM(VMDescription desc) {
+//		
+//		try {
+//			IVMInstall vmi = StandardVMType.getDefault().createVMInstall(desc.getId());
+//			vmi.setInstallLocation(new File(desc.getInstallLocation()));
+//			VMInstallModel.getDefault().addVMInstall(vmi);
+//		} catch(IllegalArgumentException arg) {
+//			LaunchingCore.log(arg);
+//		}
+//	}
+//
+//	@Override
+//	public void removeVM(VMHandle handle) {
+//		VMInstallModel.getDefault().removeVMInstall(handle.getId());
+//	}
+//
+//	
 	
 	/**
 	 * Return existing messages.

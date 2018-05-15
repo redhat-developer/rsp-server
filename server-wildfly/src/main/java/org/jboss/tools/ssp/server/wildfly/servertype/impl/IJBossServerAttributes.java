@@ -12,7 +12,6 @@ public interface IJBossServerAttributes {
 	/*
 	 * Required attributes
 	 */
-	public static final String VM_INSTALL_ID = "vm.install.id";
 	public static final String SERVER_HOME = "server.home.dir";
 	
 	
@@ -20,6 +19,7 @@ public interface IJBossServerAttributes {
 	/*
 	 * Optional Attributes
 	 */
+	public static final String VM_INSTALL_PATH = "vm.install.path";
 	
 	
 	/*

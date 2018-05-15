@@ -19,7 +19,6 @@ import org.jboss.tools.ssp.api.beans.ServerHandle;
 import org.jboss.tools.ssp.api.beans.ServerProcess;
 import org.jboss.tools.ssp.api.beans.ServerProcessOutput;
 import org.jboss.tools.ssp.api.beans.ServerStateChange;
-import org.jboss.tools.ssp.api.beans.VMDescription;
 
 public class ServerManagementClientImpl implements ServerManagementClient {
 	
@@ -44,16 +43,16 @@ public class ServerManagementClientImpl implements ServerManagementClient {
 		System.out.println("Removed discovery path: " + message.getFilepath());
 	}
 
-	@Override
-	public void vmAdded(VMDescription vmd) {
-		System.out.println("VM added: " + vmd.getId() + ":" + vmd.getInstallLocation());
-	}
-
-	@Override
-	public void vmRemoved(VMDescription vmd) {
-		System.out.println("VM removed: " + vmd.getId() + ":" + vmd.getInstallLocation());
-	}
-
+//	@Override
+//	public void vmAdded(VMDescription vmd) {
+//		System.out.println("VM added: " + vmd.getId() + ":" + vmd.getInstallLocation());
+//	}
+//
+//	@Override
+//	public void vmRemoved(VMDescription vmd) {
+//		System.out.println("VM removed: " + vmd.getId() + ":" + vmd.getInstallLocation());
+//	}
+//
 	@Override
 	public void serverAdded(ServerHandle server) {
 		System.out.println("Server added: " + server.getType() + ":" + server.getId());

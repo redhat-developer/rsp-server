@@ -199,56 +199,6 @@ The protocol currently assumes that one server serves one tool. There is current
 
 ### The Server Interface
 
-#### server/getVMs
-
- The `server/getVMs` request is sent by the client to fetch a list of VMs that are able to be used 
-
-This endpoint takes no parameters. 
-
-#### server/addVM
-
- The `server/addVM` request is sent by the client to add a new java virtual machine to the server's list of VMs for use by any java-based server. 
-
-This endpoint takes the following json schemas as parameters: 
-
-<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
-<tr><td>0</td><td><pre>{
-  "type" : "object",
-  "properties" : {
-    "id" : {
-      "type" : "string"
-    },
-    "installLocation" : {
-      "type" : "string"
-    },
-    "version" : {
-      "type" : "string"
-    }
-  }
-}</pre></td><td><pre>export interface VMDescription {
-    id: string;
-    installLocation: string;
-    version: string;
-}</pre></td></tr></table>
-
-#### server/removeVM
-
- The `server/removeVM` request is sent by the client to remove a java virtual machine from the server's list of VMs for use by any java-based server. 
-
-This endpoint takes the following json schemas as parameters: 
-
-<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
-<tr><td>0</td><td><pre>{
-  "type" : "object",
-  "properties" : {
-    "id" : {
-      "type" : "string"
-    }
-  }
-}</pre></td><td><pre>export interface VMHandle {
-    id: string;
-}</pre></td></tr></table>
-
 #### server/getDiscoveryPaths
 
  The `server/getDiscoveryPaths` request is sent by the client to fetch a list of discovery paths that can be searched. 
@@ -496,58 +446,6 @@ This endpoint takes the following json schemas as parameters:
   }
 }</pre></td><td><pre>export interface DiscoveryPath {
     filepath: string;
-}</pre></td></tr></table>
-
-#### client/vmAdded
-
- The `client/vmAdded` is sent by the server to all clients in a response to the `server/addVM` notification. 
-
-This endpoint takes the following json schemas as parameters: 
-
-<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
-<tr><td>0</td><td><pre>{
-  "type" : "object",
-  "properties" : {
-    "id" : {
-      "type" : "string"
-    },
-    "installLocation" : {
-      "type" : "string"
-    },
-    "version" : {
-      "type" : "string"
-    }
-  }
-}</pre></td><td><pre>export interface VMDescription {
-    id: string;
-    installLocation: string;
-    version: string;
-}</pre></td></tr></table>
-
-#### client/vmRemoved
-
- The `client/vmRemoved` is sent by the server to all clients in a response to the `server/removeVM` notification. 
-
-This endpoint takes the following json schemas as parameters: 
-
-<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
-<tr><td>0</td><td><pre>{
-  "type" : "object",
-  "properties" : {
-    "id" : {
-      "type" : "string"
-    },
-    "installLocation" : {
-      "type" : "string"
-    },
-    "version" : {
-      "type" : "string"
-    }
-  }
-}</pre></td><td><pre>export interface VMDescription {
-    id: string;
-    installLocation: string;
-    version: string;
 }</pre></td></tr></table>
 
 #### client/serverAdded

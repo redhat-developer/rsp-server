@@ -22,6 +22,15 @@ import com.fasterxml.jackson.module.jsonSchema.factories.VisitorContext;
 import com.fasterxml.jackson.module.jsonSchema.factories.WrapperFactory;
 
 public class JSONUtility {
+	
+	public static void cleanFolder() {
+		Path folder = getDaoJsonFolder();
+		File[] jsons = folder.toFile().listFiles();
+		for( int i = 0; i < jsons.length; i++ ) {
+			jsons[i].delete();
+		}
+	}
+	
 	public static void writeJsonDAOSchemas(Class[] daoClasses) throws Exception {
 		File daoFolder = getDaoJsonFolder().toFile();
 		daoFolder.mkdirs();

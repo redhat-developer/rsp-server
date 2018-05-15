@@ -55,17 +55,17 @@ public class RemoteEventManager implements IDiscoveryPathListener, IVMInstallCha
 	
 	@Override
 	public void vmAdded(IVMInstall vm) {
-		List<ServerManagementClient> l = server.getClients();
-		for( ServerManagementClient c : l) {
-			c.vmAdded(getDescription(vm));
-		}
+//		List<ServerManagementClient> l = server.getClients();
+//		for( ServerManagementClient c : l) {
+//			c.vmAdded(getDescription(vm));
+//		}
 	}
 	@Override
 	public void vmRemoved(IVMInstall vm) {
-		List<ServerManagementClient> l = server.getClients();
-		for( ServerManagementClient c : l) {
-			c.vmRemoved(getDescription(vm));
-		}
+//		List<ServerManagementClient> l = server.getClients();
+//		for( ServerManagementClient c : l) {
+//			c.vmRemoved(getDescription(vm));
+//		}
 	}
 
 	public void serverAdded(ServerHandle server2) {
