@@ -130,7 +130,7 @@ tests enabled to make sure your changes are still good.
 
 You can then push your topic branch and its changes into your public fork repository:
 
-	$ git push origin jbide-1234         # pushes your topic branch into your public fork of OpenShift Tools
+	$ git push origin jbide-1234         # pushes your topic branch into your public fork of SSP
 
 And then [generate a pull-request](http://help.github.com/pull-requests/) where we can
 review the proposed changes, comment on them, discuss them with you,
