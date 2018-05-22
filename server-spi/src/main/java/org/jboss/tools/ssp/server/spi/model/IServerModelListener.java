@@ -6,9 +6,9 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.server.model;
+package org.jboss.tools.ssp.server.spi.model;
 
-import org.jboss.tools.ssp.api.beans.ServerHandle;
+import org.jboss.tools.ssp.api.dao.ServerHandle;
 
 public interface IServerModelListener {
 	void serverAdded(ServerHandle server);

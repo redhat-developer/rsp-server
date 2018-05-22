@@ -14,11 +14,11 @@ package org.jboss.tools.ssp.client.bindings;
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
 import org.jboss.tools.ssp.api.ServerManagementClient;
 import org.jboss.tools.ssp.api.ServerManagementServer;
-import org.jboss.tools.ssp.api.beans.DiscoveryPath;
-import org.jboss.tools.ssp.api.beans.ServerHandle;
-import org.jboss.tools.ssp.api.beans.ServerProcess;
-import org.jboss.tools.ssp.api.beans.ServerProcessOutput;
-import org.jboss.tools.ssp.api.beans.ServerStateChange;
+import org.jboss.tools.ssp.api.dao.DiscoveryPath;
+import org.jboss.tools.ssp.api.dao.ServerHandle;
+import org.jboss.tools.ssp.api.dao.ServerProcess;
+import org.jboss.tools.ssp.api.dao.ServerProcessOutput;
+import org.jboss.tools.ssp.api.dao.ServerStateChange;
 
 public class ServerManagementClientImpl implements ServerManagementClient {
 	

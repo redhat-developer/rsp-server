@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
-import org.jboss.tools.ssp.api.ServerManagementClient;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.eclipse.core.runtime.Status;
 import org.jboss.tools.ssp.eclipse.debug.core.DebugEvent;

@@ -9,14 +9,14 @@
 package org.jboss.tools.ssp.server.wildfly.servertype.impl;
 
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
-import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
-import org.jboss.tools.ssp.api.beans.util.CreateServerAttributesUtility;
+import org.jboss.tools.ssp.api.dao.CreateServerAttributes;
+import org.jboss.tools.ssp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.ssp.server.spi.servertype.IServerType;
 import org.jboss.tools.ssp.server.wildfly.beans.impl.IServerConstants;
 
-public class JBossServerTypeFactory implements IServerType{
+public class JBossServerFactory implements IServerType{
 	private CreateServerAttributes required = null;
 	private CreateServerAttributes optional = null;
 	

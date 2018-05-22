@@ -10,11 +10,11 @@ package org.jboss.tools.ssp.api;
 
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
-import org.jboss.tools.ssp.api.beans.DiscoveryPath;
-import org.jboss.tools.ssp.api.beans.ServerHandle;
-import org.jboss.tools.ssp.api.beans.ServerProcess;
-import org.jboss.tools.ssp.api.beans.ServerProcessOutput;
-import org.jboss.tools.ssp.api.beans.ServerStateChange;
+import org.jboss.tools.ssp.api.dao.DiscoveryPath;
+import org.jboss.tools.ssp.api.dao.ServerHandle;
+import org.jboss.tools.ssp.api.dao.ServerProcess;
+import org.jboss.tools.ssp.api.dao.ServerProcessOutput;
+import org.jboss.tools.ssp.api.dao.ServerStateChange;
 
 @JsonSegment("client")
 public interface ServerManagementClient {

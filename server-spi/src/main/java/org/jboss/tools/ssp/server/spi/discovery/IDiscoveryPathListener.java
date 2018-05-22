@@ -6,25 +6,13 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.api.beans;
+package org.jboss.tools.ssp.server.spi.discovery;
 
-public class StartServerAttributes {
-	private String id;
-	private String mode;
-	public StartServerAttributes(String id, String mode) {
-		this.id = id;
-		this.mode = mode;
-	}
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
-	public String getMode() {
-		return mode;
-	}
-	public void setMode(String mode) {
-		this.mode = mode;
-	}
+import org.jboss.tools.ssp.api.dao.DiscoveryPath;
+
+public interface IDiscoveryPathListener {
+	public void discoveryPathAdded(DiscoveryPath path);
+	
+	public void discoveryPathRemoved(DiscoveryPath path);
+	
 }

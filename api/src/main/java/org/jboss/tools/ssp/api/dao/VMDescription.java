@@ -6,25 +6,28 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.api.beans;
+package org.jboss.tools.ssp.api.dao;
 
-public class ServerProcess {
-	private ServerHandle server;
-	private String processId;
-	public ServerProcess(ServerHandle handle, String process) {
-		this.processId = process;
-		this.server = handle;
+public class VMDescription {
+	private String id;
+	private String installLocation;
+	private String version;
+	
+	public VMDescription(String id, String il, String v) {
+		this.id = id;
+		this.installLocation = il;
+		this.version = v;
 	}
-	public ServerHandle getServer() {
-		return server;
+
+	public String getId() {
+		return id;
 	}
-	public void setServer(ServerHandle server) {
-		this.server = server;
+
+	public String getInstallLocation() {
+		return installLocation;
 	}
-	public String getProcessId() {
-		return processId;
-	}
-	public void setProcessId(String processId) {
-		this.processId = processId;
+
+	public String getVersion() {
+		return version;
 	}
 }

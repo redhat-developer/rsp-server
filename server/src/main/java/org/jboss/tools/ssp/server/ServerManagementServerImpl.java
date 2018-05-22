@@ -19,21 +19,22 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.jboss.tools.ssp.api.ServerManagementClient;
 import org.jboss.tools.ssp.api.ServerManagementServer;
 import org.jboss.tools.ssp.api.SocketLauncher;
-import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
-import org.jboss.tools.ssp.api.beans.DiscoveryPath;
-import org.jboss.tools.ssp.api.beans.ServerAttributes;
-import org.jboss.tools.ssp.api.beans.ServerBean;
-import org.jboss.tools.ssp.api.beans.ServerHandle;
-import org.jboss.tools.ssp.api.beans.ServerType;
-import org.jboss.tools.ssp.api.beans.StartServerAttributes;
-import org.jboss.tools.ssp.api.beans.Status;
-import org.jboss.tools.ssp.api.beans.StopServerAttributes;
+import org.jboss.tools.ssp.api.dao.CreateServerAttributes;
+import org.jboss.tools.ssp.api.dao.DiscoveryPath;
+import org.jboss.tools.ssp.api.dao.ServerAttributes;
+import org.jboss.tools.ssp.api.dao.ServerBean;
+import org.jboss.tools.ssp.api.dao.ServerHandle;
+import org.jboss.tools.ssp.api.dao.ServerType;
+import org.jboss.tools.ssp.api.dao.StartServerAttributes;
+import org.jboss.tools.ssp.api.dao.Status;
+import org.jboss.tools.ssp.api.dao.StopServerAttributes;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.launching.VMInstallModel;
 import org.jboss.tools.ssp.server.core.internal.StatusConverter;
 import org.jboss.tools.ssp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.ssp.server.model.RemoteEventManager;
 import org.jboss.tools.ssp.server.model.ServerManagementModel;
+import org.jboss.tools.ssp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 
@@ -46,8 +47,10 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	private final VMInstallModel vmModel;
 	private final ServerManagementModel model;
 	private final RemoteEventManager eventManager;
-
-	public ServerManagementServerImpl() {
+	private ServerManagementServerLauncher launcher;
+	
+	public ServerManagementServerImpl(ServerManagementServerLauncher launcher) {
+		this.launcher = launcher;
 		vmModel = VMInstallModel.getDefault();
 		vmModel.addActiveVM();
 		model = new ServerManagementModel();
@@ -79,7 +82,7 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 		return new ArrayList<SocketLauncher<ServerManagementClient>>(launchers);
 	}
 	
-	public ServerManagementModel getModel() {
+	public IServerManagementModel getModel() {
 		return model;
 	}
 	
@@ -157,7 +160,7 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 
 	@Override
 	public void shutdown() {
-		ServerManagementServerLauncher.getDefault().shutdown();
+		launcher.shutdown();
 	}
 
 	@Override

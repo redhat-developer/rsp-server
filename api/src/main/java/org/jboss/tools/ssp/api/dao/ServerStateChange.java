@@ -6,13 +6,25 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.server.discovery;
+package org.jboss.tools.ssp.api.dao;
 
-import org.jboss.tools.ssp.api.beans.DiscoveryPath;
-
-public interface IDiscoveryPathListener {
-	public void discoveryPathAdded(DiscoveryPath path);
-	
-	public void discoveryPathRemoved(DiscoveryPath path);
-	
+public class ServerStateChange {
+	private ServerHandle server;
+	private int state;
+	public ServerStateChange(ServerHandle server, int state) {
+		this.server = server;
+		this.state = state;
+	}
+	public ServerHandle getServer() {
+		return server;
+	}
+	public void setServer(ServerHandle server) {
+		this.server = server;
+	}
+	public int getState() {
+		return state;
+	}
+	public void setState(int state) {
+		this.state = state;
+	}
 }

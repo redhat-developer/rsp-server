@@ -13,6 +13,7 @@ package org.jboss.tools.ssp.eclipse.jdt.internal.launching;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -39,8 +40,6 @@ import org.jboss.tools.ssp.eclipse.osgi.util.NLS;
 import org.jboss.tools.ssp.launching.LaunchingCore;
 import org.jboss.tools.ssp.launching.NativeEnvironmentUtil;
 import org.jboss.tools.ssp.launching.util.OSUtils;
-
-import com.ibm.icu.text.DateFormat;
 
 /**
  * A launcher for running Java main classes.
@@ -460,7 +459,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 			p.destroy();
 			return;
 		}
-		String timestamp = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM).format(new Date(System.currentTimeMillis()));
+		String timestamp = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss a").format(new Date(System.currentTimeMillis()));
 		IProcess process= newProcess(launch, p, renderProcessLabel(cmdLine, timestamp), getDefaultProcessMap());
 		process.setAttribute(DebugPlugin.ATTR_PATH, cmdLine[0]);
 		process.setAttribute(IProcess.ATTR_CMDLINE, renderCommandLine(cmdLine));

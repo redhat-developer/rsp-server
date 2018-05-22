@@ -17,18 +17,20 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
-import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
-import org.jboss.tools.ssp.api.beans.ServerHandle;
-import org.jboss.tools.ssp.api.beans.util.CreateServerAttributesUtility;
+import org.jboss.tools.ssp.api.dao.CreateServerAttributes;
+import org.jboss.tools.ssp.api.dao.ServerHandle;
+import org.jboss.tools.ssp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.eclipse.core.runtime.Status;
 import org.jboss.tools.ssp.launching.LaunchingCore;
 import org.jboss.tools.ssp.server.model.internal.Server;
+import org.jboss.tools.ssp.server.spi.model.IServerModel;
+import org.jboss.tools.ssp.server.spi.model.IServerModelListener;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.ssp.server.spi.servertype.IServerType;
 
-public class ServerModel {
+public class ServerModel implements IServerModel {
 	private HashMap<String, IServerType> factories;
 	private HashMap<String, IServer> servers;
 	private HashMap<String, IServerDelegate> serverDelegates;
@@ -64,13 +66,13 @@ public class ServerModel {
 		listeners.remove(l);
 	}
 
-	public void addServerFactory(IServerType fact) {
+	public void addServerType(IServerType fact) {
 		if( fact != null && fact.getServerTypeId() != null ) {
 			factories.put(fact.getServerTypeId(), fact);
 		}
 	}
 	
-	public void removeServerFactory(IServerType fact) {
+	public void removeServerType(IServerType fact) {
 		if( fact != null && fact.getServerTypeId() != null ) {
 			factories.remove(fact.getServerTypeId());
 		}

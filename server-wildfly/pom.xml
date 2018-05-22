@@ -9,11 +9,13 @@
 		<artifactId>parent</artifactId>
 		<version>0.0.8-SNAPSHOT</version>
 	</parent>
-	<artifactId>server.wildfly</artifactId>
+	<artifactId>org.jboss.tools.ssp.server.wildfly</artifactId>
 	<packaging>jar</packaging>
 
 	<name>Simple Server Protocol : Server WildFly Implementation</name>
-
+	<properties>
+		<tycho-version>1.1.0</tycho-version>
+	</properties>
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -44,44 +46,32 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.1.0</version>
+				<configuration>
+					<archive>
+						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+
 	</build>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.jboss.tools.ssp</groupId>
-			<artifactId>api</artifactId>
-			<version>0.0.8-SNAPSHOT</version>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>4.3.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.tools.ssp</groupId>
-			<artifactId>server</artifactId>
+			<artifactId>org.jboss.tools.ssp.server</artifactId>
 			<version>0.0.8-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.tools.ssp</groupId>
-			<artifactId>launching</artifactId>
-			<version>0.0.8-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.tools.ssp</groupId>
-			<artifactId>server.spi</artifactId>
-			<version>0.0.8-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.14</version>
-		</dependency>
-		<dependency>
-			<groupId>dom4j</groupId>
-			<artifactId>dom4j</artifactId>
-			<version>1.6.1</version>
-		</dependency>
-		<dependency>
-			<groupId>jaxen</groupId>
-			<artifactId>jaxen</artifactId>
-			<version>1.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>

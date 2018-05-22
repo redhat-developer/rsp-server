@@ -11,25 +11,26 @@ package org.jboss.tools.ssp.server.model;
 import java.util.List;
 
 import org.jboss.tools.ssp.api.ServerManagementClient;
-import org.jboss.tools.ssp.api.beans.DiscoveryPath;
-import org.jboss.tools.ssp.api.beans.ServerHandle;
-import org.jboss.tools.ssp.api.beans.ServerProcess;
-import org.jboss.tools.ssp.api.beans.ServerProcessOutput;
-import org.jboss.tools.ssp.api.beans.ServerStateChange;
-import org.jboss.tools.ssp.api.beans.VMDescription;
+import org.jboss.tools.ssp.api.dao.DiscoveryPath;
+import org.jboss.tools.ssp.api.dao.ServerHandle;
+import org.jboss.tools.ssp.api.dao.ServerProcess;
+import org.jboss.tools.ssp.api.dao.ServerProcessOutput;
+import org.jboss.tools.ssp.api.dao.ServerStateChange;
+import org.jboss.tools.ssp.api.dao.VMDescription;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall2;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstallChangedListener;
 import org.jboss.tools.ssp.eclipse.jdt.launching.PropertyChangeEvent;
 import org.jboss.tools.ssp.server.ServerManagementServerImpl;
-import org.jboss.tools.ssp.server.discovery.IDiscoveryPathListener;
+import org.jboss.tools.ssp.server.spi.discovery.IDiscoveryPathListener;
+import org.jboss.tools.ssp.server.spi.model.IServerModelListener;
 
 public class RemoteEventManager implements IDiscoveryPathListener, IVMInstallChangedListener, IServerModelListener {
 	private ServerManagementServerImpl server;
 	public RemoteEventManager(ServerManagementServerImpl serverManagementServerImpl) {
 		this.server = serverManagementServerImpl; 
 		serverManagementServerImpl.getModel().getDiscoveryPathModel().addListener(this);
-		serverManagementServerImpl.getModel().getVMInstallModel().addListener(this);
+		//serverManagementServerImpl.getModel().getVMInstallModel().addListener(this);
 		serverManagementServerImpl.getModel().getServerModel().addServerModelListener(this);
 	}
 	@Override

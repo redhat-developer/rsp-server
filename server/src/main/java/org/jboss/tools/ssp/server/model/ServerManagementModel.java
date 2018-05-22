@@ -11,8 +11,12 @@ package org.jboss.tools.ssp.server.model;
 import org.jboss.tools.ssp.launching.VMInstallModel;
 import org.jboss.tools.ssp.server.discovery.DiscoveryPathModel;
 import org.jboss.tools.ssp.server.discovery.serverbeans.ServerBeanTypeManager;
+import org.jboss.tools.ssp.server.spi.discovery.IDiscoveryPathModel;
+import org.jboss.tools.ssp.server.spi.model.IServerBeanTypeManager;
+import org.jboss.tools.ssp.server.spi.model.IServerManagementModel;
+import org.jboss.tools.ssp.server.spi.model.IServerModel;
 
-public class ServerManagementModel {
+public class ServerManagementModel implements IServerManagementModel {
 	private static ServerManagementModel instance;
 	public static ServerManagementModel getDefault() {
 		return instance;
@@ -29,15 +33,15 @@ public class ServerManagementModel {
 		instance = this;
 	}
 	
-	public DiscoveryPathModel getDiscoveryPathModel() {
+	public IDiscoveryPathModel getDiscoveryPathModel() {
 		return rpm;
 	}
 	
-	public ServerBeanTypeManager getServerBeanTypeManager() {
+	public IServerBeanTypeManager getServerBeanTypeManager() {
 		return serverBeanTypeManager;
 	}
 	
-	public ServerModel getServerModel() {
+	public IServerModel getServerModel() {
 		return serverModel;
 	}
 

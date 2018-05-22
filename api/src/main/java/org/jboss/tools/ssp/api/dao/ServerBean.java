@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.api.beans;
+package org.jboss.tools.ssp.api.dao;
 
 public class ServerBean {
 	public static final String UNKNOWN_STR = "UNKNOWN"; //$NON-NLS-1$

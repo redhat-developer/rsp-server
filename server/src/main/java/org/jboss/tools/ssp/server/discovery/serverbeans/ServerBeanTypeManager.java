@@ -13,8 +13,9 @@ import java.util.Arrays;
 
 import org.jboss.tools.ssp.server.spi.discovery.IServerBeanTypeProvider;
 import org.jboss.tools.ssp.server.spi.discovery.ServerBeanType;
+import org.jboss.tools.ssp.server.spi.model.IServerBeanTypeManager;
 
-public class ServerBeanTypeManager {
+public class ServerBeanTypeManager implements IServerBeanTypeManager {
 	private ArrayList<IServerBeanTypeProvider> typeProviders;
 	
 	public ServerBeanTypeManager() {

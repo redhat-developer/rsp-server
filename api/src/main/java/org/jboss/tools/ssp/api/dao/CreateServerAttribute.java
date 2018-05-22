@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.api.beans;
+package org.jboss.tools.ssp.api.dao;
 
 public class CreateServerAttribute {
 	private String type;

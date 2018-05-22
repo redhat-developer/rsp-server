@@ -12,9 +12,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.jboss.tools.ssp.api.beans.DiscoveryPath;
+import org.jboss.tools.ssp.api.dao.DiscoveryPath;
+import org.jboss.tools.ssp.server.spi.discovery.IDiscoveryPathListener;
+import org.jboss.tools.ssp.server.spi.discovery.IDiscoveryPathModel;
 
-public class DiscoveryPathModel {
+public class DiscoveryPathModel implements IDiscoveryPathModel {
 	private List<DiscoveryPath> paths;
 	private List<IDiscoveryPathListener> listeners;
 	

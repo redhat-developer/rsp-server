@@ -8,7 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.server.spi.servertype;
 
-import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
+import org.jboss.tools.ssp.api.dao.CreateServerAttributes;
 
 public interface IServerType {
 	public String getServerTypeId();

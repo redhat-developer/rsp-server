@@ -6,13 +6,13 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.api.beans.util;
+package org.jboss.tools.ssp.api.dao.util;
 
 import java.util.HashMap;
 import java.util.Set;
 
-import org.jboss.tools.ssp.api.beans.CreateServerAttribute;
-import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
+import org.jboss.tools.ssp.api.dao.CreateServerAttribute;
+import org.jboss.tools.ssp.api.dao.CreateServerAttributes;
 
 public class CreateServerAttributesUtility {
 	private HashMap<String, CreateServerAttribute> attrs;

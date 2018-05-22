@@ -6,24 +6,25 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.api.beans;
+package org.jboss.tools.ssp.api.dao;
 
-public class ServerHandle {
+public class StartServerAttributes {
 	private String id;
-	private String type;
-	public ServerHandle(String id, String type) {
+	private String mode;
+	public StartServerAttributes(String id, String mode) {
 		this.id = id;
-		this.type = type;
+		this.mode = mode;
 	}
-	
 	public String getId() {
 		return id;
 	}
-
-	public String getType() {
-		return type;
+	public void setId(String id) {
+		this.id = id;
 	}
-	public String toString() {
-		return type + ":" + id;
+	public String getMode() {
+		return mode;
+	}
+	public void setMode(String mode) {
+		this.mode = mode;
 	}
 }

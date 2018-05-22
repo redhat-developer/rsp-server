@@ -14,15 +14,15 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
-import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
-import org.jboss.tools.ssp.api.beans.DiscoveryPath;
-import org.jboss.tools.ssp.api.beans.ServerAttributes;
-import org.jboss.tools.ssp.api.beans.ServerBean;
-import org.jboss.tools.ssp.api.beans.ServerHandle;
-import org.jboss.tools.ssp.api.beans.ServerType;
-import org.jboss.tools.ssp.api.beans.StartServerAttributes;
-import org.jboss.tools.ssp.api.beans.Status;
-import org.jboss.tools.ssp.api.beans.StopServerAttributes;
+import org.jboss.tools.ssp.api.dao.CreateServerAttributes;
+import org.jboss.tools.ssp.api.dao.DiscoveryPath;
+import org.jboss.tools.ssp.api.dao.ServerAttributes;
+import org.jboss.tools.ssp.api.dao.ServerBean;
+import org.jboss.tools.ssp.api.dao.ServerHandle;
+import org.jboss.tools.ssp.api.dao.ServerType;
+import org.jboss.tools.ssp.api.dao.StartServerAttributes;
+import org.jboss.tools.ssp.api.dao.Status;
+import org.jboss.tools.ssp.api.dao.StopServerAttributes;
 
 @JsonSegment("server")
 public interface ServerManagementServer {

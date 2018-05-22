@@ -6,25 +6,17 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.api.beans;
+package org.jboss.tools.ssp.api.dao;
 
-public class ServerStateChange {
-	private ServerHandle server;
-	private int state;
-	public ServerStateChange(ServerHandle server, int state) {
-		this.server = server;
-		this.state = state;
+public class ServerType {
+	private String id;
+	public ServerType(String id) {
+		this.id = id;
 	}
-	public ServerHandle getServer() {
-		return server;
+	public String getId() {
+		return id;
 	}
-	public void setServer(ServerHandle server) {
-		this.server = server;
-	}
-	public int getState() {
-		return state;
-	}
-	public void setState(int state) {
-		this.state = state;
+	public void setId(String id) {
+		this.id = id;
 	}
 }

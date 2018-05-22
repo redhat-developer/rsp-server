@@ -17,18 +17,16 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
-import org.jboss.tools.ssp.api.beans.ServerAttributes;
-import org.jboss.tools.ssp.api.beans.DiscoveryPath;
-import org.jboss.tools.ssp.api.beans.CreateServerAttributes;
-import org.jboss.tools.ssp.api.beans.ServerBean;
-import org.jboss.tools.ssp.api.beans.ServerHandle;
-import org.jboss.tools.ssp.api.beans.ServerType;
-import org.jboss.tools.ssp.api.beans.StartServerAttributes;
-import org.jboss.tools.ssp.api.beans.Status;
-import org.jboss.tools.ssp.api.beans.StopServerAttributes;
-import org.jboss.tools.ssp.api.beans.VMDescription;
-import org.jboss.tools.ssp.api.beans.VMHandle;
-import org.jboss.tools.ssp.api.beans.util.CreateServerAttributesUtility;
+import org.jboss.tools.ssp.api.dao.CreateServerAttributes;
+import org.jboss.tools.ssp.api.dao.DiscoveryPath;
+import org.jboss.tools.ssp.api.dao.ServerAttributes;
+import org.jboss.tools.ssp.api.dao.ServerBean;
+import org.jboss.tools.ssp.api.dao.ServerHandle;
+import org.jboss.tools.ssp.api.dao.ServerType;
+import org.jboss.tools.ssp.api.dao.StartServerAttributes;
+import org.jboss.tools.ssp.api.dao.Status;
+import org.jboss.tools.ssp.api.dao.StopServerAttributes;
+import org.jboss.tools.ssp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.ssp.client.bindings.ServerManagementClientLauncher;
 
 public class ServerManagementCLI {
@@ -64,6 +62,7 @@ public class ServerManagementCLI {
 	public static void main(String[] args) {
 		ServerManagementCLI cli = new ServerManagementCLI();
 		cli.connect(args[0], args[1]);
+		System.out.println("Connected to: " + args[0] + ":" + args[1]);
 		cli.readCommands();
 	}
 	

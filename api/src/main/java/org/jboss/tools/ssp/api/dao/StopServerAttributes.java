@@ -6,17 +6,25 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.api.beans;
+package org.jboss.tools.ssp.api.dao;
 
-public class VMHandle {
+public class StopServerAttributes {
 	private String id;
-	public VMHandle(String id) {
+	private boolean force;
+	public StopServerAttributes(String id, boolean force) {
 		this.id = id;
+		this.force = force;
 	}
 	public String getId() {
 		return id;
 	}
 	public void setId(String id) {
 		this.id = id;
+	}
+	public boolean isForce() {
+		return force;
+	}
+	public void setForce(boolean force) {
+		this.force = force;
 	}
 }

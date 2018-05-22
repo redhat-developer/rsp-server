@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.jboss.tools.ssp.server.spi
+Bundle-SymbolicName: org.jboss.tools.ssp.server.spi
+Automatic-Module-Name: org.jboss.tools.ssp.server.spi
+Bundle-Version: 0.0.8.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: org.osgi.framework
+Export-Package: org.jboss.tools.ssp.server.spi.discovery,
+ org.jboss.tools.ssp.server.spi.model,
+ org.jboss.tools.ssp.server.spi.servertype
+

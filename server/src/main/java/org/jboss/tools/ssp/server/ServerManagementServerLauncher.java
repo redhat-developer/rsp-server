@@ -17,22 +17,28 @@ import java.util.concurrent.Executors;
 
 import org.jboss.tools.ssp.api.ServerManagementClient;
 import org.jboss.tools.ssp.api.SocketLauncher;
+import org.jboss.tools.ssp.server.spi.model.IServerManagementModel;
 
 public class ServerManagementServerLauncher {
-	protected static ServerManagementServerLauncher instance;
-
 	public static void main(String[] args) throws Exception {
-		instance = new ServerManagementServerLauncher();
+		ServerManagementServerLauncher instance = new ServerManagementServerLauncher();
 		instance.launch(args[0]);
+		instance.shutdownOnInput();
 	}
 
-	public static ServerManagementServerLauncher getDefault() {
-		return instance;
+	public void shutdownOnInput() throws IOException {
+		System.out.println("Enter any character to stop");
+		System.in.read();
+		shutdown();
 	}
 
 	protected ServerManagementServerImpl serverImpl;
 	public ServerManagementServerLauncher() {
-		serverImpl = new ServerManagementServerImpl();
+		serverImpl = new ServerManagementServerImpl(this);
+	}
+	
+	public IServerManagementModel getModel() {
+		return serverImpl.getModel();
 	}
 	
 	public List<ServerManagementClient> getClients() {
@@ -56,36 +62,42 @@ public class ServerManagementServerLauncher {
 			System.out.println("The server management server is running on port " + port);
 			threadPool.submit((Runnable) () -> {
 				while (true) {
-					try {
-						// wait for clients to connect
-						Socket socket = serverSocket.accept();
-						// create a JSON-RPC connection for the accepted socket
-						SocketLauncher<ServerManagementClient> launcher = new SocketLauncher<>(server,
-								ServerManagementClient.class, socket);
-						// connect a remote client proxy to the server
-						Runnable removeClient = server.addClient(launcher);
-						/*
-						 * Start listening for incoming messages. When the JSON-RPC connection is closed
-						 * disconnect the remote client from the chat server.
-						 */
-						launcher.startListening().thenRun(removeClient);
-					} catch (IOException ioe) {
-						// Log it
-					}
+					oneSocket(serverSocket, server);
 				}
 			});
-			System.out.println("Enter any character to stop");
-			System.in.read();
-			System.exit(0);
+			shutdownOnInput();
+		} catch(Throwable t) {
+			t.printStackTrace();
 		}
+	}
+	
+	private void oneSocket(ServerSocket serverSocket, ServerManagementServerImpl server) {
+		try {
+
+			// wait for clients to connect
+			Socket socket = serverSocket.accept();
+			// create a JSON-RPC connection for the accepted socket
+			SocketLauncher<ServerManagementClient> launcher = new SocketLauncher<>(server,
+					ServerManagementClient.class, socket);
+			// connect a remote client proxy to the server
+			Runnable removeClient = server.addClient(launcher);
+			/*
+			 * Start listening for incoming messages. When the JSON-RPC connection is closed
+			 * disconnect the remote client from the chat server.
+			 */
+			launcher.startListening().thenRun(removeClient);
+		} catch(IOException ioe) {
+			ioe.printStackTrace();
+		}
+
 	}
 
 	public void shutdown() {
 		closeAllConnections();
 		saveAllModels();
-		System.exit(0);
+		ShutdownExecutor.getExecutor().shutdown();
 	}
-
+	
 	private void saveAllModels() {
 		// TODO Auto-generated method stub
 		

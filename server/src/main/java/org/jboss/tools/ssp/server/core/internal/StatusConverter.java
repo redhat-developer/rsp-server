@@ -12,7 +12,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class StatusConverter {
-	public static org.jboss.tools.ssp.api.beans.Status convert(
+	public static org.jboss.tools.ssp.api.dao.Status convert(
 			org.jboss.tools.ssp.eclipse.core.runtime.IStatus status) {
 		int sev = status.getSeverity();
 		String plugin = status.getPlugin();
@@ -25,8 +25,8 @@ public class StatusConverter {
 			t.printStackTrace(pw);
 			trace = sw.toString(); // stack trace as a string
 		}
-		org.jboss.tools.ssp.api.beans.Status ret = 
-				new org.jboss.tools.ssp.api.beans.Status(sev, plugin, msg, trace);
+		org.jboss.tools.ssp.api.dao.Status ret = 
+				new org.jboss.tools.ssp.api.dao.Status(sev, plugin, msg, trace);
 		return ret;
 	}
 }
