@@ -4,7 +4,7 @@ Bundle-Name: org.jboss.tools.ssp.server.wildfly
 Bundle-SymbolicName: org.jboss.tools.ssp.server.wildfly
 Bundle-Activator: org.jboss.tools.ssp.server.wildfly.impl.Activator
 Automatic-Module-Name: org.jboss.tools.ssp.server.wildfly
-Bundle-Version: 0.0.8.qualifier
+Bundle-Version: 0.0.9.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: org.osgi.framework,
  org.eclipse.lsp4j,

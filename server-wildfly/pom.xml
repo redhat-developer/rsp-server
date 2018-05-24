@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.jboss.tools.ssp</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.0.8-SNAPSHOT</version>
+		<version>0.0.9-SNAPSHOT</version>
 	</parent>
 	<artifactId>org.jboss.tools.ssp.server.wildfly</artifactId>
 	<packaging>jar</packaging>
@@ -71,7 +71,7 @@
 		<dependency>
 			<groupId>org.jboss.tools.ssp</groupId>
 			<artifactId>org.jboss.tools.ssp.server</artifactId>
-			<version>0.0.8-SNAPSHOT</version>
+			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
