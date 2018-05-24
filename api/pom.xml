@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.jboss.tools.ssp</groupId>
     <artifactId>parent</artifactId>
-    <version>0.8-SNAPSHOT</version>
+    <version>0.0.8-SNAPSHOT</version>
   </parent>
   <artifactId>api</artifactId>
   <packaging>jar</packaging>

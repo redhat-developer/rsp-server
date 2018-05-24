@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.jboss.tools.ssp</groupId>
     <artifactId>parent</artifactId>
-    <version>0.8-SNAPSHOT</version>
+    <version>0.0.8-SNAPSHOT</version>
   </parent>
   <artifactId>launching</artifactId>
   <packaging>jar</packaging>
@@ -38,7 +38,7 @@
      <dependency>
        <groupId>org.jboss.tools.ssp</groupId>
        <artifactId>api</artifactId>
-       <version>0.8-SNAPSHOT</version>
+       <version>0.0.8-SNAPSHOT</version>
     </dependency>    
     <dependency>
       <groupId>log4j</groupId>
