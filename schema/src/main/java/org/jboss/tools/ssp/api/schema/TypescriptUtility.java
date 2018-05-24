@@ -56,6 +56,16 @@ public class TypescriptUtility {
 			String trimmed = trimFirstLines(contents);
 			Files.write(p, trimmed.getBytes());
 		}
+		
+		StringBuffer sb = new StringBuffer();
+		File[] generated = daoFolder.listFiles();
+		for( int i = 0; i < generated.length; i++ ) {
+			String contents = safeReadFile(generated[i].toPath());
+			sb.append(contents);
+			sb.append("\n\n");
+		}
+		
+		Files.write(getDaoTypescriptFolder().resolve("protocol.unified.d.ts"), sb.toString().getBytes());
 	}
 
 	private static String trimFirstLines(String contents) {
