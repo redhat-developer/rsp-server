@@ -18,6 +18,7 @@
 	  <module>server-spi</module>
 	  <module>server</module>
 	  <module>server-wildfly</module>
+	  <module>distribution</module>
   </modules>
 
   <build>
