@@ -33,6 +33,7 @@ public class ServerManagementServerLauncher {
 	}
 
 	protected ServerManagementServerImpl serverImpl;
+	private ListenOnSocketRunnable socketRunnable;
 	public ServerManagementServerLauncher() {
 		serverImpl = new ServerManagementServerImpl(this);
 	}
@@ -59,16 +60,41 @@ public class ServerManagementServerLauncher {
 
 		// create the socket server
 		try (ServerSocket serverSocket = new ServerSocket(port)) {
+			socketRunnable = new ListenOnSocketRunnable(serverSocket, server);
 			System.out.println("The server management server is running on port " + port);
-			threadPool.submit((Runnable) () -> {
-				while (true) {
-					oneSocket(serverSocket, server);
-				}
-			});
+			threadPool.submit(socketRunnable);
 			shutdownOnInput();
 		} catch(Throwable t) {
 			t.printStackTrace();
 		}
+	}
+	
+	private class ListenOnSocketRunnable implements Runnable {
+		private ServerSocket serverSocket;
+		private ServerManagementServerImpl server;
+		private boolean listening = true;
+		public ListenOnSocketRunnable(ServerSocket serverSocket, ServerManagementServerImpl server) {
+			this.server = server;
+			this.serverSocket = serverSocket;
+		}
+		@Override
+		public void run() {
+			while (isListening()) {
+				oneSocket(serverSocket, server);
+			}
+		}
+		
+		public void stopListening() {
+			setListening(false);
+		}
+		
+		private synchronized boolean isListening() {
+			return listening;
+		}
+		private synchronized void setListening(boolean listening) {
+			this.listening = listening;
+		}
+		
 	}
 	
 	private void oneSocket(ServerSocket serverSocket, ServerManagementServerImpl server) {
@@ -87,13 +113,16 @@ public class ServerManagementServerLauncher {
 			 */
 			launcher.startListening().thenRun(removeClient);
 		} catch(IOException ioe) {
-			ioe.printStackTrace();
+			// We shouldn't fail if we're still supposed to be listening
+			if( socketRunnable != null && socketRunnable.isListening())
+				ioe.printStackTrace();
 		}
 
 	}
 
 	public void shutdown() {
 		closeAllConnections();
+		socketRunnable.stopListening();
 		saveAllModels();
 		ShutdownExecutor.getExecutor().shutdown();
 	}
