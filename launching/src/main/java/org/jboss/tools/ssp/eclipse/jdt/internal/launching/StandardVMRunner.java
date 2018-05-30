@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jboss.tools.ssp.api.dao.CommandLineDetails;
 import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.ssp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.ssp.eclipse.core.runtime.NullProgressMonitor;
@@ -385,20 +386,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 		return vmargs;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jdt.launching.IVMRunner#run(org.eclipse.jdt.launching.VMRunnerConfiguration, org.eclipse.debug.core.ILaunch, org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	@Override
-	public void run(VMRunnerConfiguration config, ILaunch launch, IProgressMonitor monitor) throws CoreException {
-
-		if (monitor == null) {
-			monitor = new NullProgressMonitor();
-		}
-
-		IProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
-		subMonitor.beginTask(StandardVMRunner_Launching_VM____1, 2);
-		subMonitor.subTask(StandardVMRunner_Constructing_command_line____2);
-
+	public CommandLineDetails getCommandLineDetails(VMRunnerConfiguration config, ILaunch launch, IProgressMonitor subMonitor) throws CoreException {
 		String program= constructProgramString(config);
 
 		List<String> arguments= new ArrayList<>();
@@ -438,18 +426,38 @@ public class StandardVMRunner extends AbstractVMRunner {
 		subMonitor.worked(1);
 
 		// check for cancellation
-		if (monitor.isCanceled()) {
-			return;
+		if (subMonitor.isCanceled()) {
+			return null;
 		}
 
 		subMonitor.subTask(StandardVMRunner_Starting_virtual_machine____3);
-		Process p= null;
 		File workingDir = getWorkingDir(config);
+		String wd = workingDir == null ? null : workingDir.getAbsolutePath();
 		String[] newCmdLine = validateCommandLine(launch, cmdLine);
 		if(newCmdLine != null) {
 			cmdLine = newCmdLine;
 		}
-		p= exec(cmdLine, workingDir, envp);
+		return new CommandLineDetails(cmdLine, wd, newenvp);
+	}	
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jdt.launching.IVMRunner#run(org.eclipse.jdt.launching.VMRunnerConfiguration, org.eclipse.debug.core.ILaunch, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	public void run(VMRunnerConfiguration config, ILaunch launch, IProgressMonitor monitor) throws CoreException {
+
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+
+		IProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
+		subMonitor.beginTask(StandardVMRunner_Launching_VM____1, 2);
+		subMonitor.subTask(StandardVMRunner_Constructing_command_line____2);
+		
+		CommandLineDetails det = getCommandLineDetails(config, launch, subMonitor);
+
+		Process p= null;
+		p= exec(det.getCmdLine(), new File(det.getWorkingDir()), det.getEnvp());
 		if (p == null) {
 			return;
 		}
@@ -460,20 +468,20 @@ public class StandardVMRunner extends AbstractVMRunner {
 			return;
 		}
 		String timestamp = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss a").format(new Date(System.currentTimeMillis()));
-		IProcess process= newProcess(launch, p, renderProcessLabel(cmdLine, timestamp), getDefaultProcessMap());
-		process.setAttribute(DebugPlugin.ATTR_PATH, cmdLine[0]);
-		process.setAttribute(IProcess.ATTR_CMDLINE, renderCommandLine(cmdLine));
+		IProcess process= newProcess(launch, p, renderProcessLabel(det.getCmdLine(), timestamp), getDefaultProcessMap());
+		process.setAttribute(DebugPlugin.ATTR_PATH, det.getCmdLine()[0]);
+		process.setAttribute(IProcess.ATTR_CMDLINE, renderCommandLine(det.getCmdLine()));
 		String ltime = launch.getAttribute(DebugPlugin.ATTR_LAUNCH_TIMESTAMP);
 		process.setAttribute(DebugPlugin.ATTR_LAUNCH_TIMESTAMP, ltime != null ? ltime : timestamp);
-		if(workingDir != null) {
-			process.setAttribute(DebugPlugin.ATTR_WORKING_DIRECTORY, workingDir.getAbsolutePath());
+		if(det.getWorkingDir() != null) {
+			process.setAttribute(DebugPlugin.ATTR_WORKING_DIRECTORY, det.getWorkingDir());
 		}
-		if(envp != null) {
-			Arrays.sort(envp);
+		if(det.getEnvp() != null) {
+			Arrays.sort(det.getEnvp());
 			StringBuffer buff = new StringBuffer();
-			for (int i = 0; i < envp.length; i++) {
-				buff.append(envp[i]);
-				if(i < envp.length-1) {
+			for (int i = 0; i < det.getEnvp().length; i++) {
+				buff.append(det.getEnvp()[i]);
+				if(i < det.getEnvp().length-1) {
 					buff.append('\n');
 				}
 			}

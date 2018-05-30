@@ -8,11 +8,13 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.server.spi.servertype;
 
-import org.jboss.tools.ssp.api.dao.CreateServerAttributes;
+import org.jboss.tools.ssp.api.dao.Attributes;
 
 public interface IServerType {
 	public String getServerTypeId();
 	public IServerDelegate createServerDelegate(IServer server);
-	public CreateServerAttributes getRequiredAttributes();
-	public CreateServerAttributes getOptionalAttributes();
+	public Attributes getRequiredAttributes();
+	public Attributes getOptionalAttributes();
+	public Attributes getRequiredLaunchAttributes();
+	public Attributes getOptionalLaunchAttributes();
 }

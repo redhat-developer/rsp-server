@@ -12,6 +12,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jboss.tools.ssp.api.dao.CommandLineDetails;
 import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.eclipse.core.runtime.NullProgressMonitor;
@@ -22,6 +23,7 @@ import org.jboss.tools.ssp.eclipse.jdt.launching.ExecutionArguments;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMRunner;
 import org.jboss.tools.ssp.eclipse.jdt.launching.VMRunnerConfiguration;
+import org.jboss.tools.ssp.launching.ICommandProvider;
 import org.jboss.tools.ssp.launching.NativeEnvironmentUtil;
 import org.jboss.tools.ssp.launching.VMInstallModel;
 
@@ -33,6 +35,7 @@ public class JBossStartLauncher {
 	public JBossStartLauncher(JBossServerDelegate jBossServerDelegate) {
 		this.delegate = jBossServerDelegate;
 	}
+	
 	public ILaunch launch(String mode) throws CoreException {
 		IStatus preReqs = checkPrereqs(mode);
 		if( !preReqs.isOK())
@@ -43,6 +46,20 @@ public class JBossStartLauncher {
 		runner.run(runConfig, launch, new NullProgressMonitor());
 		return launch;
 	}
+	
+	public CommandLineDetails getLaunchCommand(String mode) throws CoreException {
+		IStatus preReqs = checkPrereqs(mode);
+		if( !preReqs.isOK())
+			throw new CoreException(preReqs);
+		
+		launch = createLaunch(mode);
+		VMRunnerConfiguration runConfig = configureRunner();
+		if( runner instanceof ICommandProvider ) {
+			return ((ICommandProvider)runner).getCommandLineDetails(runConfig, launch, new NullProgressMonitor());
+		}
+		return null;
+	}
+
 	
 	public ILaunch getLaunch() {
 		return launch;

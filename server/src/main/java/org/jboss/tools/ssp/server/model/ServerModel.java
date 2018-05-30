@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
-import org.jboss.tools.ssp.api.dao.CreateServerAttributes;
+import org.jboss.tools.ssp.api.dao.Attributes;
 import org.jboss.tools.ssp.api.dao.ServerHandle;
 import org.jboss.tools.ssp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
@@ -105,7 +105,7 @@ public class ServerModel implements IServerModel {
 	}
 	
 	private IStatus validateAttributes(IServerType type, Map<String, Object> map) {
-		CreateServerAttributes attr = type.getRequiredAttributes();
+		Attributes attr = type.getRequiredAttributes();
 		CreateServerAttributesUtility util = new CreateServerAttributesUtility(attr);
 		Set<String> required = util.listAttributes();
 		for( String attrKey : required ) {
@@ -238,13 +238,31 @@ public class ServerModel implements IServerModel {
 		return (String[]) types.toArray(new String[types.size()]);
 	}
 	
-	public CreateServerAttributes getRequiredAttributes(String type) {
+	public Attributes getRequiredAttributes(String type) {
 		IServerType t = factories.get(type);
-		CreateServerAttributes ret = t == null ? null : t.getRequiredAttributes();
+		Attributes ret = t == null ? null : t.getRequiredAttributes();
 		return validateAttributes(ret, type);
 	}
 	
-	private CreateServerAttributes validateAttributes(CreateServerAttributes ret, String serverType) {
+	public Attributes getOptionalAttributes(String type) {
+		IServerType t = factories.get(type);
+		Attributes ret = t == null ? null : t.getOptionalAttributes();
+		return validateAttributes(ret, type);
+	}
+
+	public Attributes getRequiredLaunchAttributes(String type) {
+		IServerType t = factories.get(type);
+		Attributes ret = t == null ? null : t.getRequiredLaunchAttributes();
+		return validateAttributes(ret, type);
+	}
+	
+	public Attributes getOptionalLaunchAttributes(String type) {
+		IServerType t = factories.get(type);
+		Attributes ret = t == null ? null : t.getOptionalLaunchAttributes();
+		return validateAttributes(ret, type);
+	}
+
+	private Attributes validateAttributes(Attributes ret, String serverType) {
 		if( ret != null ) {
 			CreateServerAttributesUtility util = new CreateServerAttributesUtility(ret);
 			Set<String> all = util.listAttributes();
@@ -271,12 +289,6 @@ public class ServerModel implements IServerModel {
 			return Map.class;
 		}
 		return null;
-	}
-	
-	public CreateServerAttributes getOptionalAttributes(String type) {
-		IServerType t = factories.get(type);
-		CreateServerAttributes ret = t == null ? null : t.getOptionalAttributes();
-		return validateAttributes(ret, type);
 	}
 
 }

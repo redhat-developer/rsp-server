@@ -19,8 +19,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.jboss.tools.ssp.api.ServerManagementClient;
 import org.jboss.tools.ssp.api.ServerManagementServer;
 import org.jboss.tools.ssp.api.SocketLauncher;
-import org.jboss.tools.ssp.api.dao.CreateServerAttributes;
+import org.jboss.tools.ssp.api.dao.Attributes;
+import org.jboss.tools.ssp.api.dao.CommandLineDetails;
 import org.jboss.tools.ssp.api.dao.DiscoveryPath;
+import org.jboss.tools.ssp.api.dao.GetLaunchCommandRequest;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
 import org.jboss.tools.ssp.api.dao.ServerBean;
 import org.jboss.tools.ssp.api.dao.ServerHandle;
@@ -175,14 +177,27 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	}
 
 	@Override
-	public CompletableFuture<CreateServerAttributes> getRequiredAttributes(ServerType type) {
-		CreateServerAttributes sspa = model.getServerModel().getRequiredAttributes(type.getId());
+	public CompletableFuture<Attributes> getRequiredAttributes(ServerType type) {
+		Attributes sspa = model.getServerModel().getRequiredAttributes(type.getId());
 		return CompletableFuture.completedFuture(sspa);
 	}
 
 	@Override
-	public CompletableFuture<CreateServerAttributes> getOptionalAttributes(ServerType type) {
-		CreateServerAttributes sspa = model.getServerModel().getOptionalAttributes(type.getId());
+	public CompletableFuture<Attributes> getOptionalAttributes(ServerType type) {
+		Attributes sspa = model.getServerModel().getOptionalAttributes(type.getId());
+		return CompletableFuture.completedFuture(sspa);
+	}
+	
+
+	@Override
+	public CompletableFuture<Attributes> getRequiredLaunchAttributes(ServerType type) {
+		Attributes sspa = model.getServerModel().getRequiredLaunchAttributes(type.getId());
+		return CompletableFuture.completedFuture(sspa);
+	}
+
+	@Override
+	public CompletableFuture<Attributes> getOptionalLaunchAttributes(ServerType type) {
+		Attributes sspa = model.getServerModel().getOptionalLaunchAttributes(type.getId());
 		return CompletableFuture.completedFuture(sspa);
 	}
 
@@ -218,4 +233,13 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 		IStatus ret = del.stop(attr.isForce());
 		return CompletableFuture.completedFuture(StatusConverter.convert(ret));
 	}
+
+	@Override
+	public CompletableFuture<CommandLineDetails> getLaunchCommand(GetLaunchCommandRequest req) {
+		IServer server = model.getServerModel().getServer(req.getServerId());
+		IServerDelegate del = server.getDelegate();
+		CommandLineDetails det = del.getStartLaunchCommand(req.getMode(), req.getParams());
+		return CompletableFuture.completedFuture(det);
+	}
+
 }

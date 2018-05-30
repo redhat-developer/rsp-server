@@ -11,17 +11,17 @@ package org.jboss.tools.ssp.api.dao.util;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.jboss.tools.ssp.api.dao.CreateServerAttribute;
-import org.jboss.tools.ssp.api.dao.CreateServerAttributes;
+import org.jboss.tools.ssp.api.dao.Attribute;
+import org.jboss.tools.ssp.api.dao.Attributes;
 
 public class CreateServerAttributesUtility {
-	private HashMap<String, CreateServerAttribute> attrs;
+	private HashMap<String, Attribute> attrs;
 	
 	public CreateServerAttributesUtility() {
 		attrs = new HashMap<>();
 	}
 	
-	public CreateServerAttributesUtility(CreateServerAttributes original) {
+	public CreateServerAttributesUtility(Attributes original) {
 		attrs = new HashMap<>(original.getAttributes());
 	}
 
@@ -30,32 +30,32 @@ public class CreateServerAttributesUtility {
 	}
 	
 	public String getAttributeType(String key) {
-		CreateServerAttribute a = attrs.get(key);
+		Attribute a = attrs.get(key);
 		if( a != null )
 			return a.getType();
 		return null;
 	}
 	
 	public String getAttributeDescription(String key) {
-		CreateServerAttribute a = attrs.get(key);
+		Attribute a = attrs.get(key);
 		if( a != null )
 			return a.getDescription();
 		return null;
 	}
 	
 	public Object getAttributeDefaultValue(String key) {
-		CreateServerAttribute a = attrs.get(key);
+		Attribute a = attrs.get(key);
 		if( a != null )
 			return a.getDefaultVal();
 		return null;
 	}
 	
 	public void addAttribute(String key, String type, String d, Object defaultVal) {
-		CreateServerAttribute a = new CreateServerAttribute(type, d, defaultVal);
+		Attribute a = new Attribute(type, d, defaultVal);
 		attrs.put(key,  a);
 	}
 
-	public CreateServerAttributes toPojo() {
-		return new CreateServerAttributes(attrs);
+	public Attributes toPojo() {
+		return new Attributes(attrs);
 	}
 }

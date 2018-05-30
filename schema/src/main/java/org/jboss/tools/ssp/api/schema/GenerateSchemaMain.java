@@ -9,8 +9,8 @@
 package org.jboss.tools.ssp.api.schema;
 
 
-import org.jboss.tools.ssp.api.dao.CreateServerAttribute;
-import org.jboss.tools.ssp.api.dao.CreateServerAttributes;
+import org.jboss.tools.ssp.api.dao.Attribute;
+import org.jboss.tools.ssp.api.dao.Attributes;
 import org.jboss.tools.ssp.api.dao.DiscoveryPath;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
 import org.jboss.tools.ssp.api.dao.ServerBean;
@@ -50,7 +50,7 @@ public class GenerateSchemaMain {
 
 				ServerType.class,ServerHandle.class,
 				ServerAttributes.class,
-				CreateServerAttributes.class, CreateServerAttribute.class,
+				Attributes.class, Attribute.class,
 				ServerProcess.class, ServerProcessOutput.class,
 				ServerStateChange.class, 
 				StartServerAttributes.class, StopServerAttributes.class

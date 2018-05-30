@@ -2,7 +2,7 @@ package org.jboss.tools.ssp.server.spi.model;
 
 import java.util.Map;
 
-import org.jboss.tools.ssp.api.dao.CreateServerAttributes;
+import org.jboss.tools.ssp.api.dao.Attributes;
 import org.jboss.tools.ssp.api.dao.ServerHandle;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
@@ -16,9 +16,13 @@ public interface IServerModel {
 
 	ServerHandle[] getServerHandles();
 
-	CreateServerAttributes getRequiredAttributes(String id);
+	Attributes getRequiredAttributes(String id);
 
-	CreateServerAttributes getOptionalAttributes(String id);
+	Attributes getOptionalAttributes(String id);
+
+	Attributes getRequiredLaunchAttributes(String id);
+
+	Attributes getOptionalLaunchAttributes(String id);
 
 	IStatus createServer(String serverType, String id, Map<String, Object> attributes);
 

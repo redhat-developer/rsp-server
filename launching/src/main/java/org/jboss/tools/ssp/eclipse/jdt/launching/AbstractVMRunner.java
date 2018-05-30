@@ -22,6 +22,7 @@ import org.jboss.tools.ssp.eclipse.core.runtime.Status;
 import org.jboss.tools.ssp.eclipse.debug.core.DebugPlugin;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.ssp.eclipse.debug.core.model.IProcess;
+import org.jboss.tools.ssp.launching.ICommandProvider;
 import org.jboss.tools.ssp.launching.util.ExecUtil;
 import org.jboss.tools.ssp.launching.util.OSUtils;
 
@@ -33,7 +34,7 @@ import org.jboss.tools.ssp.launching.util.OSUtils;
  * @see IVMRunner
  * @since 2.0
  */
-public abstract class AbstractVMRunner implements IVMRunner {
+public abstract class AbstractVMRunner implements IVMRunner, ICommandProvider {
 	public static final String AbstractVMRunner_0="An IProcess could not be created for the launch";
 
 	/**

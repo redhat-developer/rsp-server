@@ -8,12 +8,12 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.api.dao;
 
-public class CreateServerAttribute {
+public class Attribute {
 	private String type;
 	private String description;
 	private Object defaultVal;
 	
-	public CreateServerAttribute(String type, String desc, Object def) {
+	public Attribute(String type, String desc, Object def) {
 		this.type = type;
 		this.description = desc;
 		this.defaultVal = def;

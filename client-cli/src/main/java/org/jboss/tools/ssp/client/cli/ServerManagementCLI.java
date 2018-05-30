@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
-import org.jboss.tools.ssp.api.dao.CreateServerAttributes;
+import org.jboss.tools.ssp.api.dao.Attributes;
 import org.jboss.tools.ssp.api.dao.DiscoveryPath;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
 import org.jboss.tools.ssp.api.dao.ServerBean;
@@ -221,7 +221,7 @@ public class ServerManagementCLI {
 			System.out.println("Please choose a unique name: ");
 			String name = nextLine();
 			
-			CreateServerAttributes required2 = launcher.getServerProxy()
+			Attributes required2 = launcher.getServerProxy()
 					.getRequiredAttributes(new ServerType(type)).get();
 			CreateServerAttributesUtility required = new CreateServerAttributesUtility(required2);
 			HashMap<String, Object> toSend = new HashMap<>();

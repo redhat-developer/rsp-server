@@ -9,7 +9,7 @@
 package org.jboss.tools.ssp.server.wildfly.servertype.impl;
 
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
-import org.jboss.tools.ssp.api.dao.CreateServerAttributes;
+import org.jboss.tools.ssp.api.dao.Attributes;
 import org.jboss.tools.ssp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
@@ -17,8 +17,8 @@ import org.jboss.tools.ssp.server.spi.servertype.IServerType;
 import org.jboss.tools.ssp.server.wildfly.beans.impl.IServerConstants;
 
 public class JBossServerFactory implements IServerType{
-	private CreateServerAttributes required = null;
-	private CreateServerAttributes optional = null;
+	private Attributes required = null;
+	private Attributes optional = null;
 	
 	@Override
 	public String getServerTypeId() {
@@ -32,7 +32,7 @@ public class JBossServerFactory implements IServerType{
 	}
 
 	@Override
-	public CreateServerAttributes getRequiredAttributes() {
+	public Attributes getRequiredAttributes() {
 		if( required == null ) {
 			CreateServerAttributesUtility attrs = new CreateServerAttributesUtility();
 			attrs.addAttribute(IJBossServerAttributes.SERVER_HOME, 
@@ -44,7 +44,7 @@ public class JBossServerFactory implements IServerType{
 	}
 
 	@Override
-	public CreateServerAttributes getOptionalAttributes() {
+	public Attributes getOptionalAttributes() {
 		if( optional == null ) {
 			CreateServerAttributesUtility attrs = new CreateServerAttributesUtility();
 			attrs.addAttribute(IJBossServerAttributes.VM_INSTALL_PATH, 
@@ -55,4 +55,15 @@ public class JBossServerFactory implements IServerType{
 		return optional;
 	}
 
+	@Override
+	public Attributes getRequiredLaunchAttributes() {
+		CreateServerAttributesUtility attrs = new CreateServerAttributesUtility();
+		return attrs.toPojo();
+	}
+
+	@Override
+	public Attributes getOptionalLaunchAttributes() {
+		CreateServerAttributesUtility attrs = new CreateServerAttributesUtility();
+		return attrs.toPojo();
+	}
 }

@@ -9,6 +9,8 @@
 package org.jboss.tools.ssp.server.spi.servertype;
 
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
+import org.jboss.tools.ssp.api.dao.CommandLineDetails;
+import org.jboss.tools.ssp.api.dao.ServerAttributes;
 import org.jboss.tools.ssp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 
@@ -153,4 +155,6 @@ public interface IServerDelegate {
 	public IStatus stop(boolean force);
 	
 	public void dispose();
+
+	public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params);
 }

@@ -9,7 +9,10 @@
 package org.jboss.tools.ssp.server.wildfly.servertype.impl;
 
 import java.io.File;
+import java.util.concurrent.CompletableFuture;
 
+import org.jboss.tools.ssp.api.dao.CommandLineDetails;
+import org.jboss.tools.ssp.api.dao.ServerAttributes;
 import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.eclipse.core.runtime.Status;
@@ -142,6 +145,16 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 			}
 		}
 		fireServerProcessTerminated(getProcessId(p));
+	}
+
+	@Override
+	public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params) {
+		try {
+			return new JBossStartLauncher(this).getLaunchCommand(mode);
+		} catch(CoreException ce) {
+			LaunchingCore.log(ce);
+			return null;
+		}
 	}
 	
 }

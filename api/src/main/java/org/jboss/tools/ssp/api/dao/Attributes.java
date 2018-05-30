@@ -11,21 +11,21 @@ package org.jboss.tools.ssp.api.dao;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CreateServerAttributes {
-	private HashMap<String, CreateServerAttribute> attributes;
+public class Attributes {
+	private HashMap<String, Attribute> attributes;
 	
-	public CreateServerAttributes() {
+	public Attributes() {
 		attributes = new HashMap<>();
 	}
-	public CreateServerAttributes(Map<String, CreateServerAttribute> a) {
+	public Attributes(Map<String, Attribute> a) {
 		attributes = new HashMap<>(a);
 	}
 
-	public HashMap<String, CreateServerAttribute> getAttributes() {
+	public HashMap<String, Attribute> getAttributes() {
 		return attributes;
 	}
 
-	public void setAttributes(HashMap<String, CreateServerAttribute> attrs) {
+	public void setAttributes(HashMap<String, Attribute> attrs) {
 		this.attributes = attrs;
 	}
 }
