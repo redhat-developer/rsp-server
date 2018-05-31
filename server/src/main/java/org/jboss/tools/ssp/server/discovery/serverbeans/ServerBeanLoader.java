@@ -13,8 +13,8 @@ import java.io.File;
 
 import org.jboss.tools.ssp.api.dao.ServerBean;
 import org.jboss.tools.ssp.server.model.ServerManagementModel;
+import org.jboss.tools.ssp.server.spi.discovery.IServerBeanTypeManager;
 import org.jboss.tools.ssp.server.spi.discovery.ServerBeanType;
-import org.jboss.tools.ssp.server.spi.model.IServerBeanTypeManager;
 
 
 /**

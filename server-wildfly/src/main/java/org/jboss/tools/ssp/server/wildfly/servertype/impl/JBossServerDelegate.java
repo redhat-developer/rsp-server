@@ -9,10 +9,11 @@
 package org.jboss.tools.ssp.server.wildfly.servertype.impl;
 
 import java.io.File;
-import java.util.concurrent.CompletableFuture;
 
 import org.jboss.tools.ssp.api.dao.CommandLineDetails;
+import org.jboss.tools.ssp.api.dao.LaunchCommandRequest;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
+import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.eclipse.core.runtime.Status;
@@ -84,7 +85,7 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 		try {
 			startLaunch = new JBossStartLauncher(this).launch(mode);
 			registerLaunch(startLaunch);
-			// TODO fire poller or similar
+			launchPoller(true);
 			setServerState(IServerDelegate.STATE_STARTED);
 		} catch(CoreException ce) {
 			if( startLaunch != null ) {
@@ -107,6 +108,7 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 	@Override
 	public IStatus stop(boolean force) {
 		setServerState(IServerDelegate.STATE_STOPPING);
+		launchPoller(false);
 		ILaunch stopLaunch = null;
 		try {
 			stopLaunch = new JBossStopLauncher(this).launch(force);
@@ -129,6 +131,14 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 		}
 		return Status.OK_STATUS;
 
+	}
+	
+	private static final boolean STATE_UP = true;
+	private static final boolean STATE_DOWN = false;
+	
+	private void launchPoller(boolean expectedState) {
+		// TODO, for now do nothing but
+		// eventually launch a poll thread
 	}
 	
 	@Override
@@ -156,5 +166,19 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 			return null;
 		}
 	}
-	
+
+	@Override
+	public IStatus clientSetServerStarting(ServerStartingAttributes attr) {
+		setServerState(STATE_STARTING, true);
+		if( attr.isInitiatePolling()) {
+			launchPoller(STATE_UP);
+		}
+		return Status.OK_STATUS;
+	}
+
+	@Override
+	public IStatus clientSetServerStarted(LaunchCommandRequest attr) {
+		setServerState(STATE_STARTED, true);
+		return Status.OK_STATUS;
+	}
 }

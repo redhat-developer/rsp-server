@@ -72,9 +72,13 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	}
 
 	protected void setServerState(int state) {
+		setServerState(state, true);
+	}
+	protected void setServerState(int state, boolean fire) {
 		if( state != this.serverState) {
 			this.serverState = state;
-			fireStateChanged(state);
+			if( fire ) 
+				fireStateChanged(state);
 		}
 	}
 	

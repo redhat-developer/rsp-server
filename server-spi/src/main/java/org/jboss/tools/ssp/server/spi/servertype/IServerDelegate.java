@@ -10,7 +10,9 @@ package org.jboss.tools.ssp.server.spi.servertype;
 
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
 import org.jboss.tools.ssp.api.dao.CommandLineDetails;
+import org.jboss.tools.ssp.api.dao.LaunchCommandRequest;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
+import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.ssp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 
@@ -137,6 +139,28 @@ public interface IServerDelegate {
 	 * constants declared on {@link IServer}
 	 */
 	public int getServerState();
+	
+	/**
+	 * Set the server state to starting. 
+	 * This is most likely to be called by the model, passing along
+	 * a request from an external client that wished to launch the process
+	 * themselves. 
+	 * 
+	 * They may request we initiate polling and alert them when the 
+	 * server state is up. 
+	 * 
+	 * @param attr
+	 */
+	public IStatus clientSetServerStarting(ServerStartingAttributes attr);
+	
+	/**
+	 * Set the server state to starting. 
+	 * This is most likely to be called by the model, passing along
+	 * a request from an external client that wished to launch the process
+	 * themselves. 
+	 */
+	public IStatus clientSetServerStarted(LaunchCommandRequest attr);
+	
 
 	/**
 	 * Returns the ILaunchManager mode that the server is in. This method will

@@ -22,10 +22,12 @@ import org.jboss.tools.ssp.api.SocketLauncher;
 import org.jboss.tools.ssp.api.dao.Attributes;
 import org.jboss.tools.ssp.api.dao.CommandLineDetails;
 import org.jboss.tools.ssp.api.dao.DiscoveryPath;
-import org.jboss.tools.ssp.api.dao.GetLaunchCommandRequest;
+import org.jboss.tools.ssp.api.dao.LaunchAttributesRequest;
+import org.jboss.tools.ssp.api.dao.LaunchCommandRequest;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
 import org.jboss.tools.ssp.api.dao.ServerBean;
 import org.jboss.tools.ssp.api.dao.ServerHandle;
+import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.ssp.api.dao.ServerType;
 import org.jboss.tools.ssp.api.dao.StartServerAttributes;
 import org.jboss.tools.ssp.api.dao.Status;
@@ -190,14 +192,14 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	
 
 	@Override
-	public CompletableFuture<Attributes> getRequiredLaunchAttributes(ServerType type) {
-		Attributes sspa = model.getServerModel().getRequiredLaunchAttributes(type.getId());
+	public CompletableFuture<Attributes> getRequiredLaunchAttributes(LaunchAttributesRequest req) {
+		Attributes sspa = model.getServerModel().getRequiredLaunchAttributes(req.getId());
 		return CompletableFuture.completedFuture(sspa);
 	}
 
 	@Override
-	public CompletableFuture<Attributes> getOptionalLaunchAttributes(ServerType type) {
-		Attributes sspa = model.getServerModel().getOptionalLaunchAttributes(type.getId());
+	public CompletableFuture<Attributes> getOptionalLaunchAttributes(LaunchAttributesRequest req) {
+		Attributes sspa = model.getServerModel().getOptionalLaunchAttributes(req.getId());
 		return CompletableFuture.completedFuture(sspa);
 	}
 
@@ -235,11 +237,26 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	}
 
 	@Override
-	public CompletableFuture<CommandLineDetails> getLaunchCommand(GetLaunchCommandRequest req) {
-		IServer server = model.getServerModel().getServer(req.getServerId());
+	public CompletableFuture<CommandLineDetails> getLaunchCommand(LaunchCommandRequest req) {
+		IServer server = model.getServerModel().getServer(req.getParams().getId());
 		IServerDelegate del = server.getDelegate();
 		CommandLineDetails det = del.getStartLaunchCommand(req.getMode(), req.getParams());
 		return CompletableFuture.completedFuture(det);
+	}
+
+	@Override
+	public CompletableFuture<Status> serverStartingByClient(ServerStartingAttributes attr) {
+		IServer server = model.getServerModel().getServer(attr.getRequest().getParams().getId());
+		IServerDelegate del = server.getDelegate();
+		IStatus s = del.clientSetServerStarting(attr);
+		return CompletableFuture.completedFuture(StatusConverter.convert(s));
+	}
+	@Override
+	public CompletableFuture<Status> serverStartedByClient(LaunchCommandRequest attr) {
+		IServer server = model.getServerModel().getServer(attr.getParams().getId());
+		IServerDelegate del = server.getDelegate();
+		IStatus s = del.clientSetServerStarted(attr);
+		return CompletableFuture.completedFuture(StatusConverter.convert(s));
 	}
 
 }

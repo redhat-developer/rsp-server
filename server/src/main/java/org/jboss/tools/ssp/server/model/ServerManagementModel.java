@@ -12,7 +12,7 @@ import org.jboss.tools.ssp.launching.VMInstallModel;
 import org.jboss.tools.ssp.server.discovery.DiscoveryPathModel;
 import org.jboss.tools.ssp.server.discovery.serverbeans.ServerBeanTypeManager;
 import org.jboss.tools.ssp.server.spi.discovery.IDiscoveryPathModel;
-import org.jboss.tools.ssp.server.spi.model.IServerBeanTypeManager;
+import org.jboss.tools.ssp.server.spi.discovery.IServerBeanTypeManager;
 import org.jboss.tools.ssp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.ssp.server.spi.model.IServerModel;
 

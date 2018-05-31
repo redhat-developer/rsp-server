@@ -17,10 +17,12 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 import org.jboss.tools.ssp.api.dao.Attributes;
 import org.jboss.tools.ssp.api.dao.CommandLineDetails;
 import org.jboss.tools.ssp.api.dao.DiscoveryPath;
-import org.jboss.tools.ssp.api.dao.GetLaunchCommandRequest;
+import org.jboss.tools.ssp.api.dao.LaunchCommandRequest;
+import org.jboss.tools.ssp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
 import org.jboss.tools.ssp.api.dao.ServerBean;
 import org.jboss.tools.ssp.api.dao.ServerHandle;
+import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.ssp.api.dao.ServerType;
 import org.jboss.tools.ssp.api.dao.StartServerAttributes;
 import org.jboss.tools.ssp.api.dao.Status;
@@ -126,14 +128,14 @@ public interface ServerManagementServer {
 	 * launch behavior.
 	 */
 	@JsonRequest
-	CompletableFuture<Attributes> getRequiredLaunchAttributes(ServerType type);
+	CompletableFuture<Attributes> getRequiredLaunchAttributes(LaunchAttributesRequest req);
 	
 	/**
 	 * The `server/getOptionalLaunchAttributes` request is sent by the client to 
 	 * get any optional attributes which can be used to modify the launch behavior.
 	 */
 	@JsonRequest
-	CompletableFuture<Attributes> getOptionalLaunchAttributes(ServerType type);
+	CompletableFuture<Attributes> getOptionalLaunchAttributes(LaunchAttributesRequest req);
 
 	/**
 	 * The `server/createServer` request is sent by the client to 
@@ -148,7 +150,28 @@ public interface ServerManagementServer {
 	 * launch the server. 
 	 */	
 	@JsonRequest
-	CompletableFuture<CommandLineDetails> getLaunchCommand(GetLaunchCommandRequest req);
+	CompletableFuture<CommandLineDetails> getLaunchCommand(LaunchCommandRequest req);
+
+	
+	/**
+	 * The `server/serverStartingByClient` request is sent by the client to 
+	 * the server to inform the server that the client itself has launched the 
+	 * server instead of asking the SSP to do so. 
+	 * 
+	 * The parameters include both the request used to get the launch command,
+	 * and a boolean as to whether the server should initiate the 'state-polling' mechanism
+	 * to inform the client when the selected server has completed its startup. 
+	 */	
+	@JsonRequest
+	CompletableFuture<Status> serverStartingByClient(ServerStartingAttributes attr);
+
+	/**
+	 * The `server/serverStartedByClient` request is sent by the client to 
+	 * the server to inform the server that the client itself has launched the 
+	 * server instead of asking the SSP to do so, AND that the startup has completed.
+	 */	
+	@JsonRequest
+	CompletableFuture<Status> serverStartedByClient(LaunchCommandRequest attr);
 
 	
 	/**

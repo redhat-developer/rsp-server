@@ -1,23 +1,13 @@
 package org.jboss.tools.ssp.api.dao;
 
-public class GetLaunchCommandRequest {
-	private String serverId;
+public class LaunchCommandRequest {
 	private String mode;
 	private ServerAttributes params;
 
-	public GetLaunchCommandRequest(String serverId, String mode, ServerAttributes params) {
-		this.serverId = serverId;
+	public LaunchCommandRequest(ServerAttributes params, String mode) {
 		this.mode = mode;
 		this.params = params;
 		
-	}
-
-	public String getServerId() {
-		return serverId;
-	}
-
-	public void setServerId(String serverId) {
-		this.serverId = serverId;
 	}
 
 	public String getMode() {
