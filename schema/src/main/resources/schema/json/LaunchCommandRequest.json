@@ -1,0 +1,25 @@
+{
+  "type" : "object",
+  "properties" : {
+    "mode" : {
+      "type" : "string"
+    },
+    "params" : {
+      "type" : "object",
+      "properties" : {
+        "serverType" : {
+          "type" : "string"
+        },
+        "id" : {
+          "type" : "string"
+        },
+        "attributes" : {
+          "type" : "object",
+          "additionalProperties" : {
+            "type" : "any"
+          }
+        }
+      }
+    }
+  }
+}

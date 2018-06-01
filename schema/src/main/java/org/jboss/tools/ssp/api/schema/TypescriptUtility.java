@@ -79,10 +79,6 @@ public class TypescriptUtility {
 		return contents.substring(beginning).trim();
 	}
 
-	private void safeWrite(Path out) {
-		Scanner scanner;
-	}
-	
 	public static Path getDaoTypescriptFile(String simpleClassName) {
 		Path folder = getDaoTypescriptFolder();
 		Path out = folder.resolve(simpleClassName + ".d.ts");

@@ -295,7 +295,7 @@ This endpoint takes the following json schemas as parameters:
 
 #### server/getRequiredAttributes
 
- The `server/getRequiredAttributes` request is sent by the client to list the server adapters currently configured. 
+ The `server/getRequiredAttributes` request is sent by the client to list the required attributes that can be stored on a server object of this type, such as a server-home or other required parameters. 
 
 This endpoint takes the following json schemas as parameters: 
 
@@ -313,7 +313,7 @@ This endpoint takes the following json schemas as parameters:
 
 #### server/getOptionalAttributes
 
- The `server/getOptionalAttributes` request is sent by the client to list the server adapters currently configured. 
+ The `server/getOptionalAttributes` request is sent by the client to list the optional attributes that can be stored on a server object of this type. 
 
 This endpoint takes the following json schemas as parameters: 
 
@@ -327,6 +327,50 @@ This endpoint takes the following json schemas as parameters:
   }
 }</pre></td><td><pre>export interface ServerType {
     id: string;
+}</pre></td></tr></table>
+
+#### server/getRequiredLaunchAttributes
+
+ The `server/getRequiredLaunchAttributes` request is sent by the client to get any additional attributes required for launch or that can customize launch behavior. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "mode" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface LaunchAttributesRequest {
+    id: string;
+    mode: string;
+}</pre></td></tr></table>
+
+#### server/getOptionalLaunchAttributes
+
+ The `server/getOptionalLaunchAttributes` request is sent by the client to get any optional attributes which can be used to modify the launch behavior. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "mode" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface LaunchAttributesRequest {
+    id: string;
+    mode: string;
 }</pre></td></tr></table>
 
 #### server/createServer
@@ -353,6 +397,145 @@ This endpoint takes the following json schemas as parameters:
     }
   }
 }</pre></td><td><pre>export interface ServerAttributes {
+    serverType: string;
+    id: string;
+    attributes: { [index: string]: any };
+}</pre></td></tr></table>
+
+#### server/getLaunchCommand
+
+ The `server/getLaunchCommand` request is sent by the client to the server to get the command which can be used to launch the server. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "mode" : {
+      "type" : "string"
+    },
+    "params" : {
+      "type" : "object",
+      "properties" : {
+        "serverType" : {
+          "type" : "string"
+        },
+        "id" : {
+          "type" : "string"
+        },
+        "attributes" : {
+          "type" : "object",
+          "additionalProperties" : {
+            "type" : "any"
+          }
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface LaunchCommandRequest {
+    mode: string;
+    params: ServerAttributes;
+}
+
+export interface ServerAttributes {
+    serverType: string;
+    id: string;
+    attributes: { [index: string]: any };
+}</pre></td></tr></table>
+
+#### server/serverStartingByClient
+
+ The `server/serverStartingByClient` request is sent by the client to the server to inform the server that the client itself has launched the server instead of asking the SSP to do so. The parameters include both the request used to get the launch command, and a boolean as to whether the server should initiate the 'state-polling' mechanism to inform the client when the selected server has completed its startup. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "initiatePolling" : {
+      "type" : "boolean"
+    },
+    "request" : {
+      "type" : "object",
+      "properties" : {
+        "mode" : {
+          "type" : "string"
+        },
+        "params" : {
+          "type" : "object",
+          "properties" : {
+            "serverType" : {
+              "type" : "string"
+            },
+            "id" : {
+              "type" : "string"
+            },
+            "attributes" : {
+              "type" : "object",
+              "additionalProperties" : {
+                "type" : "any"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface ServerStartingAttributes {
+    initiatePolling: boolean;
+    request: LaunchCommandRequest;
+}
+
+export interface LaunchCommandRequest {
+    mode: string;
+    params: ServerAttributes;
+}
+
+export interface ServerAttributes {
+    serverType: string;
+    id: string;
+    attributes: { [index: string]: any };
+}</pre></td></tr></table>
+
+#### server/serverStartedByClient
+
+ The `server/serverStartedByClient` request is sent by the client to the server to inform the server that the client itself has launched the server instead of asking the SSP to do so, AND that the startup has completed. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "mode" : {
+      "type" : "string"
+    },
+    "params" : {
+      "type" : "object",
+      "properties" : {
+        "serverType" : {
+          "type" : "string"
+        },
+        "id" : {
+          "type" : "string"
+        },
+        "attributes" : {
+          "type" : "object",
+          "additionalProperties" : {
+            "type" : "any"
+          }
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface LaunchCommandRequest {
+    mode: string;
+    params: ServerAttributes;
+}
+
+export interface ServerAttributes {
     serverType: string;
     id: string;
     attributes: { [index: string]: any };

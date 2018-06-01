@@ -13,11 +13,11 @@
     "trace" : {
       "type" : "string"
     },
-    "plugin" : {
-      "type" : "string"
-    },
     "ok" : {
       "type" : "boolean"
+    },
+    "plugin" : {
+      "type" : "string"
     }
   }
 }

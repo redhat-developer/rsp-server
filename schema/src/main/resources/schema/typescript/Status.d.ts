@@ -3,6 +3,6 @@ export interface Status {
     code: number;
     message: string;
     trace: string;
-    plugin: string;
     ok: boolean;
+    plugin: string;
 }

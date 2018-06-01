@@ -11,12 +11,16 @@ package org.jboss.tools.ssp.api.schema;
 
 import org.jboss.tools.ssp.api.dao.Attribute;
 import org.jboss.tools.ssp.api.dao.Attributes;
+import org.jboss.tools.ssp.api.dao.CommandLineDetails;
 import org.jboss.tools.ssp.api.dao.DiscoveryPath;
+import org.jboss.tools.ssp.api.dao.LaunchAttributesRequest;
+import org.jboss.tools.ssp.api.dao.LaunchCommandRequest;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
 import org.jboss.tools.ssp.api.dao.ServerBean;
 import org.jboss.tools.ssp.api.dao.ServerHandle;
 import org.jboss.tools.ssp.api.dao.ServerProcess;
 import org.jboss.tools.ssp.api.dao.ServerProcessOutput;
+import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.ssp.api.dao.ServerStateChange;
 import org.jboss.tools.ssp.api.dao.ServerType;
 import org.jboss.tools.ssp.api.dao.StartServerAttributes;
@@ -44,16 +48,25 @@ public class GenerateSchemaMain {
 	private static Class[] getDAOClasses() {
 
 		Class[] daoClasses = new Class[] {
-				Status.class,
-				VMDescription.class, VMHandle.class,
-				DiscoveryPath.class, ServerBean.class, 
-
-				ServerType.class,ServerHandle.class,
+				Attribute.class,
+				Attributes.class,
+				CommandLineDetails.class,
+				DiscoveryPath.class,
+				LaunchAttributesRequest.class,
+				LaunchCommandRequest.class,
 				ServerAttributes.class,
-				Attributes.class, Attribute.class,
-				ServerProcess.class, ServerProcessOutput.class,
-				ServerStateChange.class, 
-				StartServerAttributes.class, StopServerAttributes.class
+				ServerBean.class,
+				ServerHandle.class,
+				ServerProcess.class,
+				ServerProcessOutput.class,
+				ServerStartingAttributes.class,
+				ServerStateChange.class,
+				ServerType.class,
+				StartServerAttributes.class,
+				Status.class,
+				StopServerAttributes.class,
+				VMDescription.class,
+				VMHandle.class,
 		};
 		return daoClasses;
 	}

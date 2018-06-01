@@ -20,6 +20,28 @@ export interface ServerHandle {
     type: string;
 }
 
+export interface ServerStartingAttributes {
+    initiatePolling: boolean;
+    request: LaunchCommandRequest;
+}
+
+export interface LaunchCommandRequest {
+    mode: string;
+    params: ServerAttributes;
+}
+
+export interface ServerAttributes {
+    serverType: string;
+    id: string;
+    attributes: { [index: string]: any };
+}
+
+export interface CommandLineDetails {
+    cmdLine: string[];
+    workingDir: string;
+    envp: string[];
+}
+
 export interface ServerAttributes {
     serverType: string;
     id: string;
@@ -31,8 +53,13 @@ export interface Status {
     code: number;
     message: string;
     trace: string;
-    plugin: string;
     ok: boolean;
+    plugin: string;
+}
+
+export interface LaunchAttributesRequest {
+    id: string;
+    mode: string;
 }
 
 export interface DiscoveryPath {
@@ -47,6 +74,16 @@ export interface ServerStateChange {
 export interface ServerHandle {
     id: string;
     type: string;
+}
+
+export interface Attributes {
+    attributes: { [index: string]: Attribute };
+}
+
+export interface Attribute {
+    type: string;
+    description: string;
+    defaultVal: any;
 }
 
 export interface StopServerAttributes {
@@ -73,15 +110,26 @@ export interface VMHandle {
     id: string;
 }
 
-export interface CreateServerAttribute {
+export interface ServerHandle {
+    id: string;
+    type: string;
+}
+
+export interface Attribute {
     type: string;
     description: string;
     defaultVal: any;
 }
 
-export interface ServerHandle {
+export interface LaunchCommandRequest {
+    mode: string;
+    params: ServerAttributes;
+}
+
+export interface ServerAttributes {
+    serverType: string;
     id: string;
-    type: string;
+    attributes: { [index: string]: any };
 }
 
 export interface ServerProcess {
@@ -92,15 +140,5 @@ export interface ServerProcess {
 export interface ServerHandle {
     id: string;
     type: string;
-}
-
-export interface CreateServerAttributes {
-    attributes: { [index: string]: CreateServerAttribute };
-}
-
-export interface CreateServerAttribute {
-    type: string;
-    description: string;
-    defaultVal: any;
 }
 

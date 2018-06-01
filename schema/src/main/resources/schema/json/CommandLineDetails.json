@@ -1,0 +1,20 @@
+{
+  "type" : "object",
+  "properties" : {
+    "cmdLine" : {
+      "type" : "array",
+      "items" : {
+        "type" : "string"
+      }
+    },
+    "workingDir" : {
+      "type" : "string"
+    },
+    "envp" : {
+      "type" : "array",
+      "items" : {
+        "type" : "string"
+      }
+    }
+  }
+}
