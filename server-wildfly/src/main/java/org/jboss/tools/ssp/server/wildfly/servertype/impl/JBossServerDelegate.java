@@ -24,8 +24,14 @@ import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.ssp.launching.LaunchingCore;
 import org.jboss.tools.ssp.launching.VMInstallModel;
 import org.jboss.tools.ssp.server.model.AbstractServerDelegate;
+import org.jboss.tools.ssp.server.spi.model.polling.IPollResultListener;
+import org.jboss.tools.ssp.server.spi.model.polling.IServerStatePoller;
+import org.jboss.tools.ssp.server.spi.model.polling.PollThread;
+import org.jboss.tools.ssp.server.spi.model.polling.PollThreadUtils;
+import org.jboss.tools.ssp.server.spi.model.polling.WebPortPoller;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
+import org.jboss.tools.ssp.server.wildfly.impl.Activator;
 
 public class JBossServerDelegate extends AbstractServerDelegate {
 	private ILaunch startLaunch;
@@ -39,10 +45,10 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 		String home = getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
 		
 		if( null == home ) {
-			return new Status(IStatus.ERROR, "org.jboss.tools.ssp.server.wildfly", "Server home must not be null");
+			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, "Server home must not be null");
 		}
 		if(!(new File(home).exists())) {
-			return new Status(IStatus.ERROR, "org.jboss.tools.ssp.server.wildfly", "Server home must exist");
+			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, "Server home must exist");
 		}
 		
 		String vmPath = getServer().getAttribute(IJBossServerAttributes.VM_INSTALL_PATH, (String)null);
@@ -65,8 +71,7 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 	
 	public IStatus canStart(String launchMode) {
 		if( !"run".equals(launchMode)) {
-			return new Status(IStatus.ERROR, 
-					"org.jboss.tools.ssp.server.wildfly", 
+			return new Status(IStatus.ERROR, Activator.BUNDLE_ID,
 					"Server must be launched in run mode only.");
 		}
 		if( getServerState() == IServerDelegate.STATE_STOPPED ) {
@@ -83,10 +88,9 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 		setServerState(IServerDelegate.STATE_STARTING);
 		
 		try {
+			launchPoller(IServerStatePoller.SERVER_STATE.UP);
 			startLaunch = new JBossStartLauncher(this).launch(mode);
 			registerLaunch(startLaunch);
-			launchPoller(true);
-			setServerState(IServerDelegate.STATE_STARTED);
 		} catch(CoreException ce) {
 			if( startLaunch != null ) {
 				IProcess[] processes = startLaunch.getProcesses();
@@ -108,13 +112,11 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 	@Override
 	public IStatus stop(boolean force) {
 		setServerState(IServerDelegate.STATE_STOPPING);
-		launchPoller(false);
 		ILaunch stopLaunch = null;
+		launchPoller(IServerStatePoller.SERVER_STATE.DOWN);
 		try {
 			stopLaunch = new JBossStopLauncher(this).launch(force);
 			registerLaunch(stopLaunch);
-			
-			setServerState(IServerDelegate.STATE_STOPPED);
 		} catch(CoreException ce) {
 			if( stopLaunch != null ) {
 				IProcess[] processes = startLaunch.getProcesses();
@@ -133,12 +135,16 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 
 	}
 	
-	private static final boolean STATE_UP = true;
-	private static final boolean STATE_DOWN = false;
-	
-	private void launchPoller(boolean expectedState) {
-		// TODO, for now do nothing but
-		// eventually launch a poll thread
+	private void launchPoller(IServerStatePoller.SERVER_STATE expectedState) {
+		IPollResultListener listener = expectedState == IServerStatePoller.SERVER_STATE.DOWN ? 
+				shutdownServerResultListener() : launchServerResultListener();
+		IServerStatePoller poller = new WebPortPoller() {
+			@Override
+			protected String getURL(IServer server) {
+				return "http://localhost:8080";
+			}
+		};
+		PollThreadUtils.pollServer(getServer(), expectedState, poller, listener);
 	}
 	
 	@Override
@@ -171,7 +177,7 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 	public IStatus clientSetServerStarting(ServerStartingAttributes attr) {
 		setServerState(STATE_STARTING, true);
 		if( attr.isInitiatePolling()) {
-			launchPoller(STATE_UP);
+			launchPoller(IServerStatePoller.SERVER_STATE.UP);
 		}
 		return Status.OK_STATUS;
 	}

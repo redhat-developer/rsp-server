@@ -10,6 +10,7 @@ package org.jboss.tools.ssp.server.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
@@ -20,8 +21,10 @@ import org.jboss.tools.ssp.eclipse.debug.core.IDebugEventSetListener;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.ssp.eclipse.debug.core.IStreamListener;
 import org.jboss.tools.ssp.eclipse.debug.core.model.IProcess;
-import org.jboss.tools.ssp.eclipse.debug.core.model.IStreamMonitor;
 import org.jboss.tools.ssp.launching.RuntimeProcessEventManager;
+import org.jboss.tools.ssp.server.model.internal.ServerStreamListener;
+import org.jboss.tools.ssp.server.spi.model.polling.IPollResultListener;
+import org.jboss.tools.ssp.server.spi.model.polling.IServerStatePoller;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 
@@ -31,18 +34,30 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	private int serverState = STATE_UNKNOWN;
 	private String currentMode = null;
 	private List<ILaunch> launches = new ArrayList<ILaunch>();
-	
+	protected HashMap<String, Object> sharedData = new HashMap<String, Object>();
 	private IServer server;
+	
+	
 	public AbstractServerDelegate(IServer server) {
 		this.server = server;
 		if( registerAsProcessListener())
 			RuntimeProcessEventManager.getDefault().addListener(this);
 	}
 	
+	public synchronized Object getSharedData(String key) {
+		return sharedData.get(key);
+	}
+	
+	public synchronized void putSharedData(String key, Object o) {
+		sharedData.put(key, o);
+	}
+	
 	public void dispose() {
 		if( registerAsProcessListener())
 			RuntimeProcessEventManager.getDefault().removeListener(this);
 	}
+	
+	
 	
 	protected boolean registerAsProcessListener() {
 		return true;
@@ -94,10 +109,6 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		ServerManagementModel.getDefault().getServerModel().fireServerProcessCreated(server, processId);
 	}
 
-	private void fireStreamAppended(IServer server2, IProcess process, int streamType, String text) {
-		ServerManagementModel.getDefault().getServerModel().fireServerStreamAppended(
-				server2, getProcessId(process), streamType, text);
-	}
 
 	/**
 	 * Returns the ILaunchManager mode that the server is in. This method will
@@ -231,35 +242,61 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 					+ ":" + ctime + ":p" + i;
 			all[i].setAttribute(PROCESS_ID_KEY, pName);
 			IStreamListener out = new ServerStreamListener(
-					getServer(), all[i], ServerManagementAPIConstants.STREAM_TYPE_SYSOUT);
+					getServer(), all[i], getProcessId(all[i]), 
+					ServerManagementAPIConstants.STREAM_TYPE_SYSOUT);
 			IStreamListener err = new ServerStreamListener(
-					getServer(), all[i], ServerManagementAPIConstants.STREAM_TYPE_SYSERR);
+					getServer(), all[i], getProcessId(all[i]), 
+					ServerManagementAPIConstants.STREAM_TYPE_SYSERR);
 			all[i].getStreamsProxy().getOutputStreamMonitor().addListener(out);
 			all[i].getStreamsProxy().getErrorStreamMonitor().addListener(err);
 			fireServerProcessCreated(pName);
 		}
 	}
 
-	
-	public class ServerStreamListener implements IStreamListener {
-
-		
-		private IServer server;
-		private IProcess process;
-		private int streamType;
-		public ServerStreamListener(IServer server, IProcess process, int type) {
-			this.server = server;
-			this.process = process;
-			this.streamType = type;
-		}
-		@Override
-		public void streamAppended(String text, IStreamMonitor monitor) {
-			fireStreamAppended(server, process, streamType, text);
-		}
-		
-	}
-	
 	protected String getProcessId(IProcess p) {
 		return p.getAttribute(PROCESS_ID_KEY);
 	}
+	
+	
+	/*
+	 * Polling utility methods
+	 */
+	protected IPollResultListener launchServerResultListener() {
+		return new IPollResultListener() {
+
+			@Override
+			public void stateNotAsserted(IServerStatePoller.SERVER_STATE expectedState, IServerStatePoller.SERVER_STATE currentState) {
+				stop(true);
+			}
+
+			@Override
+			public void stateAsserted(IServerStatePoller.SERVER_STATE expectedState, IServerStatePoller.SERVER_STATE currentState) {
+				if (currentState == IServerStatePoller.SERVER_STATE.UP) {
+					setServerState(STATE_STARTED);
+				} else {
+					setServerState(STATE_STOPPED);
+				}
+			}
+		};
+	}
+	
+	protected IPollResultListener shutdownServerResultListener() {
+		return new IPollResultListener() {
+			@Override
+			public void stateNotAsserted(IServerStatePoller.SERVER_STATE expectedState, IServerStatePoller.SERVER_STATE currentState) {
+				setServerState(STATE_STARTED);
+			}
+
+			@Override
+			public void stateAsserted(IServerStatePoller.SERVER_STATE expectedState, IServerStatePoller.SERVER_STATE currentState) {
+				if (currentState == IServerStatePoller.SERVER_STATE.UP) {
+					setServerState(STATE_STARTED);
+				} else {
+					setServerState(STATE_STOPPED);
+				}
+			}
+		};
+	}
+	
+	
 }

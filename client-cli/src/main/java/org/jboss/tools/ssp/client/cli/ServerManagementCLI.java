@@ -192,6 +192,7 @@ public class ServerManagementCLI {
 			}
 		} else if( s.trim().equals(LIST_SERVERS)) {
 			List<ServerHandle> handles = launcher.getServerProxy().getServerHandles().get();
+			System.out.println(handles.size() + " servers found:");
 			for( ServerHandle sh : handles ) {
 				System.out.println("   " + sh.getType() + ":" + sh.getId());
 			}

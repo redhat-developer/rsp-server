@@ -7,6 +7,8 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 public class Activator implements BundleActivator {
+	public static final String BUNDLE_ID = "org.jboss.tools.ssp.server.wildfly";
+	
 	@Override
 	public void start(BundleContext context) throws Exception {
 		System.out.println("Wildfly Server bundle started");
