@@ -34,6 +34,7 @@ public class ServerManagementServerLauncher {
 
 	protected ServerManagementServerImpl serverImpl;
 	private ListenOnSocketRunnable socketRunnable;
+	private ServerSocket serverSocket;
 	public ServerManagementServerLauncher() {
 		serverImpl = new ServerManagementServerImpl(this);
 	}
@@ -57,13 +58,12 @@ public class ServerManagementServerLauncher {
 
 	protected void startListening(int port, ServerManagementServerImpl server) throws IOException {
 		ExecutorService threadPool = Executors.newCachedThreadPool();
-
+		serverSocket = new ServerSocket(port);
 		// create the socket server
-		try (ServerSocket serverSocket = new ServerSocket(port)) {
+		try {
 			socketRunnable = new ListenOnSocketRunnable(serverSocket, server);
 			System.out.println("The server management server is running on port " + port);
 			threadPool.submit(socketRunnable);
-			shutdownOnInput();
 		} catch(Throwable t) {
 			t.printStackTrace();
 		}
@@ -123,6 +123,11 @@ public class ServerManagementServerLauncher {
 	public void shutdown() {
 		closeAllConnections();
 		socketRunnable.stopListening();
+		try {
+			serverSocket.close();
+		} catch(IOException ioe) {
+			ioe.printStackTrace();
+		}
 		saveAllModels();
 		ShutdownExecutor.getExecutor().shutdown();
 	}

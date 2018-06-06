@@ -8,6 +8,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Activator: org.jboss.tools.ssp.launching.LaunchingActivator
 Bundle-ClassPath: .
 Import-Package: org.osgi.framework,
+ org.osgi.service.log,
  com.google.gson,
  org.jboss.tools.ssp.api,
  org.jboss.tools.ssp.api.dao,

@@ -49,9 +49,6 @@ public final class SafeRunner {
 	private static void log(Throwable t) {
 		t.printStackTrace();
 	}
-	private static void log(String bind) {
-		System.out.println(bind);
-	}
 	
 	private static void handleException(ISafeRunnable code, Throwable e) {
 		// TODO handle this exception better? Depends on our logging implementation I guess. 

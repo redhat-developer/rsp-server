@@ -4,7 +4,6 @@ Bundle-Name: org.jboss.tools.ssp.api
 Bundle-SymbolicName: org.jboss.tools.ssp.api
 Bundle-Version: 0.0.9.qualifier
 Automatic-Module-Name: org.jboss.tools.ssp.api
-Bundle-Activator: org.jboss.tools.ssp.api.Activator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .,
  lib/animal-sniffer-annotations-1.14.jar,
