@@ -199,7 +199,669 @@ The protocol currently assumes that one server serves one tool. There is current
 
 ### The Server Interface
 
+#### server/getDiscoveryPaths
+
+ The `server/getDiscoveryPaths` request is sent by the client to fetch a list of discovery paths that can be searched. Discovery paths exist in the SSP model as paths suitable to be searched for server runtime installations. Additional paths may be added via the `server/addDiscoveryPath` entry point, or removed via the `server/removeDiscoveryPath` entry point. 
+
+This endpoint takes no parameters. 
+
+#### server/findServerBeans
+
+ The `server/findServerBeans` request is sent by the client to fetch a list of server beans for the given path. The SSP model will iterate through a number of `IServerBeanTypeProvider` instances and ask them if they recognize the contents of the folder underlying the discovery path. Any providers that claim to be able to handle the given path will return an object representing the details of this recognized server runtime, its version, etc. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "filepath" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface DiscoveryPath {
+    filepath: string;
+}</pre></td></tr></table>
+
+#### server/addDiscoveryPath
+
+ The `server/addDiscoveryPath` notification is sent by the client to add a new path to search when discovering servers. These paths will be stored in a model, to be queried or searched later by a client. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "filepath" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface DiscoveryPath {
+    filepath: string;
+}</pre></td></tr></table>
+
+#### server/removeDiscoveryPath
+
+ The `server/removeDiscoveryPath` notification is sent by the client to remove a path from the model and prevent it from being searched by clients when discovering servers in the future. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "filepath" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface DiscoveryPath {
+    filepath: string;
+}</pre></td></tr></table>
+
+#### server/getServerHandles
+
+ The `server/getServerHandles` request is sent by the client to list the server adapters currently configured. A server adapter is configured when a call to `server/createServer` completes without error, or, some may be pre-configured by the server upon installation. 
+
+This endpoint takes no parameters. 
+
+#### server/getServerTypes
+
+ The `server/getServerTypes` request is sent by the client to list the server types currently supported. The details of how many server types are supported by an SSP, or how they are registered, is implementation-specific. 
+
+This endpoint takes no parameters. 
+
+#### server/deleteServer
+
+ The `server/deleteServer` notification is sent by the client to delete a server from the model. This server will no longer be able to be started, shut down, or interacted with in any fashion. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "type" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface ServerHandle {
+    id: string;
+    type: string;
+}</pre></td></tr></table>
+
+#### server/getRequiredAttributes
+
+ The `server/getRequiredAttributes` request is sent by the client to list the required attributes that must be stored on a server object of this type, such as a server-home or other required parameters. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface ServerType {
+    id: string;
+}</pre></td></tr></table>
+
+#### server/getOptionalAttributes
+
+ The `server/getOptionalAttributes` request is sent by the client to list the optional attributes that can be stored on a server object of this type. This may include things like customizing ports, or custom methods of interacting with various functionality specific to the server type. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface ServerType {
+    id: string;
+}</pre></td></tr></table>
+
+#### server/getRequiredLaunchAttributes
+
+ The `server/getRequiredLaunchAttributes` request is sent by the client to get any additional attributes required for launch or that can customize launch behavior. Some server types may require references to a specific library, a clear decision about which of several configurations the server should be launched with, or any other required details required to successfully start up the server. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "mode" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface LaunchAttributesRequest {
+    id: string;
+    mode: string;
+}</pre></td></tr></table>
+
+#### server/getOptionalLaunchAttributes
+
+ The `server/getOptionalLaunchAttributes` request is sent by the client to get any optional attributes which can be used to modify the launch behavior. Some server types may allow overrides to any number of launch flags or settings, but not require these changes in order to function. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "mode" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface LaunchAttributesRequest {
+    id: string;
+    mode: string;
+}</pre></td></tr></table>
+
+#### server/createServer
+
+ The `server/createServer` request is sent by the client to create a server in the model using the given attributes (both required and optional. This request may fail if required attributes are missing, any attributes have impossible, unexpected, or invalid values, or any error occurs while attempting to create the server adapter as requested. In the event of failure, the returend `Status` object will detail the cause of error. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "serverType" : {
+      "type" : "string"
+    },
+    "id" : {
+      "type" : "string"
+    },
+    "attributes" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "any"
+      }
+    }
+  }
+}</pre></td><td><pre>export interface ServerAttributes {
+    serverType: string;
+    id: string;
+    attributes: { [index: string]: any };
+}</pre></td></tr></table>
+
+#### server/getLaunchCommand
+
+ The `server/getLaunchCommand` request is sent by the client to the server to get the command which can be used to launch the server. This entry point is most often used if an editor or IDE wishes to start the server by itself, but does not know the servertype-specific command that must be launched. The parameter will include a mode the server should run in (run, debug, etc), as well as any custom attributes that may have an effect on the generation of the launch command. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "mode" : {
+      "type" : "string"
+    },
+    "params" : {
+      "type" : "object",
+      "properties" : {
+        "serverType" : {
+          "type" : "string"
+        },
+        "id" : {
+          "type" : "string"
+        },
+        "attributes" : {
+          "type" : "object",
+          "additionalProperties" : {
+            "type" : "any"
+          }
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface LaunchParameters {
+    mode: string;
+    params: ServerAttributes;
+}
+
+export interface ServerAttributes {
+    serverType: string;
+    id: string;
+    attributes: { [index: string]: any };
+}</pre></td></tr></table>
+
+#### server/serverStartingByClient
+
+ The `server/serverStartingByClient` request is sent by the client to the server to inform the server that the client itself has launched the server instead of asking the SSP to do so. The parameters include both the request used to get the launch command, and a boolean as to whether the server should initiate the 'state-polling' mechanism to inform the client when the selected server has completed its startup. If the `polling` boolean is false, the client is expected to also alert the SSP when the launched server has completed its startup via the `server/serverStartedByClient` request. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "initiatePolling" : {
+      "type" : "boolean"
+    },
+    "request" : {
+      "type" : "object",
+      "properties" : {
+        "mode" : {
+          "type" : "string"
+        },
+        "params" : {
+          "type" : "object",
+          "properties" : {
+            "serverType" : {
+              "type" : "string"
+            },
+            "id" : {
+              "type" : "string"
+            },
+            "attributes" : {
+              "type" : "object",
+              "additionalProperties" : {
+                "type" : "any"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface ServerStartingAttributes {
+    initiatePolling: boolean;
+    request: LaunchParameters;
+}
+
+export interface LaunchParameters {
+    mode: string;
+    params: ServerAttributes;
+}
+
+export interface ServerAttributes {
+    serverType: string;
+    id: string;
+    attributes: { [index: string]: any };
+}</pre></td></tr></table>
+
+#### server/serverStartedByClient
+
+ The `server/serverStartedByClient` request is sent by the client to the server to inform the server that the client itself has launched the server instead of asking the SSP to do so, AND that the startup has completed. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "mode" : {
+      "type" : "string"
+    },
+    "params" : {
+      "type" : "object",
+      "properties" : {
+        "serverType" : {
+          "type" : "string"
+        },
+        "id" : {
+          "type" : "string"
+        },
+        "attributes" : {
+          "type" : "object",
+          "additionalProperties" : {
+            "type" : "any"
+          }
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface LaunchParameters {
+    mode: string;
+    params: ServerAttributes;
+}
+
+export interface ServerAttributes {
+    serverType: string;
+    id: string;
+    attributes: { [index: string]: any };
+}</pre></td></tr></table>
+
+#### server/startServerAsync
+
+ The `server/startServerAsync` request is sent by the client to the server to start an existing server in the model. This request will cause the server to launch the server and keep organized the spawned processes, their I/O streams, and any events that must be propagated to the client. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "mode" : {
+      "type" : "string"
+    },
+    "params" : {
+      "type" : "object",
+      "properties" : {
+        "serverType" : {
+          "type" : "string"
+        },
+        "id" : {
+          "type" : "string"
+        },
+        "attributes" : {
+          "type" : "object",
+          "additionalProperties" : {
+            "type" : "any"
+          }
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface LaunchParameters {
+    mode: string;
+    params: ServerAttributes;
+}
+
+export interface ServerAttributes {
+    serverType: string;
+    id: string;
+    attributes: { [index: string]: any };
+}</pre></td></tr></table>
+
+#### server/stopServerAsync
+
+ The `server/stopServerAsync` request is sent by the client to the server to stop an existing server in the model. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "force" : {
+      "type" : "boolean"
+    }
+  }
+}</pre></td><td><pre>export interface StopServerAttributes {
+    id: string;
+    force: boolean;
+}</pre></td></tr></table>
+
+#### server/shutdown
+
+ The `server/shutdown` notification is sent by the client to shut down the SSP itself. 
+
+This endpoint takes no parameters. 
+
 
 
 ### The Client Interface
+
+#### client/discoveryPathAdded
+
+ The `client/discoveryPathAdded` notification is sent by the server to all clients in response to the `server/addDiscoveryPath` notification. This call indicates that a discovery path has been added to the SSP model which keeps track of filesystem paths that may be searched for server runtimes. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "filepath" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface DiscoveryPath {
+    filepath: string;
+}</pre></td></tr></table>
+
+#### client/discoveryPathRemoved
+
+ The `client/discoveryPathRemoved` notification is sent by the server to all clients in response to the `server/removeDiscoveryPath` notification. This call indicates that a discovery path has been removed from the SSP model which keeps track of filesystem paths that may be searched for server runtimes. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "filepath" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface DiscoveryPath {
+    filepath: string;
+}</pre></td></tr></table>
+
+#### client/serverAdded
+
+ The `client/serverAdded` notification is sent by the server to all clients in a response to the `server/createServer` notification. This notification indicates that a new server adapter has been created in the SSP model of existing servers. As mentioned above, this was most likely in response to a server/createServer notification, but is not strictly limited to this entrypoint. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "type" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface ServerHandle {
+    id: string;
+    type: string;
+}</pre></td></tr></table>
+
+#### client/serverRemoved
+
+ The `client/serverRemoved` notification is sent by the server to all clients in response to the `server/deleteServer` notification. This notification indicates that a server adapter has been removed from the SSP model of existing servers. As mentioned above, this was most likely in response to a server/deleteServer notification, but is not strictly limited to this entrypoint. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "type" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface ServerHandle {
+    id: string;
+    type: string;
+}</pre></td></tr></table>
+
+#### client/serverAttributesChanged
+
+ The `client/serverRemoved` notification is sent by the server to all clients when any server has had one of its attributes changed. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "type" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface ServerHandle {
+    id: string;
+    type: string;
+}</pre></td></tr></table>
+
+#### client/serverStateChanged
+
+ The `client/serverStateChanged` notification is sent by the server to all clients when any server has had its state change. Possible values include: `0` representing an unknown state `1` representing starting `2` representing started `3` representing stopping `4` representing stopped 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "server" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "string"
+        }
+      }
+    },
+    "state" : {
+      "type" : "integer"
+    }
+  }
+}</pre></td><td><pre>export interface ServerStateChange {
+    server: ServerHandle;
+    state: number;
+}
+
+export interface ServerHandle {
+    id: string;
+    type: string;
+}</pre></td></tr></table>
+
+#### client/serverProcessCreated
+
+ The `client/serverProcessCreated` notification is sent by the server to all clients when any server has launched a new process which can be monitored. This notification is most often sent in response to a call to `server/startServerAsync` which will typically launch a process to run the server in question. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "server" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "string"
+        }
+      }
+    },
+    "processId" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface ServerProcess {
+    server: ServerHandle;
+    processId: string;
+}
+
+export interface ServerHandle {
+    id: string;
+    type: string;
+}</pre></td></tr></table>
+
+#### client/serverProcessTerminated
+
+ The `client/serverProcessTerminated` notification is sent by the server to all clients when any process associated with a server has been terminated. This notification is most often sent as a result of a call to `server/stopServerAsync`, which should shut down a given server and cause all of that server's processes to terminate after some time. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "server" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "string"
+        }
+      }
+    },
+    "processId" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface ServerProcess {
+    server: ServerHandle;
+    processId: string;
+}
+
+export interface ServerHandle {
+    id: string;
+    type: string;
+}</pre></td></tr></table>
+
+#### client/serverProcessOutputAppended
+
+ The `client/serverProcessOutputAppended` notification is sent by the server to all clients when any process associated with a server generated output on any of its output streams. This notification may be sent as a result of anything that causes a given server process to emit output, such as a change in configuration, a deployment, an error, normal logging, or any other number of possibilities. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "server" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "string"
+        }
+      }
+    },
+    "processId" : {
+      "type" : "string"
+    },
+    "streamType" : {
+      "type" : "integer"
+    },
+    "text" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface ServerProcessOutput {
+    server: ServerHandle;
+    processId: string;
+    streamType: number;
+    text: string;
+}
+
+export interface ServerHandle {
+    id: string;
+    type: string;
+}</pre></td></tr></table>
 
