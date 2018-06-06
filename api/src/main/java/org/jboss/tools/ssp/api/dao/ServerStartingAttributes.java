@@ -10,8 +10,8 @@ package org.jboss.tools.ssp.api.dao;
 
 public class ServerStartingAttributes {
 	private boolean initiatePolling;
-	private LaunchCommandRequest request;
-	public ServerStartingAttributes(LaunchCommandRequest request, boolean initiatePolling) {
+	private LaunchParameters request;
+	public ServerStartingAttributes(LaunchParameters request, boolean initiatePolling) {
 		this.request = request;
 		this.initiatePolling = initiatePolling;
 	}
@@ -21,10 +21,10 @@ public class ServerStartingAttributes {
 	public void setInitiatePolling(boolean initiatePolling) {
 		this.initiatePolling = initiatePolling;
 	}
-	public LaunchCommandRequest getRequest() {
+	public LaunchParameters getRequest() {
 		return request;
 	}
-	public void setRequest(LaunchCommandRequest request) {
+	public void setRequest(LaunchParameters request) {
 		this.request = request;
 	}
 }

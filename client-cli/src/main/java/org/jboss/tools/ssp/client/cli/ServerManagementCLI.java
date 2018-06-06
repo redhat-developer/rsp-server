@@ -21,13 +21,12 @@ import org.jboss.tools.ssp.api.dao.Attributes;
 import org.jboss.tools.ssp.api.dao.CommandLineDetails;
 import org.jboss.tools.ssp.api.dao.DiscoveryPath;
 import org.jboss.tools.ssp.api.dao.LaunchAttributesRequest;
-import org.jboss.tools.ssp.api.dao.LaunchCommandRequest;
+import org.jboss.tools.ssp.api.dao.LaunchParameters;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
 import org.jboss.tools.ssp.api.dao.ServerBean;
 import org.jboss.tools.ssp.api.dao.ServerHandle;
 import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.ssp.api.dao.ServerType;
-import org.jboss.tools.ssp.api.dao.StartServerAttributes;
 import org.jboss.tools.ssp.api.dao.Status;
 import org.jboss.tools.ssp.api.dao.StopServerAttributes;
 import org.jboss.tools.ssp.api.dao.util.CreateServerAttributesUtility;
@@ -159,11 +158,14 @@ public class ServerManagementCLI {
 			}
 		} else if( s.startsWith(START_SERVER)) {
 			String suffix = s.substring(START_SERVER.length()).trim();
-			StartServerAttributes ssa = new StartServerAttributes(suffix, "run");
-			Status stat = launcher.getServerProxy().startServerAsync(ssa).get();
+			String serverId = suffix;
+			ServerHandle handle = findServer(serverId);
+			ServerAttributes sa = new ServerAttributes(handle.getType(), handle.getId(), new HashMap<String,Object>());
+			LaunchParameters params = new LaunchParameters(sa, "run");
+			Status stat = launcher.getServerProxy().startServerAsync(params).get();
 			System.out.println(stat.toString());
 		} else if( s.equals(LAUNCH_COMMAND)) {
-			LaunchCommandRequest getLaunchReq = getLaunchCommandRequest();
+			LaunchParameters getLaunchReq = getLaunchCommandRequest();
 			printLocalLaunchCommandDetails(getLaunchReq);
 		} else if( s.equals(LAUNCH_LOCAL)) {
 			runLocalLaunchScenario(s);
@@ -214,7 +216,7 @@ public class ServerManagementCLI {
 	}
 	
 	private void runLocalLaunchScenario(String s) throws Exception {
-		LaunchCommandRequest getLaunchReq = getLaunchCommandRequest();
+		LaunchParameters getLaunchReq = getLaunchCommandRequest();
 		printLocalLaunchCommandDetails(getLaunchReq);
 		
 		// This CLI will not actually launch this server locally. 
@@ -230,7 +232,7 @@ public class ServerManagementCLI {
 		System.out.println(status2.toString());
 
 	}
-	private void printLocalLaunchCommandDetails(LaunchCommandRequest getLaunchReq) throws Exception {
+	private void printLocalLaunchCommandDetails(LaunchParameters getLaunchReq) throws Exception {
 		CommandLineDetails det = launcher.getServerProxy().getLaunchCommand(getLaunchReq).get();
 		String[] cmdline = det.getCmdLine();
 		String wd = det.getWorkingDir();
@@ -239,7 +241,7 @@ public class ServerManagementCLI {
 		System.out.println("Got it.");
 		System.out.println("command: " + String.join(" ", cmdline));
 	}
-	private LaunchCommandRequest getLaunchCommandRequest() throws Exception {
+	private LaunchParameters getLaunchCommandRequest() throws Exception {
 		System.out.println("Which server would you like to run?");
 		List<ServerHandle> handles = launcher.getServerProxy().getServerHandles().get();
 		for( ServerHandle sh : handles ) {
@@ -256,8 +258,8 @@ public class ServerManagementCLI {
 		HashMap<String, Object> toSend = promptForAttributes(attrs);
 		
 		ServerAttributes servAttr = new ServerAttributes(handle.getType(), handle.getId(), toSend);
-		LaunchCommandRequest getLaunchReq = 
-				new LaunchCommandRequest(servAttr, mode);
+		LaunchParameters getLaunchReq = 
+				new LaunchParameters(servAttr, mode);
 		return getLaunchReq;
 	}
 

@@ -1,4 +1,4 @@
-export interface LaunchCommandRequest {
+export interface LaunchParameters {
     mode: string;
     params: ServerAttributes;
 }

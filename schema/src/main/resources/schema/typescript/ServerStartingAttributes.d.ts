@@ -1,9 +1,9 @@
 export interface ServerStartingAttributes {
     initiatePolling: boolean;
-    request: LaunchCommandRequest;
+    request: LaunchParameters;
 }
 
-export interface LaunchCommandRequest {
+export interface LaunchParameters {
     mode: string;
     params: ServerAttributes;
 }

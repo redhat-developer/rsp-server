@@ -8,23 +8,28 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.api.dao;
 
-public class StartServerAttributes {
-	private String id;
+public class LaunchParameters {
 	private String mode;
-	public StartServerAttributes(String id, String mode) {
-		this.id = id;
+	private ServerAttributes params;
+
+	public LaunchParameters(ServerAttributes params, String mode) {
 		this.mode = mode;
+		this.params = params;
 	}
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
+
 	public String getMode() {
 		return mode;
 	}
+
 	public void setMode(String mode) {
 		this.mode = mode;
+	}
+
+	public ServerAttributes getParams() {
+		return params;
+	}
+
+	public void setParams(ServerAttributes params) {
+		this.params = params;
 	}
 }

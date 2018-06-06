@@ -10,7 +10,7 @@ package org.jboss.tools.ssp.server.spi.servertype;
 
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
 import org.jboss.tools.ssp.api.dao.CommandLineDetails;
-import org.jboss.tools.ssp.api.dao.LaunchCommandRequest;
+import org.jboss.tools.ssp.api.dao.LaunchParameters;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
 import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.ssp.eclipse.core.runtime.IProgressMonitor;
@@ -159,7 +159,7 @@ public interface IServerDelegate {
 	 * a request from an external client that wished to launch the process
 	 * themselves. 
 	 */
-	public IStatus clientSetServerStarted(LaunchCommandRequest attr);
+	public IStatus clientSetServerStarted(LaunchParameters attr);
 	
 
 	/**

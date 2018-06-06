@@ -11,7 +11,7 @@ package org.jboss.tools.ssp.server.wildfly.servertype.impl;
 import java.io.File;
 
 import org.jboss.tools.ssp.api.dao.CommandLineDetails;
-import org.jboss.tools.ssp.api.dao.LaunchCommandRequest;
+import org.jboss.tools.ssp.api.dao.LaunchParameters;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
 import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
@@ -183,7 +183,7 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 	}
 
 	@Override
-	public IStatus clientSetServerStarted(LaunchCommandRequest attr) {
+	public IStatus clientSetServerStarted(LaunchParameters attr) {
 		setServerState(STATE_STARTED, true);
 		return Status.OK_STATUS;
 	}

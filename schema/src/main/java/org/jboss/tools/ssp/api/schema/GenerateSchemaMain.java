@@ -14,7 +14,7 @@ import org.jboss.tools.ssp.api.dao.Attributes;
 import org.jboss.tools.ssp.api.dao.CommandLineDetails;
 import org.jboss.tools.ssp.api.dao.DiscoveryPath;
 import org.jboss.tools.ssp.api.dao.LaunchAttributesRequest;
-import org.jboss.tools.ssp.api.dao.LaunchCommandRequest;
+import org.jboss.tools.ssp.api.dao.LaunchParameters;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
 import org.jboss.tools.ssp.api.dao.ServerBean;
 import org.jboss.tools.ssp.api.dao.ServerHandle;
@@ -23,11 +23,13 @@ import org.jboss.tools.ssp.api.dao.ServerProcessOutput;
 import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.ssp.api.dao.ServerStateChange;
 import org.jboss.tools.ssp.api.dao.ServerType;
-import org.jboss.tools.ssp.api.dao.StartServerAttributes;
 import org.jboss.tools.ssp.api.dao.Status;
 import org.jboss.tools.ssp.api.dao.StopServerAttributes;
 import org.jboss.tools.ssp.api.dao.VMDescription;
 import org.jboss.tools.ssp.api.dao.VMHandle;
+import org.jboss.tools.ssp.api.schema.JSONUtility;
+import org.jboss.tools.ssp.api.schema.TypescriptUtility;
+import org.jboss.tools.ssp.api.schema.SpecificationGenerator;
 
 public class GenerateSchemaMain {
 	public static void main(String[] args) throws Exception {
@@ -53,7 +55,7 @@ public class GenerateSchemaMain {
 				CommandLineDetails.class,
 				DiscoveryPath.class,
 				LaunchAttributesRequest.class,
-				LaunchCommandRequest.class,
+				LaunchParameters.class,
 				ServerAttributes.class,
 				ServerBean.class,
 				ServerHandle.class,
@@ -62,7 +64,6 @@ public class GenerateSchemaMain {
 				ServerStartingAttributes.class,
 				ServerStateChange.class,
 				ServerType.class,
-				StartServerAttributes.class,
 				Status.class,
 				StopServerAttributes.class,
 				VMDescription.class,

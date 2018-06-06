@@ -16,20 +16,19 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.jboss.tools.ssp.api.ServerManagementClient;
-import org.jboss.tools.ssp.api.ServerManagementServer;
+import org.jboss.tools.ssp.api.SSPClient;
+import org.jboss.tools.ssp.api.SSPServer;
 import org.jboss.tools.ssp.api.SocketLauncher;
 import org.jboss.tools.ssp.api.dao.Attributes;
 import org.jboss.tools.ssp.api.dao.CommandLineDetails;
 import org.jboss.tools.ssp.api.dao.DiscoveryPath;
 import org.jboss.tools.ssp.api.dao.LaunchAttributesRequest;
-import org.jboss.tools.ssp.api.dao.LaunchCommandRequest;
+import org.jboss.tools.ssp.api.dao.LaunchParameters;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
 import org.jboss.tools.ssp.api.dao.ServerBean;
 import org.jboss.tools.ssp.api.dao.ServerHandle;
 import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.ssp.api.dao.ServerType;
-import org.jboss.tools.ssp.api.dao.StartServerAttributes;
 import org.jboss.tools.ssp.api.dao.Status;
 import org.jboss.tools.ssp.api.dao.StopServerAttributes;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
@@ -42,10 +41,10 @@ import org.jboss.tools.ssp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 
-public class ServerManagementServerImpl implements ServerManagementServer {
+public class ServerManagementServerImpl implements SSPServer {
 	
-	private final List<ServerManagementClient> clients = new CopyOnWriteArrayList<>();
-	private final List<SocketLauncher<ServerManagementClient>> launchers 
+	private final List<SSPClient> clients = new CopyOnWriteArrayList<>();
+	private final List<SocketLauncher<SSPClient>> launchers 
 		= new CopyOnWriteArrayList<>();
 	
 	private final VMInstallModel vmModel;
@@ -61,29 +60,29 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 		eventManager = new RemoteEventManager(this);
 	}
 	
-	public List<ServerManagementClient> getClients() {
-		return new ArrayList<ServerManagementClient>(clients);
+	public List<SSPClient> getClients() {
+		return new ArrayList<SSPClient>(clients);
 	}
 	
 	/**
 	 * Connect the given chat client.
      * Return a runnable which should be executed to disconnect the client.
 	 */
-	public Runnable addClient(SocketLauncher<ServerManagementClient> launcher) {
+	public Runnable addClient(SocketLauncher<SSPClient> launcher) {
 		this.launchers.add(launcher);
-		ServerManagementClient client = launcher.getRemoteProxy();
+		SSPClient client = launcher.getRemoteProxy();
 		this.clients.add(client);
 		return () -> this.removeClient(launcher);
 	}
 
-	private void removeClient(SocketLauncher<ServerManagementClient> launcher) {
+	private void removeClient(SocketLauncher<SSPClient> launcher) {
 		this.launchers.add(launcher);
 		this.clients.remove(launcher.getRemoteProxy());
 		
 	}
 	
-	public List<SocketLauncher<ServerManagementClient>> getActiveLaunchers() {
-		return new ArrayList<SocketLauncher<ServerManagementClient>>(launchers);
+	public List<SocketLauncher<SSPClient>> getActiveLaunchers() {
+		return new ArrayList<SocketLauncher<SSPClient>>(launchers);
 	}
 	
 	public IServerManagementModel getModel() {
@@ -221,8 +220,8 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	}
 
 	@Override
-	public CompletableFuture<Status> startServerAsync(StartServerAttributes attr) {
-		IServer server = model.getServerModel().getServer(attr.getId());
+	public CompletableFuture<Status> startServerAsync(LaunchParameters attr) {
+		IServer server = model.getServerModel().getServer(attr.getParams().getId());
 		IServerDelegate del = server.getDelegate();
 		IStatus ret = del.start(attr.getMode());
 		return CompletableFuture.completedFuture(StatusConverter.convert(ret));
@@ -237,7 +236,7 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 	}
 
 	@Override
-	public CompletableFuture<CommandLineDetails> getLaunchCommand(LaunchCommandRequest req) {
+	public CompletableFuture<CommandLineDetails> getLaunchCommand(LaunchParameters req) {
 		IServer server = model.getServerModel().getServer(req.getParams().getId());
 		IServerDelegate del = server.getDelegate();
 		CommandLineDetails det = del.getStartLaunchCommand(req.getMode(), req.getParams());
@@ -252,11 +251,10 @@ public class ServerManagementServerImpl implements ServerManagementServer {
 		return CompletableFuture.completedFuture(StatusConverter.convert(s));
 	}
 	@Override
-	public CompletableFuture<Status> serverStartedByClient(LaunchCommandRequest attr) {
+	public CompletableFuture<Status> serverStartedByClient(LaunchParameters attr) {
 		IServer server = model.getServerModel().getServer(attr.getParams().getId());
 		IServerDelegate del = server.getDelegate();
 		IStatus s = del.clientSetServerStarted(attr);
 		return CompletableFuture.completedFuture(StatusConverter.convert(s));
 	}
-
 }

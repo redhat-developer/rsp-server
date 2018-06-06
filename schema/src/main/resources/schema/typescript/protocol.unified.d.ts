@@ -22,10 +22,10 @@ export interface ServerHandle {
 
 export interface ServerStartingAttributes {
     initiatePolling: boolean;
-    request: LaunchCommandRequest;
+    request: LaunchParameters;
 }
 
-export interface LaunchCommandRequest {
+export interface LaunchParameters {
     mode: string;
     params: ServerAttributes;
 }
@@ -91,6 +91,17 @@ export interface StopServerAttributes {
     force: boolean;
 }
 
+export interface LaunchParameters {
+    mode: string;
+    params: ServerAttributes;
+}
+
+export interface ServerAttributes {
+    serverType: string;
+    id: string;
+    attributes: { [index: string]: any };
+}
+
 export interface ServerBean {
     location: string;
     typeCategory: string;
@@ -99,11 +110,6 @@ export interface ServerBean {
     version: string;
     fullVersion: string;
     serverAdapterTypeId: string;
-}
-
-export interface StartServerAttributes {
-    id: string;
-    mode: string;
 }
 
 export interface VMHandle {
@@ -119,17 +125,6 @@ export interface Attribute {
     type: string;
     description: string;
     defaultVal: any;
-}
-
-export interface LaunchCommandRequest {
-    mode: string;
-    params: ServerAttributes;
-}
-
-export interface ServerAttributes {
-    serverType: string;
-    id: string;
-    attributes: { [index: string]: any };
 }
 
 export interface ServerProcess {
