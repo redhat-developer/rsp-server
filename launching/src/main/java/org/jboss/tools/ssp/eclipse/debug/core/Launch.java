@@ -252,7 +252,7 @@ public class Launch  implements ILaunch, IDisconnect  { //ILaunchListener, ILaun
 	@Override
 	public void terminate() throws DebugException {
 		MultiStatus status=
-			new MultiStatus(DebugPlugin.getUniqueIdentifier(), DebugException.REQUEST_FAILED, Launch_terminate_failed, null);
+			new MultiStatus(DebugPluginConstants.DEBUG_CORE_ID, DebugException.REQUEST_FAILED, Launch_terminate_failed, null);
 		//stop targets first to free up and sockets, etc held by the target
 		// terminate or disconnect debug target if it is still alive
 //		IDebugTarget[] targets = getDebugTargets();

@@ -11,8 +11,8 @@
 package org.jboss.tools.ssp.eclipse.debug.core.model;
 
 
+import org.jboss.tools.ssp.eclipse.debug.core.DebugPluginConstants;
 import org.jboss.tools.ssp.eclipse.debug.core.DebugException;
-import org.jboss.tools.ssp.eclipse.debug.core.DebugPlugin;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
 
 /**
@@ -26,7 +26,7 @@ import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
  * provides an implementation of this interface for a
  * <code>java.lang.Process</code>.
  * </p>
- * @see org.jboss.tools.ssp.eclipse.debug.core.DebugPlugin#newProcess(ILaunch, Process, String)
+ * @see org.jboss.tools.ssp.eclipse.debug.core.DebugPluginConstants#newProcess(ILaunch, Process, String)
  */
 public interface IProcess extends ITerminate {
 
@@ -36,7 +36,7 @@ public interface IProcess extends ITerminate {
 	 *
 	 * @since 2.1
 	 */
-	public final static String ATTR_CMDLINE= DebugPlugin.getUniqueIdentifier() + ".ATTR_CMDLINE"; //$NON-NLS-1$
+	public final static String ATTR_CMDLINE= DebugPluginConstants.DEBUG_CORE_ID + ".ATTR_CMDLINE"; //$NON-NLS-1$
 
 	/**
 	 * Attribute key for a common, optional, process property. The value of this
@@ -46,7 +46,7 @@ public interface IProcess extends ITerminate {
 	 *
 	 * @since 2.1
 	 */
-	public final static String ATTR_PROCESS_TYPE = DebugPlugin.getUniqueIdentifier() + ".ATTR_PROCESS_TYPE"; //$NON-NLS-1$
+	public final static String ATTR_PROCESS_TYPE = DebugPluginConstants.DEBUG_CORE_ID + ".ATTR_PROCESS_TYPE"; //$NON-NLS-1$
 
 	/**
 	 * Attribute key for a common, optional, process property. The value of this
@@ -55,7 +55,7 @@ public interface IProcess extends ITerminate {
 	 *
 	 * @since 3.0
 	 */
-	public final static String ATTR_PROCESS_LABEL = DebugPlugin.getUniqueIdentifier() + ".ATTR_PROCESS_LABEL"; //$NON-NLS-1$
+	public final static String ATTR_PROCESS_LABEL = DebugPluginConstants.DEBUG_CORE_ID + ".ATTR_PROCESS_LABEL"; //$NON-NLS-1$
 
 	/**
 	 * Returns a human-readable label for this process.

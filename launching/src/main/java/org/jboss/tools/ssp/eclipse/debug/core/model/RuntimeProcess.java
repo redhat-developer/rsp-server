@@ -19,7 +19,7 @@ import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.eclipse.core.runtime.Status;
 import org.jboss.tools.ssp.eclipse.debug.core.DebugEvent;
 import org.jboss.tools.ssp.eclipse.debug.core.DebugException;
-import org.jboss.tools.ssp.eclipse.debug.core.DebugPlugin;
+import org.jboss.tools.ssp.eclipse.debug.core.DebugPluginConstants;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.ssp.eclipse.debug.internal.core.NullStreamsProxy;
 import org.jboss.tools.ssp.eclipse.debug.internal.core.StreamsProxy;
@@ -119,7 +119,7 @@ public class RuntimeProcess implements IProcess {
 			fTerminated= false;
 		}
 
-		String captureOutput = launch.getAttribute(DebugPlugin.ATTR_CAPTURE_OUTPUT);
+		String captureOutput = launch.getAttribute(DebugPluginConstants.ATTR_CAPTURE_OUTPUT);
 		fCaptureOutput = !("false".equals(captureOutput)); //$NON-NLS-1$
 
 		fStreamsProxy= createStreamsProxy();
@@ -226,7 +226,7 @@ public class RuntimeProcess implements IProcess {
 				fMonitor.killThread();
 				fMonitor = null;
 			}
-			IStatus status = new Status(IStatus.ERROR, DebugPlugin.getUniqueIdentifier(), DebugException.TARGET_REQUEST_FAILED, RuntimeProcess_terminate_failed, null);
+			IStatus status = new Status(IStatus.ERROR, DebugPluginConstants.DEBUG_CORE_ID, DebugException.TARGET_REQUEST_FAILED, RuntimeProcess_terminate_failed, null);
 			throw new DebugException(status);
 		}
 	}
@@ -280,7 +280,7 @@ public class RuntimeProcess implements IProcess {
 	    if (!fCaptureOutput) {
 	        return new NullStreamsProxy(getSystemProcess());
 	    }
-		String encoding = getLaunch().getAttribute(DebugPlugin.ATTR_CONSOLE_ENCODING);
+		String encoding = getLaunch().getAttribute(DebugPluginConstants.ATTR_CONSOLE_ENCODING);
 		return new StreamsProxy(getSystemProcess(), encoding);
 	}
 
@@ -380,7 +380,7 @@ public class RuntimeProcess implements IProcess {
 		if (isTerminated()) {
 			return fExitValue;
 		}
-		throw new DebugException(new Status(IStatus.ERROR, DebugPlugin.getUniqueIdentifier(), DebugException.TARGET_REQUEST_FAILED, RuntimeProcess_Exit_value_not_available_until_process_terminates__1, null));
+		throw new DebugException(new Status(IStatus.ERROR, DebugPluginConstants.DEBUG_CORE_ID, DebugException.TARGET_REQUEST_FAILED, RuntimeProcess_Exit_value_not_available_until_process_terminates__1, null));
 	}
 
 	/**

@@ -2,12 +2,16 @@ package org.jboss.tools.ssp.eclipse.debug.core;
 
 import org.jboss.tools.ssp.eclipse.debug.core.model.IProcess;
 
-public class DebugPlugin {
+public class DebugPluginConstants {
+
+	private DebugPluginConstants() {
+	}
+
 	/**
 	 * Unique identifier constant (value <code>"org.eclipse.debug.core"</code>)
 	 * for the Debug Core plug-in.
 	 */
-	private static final String PI_DEBUG_CORE = "org.eclipse.debug.core"; //$NON-NLS-1$
+	public static final String DEBUG_CORE_ID = "org.eclipse.debug.core"; //$NON-NLS-1$
 
 
 	/**
@@ -18,7 +22,7 @@ public class DebugPlugin {
 	 *
 	 * @since 3.1
 	 */
-	public static final String ATTR_CAPTURE_OUTPUT = PI_DEBUG_CORE + ".capture_output"; //$NON-NLS-1$
+	public static final String ATTR_CAPTURE_OUTPUT = DEBUG_CORE_ID + ".capture_output"; //$NON-NLS-1$
 
 	/**
 	 * The launch attribute that stores the time stamp of when a launch configuration was
@@ -26,7 +30,7 @@ public class DebugPlugin {
 	 *
 	 * @since 3.6
 	 */
-	public static final String ATTR_LAUNCH_TIMESTAMP = PI_DEBUG_CORE + ".launch.timestamp";  //$NON-NLS-1$
+	public static final String ATTR_LAUNCH_TIMESTAMP = DEBUG_CORE_ID + ".launch.timestamp";  //$NON-NLS-1$
 
 
     /**
@@ -51,7 +55,7 @@ public class DebugPlugin {
 	 * @see IProcess
 	 * @since 3.8
 	 */
-	public static final String ATTR_ENVIRONMENT = PI_DEBUG_CORE + ".ATTR_ENVIRONMENT"; //$NON-NLS-1$
+	public static final String ATTR_ENVIRONMENT = DEBUG_CORE_ID + ".ATTR_ENVIRONMENT"; //$NON-NLS-1$
 
 	/**
 	 * Attribute key for the path of the working directory for an {@link IProcess}
@@ -59,7 +63,7 @@ public class DebugPlugin {
 	 * @see IProcess
 	 * @since 3.8
 	 */
-	public static final String ATTR_WORKING_DIRECTORY = PI_DEBUG_CORE + ".ATTR_WORKING_DIRECTORY"; //$NON-NLS-1$
+	public static final String ATTR_WORKING_DIRECTORY = DEBUG_CORE_ID + ".ATTR_WORKING_DIRECTORY"; //$NON-NLS-1$
 
 	/**
 	 * Attribute key for path of the executable that launched an {@link IProcess}
@@ -67,14 +71,6 @@ public class DebugPlugin {
 	 * @see IProcess
 	 * @since 3.8
 	 */
-	public static final String ATTR_PATH = PI_DEBUG_CORE + ".ATTR_PATH"; //$NON-NLS-1$
+	public static final String ATTR_PATH = DEBUG_CORE_ID + ".ATTR_PATH"; //$NON-NLS-1$
 
-	/**
-	 * Convenience method which returns the unique identifier of this plug-in.
-	 *
-	 * @return debug plug-in identifier
-	 */
-	public static String getUniqueIdentifier() {
-		return PI_DEBUG_CORE;
-	}
 }

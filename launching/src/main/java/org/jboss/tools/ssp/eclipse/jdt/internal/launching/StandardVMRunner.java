@@ -27,7 +27,7 @@ import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.ssp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.ssp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.ssp.eclipse.core.runtime.SubProgressMonitor;
-import org.jboss.tools.ssp.eclipse.debug.core.DebugPlugin;
+import org.jboss.tools.ssp.eclipse.debug.core.DebugPluginConstants;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.ssp.eclipse.debug.core.Launch;
 import org.jboss.tools.ssp.eclipse.debug.core.model.IProcess;
@@ -375,7 +375,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 			}
 		}
 		if(!foundencoding) {
-			String encoding = launch.getAttribute(DebugPlugin.ATTR_CONSOLE_ENCODING);
+			String encoding = launch.getAttribute(DebugPluginConstants.ATTR_CONSOLE_ENCODING);
 			if(encoding == null) {
 				return vmargs;
 			}
@@ -470,12 +470,12 @@ public class StandardVMRunner extends AbstractVMRunner {
 		}
 		String timestamp = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss a").format(new Date(System.currentTimeMillis()));
 		IProcess process= newProcess(launch, p, renderProcessLabel(det.getCmdLine(), timestamp), getDefaultProcessMap());
-		process.setAttribute(DebugPlugin.ATTR_PATH, det.getCmdLine()[0]);
+		process.setAttribute(DebugPluginConstants.ATTR_PATH, det.getCmdLine()[0]);
 		process.setAttribute(IProcess.ATTR_CMDLINE, renderCommandLine(det.getCmdLine()));
-		String ltime = launch.getAttribute(DebugPlugin.ATTR_LAUNCH_TIMESTAMP);
-		process.setAttribute(DebugPlugin.ATTR_LAUNCH_TIMESTAMP, ltime != null ? ltime : timestamp);
+		String ltime = launch.getAttribute(DebugPluginConstants.ATTR_LAUNCH_TIMESTAMP);
+		process.setAttribute(DebugPluginConstants.ATTR_LAUNCH_TIMESTAMP, ltime != null ? ltime : timestamp);
 		if(det.getWorkingDir() != null) {
-			process.setAttribute(DebugPlugin.ATTR_WORKING_DIRECTORY, det.getWorkingDir());
+			process.setAttribute(DebugPluginConstants.ATTR_WORKING_DIRECTORY, det.getWorkingDir());
 		}
 		if(det.getEnvp() != null) {
 			Arrays.sort(det.getEnvp());
@@ -486,7 +486,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 					buff.append('\n');
 				}
 			}
-			process.setAttribute(DebugPlugin.ATTR_ENVIRONMENT, buff.toString());
+			process.setAttribute(DebugPluginConstants.ATTR_ENVIRONMENT, buff.toString());
 		}
 		subMonitor.worked(1);
 		subMonitor.done();
