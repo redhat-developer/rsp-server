@@ -20,12 +20,14 @@ import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.ssp.eclipse.debug.core.IProcessFactory;
 import org.jboss.tools.ssp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.ssp.eclipse.debug.core.model.RuntimeProcess;
-import org.jboss.tools.ssp.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 
 public class ExecUtil {
+
 	public static final int ERROR = 125;
 	public static final String DebugPlugin_0="Exception occurred executing command line.";
 
+	private ExecUtil() {
+	}
 
 	/**
 	 * Convenience method that performs a runtime exec on the given command line
@@ -70,9 +72,9 @@ public class ExecUtil {
 		Process p= null;
 		try {
 			if (workingDirectory == null) {
-				p= Runtime.getRuntime().exec(cmdLine, envp);
+				p = Runtime.getRuntime().exec(cmdLine, envp);
 			} else {
-				p= Runtime.getRuntime().exec(cmdLine, envp, workingDirectory);
+				p = Runtime.getRuntime().exec(cmdLine, envp, workingDirectory);
 			}
 		} catch (IOException e) {
 		    Status status = new Status(IStatus.ERROR, DebugPlugin.getUniqueIdentifier(), ERROR, DebugPlugin_0, e);
@@ -81,23 +83,22 @@ public class ExecUtil {
 		return p;
 	}
 
-	
-
 	public static IProcess newProcess(ILaunch launch, Process p, String label) {
 		return newProcess(launch, p, label, null);
 	}	
 
 	public static IProcess newProcess(ILaunch launch, Process p, String label, Map<String, String> attributes) {
 		IProcessFactory fact = getProcessFactory(launch, p, label, attributes);
-		if( fact != null ) {
+		if (fact != null) {
 			return fact.newProcess(launch, p, label, attributes);
+		} else {
+			return new RuntimeProcess(launch, p, label, attributes);
 		}
-		return new RuntimeProcess(launch, p, label, attributes);
 	}
 	
 	protected static IProcessFactory getProcessFactory(ILaunch launch, Process p, String label, Map<String, String> attributes) {
+		// TODO: implement or get rid of it
 		return null;
 	}
-	
-	
+
 }
