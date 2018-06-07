@@ -9,12 +9,13 @@
 package org.jboss.tools.ssp.launching.util;
 
 public final class OSUtils {
+
 	private static String OS = System.getProperty("os.name").toLowerCase();
 
+	private OSUtils() {
+	}
+
 	public static String getOsName() {
-		if (OS == null) {
-			OS = System.getProperty("os.name");
-		}
 		return OS;
 	}
 
