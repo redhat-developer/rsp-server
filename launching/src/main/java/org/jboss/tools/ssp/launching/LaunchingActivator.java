@@ -1,66 +1,73 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.ssp.launching;
 
+import org.jboss.tools.ssp.eclipse.osgi.util.NLS;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.log.LogEntry;
-import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogReaderService;
 import org.osgi.service.log.LogService;
 
 public class LaunchingActivator implements BundleActivator {
+
 	public static final String BUNDLE_ID = "org.jboss.tools.ssp.launching";
-	private LogService logger = null;
+
 	private BundleContext bc = null;
+
 	@Override
 	public void start(BundleContext context) throws Exception {
-		bc = context;
-		System.out.println("Launching bundle activated");
+		this.bc = context;
 		sendLogsToSysout();
-		getLog().log(LogService.LOG_ERROR, "This sucks");
-	}
-	
-	@Override
-	public void stop(BundleContext context) throws Exception {
-		bc = null;
-		logger = null;
-	}
-	
-	private LogService getLog() {
-		if (logger == null) {
-			logger = findLogService();
-		}
-		return logger;
+		log(LogService.LOG_INFO, NLS.bind("{0} bundle activated.", BUNDLE_ID));
 	}
 
-	private LogService findLogService() {
-		ServiceReference ref = bc.getServiceReference(LogService.class.getName());
-		if (ref != null) {
-			return (LogService) bc.getService(ref);
+	@Override
+	public void stop(BundleContext context) throws Exception {
+		this.bc = null;
+	}
+
+	private void log(int level, String message) {
+		LogService log = getService(LogService.class.getName());
+		if (log == null) {
+			return;
 		}
-		return null;
+		log.log(level, message);
 	}
 
 	private void sendLogsToSysout() {
-		ServiceReference ref = bc.getServiceReference(LogReaderService.class.getName());
-		if (ref != null) {
-			LogReaderService lrs = (LogReaderService) bc.getService(ref);
-			lrs.addLogListener(new LogListener() {
-				@Override
-				public void logged(LogEntry arg0) {
-					if( arg0.getLevel() <= LogService.LOG_WARNING) { 
-						StringBuffer sb = new StringBuffer();
-						sb.append("[");
-						sb.append(arg0.getLevel());
-						sb.append("] ");
-						sb.append(arg0.getTime());
-						sb.append(": ");
-						sb.append(arg0.getMessage());
-						System.out.println(sb.toString());
-					}
-				}
-			});
+		LogReaderService logReader = getService(LogReaderService.class.getName());
+		if (logReader == null) {
+			return;
 		}
+		logReader.addLogListener(entry -> {
+				if( entry.getLevel() <= LogService.LOG_WARNING) { 
+					String message = new StringBuilder()
+						.append("[").append(entry.getLevel()).append("] ")
+						.append(entry.getTime()).append(": ").append(entry.getMessage())
+						.toString();
+					System.out.println(message);
+				}
+		});
+	}
+
+	private <S> S getService(String name) {
+		if (bc == null) {
+			return null;
+		}
+
+		ServiceReference<S> ref = 
+				(ServiceReference<S>) bc.getServiceReference(name);
+		if (ref == null) {
+			return null;
+		}
+		return bc.getService(ref);
 	}
 	
 }
