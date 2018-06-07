@@ -31,6 +31,7 @@ import org.jboss.tools.ssp.eclipse.debug.core.DebugPlugin;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.ssp.eclipse.debug.core.Launch;
 import org.jboss.tools.ssp.eclipse.debug.core.model.IProcess;
+import org.jboss.tools.ssp.eclipse.debug.internal.core.util.ArgumentUtils;
 import org.jboss.tools.ssp.eclipse.jdt.launching.AbstractVMRunner;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
@@ -137,7 +138,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 	 * @return the command line label
 	 */
 	protected String renderCommandLine(String[] commandLine) {
-		return DebugPlugin.renderArguments(commandLine, null);
+		return ArgumentUtils.renderArguments(commandLine, null);
 	}
 
 	/**
