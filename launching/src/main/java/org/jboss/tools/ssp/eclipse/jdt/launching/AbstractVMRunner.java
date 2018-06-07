@@ -19,7 +19,7 @@ import java.util.Map;
 import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.eclipse.core.runtime.Status;
-import org.jboss.tools.ssp.eclipse.debug.core.DebugPlugin;
+import org.jboss.tools.ssp.eclipse.debug.core.DebugPluginConstants;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.ssp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.ssp.launching.ICommandProvider;
@@ -194,7 +194,7 @@ public abstract class AbstractVMRunner implements IVMRunner, ICommandProvider {
 	 * @param workingDirectory the working directory
 	 * @return the {@link Process}
 	 * @throws CoreException if the execution fails
-	 * @see DebugPlugin#exec(String[], File)
+	 * @see DebugPluginConstants#exec(String[], File)
 	 */
 	protected Process exec(String[] cmdLine, File workingDirectory) throws CoreException {
 		cmdLine = quoteWindowsArgs(cmdLine);
@@ -210,7 +210,7 @@ public abstract class AbstractVMRunner implements IVMRunner, ICommandProvider {
 	 * @return the {@link Process}
 	 * @throws CoreException is the execution fails
 	 * @since 3.0
-	 * @see DebugPlugin#exec(String[], File, String[])
+	 * @see DebugPluginConstants#exec(String[], File, String[])
 	 */
 	protected Process exec(String[] cmdLine, File workingDirectory, String[] envp) throws CoreException {
 		cmdLine = quoteWindowsArgs(cmdLine);

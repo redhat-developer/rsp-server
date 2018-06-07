@@ -11,7 +11,7 @@
 package org.jboss.tools.ssp.eclipse.jdt.launching;
 
 
-import org.jboss.tools.ssp.eclipse.debug.core.DebugPlugin;
+import org.jboss.tools.ssp.eclipse.debug.internal.core.util.ArgumentUtils;
 
 /**
  * The execution arguments for running a Java VM. The execution arguments are
@@ -64,7 +64,7 @@ public class ExecutionArguments {
 	 * @return the VM arguments as an array of individual arguments
 	 */
 	public String[] getVMArgumentsArray() {
-		return DebugPlugin.parseArguments(fVMArgs);
+		return ArgumentUtils.parseArguments(fVMArgs);
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class ExecutionArguments {
 	 * @return the program arguments as an array of individual arguments
 	 */
 	public String[] getProgramArgumentsArray() {
-		return DebugPlugin.parseArguments(fProgramArgs);
+		return ArgumentUtils.parseArguments(fProgramArgs);
 	}
 
 }

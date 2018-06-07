@@ -15,7 +15,7 @@ import java.util.Map;
 import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.eclipse.core.runtime.Status;
-import org.jboss.tools.ssp.eclipse.debug.core.DebugPlugin;
+import org.jboss.tools.ssp.eclipse.debug.core.DebugPluginConstants;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.ssp.eclipse.debug.core.IProcessFactory;
 import org.jboss.tools.ssp.eclipse.debug.core.model.IProcess;
@@ -77,7 +77,7 @@ public class ExecUtil {
 				p = Runtime.getRuntime().exec(cmdLine, envp, workingDirectory);
 			}
 		} catch (IOException e) {
-		    Status status = new Status(IStatus.ERROR, DebugPlugin.getUniqueIdentifier(), ERROR, DebugPlugin_0, e);
+		    Status status = new Status(IStatus.ERROR, DebugPluginConstants.DEBUG_CORE_ID, ERROR, DebugPlugin_0, e);
 		    throw new CoreException(status);
 		} 
 		return p;
