@@ -458,7 +458,8 @@ public class StandardVMRunner extends AbstractVMRunner {
 		CommandLineDetails det = getCommandLineDetails(config, launch, subMonitor);
 
 		Process p= null;
-		p= exec(det.getCmdLine(), new File(det.getWorkingDir()), det.getEnvp());
+		File workingDir = (det.getWorkingDir() == null ? null : new File(det.getWorkingDir()));
+		p= exec(det.getCmdLine(), workingDir, det.getEnvp());
 		if (p == null) {
 			return;
 		}
