@@ -8,7 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.server.model;
 
-import org.jboss.tools.ssp.launching.VMInstallModel;
+import org.jboss.tools.ssp.launching.VMInstallRegistry;
 import org.jboss.tools.ssp.server.discovery.DiscoveryPathModel;
 import org.jboss.tools.ssp.server.discovery.serverbeans.ServerBeanTypeManager;
 import org.jboss.tools.ssp.server.spi.discovery.IDiscoveryPathModel;
@@ -45,7 +45,7 @@ public class ServerManagementModel implements IServerManagementModel {
 		return serverModel;
 	}
 
-	public VMInstallModel getVMInstallModel() {
-		return VMInstallModel.getDefault();
+	public VMInstallRegistry getVMInstallModel() {
+		return VMInstallRegistry.getDefault();
 	}
 }
