@@ -17,7 +17,7 @@ node('rhel7') {
 	}
 
 	stage('Snapshot') {
-		def filesToPush = findFiles(glob: '**.zip')
+		def filesToPush = findFiles(glob: '**/*.zip')
 		sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${filesToPush[0].path} ${UPLOAD_LOCATION}/snapshots/"
 	}
 }
