@@ -39,14 +39,14 @@ public class TypescriptUtility {
 			daoFolder.mkdirs();
 		}
 
+		final Settings settings = new Settings();
+		settings.outputKind = TypeScriptOutputKind.module;
+		settings.jsonLibrary = JsonLibrary.jackson2;
 		for (int i = 0; i < daoClasses.length; i++) {
 			Class c = daoClasses[i];
 			Path p = getDaoTypescriptFile(c.getSimpleName());
 			File output = p.toFile();
 			List<String> classes = Arrays.asList(new String[] { c.getName() });
-			final Settings settings = new Settings();
-			settings.outputKind = TypeScriptOutputKind.module;
-			settings.jsonLibrary = JsonLibrary.jackson2;
 
 			new TypeScriptGenerator(settings).generateTypeScript(Input.fromClassNamesAndJaxrsApplication(classes, null,
 					null, false, null, (URLClassLoader) c.getClassLoader(), true), Output.to(output));
@@ -56,16 +56,15 @@ public class TypescriptUtility {
 			String trimmed = trimFirstLines(contents);
 			Files.write(p, trimmed.getBytes());
 		}
-		
-		StringBuffer sb = new StringBuffer();
-		File[] generated = daoFolder.listFiles();
-		for( int i = 0; i < generated.length; i++ ) {
-			String contents = safeReadFile(generated[i].toPath());
-			sb.append(contents);
-			sb.append("\n\n");
+		String[] clazNames = new String[daoClasses.length];
+		for( int i = 0; i < clazNames.length; i++ ) {
+			clazNames[i] = daoClasses[i].getName();
 		}
 		
-		Files.write(getDaoTypescriptFolder().resolve("protocol.unified.d.ts"), sb.toString().getBytes());
+		File output = getDaoTypescriptFolder().resolve("protocol.unified.d.ts").toFile();
+		new TypeScriptGenerator(settings).generateTypeScript(Input.fromClassNamesAndJaxrsApplication(
+				Arrays.asList(clazNames), null, null, false, null, (URLClassLoader) daoClasses[0].getClassLoader(), true), 
+				Output.to(output));
 	}
 
 	private static String trimFirstLines(String contents) {
