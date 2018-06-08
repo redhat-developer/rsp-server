@@ -34,7 +34,7 @@ public class LaunchingActivator implements BundleActivator {
 	}
 
 	private void log(int level, String message) {
-		LogService log = getService(LogService.class.getName());
+		LogService log = getService(LogService.class);
 		if (log == null) {
 			return;
 		}
@@ -42,7 +42,7 @@ public class LaunchingActivator implements BundleActivator {
 	}
 
 	private void sendLogsToSysout() {
-		LogReaderService logReader = getService(LogReaderService.class.getName());
+		LogReaderService logReader = getService(LogReaderService.class);
 		if (logReader == null) {
 			return;
 		}
@@ -57,17 +57,13 @@ public class LaunchingActivator implements BundleActivator {
 		});
 	}
 
-	private <S> S getService(String name) {
-		if (bc == null) {
+	private <T> T getService(Class<T> clazz) {
+		if (bc == null )
 			return null;
-		}
-
-		ServiceReference<S> ref = 
-				(ServiceReference<S>) bc.getServiceReference(name);
-		if (ref == null) {
-			return null;
-		}
-		return bc.getService(ref);
+		ServiceReference ref = bc.getServiceReference(clazz.getName());
+		if( ref != null )
+			return (T)bc.getService(bc.getServiceReference(clazz.getName()));
+		return null;
 	}
 	
 }
