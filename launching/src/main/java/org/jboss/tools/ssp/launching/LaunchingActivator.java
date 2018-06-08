@@ -60,9 +60,9 @@ public class LaunchingActivator implements BundleActivator {
 	private <T> T getService(Class<T> clazz) {
 		if (bc == null )
 			return null;
-		ServiceReference ref = bc.getServiceReference(clazz.getName());
+		ServiceReference<?> ref = bc.getServiceReference(clazz.getName());
 		if( ref != null )
-			return (T)bc.getService(bc.getServiceReference(clazz.getName()));
+			return (T)bc.getService(ref);
 		return null;
 	}
 	
