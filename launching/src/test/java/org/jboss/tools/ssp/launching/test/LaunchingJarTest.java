@@ -28,15 +28,22 @@ import org.junit.Test;
 
 public class LaunchingJarTest {
 
-    private static final String JAVA_HOME = "JAVA_HOME";
+	private static final String PROPERTY_JAVA_HOME = "java.home";
+	private static final String ENV_JAVA_HOME = "JAVA_HOME";
 	private static final String JAVA_SPECIFICATION_VERSION = "java.specification.version";
 	private static final String JAVA_SPECIFICATION_NAME = "java.specification.name";
 
 	@Test
-    public void testLaunchingSupportExtraction() {
+	public void testFindJavaExecutable() {
 		String javaHome = getAssertedJavaHome();
 		getAssertedJavaExecutable(javaHome);
-		
+	}
+
+	@Test
+	public void testLaunchingSupportExtraction() {
+		String javaHome = getAssertedJavaHome();
+		getAssertedJavaExecutable(javaHome);
+
 		LaunchingSupportUtility util = new LaunchingSupportUtility();
 		File launchingJar = getAssertedLaunchingSupportFile(util);
 
@@ -44,10 +51,10 @@ public class LaunchingJarTest {
 		assertFalse(launchingJar.exists());
 
 		getAssertedLaunchingSupportFile(util);
-    }
+	}
 
-    @Test
-    public void testLaunchingSupportLibraryDetector() {
+	@Test
+	public void testLaunchingSupportLibraryDetector() {
 		LaunchingSupportUtility util = new LaunchingSupportUtility();
 		String javaHome = getAssertedJavaHome();
 		File exe = getAssertedJavaExecutable(javaHome);
@@ -63,49 +70,51 @@ public class LaunchingJarTest {
 		assertTrue(info.getEndorsedDirs().length > 0);
 		assertNotNull(info.getExtensionDirs());
 		assertTrue(info.getExtensionDirs().length > 0);
-    }
+	}
 
-    @Test
-    public void testLaunchingSupportSysprops() {
+	@Test
+	public void testLaunchingSupportSysprops() {
 		String javaHome = getAssertedJavaHome();
-		File javaExecutable = getAssertedJavaExecutable(javaHome);
-		
+		getAssertedJavaExecutable(javaHome);
+
 		getAssertedLaunchingSupportFile(new LaunchingSupportUtility());
 
 		IVMInstall svmTmp = StandardVMType.getDefault().createVMInstall("testId");
 		assertNotNull(svmTmp);
-		svmTmp.setInstallLocation(javaExecutable);
-		
+		svmTmp.setInstallLocation(new File(javaHome));
+
 		assertTrue(svmTmp instanceof IVMInstall3);
 		IVMInstall3 svm = (IVMInstall3) svmTmp;
 
 		try {
-			String[] props = new String[] {JAVA_SPECIFICATION_NAME, JAVA_SPECIFICATION_VERSION};
+			String[] props = new String[] { JAVA_SPECIFICATION_NAME, JAVA_SPECIFICATION_VERSION };
 			Map<String, String> ret = svm.evaluateSystemProperties(props, new NullProgressMonitor());
 			assertNotNull(ret);
 			assertNotNull(ret.get(JAVA_SPECIFICATION_NAME));
 			assertNotNull(ret.get(JAVA_SPECIFICATION_VERSION));
-		} catch(CoreException ce) {
-			fail(ce.getMessage());		
+		} catch (CoreException ce) {
+			fail(ce.getMessage());
 		}
 	}
 
-    private String getAssertedJavaHome() {
-		String javaHome = System.getenv().get(JAVA_HOME);
-		assertNotNull(JAVA_HOME + " is not set!", javaHome);
+	private String getAssertedJavaHome() {
+		String javaHome = System.getenv().get(ENV_JAVA_HOME);
+		if (javaHome == null || javaHome.isEmpty()) {
+			javaHome = System.getProperty(PROPERTY_JAVA_HOME);
+		}
+		assertNotNull("Java home is not set!", javaHome);
+		assertTrue(new File(javaHome).exists());
 		return javaHome;
-    }
+	}
 
-    private File getAssertedJavaExecutable(String javaHome) {
-		File f = new File(javaHome);
-		File exe = StandardVMType.findJavaExecutable(f);
+	private File getAssertedJavaExecutable(String javaHome) {
+		File exe = StandardVMType.findJavaExecutable(new File(javaHome));
 		assertNotNull(exe);
 		return exe;
 	}
 
 	private File getAssertedLaunchingSupportFile(LaunchingSupportUtility launchSupport) {
-		File launchingJar;
-		launchingJar = launchSupport.getLaunchingSupportFile();
+		File launchingJar = launchSupport.getLaunchingSupportFile();
 		assertNotNull(launchingJar);
 		assertTrue(launchingJar.exists());
 		return launchingJar;
