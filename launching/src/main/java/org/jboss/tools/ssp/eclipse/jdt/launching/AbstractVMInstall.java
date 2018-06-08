@@ -24,7 +24,7 @@ import org.jboss.tools.ssp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.ssp.eclipse.core.runtime.Status;
 import org.jboss.tools.ssp.launching.LaunchingSupportUtility;
 import org.jboss.tools.ssp.launching.RunningVMSyspropCache;
-import org.jboss.tools.ssp.launching.VMInstallModel;
+import org.jboss.tools.ssp.launching.VMInstallRegistry;
 /**
  * Abstract implementation of a VM install.
  * <p>
@@ -451,6 +451,6 @@ public abstract class AbstractVMInstall implements IVMInstall, IVMInstall2, IVMI
 	
 	
 	private void fireVMChanged(PropertyChangeEvent event) {
-		VMInstallModel.getDefault().fireVMChanged(event);
+		VMInstallRegistry.getDefault().fireVMChanged(event);
 	}
 }

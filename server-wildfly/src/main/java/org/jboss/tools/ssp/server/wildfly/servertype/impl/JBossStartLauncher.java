@@ -25,7 +25,7 @@ import org.jboss.tools.ssp.eclipse.jdt.launching.IVMRunner;
 import org.jboss.tools.ssp.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.jboss.tools.ssp.launching.ICommandProvider;
 import org.jboss.tools.ssp.launching.NativeEnvironmentUtil;
-import org.jboss.tools.ssp.launching.VMInstallModel;
+import org.jboss.tools.ssp.launching.VMInstallRegistry;
 
 public class JBossStartLauncher {
 	private JBossServerDelegate delegate;
@@ -99,9 +99,9 @@ public class JBossStartLauncher {
 	private IStatus checkPrereqs(String mode) {
 		String vmPath = delegate.getServer().getAttribute(IJBossServerAttributes.VM_INSTALL_PATH, (String)null);
 		if( vmPath == null ) {
-			vmi = VMInstallModel.getDefault().getDefaultVMInstall();
+			vmi = VMInstallRegistry.getDefault().getDefaultVMInstall();
 		} else {
-			vmi = VMInstallModel.getDefault().findVMInstall(new File(vmPath));
+			vmi = VMInstallRegistry.getDefault().findVMInstall(new File(vmPath));
 		}
 		if( vmi == null ) {
 			return Status.CANCEL_STATUS;

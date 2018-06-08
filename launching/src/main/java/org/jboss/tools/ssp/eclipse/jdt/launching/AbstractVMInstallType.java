@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jboss.tools.ssp.eclipse.osgi.util.NLS;
-import org.jboss.tools.ssp.launching.VMInstallModel;
+import org.jboss.tools.ssp.launching.VMInstallRegistry;
 
 /**
  * Abstract implementation of a VM install type.
@@ -78,7 +78,7 @@ public abstract class AbstractVMInstallType implements IVMInstallType {
 	}
 
 	protected void fireVMRemoved(IVMInstall install) {
-		VMInstallModel.getDefault().removeVMInstall(install);
+		VMInstallRegistry.getDefault().removeVMInstall(install);
 	}
 	
 	

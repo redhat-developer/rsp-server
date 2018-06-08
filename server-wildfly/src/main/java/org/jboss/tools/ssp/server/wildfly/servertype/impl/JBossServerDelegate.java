@@ -22,7 +22,7 @@ import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.ssp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.ssp.launching.LaunchingCore;
-import org.jboss.tools.ssp.launching.VMInstallModel;
+import org.jboss.tools.ssp.launching.VMInstallRegistry;
 import org.jboss.tools.ssp.server.model.AbstractServerDelegate;
 import org.jboss.tools.ssp.server.spi.model.polling.IPollResultListener;
 import org.jboss.tools.ssp.server.spi.model.polling.IServerStatePoller;
@@ -58,9 +58,9 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 			if( !vmFile.exists()) {
 				return new Status(IStatus.ERROR, "org.jboss.tools.ssp.server.wildfly", "VM file location does not exist: " + vmPath);
 			}
-			vmi = VMInstallModel.getDefault().findVMInstall(vmFile);
+			vmi = VMInstallRegistry.getDefault().findVMInstall(vmFile);
 		} else {
-			vmi = VMInstallModel.getDefault().getDefaultVMInstall();
+			vmi = VMInstallRegistry.getDefault().getDefaultVMInstall();
 		}
 		if( vmi == null ) {
 			return new Status(IStatus.ERROR, "org.jboss.tools.ssp.server.wildfly", "VM " + vmPath + " is not found in the VM model");
