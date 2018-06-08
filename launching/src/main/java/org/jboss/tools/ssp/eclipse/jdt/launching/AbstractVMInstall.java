@@ -24,19 +24,18 @@ import org.jboss.tools.ssp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.ssp.eclipse.core.runtime.Status;
 import org.jboss.tools.ssp.launching.LaunchingSupportUtility;
 import org.jboss.tools.ssp.launching.RunningVMSyspropCache;
-import org.jboss.tools.ssp.launching.VMInstallRegistry;
 /**
  * Abstract implementation of a VM install.
  * <p>
  * Clients implementing VM installs must subclass this class.
  * </p>
  */
-public abstract class AbstractVMInstall implements IVMInstall, IVMInstall2, IVMInstall3 {
+public abstract class AbstractVMInstall implements IVMInstall {
 
 	public static final String vmInstall_assert_idNotNull="id cannot be null";
 	public static final String vmInstall_assert_typeNotNull="VM type cannot be null";
 
-	
+	private IVMInstallRegistry registry;
 	private IVMInstallType fType;
 	private String fId;
 	private String fName;
@@ -451,6 +450,15 @@ public abstract class AbstractVMInstall implements IVMInstall, IVMInstall2, IVMI
 	
 	
 	private void fireVMChanged(PropertyChangeEvent event) {
-		VMInstallRegistry.getDefault().fireVMChanged(event);
+		if( getRegistry() != null ) 
+			getRegistry().fireVMChanged(event);
+	}
+	
+	public void setRegistry(IVMInstallRegistry reg) {
+		this.registry = reg;
+	}
+	
+	public IVMInstallRegistry getRegistry() {
+		return registry;
 	}
 }

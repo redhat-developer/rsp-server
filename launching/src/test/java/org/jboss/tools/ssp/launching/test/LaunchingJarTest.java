@@ -20,7 +20,6 @@ import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.ssp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.ssp.eclipse.jdt.internal.launching.LibraryInfo;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
-import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall3;
 import org.jboss.tools.ssp.eclipse.jdt.launching.StandardVMType;
 import org.jboss.tools.ssp.launching.LaunchingSupportUtility;
 import org.jboss.tools.ssp.launching.util.FileUtil;
@@ -83,12 +82,9 @@ public class LaunchingJarTest {
 		assertNotNull(svmTmp);
 		svmTmp.setInstallLocation(new File(javaHome));
 
-		assertTrue(svmTmp instanceof IVMInstall3);
-		IVMInstall3 svm = (IVMInstall3) svmTmp;
-
 		try {
 			String[] props = new String[] { JAVA_SPECIFICATION_NAME, JAVA_SPECIFICATION_VERSION };
-			Map<String, String> ret = svm.evaluateSystemProperties(props, new NullProgressMonitor());
+			Map<String, String> ret = svmTmp.evaluateSystemProperties(props, new NullProgressMonitor());
 			assertNotNull(ret);
 			assertNotNull(ret.get(JAVA_SPECIFICATION_NAME));
 			assertNotNull(ret.get(JAVA_SPECIFICATION_VERSION));

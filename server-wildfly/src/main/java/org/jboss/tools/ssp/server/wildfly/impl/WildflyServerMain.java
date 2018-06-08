@@ -8,6 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.server.wildfly.impl;
 
+import org.jboss.tools.ssp.server.LauncherSingleton;
 import org.jboss.tools.ssp.server.ServerManagementServerLauncher;
 
 /**
@@ -18,6 +19,7 @@ import org.jboss.tools.ssp.server.ServerManagementServerLauncher;
 public class WildflyServerMain extends ServerManagementServerLauncher {
 	public static void main(String[] args) throws Exception {
 		WildflyServerMain instance = new WildflyServerMain();
+		LauncherSingleton.getDefault().setLauncher(instance);
 		instance.launch(args[0]);
 		instance.shutdownOnInput();
 	}

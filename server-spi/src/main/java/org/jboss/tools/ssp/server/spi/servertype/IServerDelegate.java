@@ -185,4 +185,6 @@ public interface IServerDelegate {
 	public void putSharedData(String key, Object o);
 	
 	public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params);
+	
+	public IServer getServer();
 }

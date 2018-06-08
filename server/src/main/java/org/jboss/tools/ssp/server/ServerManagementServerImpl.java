@@ -32,7 +32,7 @@ import org.jboss.tools.ssp.api.dao.ServerType;
 import org.jboss.tools.ssp.api.dao.Status;
 import org.jboss.tools.ssp.api.dao.StopServerAttributes;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
-import org.jboss.tools.ssp.launching.VMInstallRegistry;
+import org.jboss.tools.ssp.eclipse.jdt.launching.VMInstallRegistry;
 import org.jboss.tools.ssp.server.core.internal.StatusConverter;
 import org.jboss.tools.ssp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.ssp.server.model.RemoteEventManager;
@@ -44,18 +44,14 @@ import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 public class ServerManagementServerImpl implements SSPServer {
 	
 	private final List<SSPClient> clients = new CopyOnWriteArrayList<>();
-	private final List<SocketLauncher<SSPClient>> launchers 
-		= new CopyOnWriteArrayList<>();
+	private final List<SocketLauncher<SSPClient>> launchers = new CopyOnWriteArrayList<>();
 	
-	private final VMInstallRegistry vmModel;
 	private final ServerManagementModel model;
 	private final RemoteEventManager eventManager;
 	private ServerManagementServerLauncher launcher;
 	
 	public ServerManagementServerImpl(ServerManagementServerLauncher launcher) {
 		this.launcher = launcher;
-		vmModel = VMInstallRegistry.getDefault();
-		vmModel.addActiveVM();
 		model = new ServerManagementModel();
 		eventManager = new RemoteEventManager(this);
 	}

@@ -1,5 +1,6 @@
 package org.jboss.tools.ssp.server.wildfly.impl;
 
+import org.jboss.tools.ssp.server.LauncherSingleton;
 import org.jboss.tools.ssp.server.ServerCoreActivator;
 import org.jboss.tools.ssp.server.ServerManagementServerImpl;
 import org.jboss.tools.ssp.server.wildfly.servertype.impl.JBossServerFactory;
@@ -12,7 +13,7 @@ public class Activator implements BundleActivator {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		System.out.println("Wildfly Server bundle started");
-		ExtensionHandler.addExtensionsToModel(ServerCoreActivator.getDefault().getLauncher().getModel());
+		ExtensionHandler.addExtensionsToModel(LauncherSingleton.getDefault().getLauncher().getModel());
 	}
 
 	@Override

@@ -8,7 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.server.model;
 
-import org.jboss.tools.ssp.launching.VMInstallRegistry;
+import org.jboss.tools.ssp.eclipse.jdt.launching.VMInstallRegistry;
 import org.jboss.tools.ssp.server.discovery.DiscoveryPathModel;
 import org.jboss.tools.ssp.server.discovery.serverbeans.ServerBeanTypeManager;
 import org.jboss.tools.ssp.server.spi.discovery.IDiscoveryPathModel;
@@ -25,11 +25,14 @@ public class ServerManagementModel implements IServerManagementModel {
 	private DiscoveryPathModel rpm;
 	private ServerBeanTypeManager serverBeanTypeManager;
 	private ServerModel serverModel;
+	private VMInstallRegistry vmModel;
 	
 	public ServerManagementModel() {
 		rpm = new DiscoveryPathModel();
 		serverBeanTypeManager = new ServerBeanTypeManager();
 		serverModel = new ServerModel();
+		vmModel = new VMInstallRegistry();
+		vmModel.addActiveVM();
 		instance = this;
 	}
 	
@@ -46,6 +49,6 @@ public class ServerManagementModel implements IServerManagementModel {
 	}
 
 	public VMInstallRegistry getVMInstallModel() {
-		return VMInstallRegistry.getDefault();
+		return vmModel;
 	}
 }

@@ -35,7 +35,6 @@ import org.jboss.tools.ssp.eclipse.debug.internal.core.util.ArgumentUtils;
 import org.jboss.tools.ssp.eclipse.jdt.launching.AbstractVMRunner;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
-import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall2;
 import org.jboss.tools.ssp.eclipse.jdt.launching.StandardVMType;
 import org.jboss.tools.ssp.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.jboss.tools.ssp.eclipse.osgi.util.NLS;
@@ -81,13 +80,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 	}
 
 	protected String getJavaVersion() {
-		if (fVMInstance instanceof IVMInstall2) {
-			IVMInstall2 vm = (IVMInstall2) fVMInstance;
-			String javaVersion = vm.getJavaVersion();
-			return javaVersion;
-		}
-		
-		return null;
+		return fVMInstance.getJavaVersion();
 	}
 
 	// TODO Implement this

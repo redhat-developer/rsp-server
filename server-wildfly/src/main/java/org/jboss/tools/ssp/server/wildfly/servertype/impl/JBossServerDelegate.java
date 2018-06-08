@@ -21,12 +21,12 @@ import org.jboss.tools.ssp.eclipse.debug.core.DebugException;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.ssp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
+import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.ssp.launching.LaunchingCore;
-import org.jboss.tools.ssp.launching.VMInstallRegistry;
+import org.jboss.tools.ssp.server.ServerCoreActivator;
 import org.jboss.tools.ssp.server.model.AbstractServerDelegate;
 import org.jboss.tools.ssp.server.spi.model.polling.IPollResultListener;
 import org.jboss.tools.ssp.server.spi.model.polling.IServerStatePoller;
-import org.jboss.tools.ssp.server.spi.model.polling.PollThread;
 import org.jboss.tools.ssp.server.spi.model.polling.PollThreadUtils;
 import org.jboss.tools.ssp.server.spi.model.polling.WebPortPoller;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
@@ -56,18 +56,21 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 		if( vmPath != null && !vmPath.isEmpty()) {
 			File vmFile = new File(vmPath);
 			if( !vmFile.exists()) {
-				return new Status(IStatus.ERROR, "org.jboss.tools.ssp.server.wildfly", "VM file location does not exist: " + vmPath);
+				return new Status(IStatus.ERROR, Activator.BUNDLE_ID, "VM file location does not exist: " + vmPath);
 			}
-			vmi = VMInstallRegistry.getDefault().findVMInstall(vmFile);
+			vmi = getVmRegistry().findVMInstall(vmFile);
 		} else {
-			vmi = VMInstallRegistry.getDefault().getDefaultVMInstall();
+			vmi = getVmRegistry().getDefaultVMInstall();
 		}
 		if( vmi == null ) {
-			return new Status(IStatus.ERROR, "org.jboss.tools.ssp.server.wildfly", "VM " + vmPath + " is not found in the VM model");
+			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, "VM " + vmPath + " is not found in the VM model");
 		}
 		return Status.OK_STATUS;
 	}
 
+	private IVMInstallRegistry getVmRegistry() {
+		return JBossVMRegistryDiscovery.getDefaultRegistry();
+	}
 	
 	public IStatus canStart(String launchMode) {
 		if( !"run".equals(launchMode)) {
@@ -118,16 +121,17 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 			stopLaunch = new JBossStopLauncher(this).launch(force);
 			registerLaunch(stopLaunch);
 		} catch(CoreException ce) {
-			if( stopLaunch != null ) {
-				IProcess[] processes = startLaunch.getProcesses();
-				for( int i = 0; i < processes.length; i++ ) {
-					try {
-						processes[i].terminate();
-					} catch(DebugException de) {
-						LaunchingCore.log(de);
-					}
-				}
-			}
+			// Dead code... but I feel it's not dead?  idk :( 
+//			if( stopLaunch != null ) {
+//				IProcess[] processes = startLaunch.getProcesses();
+//				for( int i = 0; i < processes.length; i++ ) {
+//					try {
+//						processes[i].terminate();
+//					} catch(DebugException de) {
+//						LaunchingCore.log(de);
+//					}
+//				}
+//			}
 			setServerState(IServerDelegate.STATE_STARTED);
 			return ce.getStatus();
 		}

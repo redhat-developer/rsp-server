@@ -8,7 +8,6 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.server.wildfly.servertype.impl;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,17 +19,14 @@ import org.jboss.tools.ssp.eclipse.core.runtime.Status;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.ssp.eclipse.debug.core.Launch;
 import org.jboss.tools.ssp.eclipse.jdt.launching.ExecutionArguments;
-import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMRunner;
 import org.jboss.tools.ssp.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.jboss.tools.ssp.launching.ICommandProvider;
 import org.jboss.tools.ssp.launching.NativeEnvironmentUtil;
-import org.jboss.tools.ssp.launching.VMInstallRegistry;
 
 public class JBossStartLauncher {
 	private JBossServerDelegate delegate;
 	private IVMRunner runner;
-	private IVMInstall vmi;
 	private ILaunch launch;
 	public JBossStartLauncher(JBossServerDelegate jBossServerDelegate) {
 		this.delegate = jBossServerDelegate;
@@ -97,16 +93,7 @@ public class JBossStartLauncher {
 		return new Launch(this, mode, null);
 	}
 	private IStatus checkPrereqs(String mode) {
-		String vmPath = delegate.getServer().getAttribute(IJBossServerAttributes.VM_INSTALL_PATH, (String)null);
-		if( vmPath == null ) {
-			vmi = VMInstallRegistry.getDefault().getDefaultVMInstall();
-		} else {
-			vmi = VMInstallRegistry.getDefault().findVMInstall(new File(vmPath));
-		}
-		if( vmi == null ) {
-			return Status.CANCEL_STATUS;
-		}
-		runner = vmi.getVMRunner(mode);
+		runner = JBossVMRegistryDiscovery.findVMInstall(delegate, mode);
 		if( runner == null ) {
 			return Status.CANCEL_STATUS;
 		}

@@ -18,7 +18,6 @@ import org.jboss.tools.ssp.api.dao.ServerProcessOutput;
 import org.jboss.tools.ssp.api.dao.ServerStateChange;
 import org.jboss.tools.ssp.api.dao.VMDescription;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
-import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall2;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstallChangedListener;
 import org.jboss.tools.ssp.eclipse.jdt.launching.PropertyChangeEvent;
 import org.jboss.tools.ssp.server.ServerManagementServerImpl;
@@ -49,7 +48,7 @@ public class RemoteEventManager implements IDiscoveryPathListener, IVMInstallCha
 	}
 
 	private VMDescription getDescription(IVMInstall vmi) {
-		String vers = vmi instanceof IVMInstall2 ? ((IVMInstall2)vmi).getJavaVersion() : null;
+		String vers = vmi.getJavaVersion();
 		return new VMDescription(vmi.getId(), vmi.getInstallLocation().getAbsolutePath(), vers);
 	}
 

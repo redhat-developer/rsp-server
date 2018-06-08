@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.launching;
+package org.jboss.tools.ssp.eclipse.jdt.launching;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,21 +14,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
-import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstallChangedListener;
-import org.jboss.tools.ssp.eclipse.jdt.launching.PropertyChangeEvent;
-import org.jboss.tools.ssp.eclipse.jdt.launching.StandardVMType;
+import org.jboss.tools.ssp.launching.LaunchingCore;
 
-public class VMInstallRegistry {
+public class VMInstallRegistry implements IVMInstallRegistry {
 
 	private static final String JAVA_HOME = "JAVA_HOME";
 	private static final String RUNNING_VM_ID = "running";
-
-	private static VMInstallRegistry instance = new VMInstallRegistry();
-
-	public static final VMInstallRegistry getDefault() {
-		return instance;
-	}
 
 	private final Map<String, IVMInstall> vms;
 	private final List<IVMInstallChangedListener> listeners;
@@ -46,7 +37,7 @@ public class VMInstallRegistry {
 			if (f.exists()) {
 				IVMInstall vmi = StandardVMType.getDefault().createVMInstall(RUNNING_VM_ID);
 				vmi.setInstallLocation(f);
-				VMInstallRegistry.getDefault().addVMInstall(vmi);
+				addVMInstall(vmi);
 			}
 		} catch(IllegalArgumentException e) {
 			LaunchingCore.log(e);
@@ -61,6 +52,9 @@ public class VMInstallRegistry {
 		IVMInstall test = vms.get(id);
 		if (test != null) {
 			throw new IllegalArgumentException();
+		}
+		if( vm instanceof AbstractVMInstall ) {
+			((AbstractVMInstall)vm).setRegistry(this);
 		}
 		vms.put(id, vm);
 		fireVMAdded(vm);

@@ -6,24 +6,20 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.launching.test;
+package org.jboss.tools.ssp.server;
 
-import org.jboss.tools.ssp.eclipse.jdt.launching.VMInstallRegistry;
-import org.junit.Before;
-import org.junit.Test;
-
-public class VMInstallRegistryTest {
-
-	private VMInstallRegistry vmRegistry;
-
-	@Before
-	public void before() {
-		this.vmRegistry = new VMInstallRegistry(); 
+public class LauncherSingleton {
+	private static LauncherSingleton instance = new LauncherSingleton();
+	public static LauncherSingleton getDefault() {
+		return instance;
 	}
 	
-	@Test(expected=RuntimeException.class)
-	public void addNullVmThrows() {
-		vmRegistry.addVMInstall(null);
+	private ServerManagementServerLauncher launcher;
+	public ServerManagementServerLauncher getLauncher() {
+		return launcher;
 	}
-
+	
+	public void setLauncher(ServerManagementServerLauncher launcher) {
+		this.launcher = launcher;
+	}
 }

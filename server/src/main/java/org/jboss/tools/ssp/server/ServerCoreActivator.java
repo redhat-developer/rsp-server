@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.ssp.server;
 
 import org.jboss.tools.ssp.server.ShutdownExecutor.IShutdownHandler;
@@ -17,8 +25,6 @@ public class ServerCoreActivator implements BundleActivator {
 		return activator;
 	}
 	
-	private ServerManagementServerLauncher launcher;
-	
 	@Override
 	public void start(final BundleContext context2) throws Exception {
 		activator = this;
@@ -29,10 +35,8 @@ public class ServerCoreActivator implements BundleActivator {
 	}
 	
 	public ServerManagementServerLauncher getLauncher() {
-		return launcher;
+		return LauncherSingleton.getDefault().getLauncher();
 	}
-	
-	
 	
 	private String getPort() {
 		// TODO from sysprops?
@@ -43,7 +47,9 @@ public class ServerCoreActivator implements BundleActivator {
 	private void startServer() {
 		// TODO from sysprops?
 		String port = getPort();
-		launcher = new ServerManagementServerLauncher();
+		ServerManagementServerLauncher launcher = new ServerManagementServerLauncher();
+		LauncherSingleton.getDefault().setLauncher(launcher);
+		
 		new Thread("Launch SSP Server") {
 			public void run() {
 				try {
