@@ -99,7 +99,6 @@ public class ServerManagementServerLauncher {
 	
 	private void oneSocket(ServerSocket serverSocket, ServerManagementServerImpl server) {
 		try {
-
 			// wait for clients to connect
 			Socket socket = serverSocket.accept();
 			// create a JSON-RPC connection for the accepted socket
@@ -109,12 +108,15 @@ public class ServerManagementServerLauncher {
 			Runnable removeClient = server.addClient(launcher);
 			/*
 			 * Start listening for incoming messages. When the JSON-RPC connection is closed
-			 * disconnect the remote client from the chat server.
+			 * disconnect the remote client from the server.
 			 */
 			launcher.startListening().thenRun(removeClient);
+			System.out.println(
+					"Client " + socket.getInetAddress().getCanonicalHostName() +
+							":"+ socket.getPort() + " is connected");
 		} catch(IOException ioe) {
 			// We shouldn't fail if we're still supposed to be listening
-			if( socketRunnable != null && socketRunnable.isListening())
+			if (socketRunnable != null && socketRunnable.isListening())
 				ioe.printStackTrace();
 		}
 

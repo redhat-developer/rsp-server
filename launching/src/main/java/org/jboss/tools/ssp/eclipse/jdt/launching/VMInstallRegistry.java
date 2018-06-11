@@ -33,6 +33,9 @@ public class VMInstallRegistry implements IVMInstallRegistry {
 		try {
 			Map<String,String> env = System.getenv();
 			String home = env.get(JAVA_HOME);
+			if (home == null) {
+				throw new IllegalArgumentException("JAVA_HOME environment variable is not set");
+			}
 			File f = new File(home);
 			if (f.exists()) {
 				IVMInstall vmi = StandardVMType.getDefault().createVMInstall(RUNNING_VM_ID);
