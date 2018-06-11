@@ -209,9 +209,9 @@ public class ServerManagementServerImpl implements SSPServer {
 	}
 
 	@Override
-	public CompletableFuture<List<String>> getServerTypes() {
-		String[] types = model.getServerModel().getServerTypes();
-		List<String> asList = Arrays.asList(types);
+	public CompletableFuture<List<ServerType>> getServerTypes() {
+		ServerType[] types = model.getServerModel().getServerTypes();
+		List<ServerType> asList = Arrays.asList(types);
 		return CompletableFuture.completedFuture(asList);
 	}
 

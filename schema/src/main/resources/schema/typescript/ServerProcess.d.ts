@@ -5,5 +5,10 @@ export interface ServerProcess {
 
 export interface ServerHandle {
     id: string;
-    type: string;
+    type: ServerType;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
 }

@@ -160,7 +160,7 @@ public class ServerManagementCLI {
 			String suffix = s.substring(START_SERVER.length()).trim();
 			String serverId = suffix;
 			ServerHandle handle = findServer(serverId);
-			ServerAttributes sa = new ServerAttributes(handle.getType(), handle.getId(), new HashMap<String,Object>());
+			ServerAttributes sa = new ServerAttributes(handle.getType().getId(), handle.getId(), new HashMap<String,Object>());
 			LaunchParameters params = new LaunchParameters(sa, "run");
 			Status stat = launcher.getServerProxy().startServerAsync(params).get();
 			System.out.println(stat.toString());
@@ -252,12 +252,12 @@ public class ServerManagementCLI {
 		
 		System.out.println("What mode should this be launched in? Currently supported:  run");
 		String mode = nextLine();
-		LaunchAttributesRequest req = new LaunchAttributesRequest(handle.getType(), mode);
+		LaunchAttributesRequest req = new LaunchAttributesRequest(handle.getType().getId(), mode);
 		
 		Attributes attrs = launcher.getServerProxy().getRequiredLaunchAttributes(req).get();
 		HashMap<String, Object> toSend = promptForAttributes(attrs);
 		
-		ServerAttributes servAttr = new ServerAttributes(handle.getType(), handle.getId(), toSend);
+		ServerAttributes servAttr = new ServerAttributes(handle.getType().getId(), handle.getId(), toSend);
 		LaunchParameters getLaunchReq = 
 				new LaunchParameters(servAttr, mode);
 		return getLaunchReq;
@@ -273,20 +273,26 @@ public class ServerManagementCLI {
 	}
 	
 	private void runAddServer() {
-		List<String> types = null;
+		List<ServerType> types = null;
 		try {
 			types = launcher.getServerProxy().getServerTypes().get();
 			System.out.println("What type of server do you want to create?");
-			for( String it : types ) {
-				System.out.println("   " + it);
+			for( ServerType it : types ) {
+				System.out.println("   " + it.getId());
 			}
 			String type = nextLine().trim();
+			ServerType selected = null;
+			for( ServerType st1 : types ) {
+				if( st1.getId().equals(type)) {
+					selected = st1;
+				}
+			}
 			
 			System.out.println("Please choose a unique name: ");
 			String name = nextLine();
 			
 			Attributes required2 = launcher.getServerProxy()
-					.getRequiredAttributes(new ServerType(type)).get();
+					.getRequiredAttributes(selected).get();
 
 			HashMap<String, Object> toSend = promptForAttributes(required2);
 			System.out.println("Adding Server...");

@@ -86,7 +86,7 @@ public interface SSPServer {
 	 * by an SSP, or how they are registered, is implementation-specific.
 	 */
 	@JsonRequest
-	CompletableFuture<List<String>> getServerTypes();
+	CompletableFuture<List<ServerType>> getServerTypes();
 
 	/**
 	 * The `server/deleteServer` notification is sent by the client to delete a

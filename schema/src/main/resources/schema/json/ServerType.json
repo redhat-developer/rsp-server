@@ -3,6 +3,9 @@
   "properties" : {
     "id" : {
       "type" : "string"
+    },
+    "visibleName" : {
+      "type" : "string"
     }
   }
 }

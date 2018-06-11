@@ -11,7 +11,9 @@ package org.jboss.tools.ssp.server.spi.servertype;
 import org.jboss.tools.ssp.api.dao.Attributes;
 
 public interface IServerType {
-	public String getServerTypeId();
+	public String getId();
+	public String getName();
+	public String getDescription();
 	public IServerDelegate createServerDelegate(IServer server);
 	public Attributes getRequiredAttributes();
 	public Attributes getOptionalAttributes();

@@ -10,6 +10,7 @@ package org.jboss.tools.ssp.server.model;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Set;
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
 import org.jboss.tools.ssp.api.dao.Attributes;
 import org.jboss.tools.ssp.api.dao.ServerHandle;
+import org.jboss.tools.ssp.api.dao.ServerType;
 import org.jboss.tools.ssp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.eclipse.core.runtime.Status;
@@ -67,14 +69,14 @@ public class ServerModel implements IServerModel {
 	}
 
 	public void addServerType(IServerType fact) {
-		if( fact != null && fact.getServerTypeId() != null ) {
-			factories.put(fact.getServerTypeId(), fact);
+		if( fact != null && fact.getId() != null ) {
+			factories.put(fact.getId(), fact);
 		}
 	}
 	
 	public void removeServerType(IServerType fact) {
-		if( fact != null && fact.getServerTypeId() != null ) {
-			factories.remove(fact.getServerTypeId());
+		if( fact != null && fact.getId() != null ) {
+			factories.remove(fact.getId());
 		}
 	}
 	
@@ -210,8 +212,10 @@ public class ServerModel implements IServerModel {
 	}
 	
 	private ServerHandle toHandle(IServer s) {
-		return new ServerHandle(s.getId(), s.getTypeId());
+		String typeId = s.getTypeId();
+		return new ServerHandle(s.getId(), getServerType(typeId));
 	}
+	
 	public void removeServer(String serverId) {
 		IServer toRemove = servers.get(serverId);
 		servers.remove(serverId);
@@ -228,14 +232,27 @@ public class ServerModel implements IServerModel {
 		for( String s1 : s ) {
 			String id = s1;
 			String type = servers.get(id).getTypeId();
-			handles.add(new ServerHandle(id,  type));
+			handles.add(new ServerHandle(id,  getServerType(type)));
 		}
 		return (ServerHandle[]) handles.toArray(new ServerHandle[handles.size()]);
 	}
 	
-	public String[] getServerTypes() {
+	private ServerType getServerType(String typeId) {
+		IServerType st = factories.get(typeId);
+		return new ServerType(typeId, st.getName(), st.getDescription());
+		
+	}
+	
+	public ServerType[] getServerTypes() {
 		Set<String> types = factories.keySet();
-		return (String[]) types.toArray(new String[types.size()]);
+		ArrayList<String> types2 = new ArrayList<String>(types);
+		Collections.sort(types2);
+		ArrayList<ServerType> ret = new ArrayList<ServerType>();
+		for( String t : types2 ) {
+			IServerType type = factories.get(t);
+			ret.add(new ServerType(t, type.getName(), type.getDescription()));
+		}
+		return (ServerType[]) ret.toArray(new ServerType[ret.size()]);
 	}
 	
 	public Attributes getRequiredAttributes(String type) {

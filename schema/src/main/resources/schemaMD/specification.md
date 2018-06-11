@@ -285,12 +285,25 @@ This endpoint takes the following json schemas as parameters:
       "type" : "string"
     },
     "type" : {
-      "type" : "string"
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "visibleName" : {
+          "type" : "string"
+        }
+      }
     }
   }
 }</pre></td><td><pre>export interface ServerHandle {
     id: string;
-    type: string;
+    type: ServerType;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
 }</pre></td></tr></table>
 
 #### server/getRequiredAttributes
@@ -305,10 +318,14 @@ This endpoint takes the following json schemas as parameters:
   "properties" : {
     "id" : {
       "type" : "string"
+    },
+    "visibleName" : {
+      "type" : "string"
     }
   }
 }</pre></td><td><pre>export interface ServerType {
     id: string;
+    visibleName: string;
 }</pre></td></tr></table>
 
 #### server/getOptionalAttributes
@@ -323,10 +340,14 @@ This endpoint takes the following json schemas as parameters:
   "properties" : {
     "id" : {
       "type" : "string"
+    },
+    "visibleName" : {
+      "type" : "string"
     }
   }
 }</pre></td><td><pre>export interface ServerType {
     id: string;
+    visibleName: string;
 }</pre></td></tr></table>
 
 #### server/getRequiredLaunchAttributes
@@ -665,12 +686,25 @@ This endpoint takes the following json schemas as parameters:
       "type" : "string"
     },
     "type" : {
-      "type" : "string"
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "visibleName" : {
+          "type" : "string"
+        }
+      }
     }
   }
 }</pre></td><td><pre>export interface ServerHandle {
     id: string;
-    type: string;
+    type: ServerType;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
 }</pre></td></tr></table>
 
 #### client/serverRemoved
@@ -687,12 +721,25 @@ This endpoint takes the following json schemas as parameters:
       "type" : "string"
     },
     "type" : {
-      "type" : "string"
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "visibleName" : {
+          "type" : "string"
+        }
+      }
     }
   }
 }</pre></td><td><pre>export interface ServerHandle {
     id: string;
-    type: string;
+    type: ServerType;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
 }</pre></td></tr></table>
 
 #### client/serverAttributesChanged
@@ -709,12 +756,25 @@ This endpoint takes the following json schemas as parameters:
       "type" : "string"
     },
     "type" : {
-      "type" : "string"
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "visibleName" : {
+          "type" : "string"
+        }
+      }
     }
   }
 }</pre></td><td><pre>export interface ServerHandle {
     id: string;
-    type: string;
+    type: ServerType;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
 }</pre></td></tr></table>
 
 #### client/serverStateChanged
@@ -734,7 +794,15 @@ This endpoint takes the following json schemas as parameters:
           "type" : "string"
         },
         "type" : {
-          "type" : "string"
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "visibleName" : {
+              "type" : "string"
+            }
+          }
         }
       }
     },
@@ -749,7 +817,12 @@ This endpoint takes the following json schemas as parameters:
 
 export interface ServerHandle {
     id: string;
-    type: string;
+    type: ServerType;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
 }</pre></td></tr></table>
 
 #### client/serverProcessCreated
@@ -769,7 +842,15 @@ This endpoint takes the following json schemas as parameters:
           "type" : "string"
         },
         "type" : {
-          "type" : "string"
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "visibleName" : {
+              "type" : "string"
+            }
+          }
         }
       }
     },
@@ -784,7 +865,12 @@ This endpoint takes the following json schemas as parameters:
 
 export interface ServerHandle {
     id: string;
-    type: string;
+    type: ServerType;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
 }</pre></td></tr></table>
 
 #### client/serverProcessTerminated
@@ -804,7 +890,15 @@ This endpoint takes the following json schemas as parameters:
           "type" : "string"
         },
         "type" : {
-          "type" : "string"
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "visibleName" : {
+              "type" : "string"
+            }
+          }
         }
       }
     },
@@ -819,7 +913,12 @@ This endpoint takes the following json schemas as parameters:
 
 export interface ServerHandle {
     id: string;
-    type: string;
+    type: ServerType;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
 }</pre></td></tr></table>
 
 #### client/serverProcessOutputAppended
@@ -839,7 +938,15 @@ This endpoint takes the following json schemas as parameters:
           "type" : "string"
         },
         "type" : {
-          "type" : "string"
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "visibleName" : {
+              "type" : "string"
+            }
+          }
         }
       }
     },
@@ -862,6 +969,11 @@ This endpoint takes the following json schemas as parameters:
 
 export interface ServerHandle {
     id: string;
-    type: string;
+    type: ServerType;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
 }</pre></td></tr></table>
 

@@ -10,13 +10,29 @@ package org.jboss.tools.ssp.api.dao;
 
 public class ServerType {
 	private String id;
-	public ServerType(String id) {
+	private String visibleName;
+	private String description;
+	public ServerType(String id, String name, String description) {
 		this.id = id;
+		this.visibleName = name;
+		this.description = description;
 	}
 	public String getId() {
 		return id;
 	}
 	public void setId(String id) {
 		this.id = id;
+	}
+	public String getVisibleName() {
+		return visibleName;
+	}
+	public void setVisibleName(String visibleName) {
+		this.visibleName = visibleName;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }

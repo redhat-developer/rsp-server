@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2018-06-08 13:05:00.
+// Generated using typescript-generator version 2.2.413 on 2018-06-11 13:34:24.
 
 export interface Attribute {
     type: string;
@@ -49,7 +49,7 @@ export interface ServerBean {
 
 export interface ServerHandle {
     id: string;
-    type: string;
+    type: ServerType;
 }
 
 export interface ServerProcess {
@@ -76,6 +76,7 @@ export interface ServerStateChange {
 
 export interface ServerType {
     id: string;
+    visibleName: string;
 }
 
 export interface Status {

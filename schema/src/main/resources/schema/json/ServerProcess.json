@@ -8,7 +8,15 @@
           "type" : "string"
         },
         "type" : {
-          "type" : "string"
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "visibleName" : {
+              "type" : "string"
+            }
+          }
         }
       }
     },

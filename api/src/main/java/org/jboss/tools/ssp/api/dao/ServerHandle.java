@@ -10,8 +10,8 @@ package org.jboss.tools.ssp.api.dao;
 
 public class ServerHandle {
 	private String id;
-	private String type;
-	public ServerHandle(String id, String type) {
+	private ServerType type;
+	public ServerHandle(String id, ServerType type) {
 		this.id = id;
 		this.type = type;
 	}
@@ -20,10 +20,10 @@ public class ServerHandle {
 		return id;
 	}
 
-	public String getType() {
+	public ServerType getType() {
 		return type;
 	}
 	public String toString() {
-		return type + ":" + id;
+		return type.toString() + ":" + id;
 	}
 }

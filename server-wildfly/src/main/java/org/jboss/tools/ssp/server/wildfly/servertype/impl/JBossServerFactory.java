@@ -21,10 +21,19 @@ public class JBossServerFactory implements IServerType{
 	private Attributes optional = null;
 	
 	@Override
-	public String getServerTypeId() {
+	public String getId() {
 		return IServerConstants.SERVER_WILDFLY_120;
 	}
 
+	@Override
+	public String getName() {
+		return "WildFly 12.x";
+	}
+	@Override
+	public String getDescription() {
+		return "A server adapter capable of discovering and controlling a WildFly 12.x runtime instance.";
+	}
+	
 	@Override
 	public IServerDelegate createServerDelegate(IServer server) {
 		JBossServerDelegate ret = new JBossServerDelegate(server);
@@ -66,4 +75,5 @@ public class JBossServerFactory implements IServerType{
 		CreateServerAttributesUtility attrs = new CreateServerAttributesUtility();
 		return attrs.toPojo();
 	}
+
 }
