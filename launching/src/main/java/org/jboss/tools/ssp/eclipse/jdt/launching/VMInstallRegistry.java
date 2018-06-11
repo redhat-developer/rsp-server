@@ -18,7 +18,7 @@ import org.jboss.tools.ssp.internal.launching.LaunchingCore;
 
 public class VMInstallRegistry implements IVMInstallRegistry {
 
-	private static final String JAVA_HOME = "JAVA_HOME";
+	private static final String JAVA_HOME = "java.home";
 	private static final String RUNNING_VM_ID = "running";
 
 	private final Map<String, IVMInstall> vms;
@@ -31,11 +31,7 @@ public class VMInstallRegistry implements IVMInstallRegistry {
 
 	public void addActiveVM() {
 		try {
-			Map<String,String> env = System.getenv();
-			String home = env.get(JAVA_HOME);
-			if (home == null) {
-				throw new IllegalArgumentException("JAVA_HOME environment variable is not set");
-			}
+			String home = System.getProperty(JAVA_HOME);
 			File f = new File(home);
 			if (f.exists()) {
 				IVMInstall vmi = StandardVMType.getDefault().createVMInstall(RUNNING_VM_ID);
