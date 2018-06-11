@@ -22,8 +22,8 @@ import org.jboss.tools.ssp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.ssp.eclipse.core.runtime.Status;
+import org.jboss.tools.ssp.internal.launching.RunningVMSyspropCache;
 import org.jboss.tools.ssp.internal.launching.util.LaunchingSupportUtils;
-import org.jboss.tools.ssp.launching.RunningVMSyspropCache;
 /**
  * Abstract implementation of a VM install.
  * <p>

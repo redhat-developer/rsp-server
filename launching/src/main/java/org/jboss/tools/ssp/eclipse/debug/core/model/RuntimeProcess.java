@@ -23,7 +23,7 @@ import org.jboss.tools.ssp.eclipse.debug.core.DebugPluginConstants;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.ssp.eclipse.debug.internal.core.NullStreamsProxy;
 import org.jboss.tools.ssp.eclipse.debug.internal.core.StreamsProxy;
-import org.jboss.tools.ssp.launching.RuntimeProcessEventManager;
+import org.jboss.tools.ssp.internal.launching.RuntimeProcessEventManager;
 
 
 /**

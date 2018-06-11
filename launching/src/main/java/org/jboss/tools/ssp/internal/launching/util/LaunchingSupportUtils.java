@@ -39,7 +39,7 @@ import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstallChangedListener;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMRunner;
 import org.jboss.tools.ssp.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.jboss.tools.ssp.eclipse.osgi.util.NLS;
-import org.jboss.tools.ssp.launching.LaunchingCore;
+import org.jboss.tools.ssp.internal.launching.LaunchingCore;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

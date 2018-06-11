@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.jboss.tools.ssp.launching.LaunchingCore;
+import org.jboss.tools.ssp.internal.launching.LaunchingCore;
 
 import java.util.Properties;
 
