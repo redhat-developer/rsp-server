@@ -8,10 +8,12 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.server.spi.model;
 
+import java.util.List;
 import java.util.Map;
 
 import org.jboss.tools.ssp.api.dao.Attributes;
 import org.jboss.tools.ssp.api.dao.ServerHandle;
+import org.jboss.tools.ssp.api.dao.ServerLaunchMode;
 import org.jboss.tools.ssp.api.dao.ServerType;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
@@ -29,6 +31,8 @@ public interface IServerModel {
 
 	Attributes getOptionalAttributes(String id);
 
+	List<ServerLaunchMode> getLaunchModes(String serverType);
+	
 	Attributes getRequiredLaunchAttributes(String id);
 
 	Attributes getOptionalLaunchAttributes(String id);

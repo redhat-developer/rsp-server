@@ -17,7 +17,7 @@ import org.jboss.tools.ssp.server.LauncherSingleton;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 
 public class JBossVMRegistryDiscovery {
-	public static IVMRunner findVMInstall(IServerDelegate delegate, String mode) {
+	public static IVMInstall findVMInstall(IServerDelegate delegate) {
 		String vmPath = delegate.getServer().getAttribute(IJBossServerAttributes.VM_INSTALL_PATH, (String)null);
 		IVMInstall vmi = null;
 		if( vmPath == null ) {
@@ -25,6 +25,10 @@ public class JBossVMRegistryDiscovery {
 		} else {
 			vmi = getDefaultRegistry().findVMInstall(new File(vmPath));
 		}
+		return vmi;
+	}
+	public static IVMRunner getVMRunner(IServerDelegate delegate, String mode) {
+		IVMInstall vmi = findVMInstall(delegate);
 		if( vmi == null ) {
 			return null;
 		}

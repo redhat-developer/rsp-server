@@ -77,7 +77,7 @@ public class JBossStopLauncher {
 		return new Launch(this, mode, null);
 	}
 	private IStatus checkPrereqs(String mode) {
-		runner = JBossVMRegistryDiscovery.findVMInstall(delegate, mode);
+		runner = JBossVMRegistryDiscovery.getVMRunner(delegate, mode);
 		if( runner == null ) {
 			return Status.CANCEL_STATUS;
 		}

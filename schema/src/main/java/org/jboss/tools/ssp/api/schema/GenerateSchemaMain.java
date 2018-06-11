@@ -18,6 +18,7 @@ import org.jboss.tools.ssp.api.dao.LaunchParameters;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
 import org.jboss.tools.ssp.api.dao.ServerBean;
 import org.jboss.tools.ssp.api.dao.ServerHandle;
+import org.jboss.tools.ssp.api.dao.ServerLaunchMode;
 import org.jboss.tools.ssp.api.dao.ServerProcess;
 import org.jboss.tools.ssp.api.dao.ServerProcessOutput;
 import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
@@ -59,6 +60,7 @@ public class GenerateSchemaMain {
 				ServerAttributes.class,
 				ServerBean.class,
 				ServerHandle.class,
+				ServerLaunchMode.class,
 				ServerProcess.class,
 				ServerProcessOutput.class,
 				ServerStartingAttributes.class,

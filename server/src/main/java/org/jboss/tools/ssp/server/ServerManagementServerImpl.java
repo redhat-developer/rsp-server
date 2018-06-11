@@ -27,12 +27,12 @@ import org.jboss.tools.ssp.api.dao.LaunchParameters;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
 import org.jboss.tools.ssp.api.dao.ServerBean;
 import org.jboss.tools.ssp.api.dao.ServerHandle;
+import org.jboss.tools.ssp.api.dao.ServerLaunchMode;
 import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.ssp.api.dao.ServerType;
 import org.jboss.tools.ssp.api.dao.Status;
 import org.jboss.tools.ssp.api.dao.StopServerAttributes;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
-import org.jboss.tools.ssp.eclipse.jdt.launching.VMInstallRegistry;
 import org.jboss.tools.ssp.server.core.internal.StatusConverter;
 import org.jboss.tools.ssp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.ssp.server.model.RemoteEventManager;
@@ -185,7 +185,13 @@ public class ServerManagementServerImpl implements SSPServer {
 		return CompletableFuture.completedFuture(sspa);
 	}
 	
-
+	@Override
+	public CompletableFuture<List<ServerLaunchMode>> getLaunchModes(ServerType type) {
+		List<ServerLaunchMode> l = model.getServerModel()
+				.getLaunchModes(type.getId());
+		return CompletableFuture.completedFuture(l);
+	}
+	
 	@Override
 	public CompletableFuture<Attributes> getRequiredLaunchAttributes(LaunchAttributesRequest req) {
 		Attributes sspa = model.getServerModel().getRequiredLaunchAttributes(req.getId());

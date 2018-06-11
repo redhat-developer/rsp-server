@@ -47,5 +47,11 @@ public class JavaCoreConstants {
 	 * @category OptionValue
 	 */
 	public static final String VERSION_1_8 = "1.8"; //$NON-NLS-1$
-	
+	/**
+	 * Configurable option value: {@value}.
+	 * @since 3.14
+	 * @category OptionValue
+	 */
+	public static final String VERSION_9 = "9"; //$NON-NLS-1$
+
 }

@@ -9,6 +9,7 @@
 package org.jboss.tools.ssp.server.spi.servertype;
 
 import org.jboss.tools.ssp.api.dao.Attributes;
+import org.jboss.tools.ssp.api.dao.ServerLaunchMode;
 
 public interface IServerType {
 	public String getId();
@@ -19,4 +20,5 @@ public interface IServerType {
 	public Attributes getOptionalAttributes();
 	public Attributes getRequiredLaunchAttributes();
 	public Attributes getOptionalLaunchAttributes();
+	public ServerLaunchMode[] getLaunchModes();
 }

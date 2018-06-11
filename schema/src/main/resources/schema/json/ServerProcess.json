@@ -15,6 +15,9 @@
             },
             "visibleName" : {
               "type" : "string"
+            },
+            "description" : {
+              "type" : "string"
             }
           }
         }

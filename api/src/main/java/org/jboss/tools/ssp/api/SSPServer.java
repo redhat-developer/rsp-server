@@ -22,6 +22,7 @@ import org.jboss.tools.ssp.api.dao.LaunchParameters;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
 import org.jboss.tools.ssp.api.dao.ServerBean;
 import org.jboss.tools.ssp.api.dao.ServerHandle;
+import org.jboss.tools.ssp.api.dao.ServerLaunchMode;
 import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.ssp.api.dao.ServerType;
 import org.jboss.tools.ssp.api.dao.Status;
@@ -29,7 +30,11 @@ import org.jboss.tools.ssp.api.dao.StopServerAttributes;
 
 @JsonSegment("server")
 public interface SSPServer {
-
+	/*
+	 * Discovery
+	 */
+	
+	
 	/**
 	 * The `server/getDiscoveryPaths` request is sent by the client to fetch a list
 	 * of discovery paths that can be searched.
@@ -70,6 +75,14 @@ public interface SSPServer {
 	 */
 	@JsonNotification
 	void removeDiscoveryPath(DiscoveryPath path);
+	
+	
+	
+	
+	
+	/*
+	 * Server Model
+	 */
 
 	/**
 	 * The `server/getServerHandles` request is sent by the client to list the
@@ -114,6 +127,38 @@ public interface SSPServer {
 	CompletableFuture<Attributes> getOptionalAttributes(ServerType type);
 
 	/**
+	 * The `server/createServer` request is sent by the client to create a server in
+	 * the model using the given attributes (both required and optional. This
+	 * request may fail if required attributes are missing, any attributes 
+	 * have impossible, unexpected, or invalid values, or any error occurs
+	 * while attempting to create the server adapter as requested.
+	 * 
+	 * In the event of failure, the returend `Status` object will 
+	 * detail the cause of error.   
+	 */
+	@JsonRequest
+	CompletableFuture<Status> createServer(ServerAttributes csa);
+
+	
+	
+	
+	/* 
+	 * Launching
+	 */
+
+	/**
+	 * The `server/getLaunchModes` request is sent by the client to get
+	 * a list of launch modes that are applicable to this server type. 
+	 * Some servers can only be started. 
+	 * Others can be started, debugged, profiled, etc. 
+	 * 
+	 * Server types may come up with their own launch modes if desired.
+	 */
+	@JsonRequest
+	CompletableFuture<List<ServerLaunchMode>> getLaunchModes(ServerType type);
+
+
+	/**
 	 * The `server/getRequiredLaunchAttributes` request is sent by the client to get
 	 * any additional attributes required for launch or that can customize launch
 	 * behavior. Some server types may require references to a specific library, a
@@ -132,19 +177,6 @@ public interface SSPServer {
 	 */
 	@JsonRequest
 	CompletableFuture<Attributes> getOptionalLaunchAttributes(LaunchAttributesRequest req);
-
-	/**
-	 * The `server/createServer` request is sent by the client to create a server in
-	 * the model using the given attributes (both required and optional. This
-	 * request may fail if required attributes are missing, any attributes 
-	 * have impossible, unexpected, or invalid values, or any error occurs
-	 * while attempting to create the server adapter as requested.
-	 * 
-	 * In the event of failure, the returend `Status` object will 
-	 * detail the cause of error.   
-	 */
-	@JsonRequest
-	CompletableFuture<Status> createServer(ServerAttributes csa);
 
 	/**
 	 * The `server/getLaunchCommand` request is sent by the client to the server to
@@ -195,6 +227,11 @@ public interface SSPServer {
 	@JsonRequest
 	CompletableFuture<Status> startServerAsync(LaunchParameters params);
 
+	
+	
+	/*
+	 * Shutdown
+	 */
 	/**
 	 * The `server/stopServerAsync` request is sent by the client to the server to
 	 * stop an existing server in the model.

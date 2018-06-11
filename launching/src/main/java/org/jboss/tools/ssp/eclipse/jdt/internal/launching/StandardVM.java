@@ -17,6 +17,7 @@ import org.jboss.tools.ssp.eclipse.jdt.launching.AbstractVMInstall;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstallType;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMRunner;
 import org.jboss.tools.ssp.eclipse.jdt.launching.StandardVMType;
+import org.jboss.tools.ssp.launching.ILaunchModes;
 
 public class StandardVM extends AbstractVMInstall {
 
@@ -35,11 +36,10 @@ public class StandardVM extends AbstractVMInstall {
 	 */
 	@Override
 	public IVMRunner getVMRunner(String mode) {
-		if ("run".equals(mode)) {
+		if (ILaunchModes.RUN.equals(mode)) {
 			return new StandardVMRunner(this);
-			// TODO implement / fix debug
-//		} else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
-//			return new StandardVMDebugger(this);
+		} else if (ILaunchModes.DEBUG.equals(mode)) {
+			return new StandardVMDebugger(this);
 		}
 		return null;
 	}

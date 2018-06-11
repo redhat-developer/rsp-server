@@ -22,6 +22,8 @@ import org.jboss.tools.ssp.eclipse.core.runtime.Status;
 import org.jboss.tools.ssp.eclipse.debug.core.DebugPluginConstants;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.ssp.eclipse.debug.core.model.IProcess;
+import org.jboss.tools.ssp.eclipse.jdt.core.JavaCore;
+import org.jboss.tools.ssp.eclipse.jdt.core.JavaCoreConstants;
 import org.jboss.tools.ssp.internal.launching.util.ExecUtil;
 import org.jboss.tools.ssp.internal.launching.util.OSUtils;
 import org.jboss.tools.ssp.launching.ICommandProvider;
@@ -185,6 +187,32 @@ public abstract class AbstractVMRunner implements IVMRunner, ICommandProvider {
 		System.arraycopy(vmVMArgs, 0, allVMArgs, 0, vmVMArgs.length);
 		System.arraycopy(launchVMArgs, 0, allVMArgs, vmVMArgs.length, launchVMArgs.length);
 		return allVMArgs;
+	}
+	
+
+	/**
+	 * Examines the project and install for presence of module and execution support.
+	 *
+	 * @param config
+	 *            runner configuration
+	 * @param vmInstall
+	 *            VM install
+	 * @return <code>true</code> if project is a module and uses JRE version 9 or more, or <code>false</code> otherwise
+	 * @since 3.10
+	 */
+	protected boolean isModular(VMRunnerConfiguration config, IVMInstall vmInstall) {
+		if (config.getModuleDescription() != null && config.getModuleDescription().length() > 0 && vmInstall instanceof AbstractVMInstall) {
+			AbstractVMInstall install = (AbstractVMInstall) vmInstall;
+			String vmver = install.getJavaVersion();
+			// versionToJdkLevel only handles 3 char versions = 1.5, 1.6, 1.9, etc
+			if (vmver.length() > 3) {
+				vmver = vmver.substring(0, 3);
+			}
+			if (JavaCore.compareJavaVersions(vmver, JavaCoreConstants.VERSION_9) >= 0) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

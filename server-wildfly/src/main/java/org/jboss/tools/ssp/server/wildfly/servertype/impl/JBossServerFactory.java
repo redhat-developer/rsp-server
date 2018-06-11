@@ -10,7 +10,9 @@ package org.jboss.tools.ssp.server.wildfly.servertype.impl;
 
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
 import org.jboss.tools.ssp.api.dao.Attributes;
+import org.jboss.tools.ssp.api.dao.ServerLaunchMode;
 import org.jboss.tools.ssp.api.dao.util.CreateServerAttributesUtility;
+import org.jboss.tools.ssp.launching.ILaunchModes;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.ssp.server.spi.servertype.IServerType;
@@ -74,6 +76,14 @@ public class JBossServerFactory implements IServerType{
 	public Attributes getOptionalLaunchAttributes() {
 		CreateServerAttributesUtility attrs = new CreateServerAttributesUtility();
 		return attrs.toPojo();
+	}
+
+	@Override
+	public ServerLaunchMode[] getLaunchModes() {
+		return new ServerLaunchMode[] {
+				new ServerLaunchMode(ILaunchModes.RUN, ILaunchModes.RUN_DESC),
+				new ServerLaunchMode(ILaunchModes.DEBUG, ILaunchModes.DEBUG_DESC)
+		};
 	}
 
 }

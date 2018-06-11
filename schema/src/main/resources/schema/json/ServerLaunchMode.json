@@ -1,13 +1,10 @@
 {
   "type" : "object",
   "properties" : {
-    "id" : {
+    "mode" : {
       "type" : "string"
     },
-    "visibleName" : {
-      "type" : "string"
-    },
-    "description" : {
+    "desc" : {
       "type" : "string"
     }
   }

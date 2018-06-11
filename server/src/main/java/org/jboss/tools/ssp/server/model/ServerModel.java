@@ -10,6 +10,7 @@ package org.jboss.tools.ssp.server.model;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +21,7 @@ import java.util.Set;
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
 import org.jboss.tools.ssp.api.dao.Attributes;
 import org.jboss.tools.ssp.api.dao.ServerHandle;
+import org.jboss.tools.ssp.api.dao.ServerLaunchMode;
 import org.jboss.tools.ssp.api.dao.ServerType;
 import org.jboss.tools.ssp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
@@ -267,6 +269,12 @@ public class ServerModel implements IServerModel {
 		return validateAttributes(ret, type);
 	}
 
+	public List<ServerLaunchMode> getLaunchModes(String serverType) {
+		IServerType t = factories.get(serverType);
+		ServerLaunchMode[] ret = t.getLaunchModes();
+		return Arrays.asList(ret);
+	}
+	
 	public Attributes getRequiredLaunchAttributes(String type) {
 		IServerType t = factories.get(type);
 		Attributes ret = t == null ? null : t.getRequiredLaunchAttributes();

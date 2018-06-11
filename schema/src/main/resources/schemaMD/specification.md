@@ -292,6 +292,9 @@ This endpoint takes the following json schemas as parameters:
         },
         "visibleName" : {
           "type" : "string"
+        },
+        "description" : {
+          "type" : "string"
         }
       }
     }
@@ -304,6 +307,7 @@ This endpoint takes the following json schemas as parameters:
 export interface ServerType {
     id: string;
     visibleName: string;
+    description: string;
 }</pre></td></tr></table>
 
 #### server/getRequiredAttributes
@@ -321,11 +325,15 @@ This endpoint takes the following json schemas as parameters:
     },
     "visibleName" : {
       "type" : "string"
+    },
+    "description" : {
+      "type" : "string"
     }
   }
 }</pre></td><td><pre>export interface ServerType {
     id: string;
     visibleName: string;
+    description: string;
 }</pre></td></tr></table>
 
 #### server/getOptionalAttributes
@@ -343,11 +351,70 @@ This endpoint takes the following json schemas as parameters:
     },
     "visibleName" : {
       "type" : "string"
+    },
+    "description" : {
+      "type" : "string"
     }
   }
 }</pre></td><td><pre>export interface ServerType {
     id: string;
     visibleName: string;
+    description: string;
+}</pre></td></tr></table>
+
+#### server/createServer
+
+ The `server/createServer` request is sent by the client to create a server in the model using the given attributes (both required and optional. This request may fail if required attributes are missing, any attributes have impossible, unexpected, or invalid values, or any error occurs while attempting to create the server adapter as requested. In the event of failure, the returend `Status` object will detail the cause of error. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "serverType" : {
+      "type" : "string"
+    },
+    "id" : {
+      "type" : "string"
+    },
+    "attributes" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "any"
+      }
+    }
+  }
+}</pre></td><td><pre>export interface ServerAttributes {
+    serverType: string;
+    id: string;
+    attributes: { [index: string]: any };
+}</pre></td></tr></table>
+
+#### server/getLaunchModes
+
+ The `server/getLaunchModes` request is sent by the client to get a list of launch modes that are applicable to this server type. Some servers can only be started. Others can be started, debugged, profiled, etc. Server types may come up with their own launch modes if desired. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "visibleName" : {
+      "type" : "string"
+    },
+    "description" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface ServerType {
+    id: string;
+    visibleName: string;
+    description: string;
 }</pre></td></tr></table>
 
 #### server/getRequiredLaunchAttributes
@@ -392,35 +459,6 @@ This endpoint takes the following json schemas as parameters:
 }</pre></td><td><pre>export interface LaunchAttributesRequest {
     id: string;
     mode: string;
-}</pre></td></tr></table>
-
-#### server/createServer
-
- The `server/createServer` request is sent by the client to create a server in the model using the given attributes (both required and optional. This request may fail if required attributes are missing, any attributes have impossible, unexpected, or invalid values, or any error occurs while attempting to create the server adapter as requested. In the event of failure, the returend `Status` object will detail the cause of error. 
-
-This endpoint takes the following json schemas as parameters: 
-
-<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
-<tr><td>0</td><td><pre>{
-  "type" : "object",
-  "properties" : {
-    "serverType" : {
-      "type" : "string"
-    },
-    "id" : {
-      "type" : "string"
-    },
-    "attributes" : {
-      "type" : "object",
-      "additionalProperties" : {
-        "type" : "any"
-      }
-    }
-  }
-}</pre></td><td><pre>export interface ServerAttributes {
-    serverType: string;
-    id: string;
-    attributes: { [index: string]: any };
 }</pre></td></tr></table>
 
 #### server/getLaunchCommand
@@ -693,6 +731,9 @@ This endpoint takes the following json schemas as parameters:
         },
         "visibleName" : {
           "type" : "string"
+        },
+        "description" : {
+          "type" : "string"
         }
       }
     }
@@ -705,6 +746,7 @@ This endpoint takes the following json schemas as parameters:
 export interface ServerType {
     id: string;
     visibleName: string;
+    description: string;
 }</pre></td></tr></table>
 
 #### client/serverRemoved
@@ -728,6 +770,9 @@ This endpoint takes the following json schemas as parameters:
         },
         "visibleName" : {
           "type" : "string"
+        },
+        "description" : {
+          "type" : "string"
         }
       }
     }
@@ -740,6 +785,7 @@ This endpoint takes the following json schemas as parameters:
 export interface ServerType {
     id: string;
     visibleName: string;
+    description: string;
 }</pre></td></tr></table>
 
 #### client/serverAttributesChanged
@@ -763,6 +809,9 @@ This endpoint takes the following json schemas as parameters:
         },
         "visibleName" : {
           "type" : "string"
+        },
+        "description" : {
+          "type" : "string"
         }
       }
     }
@@ -775,6 +824,7 @@ This endpoint takes the following json schemas as parameters:
 export interface ServerType {
     id: string;
     visibleName: string;
+    description: string;
 }</pre></td></tr></table>
 
 #### client/serverStateChanged
@@ -801,6 +851,9 @@ This endpoint takes the following json schemas as parameters:
             },
             "visibleName" : {
               "type" : "string"
+            },
+            "description" : {
+              "type" : "string"
             }
           }
         }
@@ -823,6 +876,7 @@ export interface ServerHandle {
 export interface ServerType {
     id: string;
     visibleName: string;
+    description: string;
 }</pre></td></tr></table>
 
 #### client/serverProcessCreated
@@ -849,6 +903,9 @@ This endpoint takes the following json schemas as parameters:
             },
             "visibleName" : {
               "type" : "string"
+            },
+            "description" : {
+              "type" : "string"
             }
           }
         }
@@ -871,6 +928,7 @@ export interface ServerHandle {
 export interface ServerType {
     id: string;
     visibleName: string;
+    description: string;
 }</pre></td></tr></table>
 
 #### client/serverProcessTerminated
@@ -897,6 +955,9 @@ This endpoint takes the following json schemas as parameters:
             },
             "visibleName" : {
               "type" : "string"
+            },
+            "description" : {
+              "type" : "string"
             }
           }
         }
@@ -919,6 +980,7 @@ export interface ServerHandle {
 export interface ServerType {
     id: string;
     visibleName: string;
+    description: string;
 }</pre></td></tr></table>
 
 #### client/serverProcessOutputAppended
@@ -944,6 +1006,9 @@ This endpoint takes the following json schemas as parameters:
               "type" : "string"
             },
             "visibleName" : {
+              "type" : "string"
+            },
+            "description" : {
               "type" : "string"
             }
           }
@@ -975,5 +1040,6 @@ export interface ServerHandle {
 export interface ServerType {
     id: string;
     visibleName: string;
+    description: string;
 }</pre></td></tr></table>
 

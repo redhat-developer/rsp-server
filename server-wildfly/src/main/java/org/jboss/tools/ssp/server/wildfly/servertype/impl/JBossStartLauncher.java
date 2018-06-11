@@ -8,6 +8,8 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.server.wildfly.servertype.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,10 +21,12 @@ import org.jboss.tools.ssp.eclipse.core.runtime.Status;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.ssp.eclipse.debug.core.Launch;
 import org.jboss.tools.ssp.eclipse.jdt.launching.ExecutionArguments;
+import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMRunner;
 import org.jboss.tools.ssp.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.jboss.tools.ssp.internal.launching.util.NativeEnvironmentUtils;
 import org.jboss.tools.ssp.launching.ICommandProvider;
+import org.jboss.tools.ssp.launching.JREClasspathProvider;
 
 public class JBossStartLauncher {
 	private JBossServerDelegate delegate;
@@ -93,7 +97,7 @@ public class JBossStartLauncher {
 		return new Launch(this, mode, null);
 	}
 	private IStatus checkPrereqs(String mode) {
-		runner = JBossVMRegistryDiscovery.findVMInstall(delegate, mode);
+		runner = JBossVMRegistryDiscovery.getVMRunner(delegate, mode);
 		if( runner == null ) {
 			return Status.CANCEL_STATUS;
 		}
@@ -118,9 +122,18 @@ public class JBossStartLauncher {
 	private String getMainTypeName() {
 		return "org.jboss.modules.Main";
 	}
+	
+	protected String[] getJREClasspath() {
+		IVMInstall vm = JBossVMRegistryDiscovery.findVMInstall(delegate);
+		return JREClasspathProvider.getJREClasspath(vm);
+	}
+	
 	private String[] getClasspath() {
+		ArrayList<String> all = new ArrayList<String>(Arrays.asList(getJREClasspath()));
 		String serverHome = delegate.getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
-		return new String[] {serverHome + "/jboss-modules.jar"};
+		String jbModules = serverHome + "/jboss-modules.jar";
+		all.add(jbModules);
+		return (String[]) all.toArray(new String[all.size()]);
 	}
 	private String getVMArguments() {
 		String serverHome = delegate.getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);

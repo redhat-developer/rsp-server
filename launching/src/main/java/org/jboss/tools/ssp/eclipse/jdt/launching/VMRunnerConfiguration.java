@@ -27,16 +27,16 @@ public class VMRunnerConfiguration {
 	public static final String vmRunnerConfig_assert_classPathNotNull="classPath cannot be null";
 	public static final String vmRunnerConfig_assert_programArgsNotNull="args cannot be null";
 	public static final String vmRunnerConfig_assert_vmArgsNotNull="args cannot be null";
-
-	
-	
 	private String fClassToLaunch;
 	private String[] fVMArgs;
 	private String[] fProgramArgs;
 	private String[] fEnvironment;
 	private String[] fClassPath;
 	private String[] fBootClassPath;
+	private String[] fModulepath;
+	private String fModuleDescription;
 	private String fWorkingDirectory;
+	private String fOverrideDependencies;
 	private Map<String, Object> fVMSpecificAttributesMap;
 	private boolean fResume = true;
 
@@ -268,5 +268,68 @@ public class VMRunnerConfiguration {
 	 */
 	public boolean isResumeOnStartup() {
 		return fResume;
+	}
+
+	/**
+	 * Sets the modulepath.
+	 *
+	 * @param modulepath
+	 *            modulepath
+	 * @since 3.10
+	 */
+	public void setModulepath(String[] modulepath) {
+		this.fModulepath = modulepath;
+	}
+
+	/**
+	 * Returns the Modulepath.
+	 *
+	 * @return the modulepath
+	 * @since 3.10
+	 */
+	public String[] getModulepath() {
+		return this.fModulepath;
+	}
+
+	/**
+	 * Sets the fModuleDescription.
+	 *
+	 * @param fModuleDescription
+	 *            fModuleDescription
+	 * @since 3.10
+	 */
+	public void setModuleDescription(String fModuleDescription) {
+		this.fModuleDescription = fModuleDescription;
+	}
+
+	/**
+	 * Returns the ModuleDescription.
+	 *
+	 * @return the ModuleDescription
+	 * @since 3.10
+	 */
+	public String getModuleDescription() {
+		return this.fModuleDescription;
+	}
+
+	/**
+	 * Gets the fOverrideDependencies.
+	 * 
+	 * @return the fOverrideDependencies
+	 * @since 3.10
+	 */
+	public String getOverrideDependencies() {
+		return fOverrideDependencies;
+	}
+
+	/**
+	 * Sets the fOverrideDependencies.
+	 * 
+	 * @param fOverrideDependencies
+	 *            the fOverrideDependencies to set
+	 * @since 3.10
+	 */
+	public void setOverrideDependencies(String fOverrideDependencies) {
+		this.fOverrideDependencies = fOverrideDependencies;
 	}
 }

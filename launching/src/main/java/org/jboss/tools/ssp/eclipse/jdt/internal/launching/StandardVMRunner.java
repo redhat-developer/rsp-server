@@ -79,10 +79,6 @@ public class StandardVMRunner extends AbstractVMRunner {
 		fVMInstance= vmInstance;
 	}
 
-	protected String getJavaVersion() {
-		return fVMInstance.getJavaVersion();
-	}
-
 	// TODO Implement this
 	protected File findJavaExecutable() {
 		File exe = null;
@@ -99,8 +95,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 	}
 	
 	public String getVMName() {
-		//fVMInstance.getName()
-		return null;
+		return fVMInstance.getName();
 	}
 	
 	/**
@@ -439,6 +434,10 @@ public class StandardVMRunner extends AbstractVMRunner {
 	 */
 	@Override
 	public void run(VMRunnerConfiguration config, ILaunch launch, IProgressMonitor monitor) throws CoreException {
+		run(config, launch, false, monitor);
+	}
+	protected void run(VMRunnerConfiguration config, ILaunch launch, boolean destroyAtEnd, IProgressMonitor monitor) throws CoreException {
+
 
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
@@ -484,6 +483,10 @@ public class StandardVMRunner extends AbstractVMRunner {
 		}
 		subMonitor.worked(1);
 		subMonitor.done();
+		
+		if( destroyAtEnd && p != null ) {
+			p.destroy();
+		}
 	}
 
 	/**
@@ -577,7 +580,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 	 */
 	protected String[] prependJREPath(String[] env) {
 		if (OSUtils.isMac()) {
-			String javaVersion = getJavaVersion();
+			String javaVersion = fVMInstance.getJavaVersion();
 			if (javaVersion != null) {
 				if (env == null) {
 					Map<String, String> map = NativeEnvironmentUtils.getDefault().getNativeEnvironmentCasePreserved();

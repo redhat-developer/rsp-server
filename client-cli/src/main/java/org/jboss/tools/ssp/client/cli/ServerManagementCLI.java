@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -25,6 +26,7 @@ import org.jboss.tools.ssp.api.dao.LaunchParameters;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
 import org.jboss.tools.ssp.api.dao.ServerBean;
 import org.jboss.tools.ssp.api.dao.ServerHandle;
+import org.jboss.tools.ssp.api.dao.ServerLaunchMode;
 import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.ssp.api.dao.ServerType;
 import org.jboss.tools.ssp.api.dao.Status;
@@ -120,7 +122,7 @@ public class ServerManagementCLI {
 	private void processCommand(String s) throws Exception {
 		if( s.trim().isEmpty())
 			return;
-		
+		Properties p = System.getProperties();
 		if( s.trim().equals(SHUTDOWN)) {
 			launcher.getServerProxy().shutdown();
 			System.out.println("The server has been shutdown");
@@ -160,8 +162,9 @@ public class ServerManagementCLI {
 			String suffix = s.substring(START_SERVER.length()).trim();
 			String serverId = suffix;
 			ServerHandle handle = findServer(serverId);
+			String mode = selectLaunchMode(handle.getType());
 			ServerAttributes sa = new ServerAttributes(handle.getType().getId(), handle.getId(), new HashMap<String,Object>());
-			LaunchParameters params = new LaunchParameters(sa, "run");
+			LaunchParameters params = new LaunchParameters(sa, mode);
 			Status stat = launcher.getServerProxy().startServerAsync(params).get();
 			System.out.println(stat.toString());
 		} else if( s.equals(LAUNCH_COMMAND)) {
@@ -249,9 +252,7 @@ public class ServerManagementCLI {
 		}
 		String server = nextLine().trim();
 		ServerHandle handle = findServer(server);
-		
-		System.out.println("What mode should this be launched in? Currently supported:  run");
-		String mode = nextLine();
+		String mode = selectLaunchMode(handle.getType());
 		LaunchAttributesRequest req = new LaunchAttributesRequest(handle.getType().getId(), mode);
 		
 		Attributes attrs = launcher.getServerProxy().getRequiredLaunchAttributes(req).get();
@@ -421,5 +422,17 @@ public class ServerManagementCLI {
 			System.out.println("   " + CMD_ARR[i]);
 		}
 		
+	}
+	
+	private String selectLaunchMode(ServerType st) throws Exception {
+		List<ServerLaunchMode> modes = launcher.getServerProxy().getLaunchModes(st).get();
+		if( modes.size() > 0 ) {
+			System.out.println("Please select a launch mode:");
+			for( ServerLaunchMode slm : modes ) {
+				System.out.println(slm.getMode());
+			}
+		}
+		String mode = nextLine().trim();
+		return mode;
 	}
 }
