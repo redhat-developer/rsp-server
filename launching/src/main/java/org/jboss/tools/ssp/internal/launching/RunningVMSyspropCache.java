@@ -12,38 +12,72 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RunningVMSyspropCache {
-	public static RunningVMSyspropCache cache = new RunningVMSyspropCache();
+
+	private static RunningVMSyspropCache cache = new RunningVMSyspropCache();
+
 	public static RunningVMSyspropCache getDefault() {
 		return cache;
 	}
-	
-	private HashMap<String, String> cachedValues = null;
-	public RunningVMSyspropCache() {
-		
+
+	private HashMap<String, String> cachedValues = new HashMap<>();
+
+	private RunningVMSyspropCache() {
+	}
+
+	/**
+	 * Removes all cached values.
+	 */
+	public void clear() {
+		cachedValues.clear();
 	}
 	
+	/**
+	 * Returns all cached values. Returns {@code null} if the cache is empty. 
+	 * 
+	 * @return
+	 */
 	public Map<String, String> getCachedValues() {
-		return new HashMap<String, String>(cachedValues);
+		if (cachedValues == null
+				|| cachedValues.isEmpty()) {
+			return null;
+		}
+		return new HashMap<>(cachedValues);
 	}
-	
+
+	/**
+	 * Returns cached values for the given keys. If the cache differs in size or
+	 * keys {@code null} is returned.
+	 * 
+	 * @param keys
+	 * @return
+	 */
 	public Map<String, String> getCachedValues(String[] keys) {
-		if( cachedValues == null )
+		if (cachedValues.size() < keys.length)
 			return null;
-		if( cachedValues.size() < keys.length )
-			return null;
-		
-		HashMap<String, String>  ret = new HashMap<String, String>();
-		for( int i = 0; i < keys.length; i++ ) {
+
+		Map<String, String> ret = new HashMap<>();
+		for (int i = 0; i < keys.length; i++) {
 			String v = cachedValues.get(keys[i]);
-			if( v == null )
+			// key is not cached
+			if (v == null) {
 				return null;
-			ret.put(keys[i],  v);
+			}
+			ret.put(keys[i], v);
 		}
 		return ret;
 	}
-	
+
+	/**
+	 * Sets the values that are cached in this cache.
+	 * 
+	 * @param vals
+	 */
 	public void setCachedValues(Map<String, String> vals) {
-		cachedValues = new HashMap<String,String>(vals);
+		if (vals == null) {
+			this.cachedValues = new HashMap<>();
+		} else {
+			this.cachedValues = new HashMap<>(vals);
+		}
 	}
-	
+
 }
