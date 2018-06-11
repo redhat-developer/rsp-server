@@ -11,7 +11,12 @@ package org.jboss.tools.ssp.launching.util;
 import java.io.File;
 import java.net.URL;
 
-public class URLUtilities {
+public class URLUtils {
+	
+	private static final String URL_PROTO_FILE = "file";
+	
+	private URLUtils() {
+	}
 
 	/**
 	 * Compares two URL for equality, but do not connect to do DNS resolution
@@ -31,8 +36,8 @@ public class URLUtilities {
 		}
 		// check if URL are file: URL as we may have two URL pointing to the same doc location
 		// but with different representation - (i.e. file:/C;/ and file:C:/)
-		final boolean isFile1 = "file".equalsIgnoreCase(url1.getProtocol());//$NON-NLS-1$
-		final boolean isFile2 = "file".equalsIgnoreCase(url2.getProtocol());//$NON-NLS-1$
+		final boolean isFile1 = URL_PROTO_FILE.equalsIgnoreCase(url1.getProtocol());//$NON-NLS-1$
+		final boolean isFile2 = URL_PROTO_FILE.equalsIgnoreCase(url2.getProtocol());//$NON-NLS-1$
 		if (isFile1 && isFile2) {
 			File file1 = new File(url1.getFile());
 			File file2 = new File(url2.getFile());
@@ -48,13 +53,13 @@ public class URLUtilities {
 	/**
 	 * Gets the external form of this URL. In particular, it trims any white space,
 	 * removes a trailing slash and creates a lower case string.
+	 * 
 	 * @param url the URL to get the {@link String} value of
 	 * @return the lower-case {@link String} form of the given URL
 	 */
 	private static String getExternalForm(URL url) {
 		String externalForm = url.toExternalForm();
-		if (externalForm == null)
-		 {
+		if (externalForm == null) {
 			return ""; //$NON-NLS-1$
 		}
 		externalForm = externalForm.trim();
