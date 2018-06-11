@@ -14,7 +14,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Properties;
 
-import org.jboss.tools.ssp.launching.util.FileUtil;
+import org.jboss.tools.ssp.internal.launching.util.FileUtil;
 
 public abstract class ServerBeanTypeEnterprise extends JBossServerBeanType {
 

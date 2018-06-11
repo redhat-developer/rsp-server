@@ -21,6 +21,6 @@ Export-Package: org.jboss.tools.ssp.eclipse.core.runtime,
  org.jboss.tools.ssp.eclipse.jdt.internal.launching,
  org.jboss.tools.ssp.eclipse.jdt.launching,
  org.jboss.tools.ssp.eclipse.osgi.util,
+ org.jboss.tools.ssp.internal.launching.util,
  org.jboss.tools.ssp.launching,
- org.jboss.tools.ssp.launching.test,
- org.jboss.tools.ssp.launching.util
+ org.jboss.tools.ssp.launching.test

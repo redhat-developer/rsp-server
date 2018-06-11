@@ -38,9 +38,9 @@ import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.ssp.eclipse.jdt.launching.StandardVMType;
 import org.jboss.tools.ssp.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.jboss.tools.ssp.eclipse.osgi.util.NLS;
+import org.jboss.tools.ssp.internal.launching.util.OSUtils;
 import org.jboss.tools.ssp.launching.LaunchingCore;
 import org.jboss.tools.ssp.launching.NativeEnvironmentUtil;
-import org.jboss.tools.ssp.launching.util.OSUtils;
 
 /**
  * A launcher for running Java main classes.

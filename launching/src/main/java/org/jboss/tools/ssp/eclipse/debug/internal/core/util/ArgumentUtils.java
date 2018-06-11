@@ -13,7 +13,7 @@ package org.jboss.tools.ssp.eclipse.debug.internal.core.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jboss.tools.ssp.launching.util.OSUtils;
+import org.jboss.tools.ssp.internal.launching.util.OSUtils;
 
 public class ArgumentUtils {
 	

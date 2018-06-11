@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.launching.util;
+package org.jboss.tools.ssp.internal.launching.util;
 
 public final class OSUtils {
 

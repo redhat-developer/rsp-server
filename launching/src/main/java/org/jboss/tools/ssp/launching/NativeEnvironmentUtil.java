@@ -20,10 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.jboss.tools.ssp.launching.util.OSUtils;
-
 import java.util.Properties;
+
+import org.jboss.tools.ssp.internal.launching.util.OSUtils;
 
 public class NativeEnvironmentUtil {
 	private static final NativeEnvironmentUtil instance = new NativeEnvironmentUtil();
