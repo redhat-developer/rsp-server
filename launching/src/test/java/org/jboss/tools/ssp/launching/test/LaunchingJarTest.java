@@ -21,8 +21,8 @@ import org.jboss.tools.ssp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.ssp.eclipse.jdt.internal.launching.LibraryInfo;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.ssp.eclipse.jdt.launching.StandardVMType;
-import org.jboss.tools.ssp.launching.LaunchingSupportUtility;
-import org.jboss.tools.ssp.launching.util.FileUtil;
+import org.jboss.tools.ssp.internal.launching.util.FileUtil;
+import org.jboss.tools.ssp.internal.launching.util.LaunchingSupportUtils;
 import org.junit.Test;
 
 public class LaunchingJarTest {
@@ -43,7 +43,7 @@ public class LaunchingJarTest {
 		String javaHome = getAssertedJavaHome();
 		getAssertedJavaExecutable(javaHome);
 
-		LaunchingSupportUtility util = new LaunchingSupportUtility();
+		LaunchingSupportUtils util = new LaunchingSupportUtils();
 		File launchingJar = getAssertedLaunchingSupportFile(util);
 
 		FileUtil.deleteDirectory(util.getLaunchingSupportFile().getParentFile(), true);
@@ -54,7 +54,7 @@ public class LaunchingJarTest {
 
 	@Test
 	public void testLaunchingSupportLibraryDetector() {
-		LaunchingSupportUtility util = new LaunchingSupportUtility();
+		LaunchingSupportUtils util = new LaunchingSupportUtils();
 		String javaHome = getAssertedJavaHome();
 		File exe = getAssertedJavaExecutable(javaHome);
 		File launchingJar = getAssertedLaunchingSupportFile(util);
@@ -76,7 +76,7 @@ public class LaunchingJarTest {
 		String javaHome = getAssertedJavaHome();
 		getAssertedJavaExecutable(javaHome);
 
-		getAssertedLaunchingSupportFile(new LaunchingSupportUtility());
+		getAssertedLaunchingSupportFile(new LaunchingSupportUtils());
 
 		IVMInstall svmTmp = StandardVMType.getDefault().createVMInstall("testId");
 		assertNotNull(svmTmp);
@@ -109,7 +109,7 @@ public class LaunchingJarTest {
 		return exe;
 	}
 
-	private File getAssertedLaunchingSupportFile(LaunchingSupportUtility launchSupport) {
+	private File getAssertedLaunchingSupportFile(LaunchingSupportUtils launchSupport) {
 		File launchingJar = launchSupport.getLaunchingSupportFile();
 		assertNotNull(launchingJar);
 		assertTrue(launchingJar.exists());

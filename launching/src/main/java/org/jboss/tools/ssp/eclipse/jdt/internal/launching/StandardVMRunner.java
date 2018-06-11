@@ -38,9 +38,9 @@ import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.ssp.eclipse.jdt.launching.StandardVMType;
 import org.jboss.tools.ssp.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.jboss.tools.ssp.eclipse.osgi.util.NLS;
-import org.jboss.tools.ssp.launching.LaunchingCore;
-import org.jboss.tools.ssp.launching.NativeEnvironmentUtil;
-import org.jboss.tools.ssp.launching.util.OSUtils;
+import org.jboss.tools.ssp.internal.launching.LaunchingCore;
+import org.jboss.tools.ssp.internal.launching.util.NativeEnvironmentUtils;
+import org.jboss.tools.ssp.internal.launching.util.OSUtils;
 
 /**
  * A launcher for running Java main classes.
@@ -533,7 +533,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 				String[] newenvp = null;
 				int index = -1;
 				if(env == null) {
-					Map<String, String> nenv = NativeEnvironmentUtil.getDefault().getNativeEnvironment();
+					Map<String, String> nenv = NativeEnvironmentUtils.getDefault().getNativeEnvironment();
 					Entry<String, String> entry = null;
 					newenvp = new String[nenv.size()];
 					int idx = 0;
@@ -580,7 +580,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 			String javaVersion = getJavaVersion();
 			if (javaVersion != null) {
 				if (env == null) {
-					Map<String, String> map = NativeEnvironmentUtil.getDefault().getNativeEnvironmentCasePreserved();
+					Map<String, String> map = NativeEnvironmentUtils.getDefault().getNativeEnvironmentCasePreserved();
 					if (map.containsKey(JAVA_JVM_VERSION)) {
 						String[] env2 = new String[map.size()];
 						Iterator<Entry<String, String>> iterator = map.entrySet().iterator();

@@ -20,7 +20,7 @@ import org.jboss.tools.ssp.eclipse.core.runtime.ListenerList;
 import org.jboss.tools.ssp.eclipse.core.runtime.SafeRunner;
 import org.jboss.tools.ssp.eclipse.debug.core.IStreamListener;
 import org.jboss.tools.ssp.eclipse.debug.core.model.IFlushableStreamMonitor;
-import org.jboss.tools.ssp.launching.LaunchingCore;
+import org.jboss.tools.ssp.internal.launching.LaunchingCore;
 
 /**
  * Monitors the output stream of a system process and notifies

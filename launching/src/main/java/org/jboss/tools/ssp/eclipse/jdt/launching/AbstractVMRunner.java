@@ -22,9 +22,9 @@ import org.jboss.tools.ssp.eclipse.core.runtime.Status;
 import org.jboss.tools.ssp.eclipse.debug.core.DebugPluginConstants;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.ssp.eclipse.debug.core.model.IProcess;
+import org.jboss.tools.ssp.internal.launching.util.ExecUtil;
+import org.jboss.tools.ssp.internal.launching.util.OSUtils;
 import org.jboss.tools.ssp.launching.ICommandProvider;
-import org.jboss.tools.ssp.launching.util.ExecUtil;
-import org.jboss.tools.ssp.launching.util.OSUtils;
 
 /**
  * Abstract implementation of a VM runner.

@@ -21,7 +21,7 @@ import org.jboss.tools.ssp.eclipse.debug.core.IDebugEventSetListener;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.ssp.eclipse.debug.core.IStreamListener;
 import org.jboss.tools.ssp.eclipse.debug.core.model.IProcess;
-import org.jboss.tools.ssp.launching.RuntimeProcessEventManager;
+import org.jboss.tools.ssp.internal.launching.RuntimeProcessEventManager;
 import org.jboss.tools.ssp.server.model.internal.ServerStreamListener;
 import org.jboss.tools.ssp.server.spi.model.polling.IPollResultListener;
 import org.jboss.tools.ssp.server.spi.model.polling.IServerStatePoller;

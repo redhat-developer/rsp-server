@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jboss.tools.ssp.launching.LaunchingCore;
+import org.jboss.tools.ssp.internal.launching.LaunchingCore;
 
 public class VMInstallRegistry implements IVMInstallRegistry {
 

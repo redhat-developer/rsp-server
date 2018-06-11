@@ -22,7 +22,7 @@ import org.jboss.tools.ssp.api.dao.ServerHandle;
 import org.jboss.tools.ssp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.eclipse.core.runtime.Status;
-import org.jboss.tools.ssp.launching.LaunchingCore;
+import org.jboss.tools.ssp.internal.launching.LaunchingCore;
 import org.jboss.tools.ssp.server.model.internal.Server;
 import org.jboss.tools.ssp.server.spi.model.IServerModel;
 import org.jboss.tools.ssp.server.spi.model.IServerModelListener;

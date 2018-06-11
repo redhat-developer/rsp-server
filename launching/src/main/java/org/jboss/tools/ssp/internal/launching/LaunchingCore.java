@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.launching;
+package org.jboss.tools.ssp.internal.launching;
 
 import java.io.File;
 

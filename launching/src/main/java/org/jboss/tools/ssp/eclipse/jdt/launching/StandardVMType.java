@@ -34,10 +34,10 @@ import org.jboss.tools.ssp.eclipse.jdt.core.JavaCoreConstants;
 import org.jboss.tools.ssp.eclipse.jdt.internal.launching.LibraryInfo;
 import org.jboss.tools.ssp.eclipse.jdt.internal.launching.StandardVM;
 import org.jboss.tools.ssp.eclipse.osgi.util.NLS;
-import org.jboss.tools.ssp.launching.LaunchingCore;
-import org.jboss.tools.ssp.launching.LaunchingSupportUtility;
-import org.jboss.tools.ssp.launching.LibraryInfoCache;
-import org.jboss.tools.ssp.launching.util.OSUtils;
+import org.jboss.tools.ssp.internal.launching.LaunchingCore;
+import org.jboss.tools.ssp.internal.launching.LibraryInfoCache;
+import org.jboss.tools.ssp.internal.launching.util.LaunchingSupportUtils;
+import org.jboss.tools.ssp.internal.launching.util.OSUtils;
 
 
 /**
@@ -644,7 +644,7 @@ public class StandardVMType extends AbstractVMInstallType {
 	}
 
 	public LibraryInfo runLaunchingSupportLibraryDetector(File javaExecutable) {
-		LaunchingSupportUtility util = new LaunchingSupportUtility();
+		LaunchingSupportUtils util = new LaunchingSupportUtils();
 		File launchingSupportFile = util.getLaunchingSupportFile();
 		if (launchingSupportFile != null && launchingSupportFile.exists()) {
 			return util.runLaunchingSupportLibraryDetector(javaExecutable, launchingSupportFile);

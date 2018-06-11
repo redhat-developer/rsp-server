@@ -16,7 +16,7 @@ import java.net.URL;
 
 import org.jboss.tools.ssp.eclipse.core.runtime.IPath;
 import org.jboss.tools.ssp.eclipse.core.runtime.Path;
-import org.jboss.tools.ssp.launching.util.URLUtils;
+import org.jboss.tools.ssp.internal.launching.util.URLUtils;
 
 
 /**
