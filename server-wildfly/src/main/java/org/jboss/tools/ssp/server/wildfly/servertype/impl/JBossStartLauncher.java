@@ -21,8 +21,8 @@ import org.jboss.tools.ssp.eclipse.debug.core.Launch;
 import org.jboss.tools.ssp.eclipse.jdt.launching.ExecutionArguments;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMRunner;
 import org.jboss.tools.ssp.eclipse.jdt.launching.VMRunnerConfiguration;
+import org.jboss.tools.ssp.internal.launching.util.NativeEnvironmentUtils;
 import org.jboss.tools.ssp.launching.ICommandProvider;
-import org.jboss.tools.ssp.launching.NativeEnvironmentUtil;
 
 public class JBossStartLauncher {
 	private JBossServerDelegate delegate;
@@ -147,7 +147,7 @@ public class JBossStartLauncher {
 	
 	private String[] getEnvironment(boolean appendNativeEnv) {
 		Map<String, String> configEnv = getEnvironmentFromServer();
-		return NativeEnvironmentUtil.getDefault().getEnvironment(configEnv, appendNativeEnv);
+		return NativeEnvironmentUtils.getDefault().getEnvironment(configEnv, appendNativeEnv);
 	}
 
 	private Map<String, String>  getEnvironmentFromServer() {

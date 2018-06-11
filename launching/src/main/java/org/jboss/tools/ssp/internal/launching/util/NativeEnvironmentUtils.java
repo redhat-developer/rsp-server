@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.launching;
+package org.jboss.tools.ssp.internal.launching.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -20,13 +20,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.jboss.tools.ssp.launching.LaunchingCore;
+
 import java.util.Properties;
 
-import org.jboss.tools.ssp.internal.launching.util.OSUtils;
-
-public class NativeEnvironmentUtil {
-	private static final NativeEnvironmentUtil instance = new NativeEnvironmentUtil();
-	public static final NativeEnvironmentUtil getDefault() {
+public class NativeEnvironmentUtils {
+	private static final NativeEnvironmentUtils instance = new NativeEnvironmentUtils();
+	public static final NativeEnvironmentUtils getDefault() {
 		return instance;
 	}
 	
@@ -200,7 +201,7 @@ public class NativeEnvironmentUtil {
 		}
 		Map<String, String> env = new HashMap<String, String>();
 		if (appendNativeEnv) {
-			env.putAll(NativeEnvironmentUtil.getDefault().getNativeEnvironmentCasePreserved());
+			env.putAll(NativeEnvironmentUtils.getDefault().getNativeEnvironmentCasePreserved());
 		}
 		List<String> strings = new ArrayList<String>(env.size());
 		StringBuffer buffer = null;

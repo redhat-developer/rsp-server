@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.launching;
+package org.jboss.tools.ssp.internal.launching.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -39,8 +39,7 @@ import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstallChangedListener;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMRunner;
 import org.jboss.tools.ssp.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.jboss.tools.ssp.eclipse.osgi.util.NLS;
-import org.jboss.tools.ssp.internal.launching.util.ExecUtil;
-import org.jboss.tools.ssp.internal.launching.util.OSUtils;
+import org.jboss.tools.ssp.launching.LaunchingCore;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -48,7 +47,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class LaunchingSupportUtility {
+public class LaunchingSupportUtils {
 	private static final String BAR = "|"; //$NON-NLS-1$
 	protected static final String JAVA_JVM_VERSION = "JAVA_JVM_VERSION"; //$NON-NLS-1$
 	private static final String AbstractVMInstall_4="Exception retrieving system properties: {0}";
@@ -180,7 +179,7 @@ public class LaunchingSupportUtility {
 
 	private String[] getLaunchingSupportEnvironment() {
 		if (OSUtils.isMac()) {
-			Map<String, String> map = NativeEnvironmentUtil.getDefault().getNativeEnvironmentCasePreserved(); 
+			Map<String, String> map = NativeEnvironmentUtils.getDefault().getNativeEnvironmentCasePreserved(); 
 			if (map.remove(JAVA_JVM_VERSION) != null) {
 				String[] envp = new String[map.size()];
 				Iterator<Entry<String, String>> iterator = map.entrySet().iterator();

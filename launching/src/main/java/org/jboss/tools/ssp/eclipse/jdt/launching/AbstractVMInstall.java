@@ -22,7 +22,7 @@ import org.jboss.tools.ssp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.ssp.eclipse.core.runtime.Status;
-import org.jboss.tools.ssp.launching.LaunchingSupportUtility;
+import org.jboss.tools.ssp.internal.launching.util.LaunchingSupportUtils;
 import org.jboss.tools.ssp.launching.RunningVMSyspropCache;
 /**
  * Abstract implementation of a VM install.
@@ -352,7 +352,7 @@ public abstract class AbstractVMInstall implements IVMInstall {
 		Map<String, String> map = loadSyspropsFromCache(properties);
 		if (map == null) {
 			IVMRunner runner = getVMRunner("run");
-			LaunchingSupportUtility util = new LaunchingSupportUtility();
+			LaunchingSupportUtils util = new LaunchingSupportUtils();
 			map = util.runAndParseLaunchingSupportSysprops(
 					runner, properties, monitor);
 			saveSyspropsInCache(map);
