@@ -15,36 +15,29 @@ import org.jboss.tools.ssp.eclipse.debug.core.DebugEvent;
 import org.jboss.tools.ssp.eclipse.debug.core.IDebugEventSetListener;
 
 public class RuntimeProcessEventManager {
+
 	private static RuntimeProcessEventManager instance = new RuntimeProcessEventManager();
 	
-	private List<IDebugEventSetListener> listeners;
-	
-	
+	private List<IDebugEventSetListener> listeners = new ArrayList<>();
 	
 	public static RuntimeProcessEventManager getDefault() {
 		return instance;
 	}
 	
-	public RuntimeProcessEventManager() {
-		listeners = new ArrayList<IDebugEventSetListener>();
-	}
-	
 	public synchronized void addListener(IDebugEventSetListener listener) {
-		if( !listeners.contains(listener)) 
+		if (!listeners.contains(listener)) {
 			listeners.add(listener);
+		}
 	}
 	public synchronized void removeListener(IDebugEventSetListener listener) {
 		listeners.remove(listener);
 	}
 	
 	private synchronized List<IDebugEventSetListener> getListeners() {
-		return new ArrayList<IDebugEventSetListener>(listeners);
+		return new ArrayList<>(listeners);
 	}
 	
 	public void fireDebugEventSet(DebugEvent[] debugEvents) {
-		List<IDebugEventSetListener> toIt = getListeners();
-		for( IDebugEventSetListener i : toIt) {
-			i.handleDebugEvents(debugEvents);
-		}
+		getListeners().forEach(listener -> listener.handleDebugEvents(debugEvents));
 	}
 }
