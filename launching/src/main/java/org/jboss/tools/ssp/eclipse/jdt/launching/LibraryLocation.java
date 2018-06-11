@@ -16,7 +16,7 @@ import java.net.URL;
 
 import org.jboss.tools.ssp.eclipse.core.runtime.IPath;
 import org.jboss.tools.ssp.eclipse.core.runtime.Path;
-import org.jboss.tools.ssp.launching.util.URLUtilities;
+import org.jboss.tools.ssp.launching.util.URLUtils;
 
 
 /**
@@ -194,7 +194,7 @@ public final class LibraryLocation {
 				&& equals(getSystemLibrarySourcePath(), lib.getSystemLibrarySourcePath())
 				&& equals(getExternalAnnotationsPath(), lib.getExternalAnnotationsPath())
 				&& equals(getPackageRootPath(), lib.getPackageRootPath())
-				&& URLUtilities.sameURL(getJavadocLocation(), lib.getJavadocLocation());
+				&& URLUtils.sameURL(getJavadocLocation(), lib.getJavadocLocation());
 		}
 		return false;
 	}
