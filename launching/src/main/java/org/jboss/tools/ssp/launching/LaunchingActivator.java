@@ -24,7 +24,6 @@ public class LaunchingActivator implements BundleActivator {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		this.bc = context;
-		sendLogsToSysout();
 		log(LogService.LOG_INFO, NLS.bind("{0} bundle activated.", BUNDLE_ID));
 	}
 
@@ -39,22 +38,6 @@ public class LaunchingActivator implements BundleActivator {
 			return;
 		}
 		log.log(level, message);
-	}
-
-	private void sendLogsToSysout() {
-		LogReaderService logReader = getService(LogReaderService.class);
-		if (logReader == null) {
-			return;
-		}
-		logReader.addLogListener(entry -> {
-				if( entry.getLevel() <= LogService.LOG_WARNING) { 
-					String message = new StringBuilder()
-						.append("[").append(entry.getLevel()).append("] ")
-						.append(entry.getTime()).append(": ").append(entry.getMessage())
-						.toString();
-					System.out.println(message);
-				}
-		});
 	}
 
 	private <T> T getService(Class<T> clazz) {

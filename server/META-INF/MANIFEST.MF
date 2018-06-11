@@ -32,7 +32,8 @@ Import-Package: org.eclipse.lsp4j,
  org.jboss.tools.ssp.server.spi.discovery,
  org.jboss.tools.ssp.server.spi.model,
  org.jboss.tools.ssp.server.spi.servertype,
- org.osgi.framework
+ org.osgi.framework,
+ org.osgi.service.log
 Export-Package: org.jboss.tools.ssp.server,
  org.jboss.tools.ssp.server.core.internal,
  org.jboss.tools.ssp.server.discovery,

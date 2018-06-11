@@ -8,12 +8,18 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.server;
 
+import org.jboss.tools.ssp.eclipse.osgi.util.NLS;
 import org.jboss.tools.ssp.server.ShutdownExecutor.IShutdownHandler;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.log.LogReaderService;
+import org.osgi.service.log.LogService;
 
 public class ServerCoreActivator implements BundleActivator {
+	public static final String BUNDLE_ID = "org.jboss.tools.ssp.server";
+	
 	private static BundleContext context;
 	private static ServerCoreActivator activator;
 	
@@ -29,9 +35,10 @@ public class ServerCoreActivator implements BundleActivator {
 	public void start(final BundleContext context2) throws Exception {
 		activator = this;
 		context = context2;
+		sendLogsToSysout();
 		setShutdownHandler();
 		startServer();
-		System.out.println("Server bundle started");
+		log(LogService.LOG_INFO, NLS.bind("{0} bundle activated.", BUNDLE_ID));
 	}
 	
 	public ServerManagementServerLauncher getLauncher() {
@@ -78,4 +85,38 @@ public class ServerCoreActivator implements BundleActivator {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	private void sendLogsToSysout() {
+		LogReaderService logReader = getService(LogReaderService.class);
+		if (logReader == null) {
+			return;
+		}
+		logReader.addLogListener(entry -> {
+				if( entry.getLevel() <= LogService.LOG_WARNING) { 
+					String message = new StringBuilder()
+						.append("[").append(entry.getLevel()).append("] ")
+						.append(entry.getTime()).append(": ").append(entry.getMessage())
+						.toString();
+					System.out.println(message);
+				}
+		});
+	}
+
+	private void log(int level, String message) {
+		LogService log = getService(LogService.class);
+		if (log == null) {
+			return;
+		}
+		log.log(level, message);
+	}
+
+	private <T> T getService(Class<T> clazz) {
+		if (context == null )
+			return null;
+		ServiceReference<?> ref = context.getServiceReference(clazz.getName());
+		if( ref != null )
+			return (T)context.getService(ref);
+		return null;
+	}
+	
 }

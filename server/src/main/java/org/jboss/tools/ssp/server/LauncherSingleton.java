@@ -8,6 +8,19 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.server;
 
+/**
+ * This application (for now) can be launched one of two ways:
+ *   1) In an OSGi environment, or, 
+ *   2) via a main class that instantiates a launcher object. 
+ *   
+ * This class exists for a few purposes. It's primary purpose is to hold a 
+ * single launcher. Regardless of how the application is started, there should
+ * not be more than one launcher running at a time. This class holds that reference. 
+ * 
+ * If launched via OSGi, the activator should instantiate the launcher and set it here.
+ * If launched via a main class, that class should instantiate the launcher and set it here.
+ * 
+ */
 public class LauncherSingleton {
 	private static LauncherSingleton instance = new LauncherSingleton();
 	public static LauncherSingleton getDefault() {
