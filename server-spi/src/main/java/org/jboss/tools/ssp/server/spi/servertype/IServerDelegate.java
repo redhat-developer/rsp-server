@@ -13,6 +13,7 @@ import org.jboss.tools.ssp.api.dao.CommandLineDetails;
 import org.jboss.tools.ssp.api.dao.LaunchParameters;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
 import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
+import org.jboss.tools.ssp.api.dao.StartServerResponse;
 import org.jboss.tools.ssp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 
@@ -172,7 +173,7 @@ public interface IServerDelegate {
 	 */
 	public String getMode();
 	
-	public IStatus start(String mode);
+	public StartServerResponse start(String mode);
 	
 	public IStatus validate();
 

@@ -11,6 +11,7 @@ package org.jboss.tools.ssp.server;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -30,10 +31,11 @@ import org.jboss.tools.ssp.api.dao.ServerHandle;
 import org.jboss.tools.ssp.api.dao.ServerLaunchMode;
 import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.ssp.api.dao.ServerType;
+import org.jboss.tools.ssp.api.dao.StartServerResponse;
 import org.jboss.tools.ssp.api.dao.Status;
 import org.jboss.tools.ssp.api.dao.StopServerAttributes;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
-import org.jboss.tools.ssp.server.core.internal.StatusConverter;
+import org.jboss.tools.ssp.launching.utils.StatusConverter;
 import org.jboss.tools.ssp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.ssp.server.model.RemoteEventManager;
 import org.jboss.tools.ssp.server.model.ServerManagementModel;
@@ -222,11 +224,11 @@ public class ServerManagementServerImpl implements SSPServer {
 	}
 
 	@Override
-	public CompletableFuture<Status> startServerAsync(LaunchParameters attr) {
+	public CompletableFuture<StartServerResponse> startServerAsync(LaunchParameters attr) {
 		IServer server = model.getServerModel().getServer(attr.getParams().getId());
 		IServerDelegate del = server.getDelegate();
-		IStatus ret = del.start(attr.getMode());
-		return CompletableFuture.completedFuture(StatusConverter.convert(ret));
+		StartServerResponse ret = del.start(attr.getMode());
+		return CompletableFuture.completedFuture(ret);
 	}
 
 	@Override

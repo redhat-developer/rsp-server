@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -426,7 +427,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 		if(newCmdLine != null) {
 			cmdLine = newCmdLine;
 		}
-		return new CommandLineDetails(cmdLine, wd, newenvp);
+		return new CommandLineDetails(cmdLine, wd, newenvp, new HashMap<String,String>());
 	}	
 	
 	/* (non-Javadoc)

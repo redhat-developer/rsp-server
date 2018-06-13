@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
+import org.jboss.tools.ssp.api.dao.StartServerResponse;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.eclipse.core.runtime.Status;
 import org.jboss.tools.ssp.eclipse.debug.core.DebugEvent;
@@ -209,7 +210,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		return Status.OK_STATUS;
 	}
 	
-	public abstract IStatus start(String mode);
+	public abstract StartServerResponse start(String mode);
 	
 	public void handleDebugEvents(DebugEvent[] events) {
 		ArrayList<ILaunch> launchList = new ArrayList<ILaunch>(this.launches);

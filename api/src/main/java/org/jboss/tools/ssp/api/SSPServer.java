@@ -25,6 +25,7 @@ import org.jboss.tools.ssp.api.dao.ServerHandle;
 import org.jboss.tools.ssp.api.dao.ServerLaunchMode;
 import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.ssp.api.dao.ServerType;
+import org.jboss.tools.ssp.api.dao.StartServerResponse;
 import org.jboss.tools.ssp.api.dao.Status;
 import org.jboss.tools.ssp.api.dao.StopServerAttributes;
 
@@ -225,7 +226,7 @@ public interface SSPServer {
 	 * and any events that must be propagated to the client. 
 	 */
 	@JsonRequest
-	CompletableFuture<Status> startServerAsync(LaunchParameters params);
+	CompletableFuture<StartServerResponse> startServerAsync(LaunchParameters params);
 
 	
 	

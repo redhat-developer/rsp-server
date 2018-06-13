@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.server.core.internal;
+package org.jboss.tools.ssp.launching.utils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

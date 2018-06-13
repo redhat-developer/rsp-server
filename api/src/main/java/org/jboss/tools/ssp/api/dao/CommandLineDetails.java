@@ -8,15 +8,19 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.api.dao;
 
+import java.util.Map;
+
 public class CommandLineDetails {
 	private String[] cmdLine;
 	private String workingDir;
 	private String[] envp;
-
-	public CommandLineDetails(String[] cmdLine, String workingDir, String[] envp) {
+	private Map<String,String> properties;
+	public CommandLineDetails(String[] cmdLine, String workingDir, String[] envp,
+			Map<String,String> properties) {
 		this.cmdLine = cmdLine;
 		this.workingDir = workingDir;
 		this.envp = envp;
+		this.properties = properties;
 	}
 
 	public String[] getCmdLine() {
@@ -29,5 +33,13 @@ public class CommandLineDetails {
 
 	public String[] getEnvp() {
 		return envp;
+	}
+
+	public Map<String, String> getProperties() {
+		return properties;
+	}
+
+	public void setProperties(Map<String, String> properties) {
+		this.properties = properties;
 	}
 }

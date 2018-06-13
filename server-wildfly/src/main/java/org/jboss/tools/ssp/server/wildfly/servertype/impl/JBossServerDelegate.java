@@ -14,6 +14,7 @@ import org.jboss.tools.ssp.api.dao.CommandLineDetails;
 import org.jboss.tools.ssp.api.dao.LaunchParameters;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
 import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
+import org.jboss.tools.ssp.api.dao.StartServerResponse;
 import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.eclipse.core.runtime.Status;
@@ -23,6 +24,7 @@ import org.jboss.tools.ssp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.ssp.launching.LaunchingCore;
+import org.jboss.tools.ssp.launching.utils.StatusConverter;
 import org.jboss.tools.ssp.server.model.AbstractServerDelegate;
 import org.jboss.tools.ssp.server.spi.model.polling.IPollResultListener;
 import org.jboss.tools.ssp.server.spi.model.polling.IServerStatePoller;
@@ -86,12 +88,14 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 	}
 	
 	@Override
-	public IStatus start(String mode) {
+	public StartServerResponse start(String mode) {
 		setServerState(IServerDelegate.STATE_STARTING);
-		
+		CommandLineDetails launchedDetails = null;
 		try {
 			launchPoller(IServerStatePoller.SERVER_STATE.UP);
-			startLaunch = new JBossStartLauncher(this).launch(mode);
+			JBossStartLauncher launcher = new JBossStartLauncher(this);
+			startLaunch = launcher.launch(mode);
+			launchedDetails = launcher.getLaunchedDetails();
 			registerLaunch(startLaunch);
 		} catch(CoreException ce) {
 			if( startLaunch != null ) {
@@ -105,9 +109,10 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 				}
 			}
 			setServerState(IServerDelegate.STATE_STOPPED);
-			return ce.getStatus();
+			org.jboss.tools.ssp.api.dao.Status s = StatusConverter.convert(ce.getStatus());
+			return new StartServerResponse(s, launchedDetails);
 		}
-		return Status.OK_STATUS;
+		return new StartServerResponse(StatusConverter.convert(Status.OK_STATUS), launchedDetails);
 	}
 
 	

@@ -16,10 +16,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
 import org.jboss.tools.ssp.api.dao.CommandLineDetails;
 import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.ssp.eclipse.core.runtime.IPath;
@@ -84,6 +86,12 @@ public class StandardVMDebugger extends StandardVMRunner {
 
 	@Override
 	public CommandLineDetails getCommandLineDetails(VMRunnerConfiguration config, ILaunch launch, IProgressMonitor subMonitor) throws CoreException {
+		// TODO maybe make these adjustable?  idk
+		String transport = "dt_socket";
+		String server = "y";
+		String suspend = "y";
+		String host = "localhost";
+
 		int port= findFreePort();
 		if (port == -1) {
 			abort(StandardVMDebugger_Could_not_find_a_free_socket_for_the_debugger_1, null, IJavaLaunchConfigurationConstants.ERR_NO_SOCKET_AVAILABLE);
@@ -105,24 +113,8 @@ public class StandardVMDebugger extends StandardVMRunner {
 				arguments.add(debugArgs[i]);
 			}
 		} else {
-			// VM arguments are the first thing after the java program so that users can specify
-			// options like '-client' & '-server' which are required to be the first options
-			double version = getJavaVersion();
-			if (version < 1.5) {
-				arguments.add("-Xdebug"); //$NON-NLS-1$
-				arguments.add("-Xnoagent"); //$NON-NLS-1$
-			}
-
-			//check if java 1.4 or greater
-			if (version < 1.4) {
-				arguments.add("-Djava.compiler=NONE"); //$NON-NLS-1$
-			}
-			if (version < 1.5) {
-				arguments.add("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=localhost:" + port); //$NON-NLS-1$
-			} else {
-				arguments.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=localhost:" + port); //$NON-NLS-1$
-			}
-
+			// Extracted method out
+			addDebugFlags(arguments, transport, server, suspend, host, port);
 		}
 
 		String[] allVMArgs = combineVmArgs(config, new String[0]); //fVMInstance);
@@ -196,7 +188,58 @@ public class StandardVMDebugger extends StandardVMRunner {
 
 		subMonitor.worked(1);
 		subMonitor.subTask(StandardVMDebugger_Starting_virtual_machine____4);
-		return new CommandLineDetails(cmdLine, wd, newenvp);
+		Map<String,String> debugFlagMap = generateDebugFlagMap(transport, server, suspend, host, port);
+		return new CommandLineDetails(cmdLine, wd, newenvp, debugFlagMap);
+	}
+	
+	
+	private static final String DEBUG_TRANSPORT_KEY = "debug.java.transport";
+	private static final String DEBUG_TRANSPORT_SERVER = "debug.java.server";
+	private static final String DEBUG_TRANSPORT_SUSPEND = "debug.java.suspend";
+	
+	private HashMap<String,String> generateDebugFlagMap(String transport, String server, 
+			String suspend, String host, int port) {
+		HashMap<String,String> ret = new HashMap<>();
+		ret.put(ServerManagementAPIConstants.DEBUG_DETAILS_TYPE, "java"); // TODO extract to better loc?
+		ret.put(ServerManagementAPIConstants.DEBUG_DETAILS_HOST, host); 
+		ret.put(ServerManagementAPIConstants.DEBUG_DETAILS_PORT, Integer.toString(port));
+		ret.put(DEBUG_TRANSPORT_KEY, transport);
+		ret.put(DEBUG_TRANSPORT_SERVER, server);
+		ret.put(DEBUG_TRANSPORT_SUSPEND, suspend);
+		return ret;
+	}
+	
+	private void addDebugFlags(List<String> arguments, String transport, String server, String suspend, String host, int port) {
+		// VM arguments are the first thing after the java program so that users can specify
+		// options like '-client' & '-server' which are required to be the first options
+		double version = getJavaVersion();
+		if (version < 1.5) {
+			arguments.add("-Xdebug"); //$NON-NLS-1$
+			arguments.add("-Xnoagent"); //$NON-NLS-1$
+		}
+
+		//check if java 1.4 or greater
+		if (version < 1.4) {
+			arguments.add("-Djava.compiler=NONE"); //$NON-NLS-1$
+		}
+		
+		StringBuffer debugFlagBuffer = new StringBuffer();
+		if (version < 1.5) {
+			debugFlagBuffer.append("-Xrunjdwp:transport=");
+		} else {
+			debugFlagBuffer.append("-agentlib:jdwp=transport=");
+		}
+		debugFlagBuffer.append(transport);
+		debugFlagBuffer.append(",server=");
+		debugFlagBuffer.append(server);
+		debugFlagBuffer.append(",suspend=");
+		debugFlagBuffer.append(suspend);
+		debugFlagBuffer.append(",address=");
+		debugFlagBuffer.append(host);
+		debugFlagBuffer.append(":");
+		debugFlagBuffer.append(port);
+		
+		arguments.add(debugFlagBuffer.toString());
 	}
 	
 	/**

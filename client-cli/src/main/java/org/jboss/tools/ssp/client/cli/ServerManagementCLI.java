@@ -29,6 +29,7 @@ import org.jboss.tools.ssp.api.dao.ServerHandle;
 import org.jboss.tools.ssp.api.dao.ServerLaunchMode;
 import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.ssp.api.dao.ServerType;
+import org.jboss.tools.ssp.api.dao.StartServerResponse;
 import org.jboss.tools.ssp.api.dao.Status;
 import org.jboss.tools.ssp.api.dao.StopServerAttributes;
 import org.jboss.tools.ssp.api.dao.util.CreateServerAttributesUtility;
@@ -165,8 +166,8 @@ public class ServerManagementCLI {
 			String mode = selectLaunchMode(handle.getType());
 			ServerAttributes sa = new ServerAttributes(handle.getType().getId(), handle.getId(), new HashMap<String,Object>());
 			LaunchParameters params = new LaunchParameters(sa, mode);
-			Status stat = launcher.getServerProxy().startServerAsync(params).get();
-			System.out.println(stat.toString());
+			StartServerResponse stat = launcher.getServerProxy().startServerAsync(params).get();
+			System.out.println(stat.getStatus().toString());
 		} else if( s.equals(LAUNCH_COMMAND)) {
 			LaunchParameters getLaunchReq = getLaunchCommandRequest();
 			printLocalLaunchCommandDetails(getLaunchReq);

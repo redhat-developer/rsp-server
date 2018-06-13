@@ -24,6 +24,7 @@ import org.jboss.tools.ssp.api.dao.ServerProcessOutput;
 import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.ssp.api.dao.ServerStateChange;
 import org.jboss.tools.ssp.api.dao.ServerType;
+import org.jboss.tools.ssp.api.dao.StartServerResponse;
 import org.jboss.tools.ssp.api.dao.Status;
 import org.jboss.tools.ssp.api.dao.StopServerAttributes;
 import org.jboss.tools.ssp.api.dao.VMDescription;
@@ -66,6 +67,7 @@ public class GenerateSchemaMain {
 				ServerStartingAttributes.class,
 				ServerStateChange.class,
 				ServerType.class,
+				StartServerResponse.class,
 				Status.class,
 				StopServerAttributes.class,
 				VMDescription.class,

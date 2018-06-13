@@ -32,6 +32,7 @@ public class JBossStartLauncher {
 	private JBossServerDelegate delegate;
 	private IVMRunner runner;
 	private ILaunch launch;
+	private CommandLineDetails launchedDetails = null;
 	public JBossStartLauncher(JBossServerDelegate jBossServerDelegate) {
 		this.delegate = jBossServerDelegate;
 	}
@@ -43,8 +44,17 @@ public class JBossStartLauncher {
 		
 		launch = createLaunch(mode);
 		VMRunnerConfiguration runConfig = configureRunner();
+		
+		if( runner instanceof ICommandProvider ) {
+			launchedDetails = ((ICommandProvider)runner).getCommandLineDetails(runConfig, launch, new NullProgressMonitor());
+		}
+
 		runner.run(runConfig, launch, new NullProgressMonitor());
 		return launch;
+	}
+	
+	public CommandLineDetails getLaunchedDetails() {
+		return launchedDetails;
 	}
 	
 	public CommandLineDetails getLaunchCommand(String mode) throws CoreException {
