@@ -12,7 +12,7 @@
 	<artifactId>org.jboss.tools.ssp.launching</artifactId>
 	<packaging>jar</packaging>
 
-	<name>Simple Server Protocol : jdt.launching</name>
+	<name>Simple Server Protocol : Launching</name>
 
 	<properties>
 		<tycho-version>1.1.0</tycho-version>

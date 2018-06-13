@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Vector;
 
-import org.jboss.tools.ssp.internal.launching.LaunchingCore;
+import org.jboss.tools.ssp.launching.LaunchingCore;
 
 /**
  * Writes to the input stream of a system process,

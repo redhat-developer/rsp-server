@@ -20,7 +20,7 @@ import org.jboss.tools.ssp.eclipse.debug.core.Launch;
 import org.jboss.tools.ssp.eclipse.jdt.launching.ExecutionArguments;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMRunner;
 import org.jboss.tools.ssp.eclipse.jdt.launching.VMRunnerConfiguration;
-import org.jboss.tools.ssp.internal.launching.util.NativeEnvironmentUtils;
+import org.jboss.tools.ssp.launching.utils.NativeEnvironmentUtils;
 
 public class JBossStopLauncher {
 	private JBossServerDelegate delegate;

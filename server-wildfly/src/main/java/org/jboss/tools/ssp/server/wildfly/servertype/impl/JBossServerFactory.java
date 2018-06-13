@@ -12,7 +12,7 @@ import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
 import org.jboss.tools.ssp.api.dao.Attributes;
 import org.jboss.tools.ssp.api.dao.ServerLaunchMode;
 import org.jboss.tools.ssp.api.dao.util.CreateServerAttributesUtility;
-import org.jboss.tools.ssp.launching.ILaunchModes;
+import org.jboss.tools.ssp.launching.java.ILaunchModes;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.ssp.server.spi.servertype.IServerType;

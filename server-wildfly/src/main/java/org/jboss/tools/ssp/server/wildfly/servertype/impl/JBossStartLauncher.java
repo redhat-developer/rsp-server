@@ -24,9 +24,9 @@ import org.jboss.tools.ssp.eclipse.jdt.launching.ExecutionArguments;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMRunner;
 import org.jboss.tools.ssp.eclipse.jdt.launching.VMRunnerConfiguration;
-import org.jboss.tools.ssp.internal.launching.util.NativeEnvironmentUtils;
-import org.jboss.tools.ssp.launching.ICommandProvider;
-import org.jboss.tools.ssp.launching.JREClasspathProvider;
+import org.jboss.tools.ssp.launching.java.ICommandProvider;
+import org.jboss.tools.ssp.launching.java.JREClasspathProvider;
+import org.jboss.tools.ssp.launching.utils.NativeEnvironmentUtils;
 
 public class JBossStartLauncher {
 	private JBossServerDelegate delegate;

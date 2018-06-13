@@ -5,7 +5,7 @@ import java.io.FileFilter;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-import org.jboss.tools.ssp.server.discovery.serverbeans.util.ManifestUtility;
+import org.jboss.tools.ssp.server.wildfly.beans.impl.ManifestUtility;
 
 public class JBossManifestUtility extends ManifestUtility {
 	/*

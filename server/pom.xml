@@ -74,6 +74,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.tools.ssp</groupId>
+			<artifactId>org.jboss.tools.ssp.launching.java</artifactId>
+			<version>0.0.9-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.tools.ssp</groupId>
 			<artifactId>org.jboss.tools.ssp.server.spi</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>

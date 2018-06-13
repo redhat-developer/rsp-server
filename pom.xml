@@ -15,6 +15,7 @@
 	  <module>schema</module>
 	  <module>client-cli</module>
 	  <module>launching</module>
+	  <module>launching-java</module>
 	  <module>server-spi</module>
 	  <module>server</module>
 	  <module>server-wildfly</module>

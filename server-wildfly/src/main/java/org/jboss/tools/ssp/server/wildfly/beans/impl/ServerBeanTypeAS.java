@@ -12,8 +12,6 @@ package org.jboss.tools.ssp.server.wildfly.beans.impl;
 
 import java.io.File;
 
-import org.jboss.tools.ssp.server.discovery.serverbeans.util.ManifestUtility;
-
 public class ServerBeanTypeAS extends JBossServerBeanType {
 
 	public ServerBeanTypeAS() {
