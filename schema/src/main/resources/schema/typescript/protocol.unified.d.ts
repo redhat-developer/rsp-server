@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2018-06-11 18:20:39.
+// Generated using typescript-generator version 2.2.413 on 2018-06-13 15:30:13.
 
 export interface Attribute {
     type: string;
@@ -15,6 +15,7 @@ export interface CommandLineDetails {
     cmdLine: string[];
     workingDir: string;
     envp: string[];
+    properties: { [index: string]: string };
 }
 
 export interface DiscoveryPath {
@@ -83,6 +84,11 @@ export interface ServerType {
     id: string;
     visibleName: string;
     description: string;
+}
+
+export interface StartServerResponse {
+    status: Status;
+    details: CommandLineDetails;
 }
 
 export interface Status {
