@@ -1,0 +1,54 @@
+{
+  "type" : "object",
+  "properties" : {
+    "status" : {
+      "type" : "object",
+      "properties" : {
+        "severity" : {
+          "type" : "integer"
+        },
+        "code" : {
+          "type" : "integer"
+        },
+        "message" : {
+          "type" : "string"
+        },
+        "trace" : {
+          "type" : "string"
+        },
+        "ok" : {
+          "type" : "boolean"
+        },
+        "plugin" : {
+          "type" : "string"
+        }
+      }
+    },
+    "details" : {
+      "type" : "object",
+      "properties" : {
+        "cmdLine" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "workingDir" : {
+          "type" : "string"
+        },
+        "envp" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "properties" : {
+          "type" : "object",
+          "additionalProperties" : {
+            "type" : "string"
+          }
+        }
+      }
+    }
+  }
+}
