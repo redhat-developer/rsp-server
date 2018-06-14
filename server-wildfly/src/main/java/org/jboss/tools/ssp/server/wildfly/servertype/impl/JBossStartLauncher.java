@@ -25,7 +25,7 @@ import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMRunner;
 import org.jboss.tools.ssp.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.jboss.tools.ssp.launching.java.ICommandProvider;
-import org.jboss.tools.ssp.launching.java.JREClasspathProvider;
+import org.jboss.tools.ssp.launching.java.VMInstallClasspath;
 import org.jboss.tools.ssp.launching.utils.NativeEnvironmentUtils;
 
 public class JBossStartLauncher {
@@ -135,7 +135,7 @@ public class JBossStartLauncher {
 	
 	protected String[] getJREClasspath() {
 		IVMInstall vm = JBossVMRegistryDiscovery.findVMInstall(delegate);
-		return JREClasspathProvider.getJREClasspath(vm);
+		return VMInstallClasspath.get(vm);
 	}
 	
 	private String[] getClasspath() {
