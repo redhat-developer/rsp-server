@@ -21,7 +21,7 @@ public class LibraryInfoCache {
 	 * Mapping of top-level VM installation directories to library info for that
 	 * VM.
 	 */
-	private static Map<String, LibraryInfo> fgLibraryInfoMap = null;
+	private Map<String, LibraryInfo> fgLibraryInfoMap = null;
 
 	/**
 	 * Mapping of the last time the directory of a given SDK was modified.
@@ -29,19 +29,19 @@ public class LibraryInfoCache {
 	 * Mapping: <code>Map&lt;String,Long&gt;</code>
 	 * @since 3.7
 	 */
-	private static Map<String, Long> fgInstallTimeMap = null;
+	private Map<String, Long> fgInstallTimeMap = null;
 	/**
 	 * List of install locations that have been detected to have changed
 	 *
 	 * @since 3.7
 	 */
-	private static HashSet<String> fgHasChanged = new HashSet<>();
+	private HashSet<String> fgHasChanged = new HashSet<>();
 	/**
 	 * Mutex for checking the time stamp of an install location
 	 *
 	 * @since 3.7
 	 */
-	private static Object installLock = new Object();	
+	private Object installLock = new Object();	
 
 	private static LibraryInfoCache instance = new LibraryInfoCache();
 
@@ -60,7 +60,7 @@ public class LibraryInfoCache {
 	 * @return the library info that corresponds to the specified JRE install
 	 * path, or <code>null</code> if none
 	 */
-	public static LibraryInfo getLibraryInfo(String javaInstallPath) {
+	public LibraryInfo getLibraryInfo(String javaInstallPath) {
 		if (fgLibraryInfoMap == null) {
 			restoreLibraryInfo();
 		}
@@ -79,7 +79,7 @@ public class LibraryInfoCache {
 	 *
 	 * @since 3.7
 	 */
-	public static boolean timeStampChanged(String location) {
+	public boolean timeStampChanged(String location) {
 		synchronized (installLock) {
 			if(fgHasChanged.contains(location)) {
 				return true;
@@ -114,7 +114,7 @@ public class LibraryInfoCache {
 	 * @param javaInstallPath home location for a JRE
 	 * @param info the library information, or <code>null</code> to remove
 	 */
-	public static void setLibraryInfo(String javaInstallPath, LibraryInfo info) {
+	public void setLibraryInfo(String javaInstallPath, LibraryInfo info) {
 		if (fgLibraryInfoMap == null) {
 			restoreLibraryInfo();
 		}
@@ -133,8 +133,8 @@ public class LibraryInfoCache {
 	/**
 	 * Restores library information for VMs
 	 */
-	private static void restoreLibraryInfo() {
-		fgLibraryInfoMap = new HashMap<>(10);
+	private void restoreLibraryInfo() {
+		this.fgLibraryInfoMap = new HashMap<>(10);
 	}
 
 	/**
@@ -143,7 +143,7 @@ public class LibraryInfoCache {
 	 *
 	 * @since 3.7
 	 */
-	private static void readInstallInfo() {
-		fgInstallTimeMap = new HashMap<>();
+	private void readInstallInfo() {
+		this.fgInstallTimeMap = new HashMap<>();
 	}
 }

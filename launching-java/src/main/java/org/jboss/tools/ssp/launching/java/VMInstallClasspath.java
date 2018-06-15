@@ -43,7 +43,7 @@ public class VMInstallClasspath {
 		if (vmInstallLocation == null) {
 			return new String[] {};
 		}
-		LibraryInfo libraryInfo = LibraryInfoCache.getLibraryInfo(vmInstallLocation.getAbsolutePath());
+		LibraryInfo libraryInfo = LibraryInfoCache.getDefault().getLibraryInfo(vmInstallLocation.getAbsolutePath());
 		if (libraryInfo == null) {
 			return new String[] {};
 		}
