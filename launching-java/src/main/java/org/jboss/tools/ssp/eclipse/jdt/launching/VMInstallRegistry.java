@@ -48,12 +48,11 @@ public class VMInstallRegistry implements IVMInstallRegistry {
 			throw new IllegalArgumentException();
 		}
 		String id = vm.getId();
-		IVMInstall test = vms.get(id);
-		if (test != null) {
+		if (vms.containsKey(id)) {
 			throw new IllegalArgumentException();
 		}
-		if( vm instanceof AbstractVMInstall ) {
-			((AbstractVMInstall)vm).setRegistry(this);
+		if (vm instanceof AbstractVMInstall) {
+			((AbstractVMInstall) vm).setRegistry(this);
 		}
 		vms.put(id, vm);
 		fireVMAdded(vm);
