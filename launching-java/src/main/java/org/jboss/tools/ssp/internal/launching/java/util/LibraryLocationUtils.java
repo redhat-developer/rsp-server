@@ -18,6 +18,9 @@ import org.jboss.tools.ssp.eclipse.jdt.launching.LibraryLocation;
 
 public class LibraryLocationUtils {
 
+	private LibraryLocationUtils() {
+	}
+
 	/**
 	 * Evaluates library locations for a IVMInstall. If no library locations are set on the install, a default
 	 * location is evaluated and checked if it exists.
