@@ -3,7 +3,9 @@ package org.jboss.tools.ssp.api.dao;
 public class StartServerResponse {
 	private Status status;
 	private CommandLineDetails details;
-	
+	public StartServerResponse() {
+		
+	}
 	public StartServerResponse(Status status, CommandLineDetails details) {
 		this.status = status;
 		this.details = details;

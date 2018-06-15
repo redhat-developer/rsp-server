@@ -10,7 +10,9 @@ package org.jboss.tools.ssp.api.dao;
 
 public class DiscoveryPath {
 	private String filepath;
-
+	public DiscoveryPath() {
+		
+	}
 	public DiscoveryPath(String filepath) {
 		super();
 		this.setFilepath(filepath);

@@ -19,7 +19,9 @@ public class ServerBean {
 	private String version = EMPTY;
 	private String fullVersion = EMPTY;
 	private String serverAdapterTypeId = EMPTY;
-	
+	public ServerBean() {
+		
+	}
 	public ServerBean(String location, String name, 
 			String typeCategory, String specificType,
 			String fullVersion, String majorMinor, 

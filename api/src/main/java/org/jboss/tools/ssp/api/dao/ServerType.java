@@ -12,6 +12,9 @@ public class ServerType {
 	private String id;
 	private String visibleName;
 	private String description;
+	public ServerType() {
+		
+	}
 	public ServerType(String id, String name, String description) {
 		this.id = id;
 		this.visibleName = name;

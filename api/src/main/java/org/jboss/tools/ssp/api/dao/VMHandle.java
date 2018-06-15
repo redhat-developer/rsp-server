@@ -10,6 +10,9 @@ package org.jboss.tools.ssp.api.dao;
 
 public class VMHandle {
 	private String id;
+	public VMHandle() {
+		
+	}
 	public VMHandle(String id) {
 		this.id = id;
 	}

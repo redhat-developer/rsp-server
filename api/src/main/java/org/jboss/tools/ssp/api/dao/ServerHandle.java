@@ -11,6 +11,9 @@ package org.jboss.tools.ssp.api.dao;
 public class ServerHandle {
 	private String id;
 	private ServerType type;
+	public ServerHandle() {
+		
+	}
 	public ServerHandle(String id, ServerType type) {
 		this.id = id;
 		this.type = type;

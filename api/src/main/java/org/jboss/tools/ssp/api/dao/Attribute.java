@@ -13,6 +13,10 @@ public class Attribute {
 	private String description;
 	private Object defaultVal;
 	
+	public Attribute() {
+		
+	}
+	
 	public Attribute(String type, String desc, Object def) {
 		this.type = type;
 		this.description = desc;

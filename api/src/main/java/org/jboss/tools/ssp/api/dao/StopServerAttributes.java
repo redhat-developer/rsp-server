@@ -11,6 +11,9 @@ package org.jboss.tools.ssp.api.dao;
 public class StopServerAttributes {
 	private String id;
 	private boolean force;
+	public StopServerAttributes() {
+		
+	}
 	public StopServerAttributes(String id, boolean force) {
 		this.id = id;
 		this.force = force;

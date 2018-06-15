@@ -11,6 +11,9 @@ package org.jboss.tools.ssp.api.dao;
 public class ServerStartingAttributes {
 	private boolean initiatePolling;
 	private LaunchParameters request;
+	public ServerStartingAttributes() {
+		
+	}
 	public ServerStartingAttributes(LaunchParameters request, boolean initiatePolling) {
 		this.request = request;
 		this.initiatePolling = initiatePolling;

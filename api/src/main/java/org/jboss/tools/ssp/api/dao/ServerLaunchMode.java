@@ -11,6 +11,9 @@ package org.jboss.tools.ssp.api.dao;
 public class ServerLaunchMode {
 	private String mode;
 	private String desc;
+	public ServerLaunchMode() {
+		
+	}
 	public ServerLaunchMode(String mode, String desc) {
 		this.mode = mode;
 		this.desc = desc;

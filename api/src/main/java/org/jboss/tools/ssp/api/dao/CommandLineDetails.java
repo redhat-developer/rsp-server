@@ -15,6 +15,12 @@ public class CommandLineDetails {
 	private String workingDir;
 	private String[] envp;
 	private Map<String,String> properties;
+	
+	public CommandLineDetails() {
+		
+	}
+
+	
 	public CommandLineDetails(String[] cmdLine, String workingDir, String[] envp,
 			Map<String,String> properties) {
 		this.cmdLine = cmdLine;

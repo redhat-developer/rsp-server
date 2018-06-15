@@ -12,7 +12,9 @@ public class VMDescription {
 	private String id;
 	private String installLocation;
 	private String version;
-	
+	public VMDescription() {
+		
+	}
 	public VMDescription(String id, String il, String v) {
 		this.id = id;
 		this.installLocation = il;

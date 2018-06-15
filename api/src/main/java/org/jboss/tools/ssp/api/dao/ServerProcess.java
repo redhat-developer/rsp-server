@@ -11,6 +11,9 @@ package org.jboss.tools.ssp.api.dao;
 public class ServerProcess {
 	private ServerHandle server;
 	private String processId;
+	public ServerProcess() {
+		
+	}
 	public ServerProcess(ServerHandle handle, String process) {
 		this.processId = process;
 		this.server = handle;

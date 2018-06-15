@@ -11,6 +11,9 @@ package org.jboss.tools.ssp.api.dao;
 public class ServerStateChange {
 	private ServerHandle server;
 	private int state;
+	public ServerStateChange() {
+		
+	}
 	public ServerStateChange(ServerHandle server, int state) {
 		this.server = server;
 		this.state = state;

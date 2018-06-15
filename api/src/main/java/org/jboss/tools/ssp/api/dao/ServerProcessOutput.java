@@ -13,6 +13,9 @@ public class ServerProcessOutput {
 	private String processId;
 	private int streamType;
 	private String text;
+	public ServerProcessOutput() {
+		
+	}
 	public ServerProcessOutput(ServerHandle handle, String id, int type, String text) {
 		this.server = handle;
 		this.processId = id;

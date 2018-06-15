@@ -14,6 +14,9 @@ public class ServerAttributes {
 	private String serverType;
 	private String id; 
 	private Map<String, Object> attributes;
+	public ServerAttributes() {
+		
+	}
 	public ServerAttributes(String type, String id, Map<String, Object> attr) {
 		this.serverType = type;
 		this.id = id;

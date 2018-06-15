@@ -11,6 +11,9 @@ package org.jboss.tools.ssp.api.dao;
 public class LaunchAttributesRequest {
 	private String id;
 	private String mode;
+	public LaunchAttributesRequest() {
+		
+	}
 	public LaunchAttributesRequest(String id, String mode) {
 		this.id = id;
 		this.mode = mode;
