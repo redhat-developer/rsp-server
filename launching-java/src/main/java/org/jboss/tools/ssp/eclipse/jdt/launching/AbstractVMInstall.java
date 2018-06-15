@@ -32,8 +32,11 @@ import org.jboss.tools.ssp.launching.java.internal.util.LaunchingSupportUtils;
  */
 public abstract class AbstractVMInstall implements IVMInstall {
 
-	public static final String vmInstall_assert_idNotNull="id cannot be null";
-	public static final String vmInstall_assert_typeNotNull="VM type cannot be null";
+	private static final String VM_INSTALL_ASSERT_ID_NOT_NULL = "id cannot be null";
+	private static final String VM_INSTALL_ASSERT_TYPE_NOT_NULL = "VM type cannot be null";
+	// system properties are cached in user preferences prefixed with this key, followed
+	// by VM type, VM id, and system property name
+	private static final String PREF_VM_INSTALL_SYSTEM_PROPERTY = "PREF_VM_INSTALL_SYSTEM_PROPERTY"; //$NON-NLS-1$
 
 	private IVMInstallRegistry registry;
 	private IVMInstallType fType;
@@ -43,15 +46,13 @@ public abstract class AbstractVMInstall implements IVMInstall {
 	private LibraryLocation[] fSystemLibraryDescriptions;
 	private URL fJavadocLocation;
 	private String fVMArgs;
+
 	/**
 	 * Map VM specific attributes that are persisted restored with a VM install.
 	 * @since 3.4
 	 */
 	private Map<String, String> fAttributeMap = new HashMap<>();
 
-	// system properties are cached in user preferences prefixed with this key, followed
-	// by VM type, VM id, and system property name
-	private static final String PREF_VM_INSTALL_SYSTEM_PROPERTY = "PREF_VM_INSTALL_SYSTEM_PROPERTY"; //$NON-NLS-1$
 	// whether change events should be fired
 	private boolean fNotify = true;
 
@@ -67,10 +68,10 @@ public abstract class AbstractVMInstall implements IVMInstall {
 	 */
 	public AbstractVMInstall(IVMInstallType type, String id) {
 		if (type == null) {
-			throw new IllegalArgumentException(vmInstall_assert_typeNotNull);
+			throw new IllegalArgumentException(VM_INSTALL_ASSERT_TYPE_NOT_NULL);
 		}
 		if (id == null) {
-			throw new IllegalArgumentException(vmInstall_assert_idNotNull);
+			throw new IllegalArgumentException(VM_INSTALL_ASSERT_ID_NOT_NULL);
 		}
 		fType= type;
 		fId= id;
@@ -447,14 +448,13 @@ public abstract class AbstractVMInstall implements IVMInstall {
 	public Map<String, String> getAttributes() {
 		return new HashMap<>(fAttributeMap);
 	}
-	
-	
+
 	private void fireVMChanged(PropertyChangeEvent event) {
-		if( getRegistry() != null ) 
+		if (getRegistry() != null)
 			getRegistry().fireVMChanged(event);
 	}
 	
-	public void setRegistry(IVMInstallRegistry reg) {
+	protected void setRegistry(IVMInstallRegistry reg) {
 		this.registry = reg;
 	}
 	
