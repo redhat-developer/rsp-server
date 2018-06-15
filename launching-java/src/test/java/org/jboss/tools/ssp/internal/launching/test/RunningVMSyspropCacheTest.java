@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jboss.tools.ssp.launching.java.internal.RunningVMSyspropCache;
+import org.jboss.tools.ssp.internal.launching.java.RunningVMSyspropCache;
 import org.junit.Before;
 import org.junit.Test;
 

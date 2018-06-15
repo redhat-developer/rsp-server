@@ -34,9 +34,9 @@ import org.jboss.tools.ssp.eclipse.jdt.core.JavaCoreConstants;
 import org.jboss.tools.ssp.eclipse.jdt.internal.launching.LibraryInfo;
 import org.jboss.tools.ssp.eclipse.jdt.internal.launching.StandardVM;
 import org.jboss.tools.ssp.eclipse.osgi.util.NLS;
+import org.jboss.tools.ssp.internal.launching.java.LibraryInfoCache;
+import org.jboss.tools.ssp.internal.launching.java.util.LaunchingSupportUtils;
 import org.jboss.tools.ssp.launching.LaunchingCore;
-import org.jboss.tools.ssp.launching.java.internal.LibraryInfoCache;
-import org.jboss.tools.ssp.launching.java.internal.util.LaunchingSupportUtils;
 import org.jboss.tools.ssp.launching.utils.OSUtils;
 
 

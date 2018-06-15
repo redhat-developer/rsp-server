@@ -19,7 +19,7 @@ import org.jboss.tools.ssp.eclipse.core.runtime.IPath;
 import org.jboss.tools.ssp.eclipse.jdt.internal.launching.LibraryInfo;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.ssp.eclipse.jdt.launching.LibraryLocation;
-import org.jboss.tools.ssp.launching.java.internal.LibraryInfoCache;
+import org.jboss.tools.ssp.internal.launching.java.LibraryInfoCache;
 
 public class VMInstallClasspath {
 

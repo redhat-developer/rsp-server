@@ -21,7 +21,7 @@ import org.jboss.tools.ssp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.ssp.eclipse.jdt.internal.launching.LibraryInfo;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.ssp.eclipse.jdt.launching.StandardVMType;
-import org.jboss.tools.ssp.launching.java.internal.util.LaunchingSupportUtils;
+import org.jboss.tools.ssp.internal.launching.java.util.LaunchingSupportUtils;
 import org.jboss.tools.ssp.launching.utils.FileUtil;
 import org.junit.Test;
 

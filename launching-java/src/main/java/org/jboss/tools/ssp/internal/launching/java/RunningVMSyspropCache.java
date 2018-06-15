@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.launching.java.internal;
+package org.jboss.tools.ssp.internal.launching.java;
 
 import java.util.HashMap;
 import java.util.Map;
