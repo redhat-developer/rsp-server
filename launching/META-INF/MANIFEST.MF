@@ -7,16 +7,19 @@ Bundle-Version: 0.0.9.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Activator: org.jboss.tools.ssp.launching.internal.LaunchingActivator
 Bundle-ClassPath: .
-Import-Package: org.osgi.framework,
- org.osgi.service.log,
- com.google.gson,
+Import-Package: com.google.gson,
  org.jboss.tools.ssp.api,
  org.jboss.tools.ssp.api.dao,
- org.jboss.tools.ssp.api.dao.util
+ org.jboss.tools.ssp.api.dao.util,
+ org.jboss.tools.ssp.eclipse.osgi.util,
+ org.osgi.framework,
+ org.osgi.service.log
 Export-Package: org.jboss.tools.ssp.eclipse.core.runtime,
  org.jboss.tools.ssp.eclipse.debug.core,
  org.jboss.tools.ssp.eclipse.debug.core.model,
  org.jboss.tools.ssp.eclipse.debug.internal.core,
+ org.jboss.tools.ssp.eclipse.debug.internal.core.util,
  org.jboss.tools.ssp.eclipse.osgi.util,
  org.jboss.tools.ssp.launching,
+ org.jboss.tools.ssp.launching.internal,
  org.jboss.tools.ssp.launching.utils
