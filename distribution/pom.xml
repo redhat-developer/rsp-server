@@ -138,5 +138,10 @@
 			<artifactId>org.jboss.tools.ssp.server.wildfly</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+		<groupId>org.everit.osgi.bundles</groupId>
+			<artifactId>org.everit.osgi.bundles.org.apache.xmlcommons.full</artifactId>
+			<version>1.4.1-20150918</version>
+		</dependency>
 	</dependencies>
 </project>

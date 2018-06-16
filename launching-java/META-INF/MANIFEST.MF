@@ -8,7 +8,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Activator: org.jboss.tools.ssp.launching.java.JavaLaunchingActivator
 Bundle-ClassPath: .
 Import-Package: com.google.gson,
- javax.xml.parsers,
  org.jboss.tools.ssp.api,
  org.jboss.tools.ssp.api.dao,
  org.jboss.tools.ssp.api.dao.util,
