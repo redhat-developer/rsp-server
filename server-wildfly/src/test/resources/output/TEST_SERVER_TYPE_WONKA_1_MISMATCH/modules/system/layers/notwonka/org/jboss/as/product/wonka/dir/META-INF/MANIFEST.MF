@@ -1,3 +1,0 @@
-JBoss-Product-Release-Name: WONKA
-JBoss-Product-Release-Version: 1.0.0.Alpha
-JBoss-Product-Console-Slot: wonka
