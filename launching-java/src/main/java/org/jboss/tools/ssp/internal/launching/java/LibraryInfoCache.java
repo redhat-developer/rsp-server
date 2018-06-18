@@ -21,7 +21,7 @@ public class LibraryInfoCache {
 	 * Mapping of top-level VM installation directories to library info for that
 	 * VM.
 	 */
-	private Map<String, LibraryInfo> fgLibraryInfoMap = null;
+	private Map<String, LibraryInfo> fgLibraryInfoMap = new HashMap<>(10);
 
 	/**
 	 * Mapping of the last time the directory of a given SDK was modified.
@@ -29,7 +29,7 @@ public class LibraryInfoCache {
 	 * Mapping: <code>Map&lt;String,Long&gt;</code>
 	 * @since 3.7
 	 */
-	private Map<String, Long> fgInstallTimeMap = null;
+	private Map<String, Long> fgInstallTimeMap = new HashMap<>();
 	/**
 	 * List of install locations that have been detected to have changed
 	 *
@@ -61,12 +61,8 @@ public class LibraryInfoCache {
 	 * path, or <code>null</code> if none
 	 */
 	public LibraryInfo getLibraryInfo(String javaInstallPath) {
-		if (fgLibraryInfoMap == null) {
-			restoreLibraryInfo();
-		}
 		return fgLibraryInfoMap.get(javaInstallPath);
 	}
-	
 
 	/**
 	 * Checks to see if the time stamp of the file describe by the given location string
@@ -81,23 +77,19 @@ public class LibraryInfoCache {
 	 */
 	public boolean timeStampChanged(String location) {
 		synchronized (installLock) {
-			if(fgHasChanged.contains(location)) {
+			if (fgHasChanged.contains(location)) {
 				return true;
 			}
 			File file = new File(location);
-			if(file.exists()) {
-				if(fgInstallTimeMap == null) {
-					readInstallInfo();
-				}
+			if (file.exists()) {
 				Long stamp = fgInstallTimeMap.get(location);
 				long fstamp = file.lastModified();
-				if(stamp != null) {
-					if(stamp.longValue() == fstamp) {
-						return false;
-					}
+				if (stamp != null 
+						&& stamp.longValue() == fstamp) {
+					return false;
 				}
 				//if there is no recorded stamp we have to assume it is new
-				stamp = new Long(fstamp);
+				stamp = Long.valueOf(fstamp);
 				fgInstallTimeMap.put(location, stamp);
 				fgHasChanged.add(location);
 				return true;
@@ -106,7 +98,6 @@ public class LibraryInfoCache {
 		return false;
 	}
 
-
 	/**
 	 * Sets the library info that corresponds to the specified JRE install
 	 * path.
@@ -114,36 +105,14 @@ public class LibraryInfoCache {
 	 * @param javaInstallPath home location for a JRE
 	 * @param info the library information, or <code>null</code> to remove
 	 */
-	public void setLibraryInfo(String javaInstallPath, LibraryInfo info) {
-		if (fgLibraryInfoMap == null) {
-			restoreLibraryInfo();
-		}
+	public void putLibraryInfo(String javaInstallPath, LibraryInfo info) {
 		if (info == null) {
 			fgLibraryInfoMap.remove(javaInstallPath);
-			if (fgInstallTimeMap != null) {
-				fgInstallTimeMap.remove(javaInstallPath);
-			}
+			fgInstallTimeMap.remove(javaInstallPath);
 		} else {
 			fgLibraryInfoMap.put(javaInstallPath, info);
 		}
 		//once the library info has been set we can forget it has changed
 		fgHasChanged.remove(javaInstallPath);
-	}
-
-	/**
-	 * Restores library information for VMs
-	 */
-	private void restoreLibraryInfo() {
-		this.fgLibraryInfoMap = new HashMap<>(10);
-	}
-
-	/**
-	 * Reads the file of saved time stamps and populates the {@link #fgInstallTimeMap}.
-	 * See https://bugs.eclipse.org/bugs/show_bug.cgi?id=266651 for more information
-	 *
-	 * @since 3.7
-	 */
-	private void readInstallInfo() {
-		this.fgInstallTimeMap = new HashMap<>();
 	}
 }

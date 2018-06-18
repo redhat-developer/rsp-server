@@ -1,10 +1,6 @@
 package org.jboss.tools.ssp.eclipse.jdt.internal.compiler.classfmt;
 
 public class CompilerOptions {
-
-	private CompilerOptions() {
-	}
-
 	public static final String VERSION_JSR14 = "jsr14"; //$NON-NLS-1$
 	public static final String VERSION_CLDC1_1 = "cldc1.1"; //$NON-NLS-1$
 

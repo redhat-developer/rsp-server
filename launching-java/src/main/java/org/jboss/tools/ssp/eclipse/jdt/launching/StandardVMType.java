@@ -219,7 +219,7 @@ public class StandardVMType extends AbstractVMInstallType {
 					fgFailedInstallPath.put(installPath, info);
 				} else {
 				    // only persist if we were able to generate information - see bug 70011
-					LibraryInfoCache.getDefault().setLibraryInfo(installPath, info);
+					LibraryInfoCache.getDefault().putLibraryInfo(installPath, info);
 				}
 			}
 		}
@@ -660,7 +660,7 @@ public class StandardVMType extends AbstractVMInstallType {
 		IVMInstall vm = findVMInstall(id);
 		if (vm != null) {
 			String path = vm.getInstallLocation().getAbsolutePath();
-            LibraryInfoCache.getDefault().setLibraryInfo(path, null);
+            LibraryInfoCache.getDefault().putLibraryInfo(path, null);
             fgFailedInstallPath.remove(path);
             fgDefaultLibLocs.remove(path);
 		}
