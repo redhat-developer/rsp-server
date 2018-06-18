@@ -60,7 +60,7 @@ public class LibraryInfoCache {
 	 * @return the library info that corresponds to the specified JRE install
 	 * path, or <code>null</code> if none
 	 */
-	public LibraryInfo getLibraryInfo(String javaInstallPath) {
+	public LibraryInfo get(String javaInstallPath) {
 		return fgLibraryInfoMap.get(javaInstallPath);
 	}
 
@@ -75,7 +75,7 @@ public class LibraryInfoCache {
 	 *
 	 * @since 3.7
 	 */
-	public boolean timeStampChanged(String location) {
+	public boolean isTimeStampChanged(String location) {
 		synchronized (installLock) {
 			if (fgHasChanged.contains(location)) {
 				return true;
@@ -105,7 +105,7 @@ public class LibraryInfoCache {
 	 * @param javaInstallPath home location for a JRE
 	 * @param info the library information, or <code>null</code> to remove
 	 */
-	public void putLibraryInfo(String javaInstallPath, LibraryInfo info) {
+	public void put(String javaInstallPath, LibraryInfo info) {
 		if (info == null) {
 			fgLibraryInfoMap.remove(javaInstallPath);
 			fgInstallTimeMap.remove(javaInstallPath);

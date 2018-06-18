@@ -35,7 +35,7 @@ public class LibraryInfoCacheTest {
 	public void returnsNullIfGetNullInstallLocation() {
 		// given
 		// when
-		LibraryInfo info = cache.getLibraryInfo(null);
+		LibraryInfo info = cache.get(null);
 		// then
 		assertThat(info).isNull();
 	}
@@ -45,9 +45,9 @@ public class LibraryInfoCacheTest {
 		// given
 		String javaInstallPath = "/";
 		LibraryInfo info = mockLibraryInfo();
-		cache.putLibraryInfo(javaInstallPath, info);
+		cache.put(javaInstallPath, info);
 		// when
-		LibraryInfo cached = cache.getLibraryInfo(javaInstallPath);
+		LibraryInfo cached = cache.get(javaInstallPath);
 		// then
 		assertThat(cached).isEqualTo(info);
 	}
@@ -56,9 +56,9 @@ public class LibraryInfoCacheTest {
 	public void returnsNullIfGetUsesMissingKey() {
 		// given
 		LibraryInfo info = mockLibraryInfo();
-		cache.putLibraryInfo("/", info);
+		cache.put("/", info);
 		// when
-		LibraryInfo cached = cache.getLibraryInfo("/home/");
+		LibraryInfo cached = cache.get("/home/");
 		// then
 		assertThat(cached).isNull();
 	}
@@ -68,13 +68,13 @@ public class LibraryInfoCacheTest {
 		// given
 		String javaInstallPath = "/";
 		LibraryInfo info = mockLibraryInfo();
-		cache.putLibraryInfo(javaInstallPath, info);
-		LibraryInfo cached = cache.getLibraryInfo(javaInstallPath);
+		cache.put(javaInstallPath, info);
+		LibraryInfo cached = cache.get(javaInstallPath);
 		assertThat(cached).isEqualTo(info);
 		// when
-		cache.putLibraryInfo(javaInstallPath, null);
+		cache.put(javaInstallPath, null);
 		// then
-		cached = cache.getLibraryInfo(javaInstallPath);
+		cached = cache.get(javaInstallPath);
 		assertThat(cached).isNull();
 	}
 
@@ -83,13 +83,13 @@ public class LibraryInfoCacheTest {
 		// given
 		String javaInstallPath = "/";
 		LibraryInfo info = mockLibraryInfo();
-		cache.putLibraryInfo(javaInstallPath, info);
-		LibraryInfo cached = cache.getLibraryInfo(javaInstallPath);
+		cache.put(javaInstallPath, info);
+		LibraryInfo cached = cache.get(javaInstallPath);
 		LibraryInfo info2 = mockLibraryInfo();
 		// when
-		cache.putLibraryInfo(javaInstallPath, info2);
+		cache.put(javaInstallPath, info2);
 		// then
-		cached = cache.getLibraryInfo(javaInstallPath);
+		cached = cache.get(javaInstallPath);
 		assertThat(cached).isEqualTo(info2);
 	}
 
@@ -97,7 +97,7 @@ public class LibraryInfoCacheTest {
 	public void timestampChangedWontTrackInexistantFiles() {
 		// given
 		// when
-		boolean changed = cache.timeStampChanged("/smurfs");
+		boolean changed = cache.isTimeStampChanged("/smurfs");
 		// then
 		assertThat(changed).isFalse();
 	}
@@ -106,7 +106,7 @@ public class LibraryInfoCacheTest {
 	public void timestampChangedReturnsTrueForNewlyCheckedFile() {
 		// given
 		// when
-		boolean changed = cache.timeStampChanged(javaInstallDirectory.getAbsolutePath());
+		boolean changed = cache.isTimeStampChanged(javaInstallDirectory.getAbsolutePath());
 		// then
 		assertThat(changed).isTrue();
 	}
@@ -114,25 +114,25 @@ public class LibraryInfoCacheTest {
 	@Test
 	public void timestampChangedReturnsFalseWhenInstallLocationWasPutAgain() {
 		// given
-		boolean changed = cache.timeStampChanged(javaInstallPath);
+		boolean changed = cache.isTimeStampChanged(javaInstallPath);
 		assertThat(changed).isTrue();
 		// when
-		cache.putLibraryInfo(javaInstallPath, mockLibraryInfo());
+		cache.put(javaInstallPath, mockLibraryInfo());
 		// then
-		changed = cache.timeStampChanged(javaInstallPath);
+		changed = cache.isTimeStampChanged(javaInstallPath);
 		assertThat(changed).isFalse();
 	}
 
 	@Test
 	public void timestampChangedReturnsTrueWhenInstallLocationWasPutAgainAndWasModified() throws InterruptedException {
 		// given
-		boolean changed = cache.timeStampChanged(javaInstallPath);
+		boolean changed = cache.isTimeStampChanged(javaInstallPath);
 		assertThat(changed).isTrue();
 		// when
-		cache.putLibraryInfo(javaInstallPath, mockLibraryInfo());
+		cache.put(javaInstallPath, mockLibraryInfo());
 		javaInstallDirectory.setLastModified(javaInstallDirectory.lastModified() + 1000); // touch file
 		// then
-		changed = cache.timeStampChanged(javaInstallPath);
+		changed = cache.isTimeStampChanged(javaInstallPath);
 		assertThat(changed).isTrue();
 	}
 
