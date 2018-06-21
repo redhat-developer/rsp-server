@@ -85,6 +85,10 @@ public abstract class AbstractLauncher implements IJBossStartLauncher {
 		String[] environment = getEnvironment();
 		String mainType = getMainTypeName();
 		String workingDirectory = getWorkingDirectory();
+		
+		// null-safe
+		pgmArgs = (pgmArgs == null ? "" : pgmArgs);
+		vmArgs = (vmArgs == null ? "" : vmArgs);
 
 		ExecutionArguments execArgs = new ExecutionArguments(vmArgs, pgmArgs);
 

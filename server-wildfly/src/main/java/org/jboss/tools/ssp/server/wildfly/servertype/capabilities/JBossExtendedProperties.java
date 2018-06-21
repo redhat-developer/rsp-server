@@ -57,7 +57,7 @@ public class JBossExtendedProperties extends ServerExtendedProperties {
 	}
 	
 	protected String getServerHome() {
-		return server.getDelegate().getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String) null);
+		return server.getAttribute(IJBossServerAttributes.SERVER_HOME, (String) null);
 	}
 	
 	protected File getServerHomeFile() {
@@ -112,10 +112,6 @@ public class JBossExtendedProperties extends ServerExtendedProperties {
 				IServerConstants.SERVER_AS_50,
 				IServerConstants.SERVER_AS_51,
 				IServerConstants.SERVER_EAP_50,
-				IServerConstants.SERVER_AS_50,
-				IServerConstants.SERVER_AS_51,
-				IServerConstants.SERVER_EAP_50,
-				
 		};
 		boolean isAS5 = false;
 		String serverType = (server == null ? null : server.getServerType() == null ? null : server.getServerType().getId());
@@ -128,17 +124,9 @@ public class JBossExtendedProperties extends ServerExtendedProperties {
 		
 		// IF we're AS 5, return the 5x args
 		if( isAS5 ) {
-			// Special case workaround for soa-p 5.3.1
-			ServerBean sb = new ServerBeanLoader(getServerHomeFile()).getServerBean();
-			if( sb.getTypeCategory().equals(JBossServerBeanTypeProvider.EAP_STD.getId())) {
-				// load from the parent folder
-				sb = new ServerBeanLoader(getServerHomeFile().getParentFile()).getServerBean();
-				if( sb != null && "SOA-P".equals(
-						sb.getTypeCategory()) && sb.getVersion().startsWith("5.")) {  //$NON-NLS-1$
-					return new JBossSoa5xDefaultLaunchArguments(server);
-				}
+			if( isSoa5x()) {
+				return new JBossSoa5xDefaultLaunchArguments(server);
 			}
-			
 			return new JBoss5xDefaultLaunchArguments(server);
 		}
 		
@@ -146,6 +134,21 @@ public class JBossExtendedProperties extends ServerExtendedProperties {
 		return new JBossDefaultLaunchArguments(server);
 	}
 	
+	private boolean isSoa5x() {
+		// Special case workaround for soa-p 5.3.1
+		return false;
+//		ServerBean sb = new ServerBeanLoader(getServerHomeFile()).getServerBean();
+//		if( sb.getTypeCategory().equals(JBossServerBeanTypeProvider.EAP_STD.getId())) {
+//			// load from the parent folder
+//			sb = new ServerBeanLoader(getServerHomeFile().getParentFile()).getServerBean();
+//			if( sb != null && "SOA-P".equals(
+//					sb.getTypeCategory()) && sb.getVersion().startsWith("5.")) {  //$NON-NLS-1$
+//				return true;
+//			}
+//		}
+//		return false;
+	}
+
 	public boolean requiresJDK() {
 		return false;
 	}

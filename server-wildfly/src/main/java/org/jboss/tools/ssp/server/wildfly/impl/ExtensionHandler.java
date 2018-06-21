@@ -15,6 +15,7 @@ public class ExtensionHandler {
 	
 	public static void addExtensionsToModel(IServerManagementModel model) {
 		model.getServerBeanTypeManager().addTypeProvider(new JBossServerBeanTypeProvider());
+		model.getServerModel().addServerType(WildFlyServerTypes.WF13_SERVER_TYPE);
 		model.getServerModel().addServerType(WildFlyServerTypes.WF12_SERVER_TYPE);
 		model.getServerModel().addServerType(WildFlyServerTypes.WF11_SERVER_TYPE);
 		model.getServerModel().addServerType(WildFlyServerTypes.WF10_SERVER_TYPE);

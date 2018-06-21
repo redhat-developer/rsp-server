@@ -81,6 +81,7 @@ public class JBossServerBeanLoaderTest extends TestCase {
 		expected.put(IServerConstants.SERVER_WILDFLY_100, new Data(JBossServerBeanTypeProvider.WILDFLY100, "10.0."));
 		expected.put(IServerConstants.SERVER_WILDFLY_110, new Data(JBossServerBeanTypeProvider.WILDFLY110, "11.0."));
 		expected.put(IServerConstants.SERVER_WILDFLY_120, new Data(JBossServerBeanTypeProvider.WILDFLY120, "12.0."));
+		expected.put(IServerConstants.SERVER_WILDFLY_130, new Data(JBossServerBeanTypeProvider.WILDFLY130, "13.0."));
 		expected.put(IServerConstants.SERVER_EAP_43, new Data(JBossServerBeanTypeProvider.EAP_STD, "4.3."));
 		expected.put(IServerConstants.SERVER_EAP_50, new Data(JBossServerBeanTypeProvider.EAP_STD, "5.1."));
 		expected.put(IServerConstants.SERVER_EAP_60, new Data(JBossServerBeanTypeProvider.EAP6, "6.0."));

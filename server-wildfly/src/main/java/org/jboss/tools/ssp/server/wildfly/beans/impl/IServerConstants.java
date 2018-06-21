@@ -25,6 +25,7 @@ public interface IServerConstants {
 	public static final String SERVER_WILDFLY_100 = "org.jboss.ide.eclipse.as.wildfly.100"; //$NON-NLS-1$
 	public static final String SERVER_WILDFLY_110 = "org.jboss.ide.eclipse.as.wildfly.110"; //$NON-NLS-1$
 	public static final String SERVER_WILDFLY_120 = "org.jboss.ide.eclipse.as.wildfly.120"; //$NON-NLS-1$
+	public static final String SERVER_WILDFLY_130 = "org.jboss.ide.eclipse.as.wildfly.130"; //$NON-NLS-1$
 	public static final String WF_SERVER_PREFIX = "org.jboss.ide.eclipse.as.wildfly."; //$NON-NLS-1$
 	public static final String EAP_SERVER_PREFIX = "org.jboss.ide.eclipse.as.eap."; //$NON-NLS-1$
 	public static final String SERVER_EAP_43 = "org.jboss.ide.eclipse.as.eap.43"; //$NON-NLS-1$
@@ -37,7 +38,8 @@ public interface IServerConstants {
 	public static final String[] ALL_JBOSS_SERVERS = new String[] {
 			SERVER_AS_32,SERVER_AS_40,SERVER_AS_42,SERVER_AS_50,SERVER_AS_51,
 			SERVER_AS_60,SERVER_AS_70,SERVER_AS_71,
-			SERVER_WILDFLY_80,SERVER_WILDFLY_90,SERVER_WILDFLY_100,SERVER_WILDFLY_110,SERVER_WILDFLY_120,
+			SERVER_WILDFLY_80,SERVER_WILDFLY_90,SERVER_WILDFLY_100,
+			SERVER_WILDFLY_110,SERVER_WILDFLY_120,SERVER_WILDFLY_130,
 			SERVER_EAP_43,SERVER_EAP_50,SERVER_EAP_60, SERVER_EAP_61, SERVER_EAP_70, SERVER_EAP_71
 		};
 		// NEW_SERVER_ADAPTER Add the new server id above this line
