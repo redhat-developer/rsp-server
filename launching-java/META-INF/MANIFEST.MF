@@ -25,5 +25,5 @@ Import-Package: com.google.gson,
  org.osgi.service.log
 Export-Package: org.jboss.tools.ssp.eclipse.jdt.core,
  org.jboss.tools.ssp.eclipse.jdt.launching,
- org.jboss.tools.ssp.launching.java,
- org.jboss.tools.ssp.launching.test
+ org.jboss.tools.ssp.launching,
+ org.jboss.tools.ssp.launching.java

@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.launching.test;
+package org.jboss.tools.ssp.internal.launching.java.util;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
