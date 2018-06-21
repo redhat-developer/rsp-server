@@ -209,8 +209,8 @@ public class StandardVMType extends AbstractVMInstallType {
 	 */
 	protected synchronized LibraryInfo getLibraryInfo(File javaHome, File javaExecutable) {
 		String installPath = javaHome.getAbsolutePath();
-		LibraryInfo info = LibraryInfoCache.getDefault().getLibraryInfo(installPath);
-		if (info == null || LibraryInfoCache.getDefault().timeStampChanged(installPath)) {
+		LibraryInfo info = LibraryInfoCache.getDefault().get(installPath);
+		if (info == null || LibraryInfoCache.getDefault().isTimeStampChanged(installPath)) {
 			info = fgFailedInstallPath.get(installPath);
 			if (info == null) {
 				info = generateLibraryInfo(javaHome, javaExecutable);
@@ -219,7 +219,7 @@ public class StandardVMType extends AbstractVMInstallType {
 					fgFailedInstallPath.put(installPath, info);
 				} else {
 				    // only persist if we were able to generate information - see bug 70011
-					LibraryInfoCache.getDefault().setLibraryInfo(installPath, info);
+					LibraryInfoCache.getDefault().put(installPath, info);
 				}
 			}
 		}
@@ -660,7 +660,7 @@ public class StandardVMType extends AbstractVMInstallType {
 		IVMInstall vm = findVMInstall(id);
 		if (vm != null) {
 			String path = vm.getInstallLocation().getAbsolutePath();
-            LibraryInfoCache.getDefault().setLibraryInfo(path, null);
+            LibraryInfoCache.getDefault().put(path, null);
             fgFailedInstallPath.remove(path);
             fgDefaultLibLocs.remove(path);
 		}
