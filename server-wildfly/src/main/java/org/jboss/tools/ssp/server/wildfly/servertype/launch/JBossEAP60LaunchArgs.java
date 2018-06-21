@@ -6,15 +6,15 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.server.spi.servertype;
+package org.jboss.tools.ssp.server.wildfly.servertype.launch;
 
-public interface IServer extends IServerAttributes {
-	
-	public String getId();
-	
-	public String getTypeId();
-	
-	public IServerType getServerType();
-	
-	public IServerDelegate getDelegate();
+import org.jboss.tools.ssp.server.spi.servertype.IServer;
+
+public class JBossEAP60LaunchArgs extends JBoss71DefaultLaunchArguments {
+	public JBossEAP60LaunchArgs(IServer rt) {
+		super(rt);
+	}
+	protected String getMemoryArgs() {
+		return "-Xms1303m -Xmx1303m -XX:MaxPermSize=256m "; //$NON-NLS-1$
+	}
 }

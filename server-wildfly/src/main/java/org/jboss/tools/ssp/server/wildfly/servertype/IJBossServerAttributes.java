@@ -6,15 +6,25 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.server.spi.servertype;
+package org.jboss.tools.ssp.server.wildfly.servertype;
 
-public interface IServer extends IServerAttributes {
+public interface IJBossServerAttributes {
+	/*
+	 * Required attributes
+	 */
+	public static final String SERVER_HOME = "server.home.dir";
 	
-	public String getId();
 	
-	public String getTypeId();
 	
-	public IServerType getServerType();
+	/*
+	 * Optional Attributes
+	 */
+	public static final String VM_INSTALL_PATH = "vm.install.path";
 	
-	public IServerDelegate getDelegate();
+	
+	/*
+	 * Launch attributes
+	 */
+	
+	
 }

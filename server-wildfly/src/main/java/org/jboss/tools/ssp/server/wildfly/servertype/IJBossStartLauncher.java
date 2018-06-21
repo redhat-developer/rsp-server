@@ -6,25 +6,18 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.server.wildfly.servertype.impl;
+package org.jboss.tools.ssp.server.wildfly.servertype;
 
-public interface IJBossServerAttributes {
-	/*
-	 * Required attributes
-	 */
-	public static final String SERVER_HOME = "server.home.dir";
-	
-	
-	
-	/*
-	 * Optional Attributes
-	 */
-	public static final String VM_INSTALL_PATH = "vm.install.path";
-	
-	
-	/*
-	 * Launch attributes
-	 */
-	
-	
+import org.jboss.tools.ssp.api.dao.CommandLineDetails;
+import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
+import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
+
+public interface IJBossStartLauncher {
+	public ILaunch launch(String mode) throws CoreException;
+
+	public CommandLineDetails getLaunchedDetails();
+
+	public CommandLineDetails getLaunchCommand(String mode) throws CoreException;
+
+	public ILaunch getLaunch();
 }

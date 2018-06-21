@@ -6,15 +6,14 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.server.spi.servertype;
+package org.jboss.tools.ssp.server.wildfly.servertype;
 
-public interface IServer extends IServerAttributes {
+import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
+import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
+
+public interface ILauncher {
+	public ILaunch launch(boolean force) throws CoreException;
 	
-	public String getId();
+	public ILaunch getLaunch();
 	
-	public String getTypeId();
-	
-	public IServerType getServerType();
-	
-	public IServerDelegate getDelegate();
 }

@@ -28,6 +28,7 @@ import org.jboss.tools.ssp.server.spi.model.polling.IPollResultListener;
 import org.jboss.tools.ssp.server.spi.model.polling.IServerStatePoller;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
+import org.jboss.tools.ssp.server.spi.servertype.IServerType;
 
 public abstract class AbstractServerDelegate implements IServerDelegate, IDebugEventSetListener {
 	private static final String PROCESS_ID_KEY = "process.id.key";
@@ -37,7 +38,6 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	private List<ILaunch> launches = new ArrayList<ILaunch>();
 	protected HashMap<String, Object> sharedData = new HashMap<String, Object>();
 	private IServer server;
-	
 	
 	public AbstractServerDelegate(IServer server) {
 		this.server = server;

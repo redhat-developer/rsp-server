@@ -14,13 +14,21 @@ import org.jboss.tools.ssp.server.core.internal.Base;
 import org.jboss.tools.ssp.server.core.internal.IMemento;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
+import org.jboss.tools.ssp.server.spi.servertype.IServerType;
 
 public class Server extends Base implements IServer {
 	private static final String TYPE_ID = "org.jboss.tools.ssp.server.typeId";
 	private IServerDelegate delegate;
-	public Server(File file, String typeId) {
+	private IServerType serverType;
+	public Server(File file, IServerType type) {
 		super(file);
-		setAttribute(TYPE_ID, typeId);
+		this.serverType = type;
+		setAttribute(TYPE_ID, type.getId());
+	}
+	
+	@Override
+	public String getName() {
+		return getId();
 	}
 
 	@Override
@@ -43,6 +51,10 @@ public class Server extends Base implements IServer {
 		return getAttribute(TYPE_ID, (String)null);
 	}
 
+	public IServerType getServerType() {
+		return serverType;
+	}
+	
 	public void setDelegate(IServerDelegate del) {
 		delegate = del;
 	}

@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.server.wildfly.servertype.impl;
+package org.jboss.tools.ssp.server.wildfly.servertype;
 
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
 import org.jboss.tools.ssp.api.dao.Attributes;
@@ -16,31 +16,37 @@ import org.jboss.tools.ssp.launching.java.ILaunchModes;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.ssp.server.spi.servertype.IServerType;
-import org.jboss.tools.ssp.server.wildfly.beans.impl.IServerConstants;
 
-public class JBossServerFactory implements IServerType{
-	private Attributes required = null;
-	private Attributes optional = null;
+public abstract class BaseJBossServerType implements IServerType{
+	protected Attributes required = null;
+	protected Attributes optional = null;
 	
+	private String id;
+	private String name;
+	private String desc;
+	
+	public BaseJBossServerType(String id, String name, String desc) {
+		this.name = name;
+		this.id = id;
+		this.desc = desc;
+	}
 	@Override
 	public String getId() {
-		return IServerConstants.SERVER_WILDFLY_120;
+		return id;
 	}
 
 	@Override
 	public String getName() {
-		return "WildFly 12.x";
+		return name;
 	}
 	@Override
 	public String getDescription() {
-		return "A server adapter capable of discovering and controlling a WildFly 12.x runtime instance.";
+		return desc;
 	}
 	
 	@Override
-	public IServerDelegate createServerDelegate(IServer server) {
-		JBossServerDelegate ret = new JBossServerDelegate(server);
-		return ret;
-	}
+	public abstract IServerDelegate createServerDelegate(IServer server);
+
 
 	@Override
 	public Attributes getRequiredAttributes() {
@@ -48,7 +54,7 @@ public class JBossServerFactory implements IServerType{
 			CreateServerAttributesUtility attrs = new CreateServerAttributesUtility();
 			attrs.addAttribute(IJBossServerAttributes.SERVER_HOME, 
 					ServerManagementAPIConstants.ATTR_TYPE_STRING, 
-					"A filesystem path pointing to a WildFly installation", null);
+					"A filesystem path pointing to a server installation's root directory", null);
 			required = attrs.toPojo();
 		}
 		return required;
@@ -60,7 +66,7 @@ public class JBossServerFactory implements IServerType{
 			CreateServerAttributesUtility attrs = new CreateServerAttributesUtility();
 			attrs.addAttribute(IJBossServerAttributes.VM_INSTALL_PATH, 
 					ServerManagementAPIConstants.ATTR_TYPE_STRING, 
-					"A string representation pointing to a java home. If not set, $JAVA_HOME will be used instead.", null);
+					"A string representation pointing to a java home. If not set, java.home will be used instead.", null);
 			optional = attrs.toPojo();
 		}
 		return optional;

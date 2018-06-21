@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.server.wildfly.servertype.impl;
+package org.jboss.tools.ssp.server.wildfly.servertype;
 
 import java.io.File;
 

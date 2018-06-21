@@ -6,13 +6,14 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.server.wildfly.servertype.impl;
+package org.jboss.tools.ssp.server.wildfly.servertype;
 
 import java.io.File;
 
 import org.jboss.tools.ssp.api.dao.CommandLineDetails;
 import org.jboss.tools.ssp.api.dao.LaunchParameters;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
+import org.jboss.tools.ssp.api.dao.ServerLaunchMode;
 import org.jboss.tools.ssp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.ssp.api.dao.StartServerResponse;
 import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
@@ -22,7 +23,6 @@ import org.jboss.tools.ssp.eclipse.debug.core.DebugException;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.ssp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
-import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.ssp.launching.LaunchingCore;
 import org.jboss.tools.ssp.launching.utils.StatusConverter;
 import org.jboss.tools.ssp.server.model.AbstractServerDelegate;
@@ -34,13 +34,19 @@ import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.ssp.server.wildfly.impl.Activator;
 
-public class JBossServerDelegate extends AbstractServerDelegate {
+public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate {
 	private ILaunch startLaunch;
 	
-	public JBossServerDelegate(IServer server) {
+	public AbstractJBossServerDelegate(IServer server) {
 		super(server);
 	}
 
+	protected abstract IJBossStartLauncher getStartLauncher();
+	
+	protected abstract ILauncher getStopLauncher();
+
+	protected abstract String getPollURL(IServer server);
+	
 	@Override
 	public IStatus validate() {
 		String home = getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
@@ -52,31 +58,19 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, "Server home must exist");
 		}
 		
-		String vmPath = getServer().getAttribute(IJBossServerAttributes.VM_INSTALL_PATH, (String)null);
-		IVMInstall vmi = null;
-		if( vmPath != null && !vmPath.isEmpty()) {
-			File vmFile = new File(vmPath);
-			if( !vmFile.exists()) {
-				return new Status(IStatus.ERROR, Activator.BUNDLE_ID, "VM file location does not exist: " + vmPath);
-			}
-			vmi = getVmRegistry().findVMInstall(vmFile);
-		} else {
-			vmi = getVmRegistry().getDefaultVMInstall();
-		}
+		
+		IVMInstall vmi = JBossVMRegistryDiscovery.findVMInstall(this);
 		if( vmi == null ) {
-			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, "VM " + vmPath + " is not found in the VM model");
+			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
+					"Server " + getServer().getId() + " can not find a valid virtual machine to use.");
 		}
 		return Status.OK_STATUS;
 	}
 
-	private IVMInstallRegistry getVmRegistry() {
-		return JBossVMRegistryDiscovery.getDefaultRegistry();
-	}
-	
 	public IStatus canStart(String launchMode) {
-		if( !"run".equals(launchMode)) {
+		if( !modesContains(launchMode)) {
 			return new Status(IStatus.ERROR, Activator.BUNDLE_ID,
-					"Server must be launched in run mode only.");
+					"Server may not be launched in mode " + launchMode);
 		}
 		if( getServerState() == IServerDelegate.STATE_STOPPED ) {
 			IStatus v = validate();
@@ -87,13 +81,29 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 		return Status.CANCEL_STATUS;
 	}
 	
+	private boolean modesContains(String needle) {
+		ServerLaunchMode[] modes = getServer().getServerType().getLaunchModes();
+		for( int i = 0; i < modes.length; i++ ) {
+			if( modes[i].getMode().equals(needle)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	@Override
 	public StartServerResponse start(String mode) {
+		IStatus stat = canStart(mode);
+		if( !stat.isOK()) {
+			org.jboss.tools.ssp.api.dao.Status s = StatusConverter.convert(stat);
+			return new StartServerResponse(s, null);
+		}
+		
 		setServerState(IServerDelegate.STATE_STARTING);
 		CommandLineDetails launchedDetails = null;
 		try {
 			launchPoller(IServerStatePoller.SERVER_STATE.UP);
-			JBossStartLauncher launcher = new JBossStartLauncher(this);
+			IJBossStartLauncher launcher = getStartLauncher();
 			startLaunch = launcher.launch(mode);
 			launchedDetails = launcher.getLaunchedDetails();
 			registerLaunch(startLaunch);
@@ -122,7 +132,7 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 		ILaunch stopLaunch = null;
 		launchPoller(IServerStatePoller.SERVER_STATE.DOWN);
 		try {
-			stopLaunch = new JBossStopLauncher(this).launch(force);
+			stopLaunch = getStopLauncher().launch(force);
 			registerLaunch(stopLaunch);
 		} catch(CoreException ce) {
 			// Dead code... but I feel it's not dead?  idk :( 
@@ -143,18 +153,30 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 
 	}
 	
-	private void launchPoller(IServerStatePoller.SERVER_STATE expectedState) {
+	protected void launchPoller(IServerStatePoller.SERVER_STATE expectedState) {
 		IPollResultListener listener = expectedState == IServerStatePoller.SERVER_STATE.DOWN ? 
 				shutdownServerResultListener() : launchServerResultListener();
-		IServerStatePoller poller = new WebPortPoller() {
-			@Override
-			protected String getURL(IServer server) {
-				return "http://localhost:8080";
-			}
-		};
+		IServerStatePoller poller = getPoller(expectedState);
 		PollThreadUtils.pollServer(getServer(), expectedState, poller, listener);
 	}
 	
+	/*
+	 * Default implementation, subclasses can override.
+	 */
+	protected IServerStatePoller getPoller(IServerStatePoller.SERVER_STATE expectedState) {
+		return getDefaultWebPortPoller();
+	}
+	
+	private IServerStatePoller getDefaultWebPortPoller() {
+		IServerStatePoller poller = new WebPortPoller() {
+			@Override
+			protected String getURL(IServer server) {
+				return getPollURL(server);
+			}
+		};
+		return poller;
+	}
+
 	@Override
 	protected void processTerminated(IProcess p, ILaunch l) {
 		if( l == startLaunch ) {
@@ -174,7 +196,7 @@ public class JBossServerDelegate extends AbstractServerDelegate {
 	@Override
 	public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params) {
 		try {
-			return new JBossStartLauncher(this).getLaunchCommand(mode);
+			return getStartLauncher().getLaunchCommand(mode);
 		} catch(CoreException ce) {
 			LaunchingCore.log(ce);
 			return null;

@@ -35,7 +35,7 @@ import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.ssp.server.spi.servertype.IServerType;
 
 public class ServerModel implements IServerModel {
-	private HashMap<String, IServerType> factories;
+	private HashMap<String, IServerType> serverTypes;
 	private HashMap<String, IServer> servers;
 	private HashMap<String, IServerDelegate> serverDelegates;
 	private List<IServerModelListener> listeners;
@@ -44,7 +44,7 @@ public class ServerModel implements IServerModel {
 
 	
 	public ServerModel() {
-		factories = new HashMap<String, IServerType>();
+		serverTypes = new HashMap<String, IServerType>();
 		servers = new HashMap<String, IServer>();
 		serverDelegates = new HashMap<String, IServerDelegate>();
 		listeners = new ArrayList<IServerModelListener>();
@@ -70,15 +70,15 @@ public class ServerModel implements IServerModel {
 		listeners.remove(l);
 	}
 
-	public void addServerType(IServerType fact) {
-		if( fact != null && fact.getId() != null ) {
-			factories.put(fact.getId(), fact);
+	public void addServerType(IServerType type) {
+		if( type != null && type.getId() != null ) {
+			serverTypes.put(type.getId(), type);
 		}
 	}
 	
-	public void removeServerType(IServerType fact) {
-		if( fact != null && fact.getId() != null ) {
-			factories.remove(fact.getId());
+	public void removeServerType(IServerType type) {
+		if( type != null && type.getId() != null ) {
+			serverTypes.remove(type.getId());
 		}
 	}
 	
@@ -87,13 +87,13 @@ public class ServerModel implements IServerModel {
 	}
 	
 	public IStatus createServer(String serverType, String id, Map<String, Object> attributes) {
-		IServerType fact = factories.get(serverType);
+		IServerType fact = serverTypes.get(serverType);
 		if( fact != null ) {
 			IStatus valid = validateAttributes(fact, attributes);
 			if( !valid.isOK()) {
 				return valid;
 			}
-			Server server = createServer2(serverType, id, attributes);
+			Server server = createServer2(fact, id, attributes);
 			IServerDelegate del = fact.createServerDelegate(server);
 			server.setDelegate(del);
 			
@@ -144,7 +144,7 @@ public class ServerModel implements IServerModel {
 		return null;
 	}
 	
-	private Server createServer2(String serverType, String id, Map<String, Object> attributes) {
+	private Server createServer2(IServerType serverType, String id, Map<String, Object> attributes) {
 		File data = LaunchingCore.getDataLocation();
 		File servers = new File(data, "servers");
 		if( !servers.exists()) {
@@ -240,49 +240,49 @@ public class ServerModel implements IServerModel {
 	}
 	
 	private ServerType getServerType(String typeId) {
-		IServerType st = factories.get(typeId);
+		IServerType st = serverTypes.get(typeId);
 		return new ServerType(typeId, st.getName(), st.getDescription());
 		
 	}
 	
 	public ServerType[] getServerTypes() {
-		Set<String> types = factories.keySet();
+		Set<String> types = serverTypes.keySet();
 		ArrayList<String> types2 = new ArrayList<String>(types);
 		Collections.sort(types2);
 		ArrayList<ServerType> ret = new ArrayList<ServerType>();
 		for( String t : types2 ) {
-			IServerType type = factories.get(t);
+			IServerType type = serverTypes.get(t);
 			ret.add(new ServerType(t, type.getName(), type.getDescription()));
 		}
 		return (ServerType[]) ret.toArray(new ServerType[ret.size()]);
 	}
 	
 	public Attributes getRequiredAttributes(String type) {
-		IServerType t = factories.get(type);
+		IServerType t = serverTypes.get(type);
 		Attributes ret = t == null ? null : t.getRequiredAttributes();
 		return validateAttributes(ret, type);
 	}
 	
 	public Attributes getOptionalAttributes(String type) {
-		IServerType t = factories.get(type);
+		IServerType t = serverTypes.get(type);
 		Attributes ret = t == null ? null : t.getOptionalAttributes();
 		return validateAttributes(ret, type);
 	}
 
 	public List<ServerLaunchMode> getLaunchModes(String serverType) {
-		IServerType t = factories.get(serverType);
+		IServerType t = serverTypes.get(serverType);
 		ServerLaunchMode[] ret = t.getLaunchModes();
 		return Arrays.asList(ret);
 	}
 	
 	public Attributes getRequiredLaunchAttributes(String type) {
-		IServerType t = factories.get(type);
+		IServerType t = serverTypes.get(type);
 		Attributes ret = t == null ? null : t.getRequiredLaunchAttributes();
 		return validateAttributes(ret, type);
 	}
 	
 	public Attributes getOptionalLaunchAttributes(String type) {
-		IServerType t = factories.get(type);
+		IServerType t = serverTypes.get(type);
 		Attributes ret = t == null ? null : t.getOptionalLaunchAttributes();
 		return validateAttributes(ret, type);
 	}

@@ -6,11 +6,12 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.server.wildfly.servertype.impl;
+package org.jboss.tools.ssp.server.wildfly.servertype;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jboss.tools.ssp.api.dao.CommandLineDetails;
@@ -27,54 +28,56 @@ import org.jboss.tools.ssp.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.jboss.tools.ssp.launching.java.ICommandProvider;
 import org.jboss.tools.ssp.launching.java.VMInstallClasspath;
 import org.jboss.tools.ssp.launching.utils.NativeEnvironmentUtils;
+import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
+import org.jboss.tools.ssp.server.wildfly.servertype.capabilities.ExtendedServerPropertiesAdapterFactory;
+import org.jboss.tools.ssp.server.wildfly.servertype.capabilities.JBossExtendedProperties;
+import org.jboss.tools.ssp.server.wildfly.servertype.capabilities.ServerExtendedProperties;
+import org.jboss.tools.ssp.server.wildfly.servertype.launch.IDefaultLaunchArguments;
 
-public class JBossStartLauncher {
-	private JBossServerDelegate delegate;
+public abstract class AbstractLauncher implements IJBossStartLauncher {
+	private IServerDelegate delegate;
 	private IVMRunner runner;
 	private ILaunch launch;
 	private CommandLineDetails launchedDetails = null;
-	public JBossStartLauncher(JBossServerDelegate jBossServerDelegate) {
+	private VMRunnerConfiguration runConfig;
+
+	public AbstractLauncher(IServerDelegate jBossServerDelegate) {
 		this.delegate = jBossServerDelegate;
+	}
+
+	protected IServerDelegate getDelegate() {
+		return delegate;
 	}
 	
 	public ILaunch launch(String mode) throws CoreException {
-		IStatus preReqs = checkPrereqs(mode);
-		if( !preReqs.isOK())
-			throw new CoreException(preReqs);
-		
-		launch = createLaunch(mode);
-		VMRunnerConfiguration runConfig = configureRunner();
-		
-		if( runner instanceof ICommandProvider ) {
-			launchedDetails = ((ICommandProvider)runner).getCommandLineDetails(runConfig, launch, new NullProgressMonitor());
-		}
-
+		getLaunchCommand(mode);
 		runner.run(runConfig, launch, new NullProgressMonitor());
 		return launch;
 	}
-	
-	public CommandLineDetails getLaunchedDetails() {
-		return launchedDetails;
-	}
-	
+
 	public CommandLineDetails getLaunchCommand(String mode) throws CoreException {
 		IStatus preReqs = checkPrereqs(mode);
-		if( !preReqs.isOK())
+		if (!preReqs.isOK())
 			throw new CoreException(preReqs);
-		
+
 		launch = createLaunch(mode);
-		VMRunnerConfiguration runConfig = configureRunner();
-		if( runner instanceof ICommandProvider ) {
-			return ((ICommandProvider)runner).getCommandLineDetails(runConfig, launch, new NullProgressMonitor());
+		runConfig = configureRunner();
+		if (runner instanceof ICommandProvider) {
+			launchedDetails = ((ICommandProvider) runner).getCommandLineDetails(runConfig, launch,
+					new NullProgressMonitor());
+			return launchedDetails;
 		}
 		return null;
 	}
 
-	
+	public CommandLineDetails getLaunchedDetails() {
+		return launchedDetails;
+	}
+
 	public ILaunch getLaunch() {
 		return launch;
 	}
-	
+
 	private VMRunnerConfiguration configureRunner() {
 		String pgmArgs = getProgramArguments();
 		String vmArgs = getVMArguments();
@@ -87,7 +90,7 @@ public class JBossStartLauncher {
 
 		// VM-specific attributes
 		Map<String, Object> vmAttributesMap = getVMSpecificAttributesMap();
-		
+
 		VMRunnerConfiguration runConfig = new VMRunnerConfiguration(mainType, classpath);
 		runConfig.setProgramArguments(execArgs.getProgramArgumentsArray());
 		runConfig.setVMArguments(execArgs.getVMArgumentsArray());
@@ -101,79 +104,82 @@ public class JBossStartLauncher {
 			runConfig.setBootClassPath(bootpath);
 		return runConfig;
 	}
-	
-	
+
 	private ILaunch createLaunch(String mode) {
 		return new Launch(this, mode, null);
 	}
-	private IStatus checkPrereqs(String mode) {
+
+	protected IStatus checkPrereqs(String mode) {
 		runner = JBossVMRegistryDiscovery.getVMRunner(delegate, mode);
-		if( runner == null ) {
+		if (runner == null) {
 			return Status.CANCEL_STATUS;
 		}
 		return Status.OK_STATUS;
+
 	}
-	/*
-	 * The bottom methods can be abstracted out into a java-server type class
-	 */
-	
-	private String[] getBootpath() {
+
+	protected abstract String getWorkingDirectory();
+
+	protected abstract String getMainTypeName();
+
+	protected abstract String getVMArguments();
+
+	protected abstract String getProgramArguments();
+
+	protected abstract String[] getClasspath();
+
+	protected String[] getBootpath() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	private Map<String, Object> getVMSpecificAttributesMap() {
+
+	protected Map<String, Object> getVMSpecificAttributesMap() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	private String getWorkingDirectory() {
-		String serverHome = delegate.getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
-		return serverHome + "/bin";
-	}
-	private String getMainTypeName() {
-		return "org.jboss.modules.Main";
-	}
-	
+
 	protected String[] getJREClasspath() {
 		IVMInstall vm = JBossVMRegistryDiscovery.findVMInstall(delegate);
 		return VMInstallClasspath.get(vm);
 	}
-	
-	private String[] getClasspath() {
-		ArrayList<String> all = new ArrayList<String>(Arrays.asList(getJREClasspath()));
-		String serverHome = delegate.getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
-		String jbModules = serverHome + "/jboss-modules.jar";
-		all.add(jbModules);
-		return (String[]) all.toArray(new String[all.size()]);
+
+	protected String[] addJreClasspathEntries(List<String> current) {
+		ArrayList<String> ret = new ArrayList<>(Arrays.asList(getJREClasspath()));
+		ret.addAll(current);
+		return (String[]) ret.toArray(new String[ret.size()]);
 	}
-	private String getVMArguments() {
-		String serverHome = delegate.getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
-		String ret = "\"-Dprogram.name=JBossTools: WildFly 12\" " + 
-					"-server -Xms64m -Xmx512m -Dorg.jboss.resolver.warning=true " +
-				"-Djava.net.preferIPv4Stack=true -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 " +
-					"-Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true "
-				+ "\"-Dorg.jboss.boot.log.file=" + serverHome + "standalone/log/boot.log\" " + 
-					"\"-Dlogging.configuration=file:" + serverHome + "/standalone/configuration/logging.properties\" " + 
-				"\"-Djboss.home.dir=" + serverHome + "\" -Dorg.jboss.logmanager.nocolor=true -Djboss.bind.address.management=localhost ";
-		return ret;
-	}
-	private String getProgramArguments() {
-		String serverHome = delegate.getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
-		return "-mp \"" + serverHome + "/modules\" " + 
-				"org.jboss.as.standalone -b localhost " + 
-				"--server-config=standalone.xml " +
-				"-Djboss.server.base.dir=\"" + serverHome + "/standalone\"";
-	}
-	
-	private String[] getEnvironment() {
+
+	protected String[] getEnvironment() {
 		return getEnvironment(true);
 	}
-	
-	private String[] getEnvironment(boolean appendNativeEnv) {
+
+	protected String[] getEnvironment(boolean appendNativeEnv) {
 		Map<String, String> configEnv = getEnvironmentFromServer();
 		return NativeEnvironmentUtils.getDefault().getEnvironment(configEnv, appendNativeEnv);
 	}
 
-	private Map<String, String>  getEnvironmentFromServer() {
-		return new HashMap<String, String>();
+	protected Map<String, String> getEnvironmentFromServer() {
+		return new HashMap<String, String>(System.getenv());
+	}
+	
+
+	protected JBossExtendedProperties getProperties() {
+		ServerExtendedProperties props = new ExtendedServerPropertiesAdapterFactory()
+				.getExtendedProperties(getDelegate().getServer());
+		if( props instanceof JBossExtendedProperties) {
+			return (JBossExtendedProperties)props;
+		}
+		return null;
+	}
+	
+	protected IDefaultLaunchArguments getLaunchArgs() {
+		JBossExtendedProperties prop = getProperties();
+		if( prop != null ) {
+			IDefaultLaunchArguments largs = prop.getDefaultLaunchArguments();
+			if( largs != null ) {
+				return largs;
+			}
+		}
+		return null;
 	}
 }
