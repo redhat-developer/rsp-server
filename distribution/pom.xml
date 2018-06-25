@@ -76,6 +76,7 @@
 							<!-- configure the plugin here -->
 							<outputDirectory>${project.basedir}/target/felix-framework-5.6.10/bundle/</outputDirectory>
 							<excludeTransitive>true</excludeTransitive>
+                                                        <includeScope>runtime</includeScope>
 						</configuration>
 					</execution>
 				</executions>

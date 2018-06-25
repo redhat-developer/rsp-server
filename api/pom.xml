@@ -49,8 +49,7 @@
 						<configuration>
 							<!-- configure the plugin here -->
 							<outputDirectory>${project.basedir}/src/main/resources/lib</outputDirectory>
-							<incudeScope>runtime</incudeScope>
-							<excludeScope>provided</excludeScope>
+							<includeScope>runtime</includeScope>
 						</configuration>
 					</execution>
 				</executions>
