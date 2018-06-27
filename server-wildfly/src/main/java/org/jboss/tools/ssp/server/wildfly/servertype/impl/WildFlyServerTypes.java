@@ -40,4 +40,18 @@ public class WildFlyServerTypes implements ServerTypeStringConstants{
 			new JBossASServerType(AS40_ID, AS40_NAME, AS40_DESC);
 	public static final BaseJBossServerType AS32_SERVER_TYPE = 
 			new JBossASServerType(AS32_ID, AS32_NAME, AS32_DESC);
+	
+	
+	public static final BaseJBossServerType EAP43_SERVER_TYPE = 
+			new JBossASServerType(EAP43_ID, EAP43_NAME, EAP43_DESC);
+	public static final BaseJBossServerType EAP50_SERVER_TYPE = 
+			new JBossASServerType(EAP50_ID, EAP50_NAME, EAP50_DESC);
+	public static final BaseJBossServerType EAP60_SERVER_TYPE = 
+			new JBossASServerType(EAP60_ID, EAP60_NAME, EAP60_DESC);
+	public static final BaseJBossServerType EAP61_SERVER_TYPE = 
+			new JBossASServerType(EAP61_ID, EAP61_NAME, EAP61_DESC);
+	public static final BaseJBossServerType EAP70_SERVER_TYPE = 
+			new JBossASServerType(EAP70_ID, EAP70_NAME, EAP70_DESC);
+	public static final BaseJBossServerType EAP71_SERVER_TYPE = 
+			new JBossASServerType(EAP71_ID, EAP71_NAME, EAP71_DESC);
 }

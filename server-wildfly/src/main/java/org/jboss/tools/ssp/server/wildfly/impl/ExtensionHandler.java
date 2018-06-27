@@ -29,6 +29,13 @@ public class ExtensionHandler {
 		model.getServerModel().addServerType(WildFlyServerTypes.AS42_SERVER_TYPE);
 		model.getServerModel().addServerType(WildFlyServerTypes.AS4_SERVER_TYPE);
 		model.getServerModel().addServerType(WildFlyServerTypes.AS32_SERVER_TYPE);
+		
+		model.getServerModel().addServerType(WildFlyServerTypes.EAP43_SERVER_TYPE);
+		model.getServerModel().addServerType(WildFlyServerTypes.EAP50_SERVER_TYPE);
+		model.getServerModel().addServerType(WildFlyServerTypes.EAP60_SERVER_TYPE);
+		model.getServerModel().addServerType(WildFlyServerTypes.EAP61_SERVER_TYPE);
+		model.getServerModel().addServerType(WildFlyServerTypes.EAP70_SERVER_TYPE);
+		model.getServerModel().addServerType(WildFlyServerTypes.EAP71_SERVER_TYPE);
 	}
 	
 }

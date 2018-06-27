@@ -26,55 +26,29 @@ public class LauncherDiscovery {
 
 	public IJBossStartLauncher getStartupLauncher(IServer server) {
 		String typeId = server.getServerType().getId();
-
-		if (typeId.equals(IServerConstants.SERVER_AS_32)) {
-		} else if (typeId.equals(IServerConstants.SERVER_AS_40)) {
-		} else if (typeId.equals(IServerConstants.SERVER_AS_42)) {
-		} else if (typeId.equals(IServerConstants.SERVER_AS_50)) {
-		} else if (typeId.equals(IServerConstants.SERVER_AS_51)) {
-		} else if (typeId.equals(IServerConstants.SERVER_AS_60)) {
-		} else if (typeId.equals(IServerConstants.SERVER_AS_70)) {
-		} else if (typeId.equals(IServerConstants.SERVER_AS_71)) {
-		} else if (typeId.equals(IServerConstants.SERVER_WILDFLY_80)) {
-		} else if (typeId.equals(IServerConstants.SERVER_WILDFLY_90)) {
-		} else if (typeId.equals(IServerConstants.SERVER_WILDFLY_100)) {
-		} else if (typeId.equals(IServerConstants.SERVER_WILDFLY_110)) {
-		} else if (typeId.equals(IServerConstants.SERVER_WILDFLY_120)) {
+		if( isJBossModules(typeId)) {
 			return new WildFlyStartLauncher(server.getDelegate());
-		} else if (typeId.equals(IServerConstants.SERVER_EAP_43)) {
-		} else if (typeId.equals(IServerConstants.SERVER_EAP_50)) {
-		} else if (typeId.equals(IServerConstants.SERVER_EAP_60)) {
-		} else if (typeId.equals(IServerConstants.SERVER_EAP_61)) {
-		} else if (typeId.equals(IServerConstants.SERVER_EAP_70)) {
-		} else if (typeId.equals(IServerConstants.SERVER_EAP_71)) {
 		}
-		return null;
+		return new JBossASStartLauncher(server.getDelegate());
 	}
+
+	private boolean isJBossModules(String typeId) {
+		if (typeId.equals(IServerConstants.SERVER_AS_32) || typeId.equals(IServerConstants.SERVER_AS_40)
+				|| typeId.equals(IServerConstants.SERVER_AS_42) || typeId.equals(IServerConstants.SERVER_AS_50)
+				|| typeId.equals(IServerConstants.SERVER_AS_51) || typeId.equals(IServerConstants.SERVER_AS_60)
+				|| typeId.equals(IServerConstants.SERVER_EAP_43)
+				|| typeId.equals(IServerConstants.SERVER_EAP_50)) {
+			return false;
+		}
+		return true;
+	}
+	
 
 	public ILauncher getShutdownLauncher(IServer server) {
 		String typeId = server.getServerType().getId();
-
-		if (typeId.equals(IServerConstants.SERVER_AS_32)) {
-		} else if (typeId.equals(IServerConstants.SERVER_AS_40)) {
-		} else if (typeId.equals(IServerConstants.SERVER_AS_42)) {
-		} else if (typeId.equals(IServerConstants.SERVER_AS_50)) {
-		} else if (typeId.equals(IServerConstants.SERVER_AS_51)) {
-		} else if (typeId.equals(IServerConstants.SERVER_AS_60)) {
-		} else if (typeId.equals(IServerConstants.SERVER_AS_70)) {
-		} else if (typeId.equals(IServerConstants.SERVER_AS_71)) {
-		} else if (typeId.equals(IServerConstants.SERVER_WILDFLY_80)) {
-		} else if (typeId.equals(IServerConstants.SERVER_WILDFLY_90)) {
-		} else if (typeId.equals(IServerConstants.SERVER_WILDFLY_100)) {
-		} else if (typeId.equals(IServerConstants.SERVER_WILDFLY_110)) {
-		} else if (typeId.equals(IServerConstants.SERVER_WILDFLY_120)) {
+		if( isJBossModules(typeId)) {
 			return new WildFlyStopLauncher(server.getDelegate());
-		} else if (typeId.equals(IServerConstants.SERVER_EAP_43)) {
-		} else if (typeId.equals(IServerConstants.SERVER_EAP_50)) {
-		} else if (typeId.equals(IServerConstants.SERVER_EAP_60)) {
-		} else if (typeId.equals(IServerConstants.SERVER_EAP_61)) {
-		} else if (typeId.equals(IServerConstants.SERVER_EAP_70)) {
-		} else if (typeId.equals(IServerConstants.SERVER_EAP_71)) {
 		}
-		return null;
+		return new JBossASStopLauncher(server.getDelegate());
 	}
 }

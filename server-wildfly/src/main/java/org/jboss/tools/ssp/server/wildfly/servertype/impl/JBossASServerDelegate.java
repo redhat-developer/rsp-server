@@ -20,11 +20,11 @@ public class JBossASServerDelegate extends AbstractJBossServerDelegate {
 		setServerState(ServerManagementAPIConstants.STATE_STOPPED);
 	}
 	protected IJBossStartLauncher getStartLauncher() {
-		return new JBossASStartLauncher(this);
+		return LauncherDiscovery.getDefault().getStartupLauncher(getServer());
 	}
 	
 	protected ILauncher getStopLauncher() {
-		return new JBossASStopLauncher(this);
+		return LauncherDiscovery.getDefault().getShutdownLauncher(getServer());
 	}
 	@Override
 	protected String getPollURL(IServer server) {

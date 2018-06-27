@@ -66,4 +66,32 @@ public interface ServerTypeStringConstants {
 	public static final String AS32_ID = IServerConstants.SERVER_AS_32;
 	public static final String AS32_NAME = "JBoss AS 3.2";
 	public static final String AS32_DESC = "A server adapter capable of discovering and controlling a JBoss 3.2 runtime instance.";
+	
+	
+	
+	public static final String EAP43_ID = IServerConstants.SERVER_EAP_43;
+	public static final String EAP43_NAME = "JBoss EAP 4.3";
+	public static final String EAP43_DESC = "A server adapter capable of discovering and controlling a JBoss EAP 4.3 runtime instance.";
+
+	public static final String EAP50_ID = IServerConstants.SERVER_EAP_50;
+	public static final String EAP50_NAME = "JBoss EAP 5.0";
+	public static final String EAP50_DESC = "A server adapter capable of discovering and controlling a JBoss EAP 5.0 runtime instance.";
+
+	public static final String EAP60_ID = IServerConstants.SERVER_EAP_60;
+	public static final String EAP60_NAME = "JBoss EAP 6.0";
+	public static final String EAP60_DESC = "A server adapter capable of discovering and controlling a JBoss EAP 6.0 runtime instance.";
+
+	public static final String EAP61_ID = IServerConstants.SERVER_EAP_61;
+	public static final String EAP61_NAME = "JBoss EAP 6.1";
+	public static final String EAP61_DESC = "A server adapter capable of discovering and controlling a JBoss EAP 6.1 runtime instance.";
+
+	public static final String EAP70_ID = IServerConstants.SERVER_EAP_70;
+	public static final String EAP70_NAME = "JBoss EAP 7.0";
+	public static final String EAP70_DESC = "A server adapter capable of discovering and controlling a JBoss EAP 7.0 runtime instance.";
+
+	public static final String EAP71_ID = IServerConstants.SERVER_EAP_71;
+	public static final String EAP71_NAME = "JBoss EAP 7.1";
+	public static final String EAP71_DESC = "A server adapter capable of discovering and controlling a JBoss EAP 7.1 runtime instance.";
+
+	
 }
