@@ -24,6 +24,7 @@
 	  <module>server-spi</module>
 	  <module>server</module>
 	  <module>server-wildfly</module>
+	  <module>server-minishift</module>
 	  <module>distribution</module>
   </modules>
 

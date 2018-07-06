@@ -8,10 +8,10 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.server.wildfly.servertype.impl;
 
+import org.jboss.tools.ssp.server.spi.launchers.IShutdownLauncher;
+import org.jboss.tools.ssp.server.spi.launchers.IStartLauncher;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.wildfly.beans.impl.IServerConstants;
-import org.jboss.tools.ssp.server.wildfly.servertype.IJBossStartLauncher;
-import org.jboss.tools.ssp.server.wildfly.servertype.ILauncher;
 
 public class LauncherDiscovery {
 	private static LauncherDiscovery instance = new LauncherDiscovery();
@@ -24,7 +24,7 @@ public class LauncherDiscovery {
 		// Private constructor
 	}
 
-	public IJBossStartLauncher getStartupLauncher(IServer server) {
+	public IStartLauncher getStartupLauncher(IServer server) {
 		String typeId = server.getServerType().getId();
 		if( isJBossModules(typeId)) {
 			return new WildFlyStartLauncher(server.getDelegate());
@@ -44,7 +44,7 @@ public class LauncherDiscovery {
 	}
 	
 
-	public ILauncher getShutdownLauncher(IServer server) {
+	public IShutdownLauncher getShutdownLauncher(IServer server) {
 		String typeId = server.getServerType().getId();
 		if( isJBossModules(typeId)) {
 			return new WildFlyStopLauncher(server.getDelegate());

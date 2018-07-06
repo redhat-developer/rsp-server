@@ -3,12 +3,14 @@ Bundle-ManifestVersion: 2
 Bundle-Name: org.jboss.tools.ssp.server.spi
 Bundle-SymbolicName: org.jboss.tools.ssp.server.spi
 Automatic-Module-Name: org.jboss.tools.ssp.server.spi
+Bundle-Activator: org.jboss.tools.ssp.server.spi.SPIActivator
 Bundle-Version: 0.0.9.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: org.jboss.tools.ssp.eclipse.core.runtime,
  org.jboss.tools.ssp.eclipse.osgi.util,
  org.osgi.framework
 Export-Package: org.jboss.tools.ssp.server.spi.discovery,
+ org.jboss.tools.ssp.server.spi.launchers,
  org.jboss.tools.ssp.server.spi.model,
  org.jboss.tools.ssp.server.spi.model.polling,
  org.jboss.tools.ssp.server.spi.servertype

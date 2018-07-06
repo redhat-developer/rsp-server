@@ -12,13 +12,14 @@ import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.ssp.eclipse.core.runtime.IPath;
 import org.jboss.tools.ssp.eclipse.core.runtime.Path;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
+import org.jboss.tools.ssp.server.spi.launchers.IShutdownLauncher;
+import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.ssp.server.wildfly.servertype.AbstractLauncher;
 import org.jboss.tools.ssp.server.wildfly.servertype.IJBossServerAttributes;
-import org.jboss.tools.ssp.server.wildfly.servertype.ILauncher;
 import org.jboss.tools.ssp.server.wildfly.servertype.launch.IDefaultLaunchArguments;
 
-public class WildFlyStopLauncher extends AbstractLauncher implements ILauncher{
+public class WildFlyStopLauncher extends AbstractLauncher implements IShutdownLauncher{
 	public WildFlyStopLauncher(IServerDelegate jBossServerDelegate) {
 		super(jBossServerDelegate);
 	}
@@ -53,5 +54,10 @@ public class WildFlyStopLauncher extends AbstractLauncher implements ILauncher{
 			return largs.getDefaultStopArgs();
 		}
 		return "";
+	}
+
+	@Override
+	public IServer getServer() {
+		return getDelegate().getServer();
 	}
 }

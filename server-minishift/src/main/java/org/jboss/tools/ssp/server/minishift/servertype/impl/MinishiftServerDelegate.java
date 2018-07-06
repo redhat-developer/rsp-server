@@ -6,10 +6,11 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.server.wildfly.servertype;
+package org.jboss.tools.ssp.server.minishift.servertype.impl;
 
 import java.io.File;
 
+import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
 import org.jboss.tools.ssp.api.dao.CommandLineDetails;
 import org.jboss.tools.ssp.api.dao.LaunchParameters;
 import org.jboss.tools.ssp.api.dao.ServerAttributes;
@@ -22,49 +23,43 @@ import org.jboss.tools.ssp.eclipse.core.runtime.Status;
 import org.jboss.tools.ssp.eclipse.debug.core.DebugException;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.ssp.eclipse.debug.core.model.IProcess;
-import org.jboss.tools.ssp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.ssp.launching.LaunchingCore;
 import org.jboss.tools.ssp.launching.utils.StatusConverter;
+import org.jboss.tools.ssp.server.minishift.impl.Activator;
+import org.jboss.tools.ssp.server.minishift.servertype.IMinishiftServerAttributes;
 import org.jboss.tools.ssp.server.model.AbstractServerDelegate;
 import org.jboss.tools.ssp.server.spi.launchers.IShutdownLauncher;
 import org.jboss.tools.ssp.server.spi.launchers.IStartLauncher;
 import org.jboss.tools.ssp.server.spi.model.polling.IPollResultListener;
 import org.jboss.tools.ssp.server.spi.model.polling.IServerStatePoller;
+import org.jboss.tools.ssp.server.spi.model.polling.IServerStatePoller.SERVER_STATE;
 import org.jboss.tools.ssp.server.spi.model.polling.PollThreadUtils;
-import org.jboss.tools.ssp.server.spi.model.polling.WebPortPoller;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
-import org.jboss.tools.ssp.server.wildfly.impl.Activator;
 
-public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate {
+public class MinishiftServerDelegate extends AbstractServerDelegate {
 	private ILaunch startLaunch;
-	
-	public AbstractJBossServerDelegate(IServer server) {
+	public MinishiftServerDelegate(IServer server) {
 		super(server);
+		setServerState(ServerManagementAPIConstants.STATE_STOPPED);
 	}
-
-	protected abstract IStartLauncher getStartLauncher();
+	protected IStartLauncher getStartLauncher() {
+		return new MinishiftStartLauncher(this);
+	}
 	
-	protected abstract IShutdownLauncher getStopLauncher();
-
-	protected abstract String getPollURL(IServer server);
+	protected IShutdownLauncher getStopLauncher() {
+		return new MinishiftStopLauncher(this);
+	}
 	
 	@Override
 	public IStatus validate() {
-		String home = getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
+		String bin = getServer().getAttribute(IMinishiftServerAttributes.MINISHIFT_BINARY, (String)null);
 		
-		if( null == home ) {
-			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, "Server home must not be null");
+		if( null == bin ) {
+			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, "Minishift binary location must not be null");
 		}
-		if(!(new File(home).exists())) {
-			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, "Server home must exist");
-		}
-		
-		
-		IVMInstall vmi = JBossVMRegistryDiscovery.findVMInstall(this);
-		if( vmi == null ) {
-			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
-					"Server " + getServer().getId() + " can not find a valid virtual machine to use.");
+		if(!(new File(bin).exists())) {
+			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, "Minishift binary location must exist");
 		}
 		return Status.OK_STATUS;
 	}
@@ -104,7 +99,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		setServerState(IServerDelegate.STATE_STARTING);
 		CommandLineDetails launchedDetails = null;
 		try {
-			launchPoller(IServerStatePoller.SERVER_STATE.UP);
+			//launchPoller(IServerStatePoller.SERVER_STATE.UP);
 			IStartLauncher launcher = getStartLauncher();
 			startLaunch = launcher.launch(mode);
 			launchedDetails = launcher.getLaunchedDetails();
@@ -132,7 +127,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	public IStatus stop(boolean force) {
 		setServerState(IServerDelegate.STATE_STOPPING);
 		ILaunch stopLaunch = null;
-		launchPoller(IServerStatePoller.SERVER_STATE.DOWN);
+		//launchPoller(IServerStatePoller.SERVER_STATE.DOWN);
 		try {
 			stopLaunch = getStopLauncher().launch(force);
 			registerLaunch(stopLaunch);
@@ -159,40 +154,36 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		IPollResultListener listener = expectedState == IServerStatePoller.SERVER_STATE.DOWN ? 
 				shutdownServerResultListener() : launchServerResultListener();
 		IServerStatePoller poller = getPoller(expectedState);
-		PollThreadUtils.pollServer(getServer(), expectedState, poller, listener);
+		// 5 minute timeout
+		PollThreadUtils.pollServer(getServer(), expectedState, poller, listener,5*60*1000);
 	}
 	
 	/*
 	 * Default implementation, subclasses can override.
 	 */
 	protected IServerStatePoller getPoller(IServerStatePoller.SERVER_STATE expectedState) {
-		return getDefaultWebPortPoller();
+		return getMinishiftStatusPoller();
 	}
 	
-	private IServerStatePoller getDefaultWebPortPoller() {
-		IServerStatePoller poller = new WebPortPoller() {
-			@Override
-			protected String getURL(IServer server) {
-				return getPollURL(server);
-			}
-		};
+	private IServerStatePoller getMinishiftStatusPoller() {
+		IServerStatePoller poller = new MinishiftStatusPoller();
 		return poller;
 	}
 
 	@Override
 	protected void processTerminated(IProcess p, ILaunch l) {
-		if( l == startLaunch ) {
-			IProcess[] all = l.getProcesses();
-			boolean allTerminated = true;
-			for( int i = 0; i < all.length; i++ ) {
-				allTerminated &= all[i].isTerminated();
-			}
-			if( allTerminated ) {
-				setServerState(IServerDelegate.STATE_STOPPED);
-				startLaunch = null;
-			}
-		}
+		// The launch command will terminate but that just means startup has completed.
+		// Not that the runtime has shutdown.
 		fireServerProcessTerminated(getProcessId(p));
+		
+		// Time to poll to check the state
+		IServerStatePoller poller = getMinishiftStatusPoller();
+		SERVER_STATE state = poller.getCurrentStateSynchronous(getServer());
+		if( state == SERVER_STATE.UP) {
+			setServerState(IServerDelegate.STATE_STARTED);
+		} else {
+			setServerState(IServerDelegate.STATE_STOPPED);
+		}
 	}
 
 	@Override
@@ -219,4 +210,5 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		setServerState(STATE_STARTED, true);
 		return Status.OK_STATUS;
 	}
+
 }

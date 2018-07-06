@@ -11,6 +11,7 @@ package org.jboss.tools.ssp.server.wildfly.servertype.impl;
 import java.util.Arrays;
 
 import org.jboss.tools.ssp.eclipse.core.runtime.Path;
+import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.ssp.server.wildfly.servertype.AbstractLauncher;
 import org.jboss.tools.ssp.server.wildfly.servertype.IJBossServerAttributes;
@@ -53,5 +54,10 @@ public class WildFlyStartLauncher extends AbstractLauncher {
 			r1 = largs.getStartDefaultProgramArgs(new Path(serverHome));
 		}
 		return r1;
+	}
+
+	@Override
+	public IServer getServer() {
+		return getDelegate().getServer();
 	}
 }

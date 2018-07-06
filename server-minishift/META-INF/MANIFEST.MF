@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: org.jboss.tools.ssp.server.wildfly
-Bundle-SymbolicName: org.jboss.tools.ssp.server.wildfly
-Bundle-Activator: org.jboss.tools.ssp.server.wildfly.impl.Activator
-Automatic-Module-Name: org.jboss.tools.ssp.server.wildfly
+Bundle-Name: org.jboss.tools.ssp.server.minishift
+Bundle-SymbolicName: org.jboss.tools.ssp.server.minishift
+Bundle-Activator: org.jboss.tools.ssp.server.minishift.impl.Activator
+Automatic-Module-Name: org.jboss.tools.ssp.server.minishift
 Bundle-Version: 0.0.9.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: org.eclipse.lsp4j,
@@ -33,10 +33,10 @@ Import-Package: org.eclipse.lsp4j,
  org.jboss.tools.ssp.server.discovery,
  org.jboss.tools.ssp.server.discovery.serverbeans,
  org.jboss.tools.ssp.server.discovery.serverbeans.util,
- org.jboss.tools.ssp.server.launchers,
  org.jboss.tools.ssp.server.model,
  org.jboss.tools.ssp.server.model.internal,
  org.jboss.tools.ssp.server.spi.discovery,
+ org.jboss.tools.ssp.server.spi.launchers,
  org.jboss.tools.ssp.server.spi.model,
  org.jboss.tools.ssp.server.spi.model.polling,
  org.jboss.tools.ssp.server.spi.servertype,

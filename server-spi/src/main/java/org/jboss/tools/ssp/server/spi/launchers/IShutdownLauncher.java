@@ -6,18 +6,17 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.server.wildfly.servertype;
+package org.jboss.tools.ssp.server.spi.launchers;
 
-import org.jboss.tools.ssp.api.dao.CommandLineDetails;
 import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
+import org.jboss.tools.ssp.server.spi.servertype.IServer;
 
-public interface IJBossStartLauncher {
-	public ILaunch launch(String mode) throws CoreException;
-
-	public CommandLineDetails getLaunchedDetails();
-
-	public CommandLineDetails getLaunchCommand(String mode) throws CoreException;
-
+public interface IShutdownLauncher {
+	public IServer getServer();
+	
+	public ILaunch launch(boolean force) throws CoreException;
+	
 	public ILaunch getLaunch();
+	
 }

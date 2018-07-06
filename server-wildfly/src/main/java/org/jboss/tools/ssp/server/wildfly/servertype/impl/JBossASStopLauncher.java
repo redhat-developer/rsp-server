@@ -12,13 +12,13 @@ import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.ssp.eclipse.core.runtime.IPath;
 import org.jboss.tools.ssp.eclipse.core.runtime.Path;
 import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
+import org.jboss.tools.ssp.server.spi.launchers.IShutdownLauncher;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.ssp.server.wildfly.servertype.AbstractLauncher;
 import org.jboss.tools.ssp.server.wildfly.servertype.IJBossServerAttributes;
-import org.jboss.tools.ssp.server.wildfly.servertype.ILauncher;
 import org.jboss.tools.ssp.server.wildfly.servertype.launch.IDefaultLaunchArguments;
 
-public class JBossASStopLauncher extends AbstractLauncher implements ILauncher{
+public class JBossASStopLauncher extends AbstractLauncher implements IShutdownLauncher{
 	public JBossASStopLauncher(IServerDelegate jBossServerDelegate) {
 		super(jBossServerDelegate);
 	}

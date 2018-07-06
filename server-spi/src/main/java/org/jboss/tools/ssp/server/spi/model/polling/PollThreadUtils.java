@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.ssp.server.spi.model.polling;
 
 import org.jboss.tools.ssp.server.spi.model.polling.IServerStatePoller.SERVER_STATE;
@@ -67,9 +75,14 @@ public class PollThreadUtils {
 	
 
 	public static void pollServer(IServer server, SERVER_STATE expectedState, IServerStatePoller poller, IPollResultListener listener) {
+		pollServer(server, expectedState, poller, listener, 2*60*1000);
+	}
+
+	public static void pollServer(IServer server, SERVER_STATE expectedState, IServerStatePoller poller,
+			IPollResultListener listener, int timeout) {
 		IServerDelegate del = server.getDelegate();
 		PollThread pollThread = (PollThread)del.getSharedData(PROP_POLL_THREAD_KEY);
-		pollThread = PollThreadUtils.pollServer(expectedState, poller, pollThread, listener, server, 120000);
+		pollThread = PollThreadUtils.pollServer(expectedState, poller, pollThread, listener, server, timeout);
 		del.putSharedData(PROP_POLL_THREAD_KEY, pollThread);
 	}
 	

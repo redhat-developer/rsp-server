@@ -9,21 +9,21 @@
 package org.jboss.tools.ssp.server.wildfly.servertype.impl;
 
 import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
+import org.jboss.tools.ssp.server.spi.launchers.IShutdownLauncher;
+import org.jboss.tools.ssp.server.spi.launchers.IStartLauncher;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.wildfly.servertype.AbstractJBossServerDelegate;
-import org.jboss.tools.ssp.server.wildfly.servertype.IJBossStartLauncher;
-import org.jboss.tools.ssp.server.wildfly.servertype.ILauncher;
 
 public class WildFlyServerDelegate extends AbstractJBossServerDelegate {
 	public WildFlyServerDelegate(IServer server) {
 		super(server);
 		setServerState(ServerManagementAPIConstants.STATE_STOPPED);
 	}
-	protected IJBossStartLauncher getStartLauncher() {
+	protected IStartLauncher getStartLauncher() {
 		return new WildFlyStartLauncher(this);
 	}
 	
-	protected ILauncher getStopLauncher() {
+	protected IShutdownLauncher getStopLauncher() {
 		return new WildFlyStopLauncher(this);
 	}
 	@Override

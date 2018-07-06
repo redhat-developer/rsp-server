@@ -6,14 +6,26 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.ssp.server.wildfly.servertype;
+package org.jboss.tools.ssp.server.minishift.servertype;
 
-import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
-import org.jboss.tools.ssp.eclipse.debug.core.ILaunch;
-
-public interface ILauncher {
-	public ILaunch launch(boolean force) throws CoreException;
+public interface IMinishiftServerAttributes {
+	/*
+	 * Required attributes
+	 */
+	public static final String MINISHIFT_BINARY = "minishift.binary.path";
 	
-	public ILaunch getLaunch();
+	public static final String MINISHIFT_VM_DRIVER = "minishift.vmdriver";
+
+	
+	// Only for CDK
+	public static final String MINISHIFT_REG_USERNAME = "minishift.username";
+
+	public static final String MINISHIFT_REG_PASSWORD = "minishift.password";
+
+	
+	/*
+	 * Launch attributes
+	 */
+	
 	
 }

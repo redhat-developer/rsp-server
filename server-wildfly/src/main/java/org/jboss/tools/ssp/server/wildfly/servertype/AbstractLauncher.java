@@ -28,13 +28,15 @@ import org.jboss.tools.ssp.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.jboss.tools.ssp.launching.java.ICommandProvider;
 import org.jboss.tools.ssp.launching.java.VMInstallClasspath;
 import org.jboss.tools.ssp.launching.utils.NativeEnvironmentUtils;
+import org.jboss.tools.ssp.server.spi.launchers.IStartLauncher;
+import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.ssp.server.wildfly.servertype.capabilities.ExtendedServerPropertiesAdapterFactory;
 import org.jboss.tools.ssp.server.wildfly.servertype.capabilities.JBossExtendedProperties;
 import org.jboss.tools.ssp.server.wildfly.servertype.capabilities.ServerExtendedProperties;
 import org.jboss.tools.ssp.server.wildfly.servertype.launch.IDefaultLaunchArguments;
 
-public abstract class AbstractLauncher implements IJBossStartLauncher {
+public abstract class AbstractLauncher implements IStartLauncher {
 	private IServerDelegate delegate;
 	private IVMRunner runner;
 	private ILaunch launch;
@@ -47,6 +49,9 @@ public abstract class AbstractLauncher implements IJBossStartLauncher {
 
 	protected IServerDelegate getDelegate() {
 		return delegate;
+	}
+	public IServer getServer() {
+		return delegate.getServer();
 	}
 	
 	public ILaunch launch(String mode) throws CoreException {
