@@ -140,6 +140,11 @@
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
 		<dependency>
+			<groupId>org.jboss.tools.ssp</groupId>
+			<artifactId>org.jboss.tools.ssp.server.minishift</artifactId>
+			<version>0.0.9-SNAPSHOT</version>
+		</dependency>
+		<dependency>
 		<groupId>org.everit.osgi.bundles</groupId>
 			<artifactId>org.everit.osgi.bundles.org.apache.xmlcommons.full</artifactId>
 			<version>1.4.1-20150918</version>
