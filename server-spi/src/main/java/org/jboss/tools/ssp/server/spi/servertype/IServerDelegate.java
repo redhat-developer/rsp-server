@@ -142,6 +142,50 @@ public interface IServerDelegate {
 	public int getServerState();
 	
 	/**
+	 * Get the IServer wrapper and holder of attribute key/value pairs
+	 * @return
+	 */
+	public IServer getServer();
+
+	/**
+	 * Dispose of this delegate, clean up any maintained resources
+	 */
+	public void dispose();
+
+	/** 
+	 * Access a datastore to hold arbitrary k/v pairs
+	 * @param key
+	 * @return
+	 */
+	public Object getSharedData(String key);
+
+	/**
+	 * Add a value to a datastore to hold arbitrary k/v pairs
+	 * @param key
+	 * @param o
+	 */
+	public void putSharedData(String key, Object o);
+	
+	/**
+	 * Returns the ILaunchManager mode that the server is in. This method will
+	 * return null if the server is not running.
+	 * 
+	 * @return the mode in which a server is running, one of the mode constants
+	 *    defined by {@link org.eclipse.debug.core.ILaunchManager}, or
+	 *    <code>null</code> if the server is stopped.
+	 */
+	public String getMode();
+
+	/**
+	 * Ask the delegate whether the current configuration is valid and all 
+	 * expected resources, keys, files, etc, exist and are accessible.
+	 * 
+	 * @return
+	 */
+	public IStatus validate();
+
+	
+	/**
 	 * Set the server state to starting. 
 	 * This is most likely to be called by the model, passing along
 	 * a request from an external client that wished to launch the process
@@ -162,30 +206,9 @@ public interface IServerDelegate {
 	 */
 	public IStatus clientSetServerStarted(LaunchParameters attr);
 	
-
-	/**
-	 * Returns the ILaunchManager mode that the server is in. This method will
-	 * return null if the server is not running.
-	 * 
-	 * @return the mode in which a server is running, one of the mode constants
-	 *    defined by {@link org.eclipse.debug.core.ILaunchManager}, or
-	 *    <code>null</code> if the server is stopped.
-	 */
-	public String getMode();
-	
 	public StartServerResponse start(String mode);
 	
-	public IStatus validate();
-
 	public IStatus stop(boolean force);
-	
-	public void dispose();
 
-	public Object getSharedData(String key);
-
-	public void putSharedData(String key, Object o);
-	
 	public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params);
-	
-	public IServer getServer();
 }

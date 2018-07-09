@@ -163,14 +163,19 @@ public class ServerManagementCLI {
 			String suffix = s.substring(START_SERVER.length()).trim();
 			String serverId = suffix;
 			ServerHandle handle = findServer(serverId);
-			String mode = selectLaunchMode(handle.getType());
-			ServerAttributes sa = new ServerAttributes(handle.getType().getId(), handle.getId(), new HashMap<String,Object>());
-			LaunchParameters params = new LaunchParameters(sa, mode);
-			StartServerResponse stat = launcher.getServerProxy().startServerAsync(params).get();
-			System.out.println(stat.getStatus().toString());
+			if( handle == null ) {
+				System.out.println("Server " + serverId + " not found.");
+			} else {
+				String mode = selectLaunchMode(handle.getType());
+				ServerAttributes sa = new ServerAttributes(handle.getType().getId(), handle.getId(), new HashMap<String,Object>());
+				LaunchParameters params = new LaunchParameters(sa, mode);
+				StartServerResponse stat = launcher.getServerProxy().startServerAsync(params).get();
+				System.out.println(stat.getStatus().toString());
+			}
 		} else if( s.equals(LAUNCH_COMMAND)) {
 			LaunchParameters getLaunchReq = getLaunchCommandRequest();
-			printLocalLaunchCommandDetails(getLaunchReq);
+			if( getLaunchReq != null )
+				printLocalLaunchCommandDetails(getLaunchReq);
 		} else if( s.equals(LAUNCH_LOCAL)) {
 			runLocalLaunchScenario(s);
 		} else if( s.startsWith(STOP_SERVER)) {
@@ -238,6 +243,10 @@ public class ServerManagementCLI {
 	}
 	private void printLocalLaunchCommandDetails(LaunchParameters getLaunchReq) throws Exception {
 		CommandLineDetails det = launcher.getServerProxy().getLaunchCommand(getLaunchReq).get();
+		if( det == null ) {
+			System.out.println("The SSP returned no launch command for this request.");
+			return;
+		}
 		String[] cmdline = det.getCmdLine();
 		String wd = det.getWorkingDir();
 		String[] envp = det.getEnvp();
@@ -253,6 +262,10 @@ public class ServerManagementCLI {
 		}
 		String server = nextLine().trim();
 		ServerHandle handle = findServer(server);
+		if( handle == null ) {
+			System.out.println("Server " + server + " not found.");
+			return null;
+		}
 		String mode = selectLaunchMode(handle.getType());
 		LaunchAttributesRequest req = new LaunchAttributesRequest(handle.getType().getId(), mode);
 		

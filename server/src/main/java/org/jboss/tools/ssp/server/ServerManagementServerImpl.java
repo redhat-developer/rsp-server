@@ -11,7 +11,6 @@ package org.jboss.tools.ssp.server;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -155,7 +154,8 @@ public class ServerManagementServerImpl implements SSPServer {
 		ServerBeanLoader loader = new ServerBeanLoader(new File(path.getFilepath()));
 		ServerBean bean = loader.getServerBean();
 		List<ServerBean> ret = new ArrayList<>();
-		ret.add(bean);
+		if( bean != null )
+			ret.add(bean);
 		return CompletableFuture.completedFuture(ret);
 	}
 
@@ -225,40 +225,115 @@ public class ServerManagementServerImpl implements SSPServer {
 
 	@Override
 	public CompletableFuture<StartServerResponse> startServerAsync(LaunchParameters attr) {
-		IServer server = model.getServerModel().getServer(attr.getParams().getId());
+		String id = attr.getParams().getId();
+		IServer server = model.getServerModel().getServer(id);
+		if( server == null ) {
+			IStatus is = new org.jboss.tools.ssp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server " + id + " does not exist");
+			return CompletableFuture.completedFuture(new StartServerResponse(StatusConverter.convert(is), null));
+		}
+
 		IServerDelegate del = server.getDelegate();
-		StartServerResponse ret = del.start(attr.getMode());
-		return CompletableFuture.completedFuture(ret);
+		if( del == null ) {
+			IStatus is = new org.jboss.tools.ssp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred: Server " + id + " has no delegate.");
+			return CompletableFuture.completedFuture(new StartServerResponse(StatusConverter.convert(is), null));
+		}
+		
+		try {
+			StartServerResponse ret = del.start(attr.getMode());
+			return CompletableFuture.completedFuture(ret);
+		} catch( Exception e ) {
+			IStatus is = new org.jboss.tools.ssp.eclipse.core.runtime.Status(IStatus.ERROR, 
+					ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred.", e);
+			return CompletableFuture.completedFuture(new StartServerResponse(StatusConverter.convert(is), null));
+		}
 	}
 
 	@Override
 	public CompletableFuture<Status> stopServerAsync(StopServerAttributes attr) {
 		IServer server = model.getServerModel().getServer(attr.getId());
+		if( server == null ) {
+			IStatus is = new org.jboss.tools.ssp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server " + attr.getId() + " does not exist");
+			return CompletableFuture.completedFuture(StatusConverter.convert(is));
+		}
 		IServerDelegate del = server.getDelegate();
-		IStatus ret = del.stop(attr.isForce());
-		return CompletableFuture.completedFuture(StatusConverter.convert(ret));
+		if( del == null ) {
+			IStatus is = new org.jboss.tools.ssp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred: Server " + attr.getId() + " has no delegate.");
+			return CompletableFuture.completedFuture(StatusConverter.convert(is));
+		}
+		try {
+			IStatus ret = del.stop(attr.isForce());
+			return CompletableFuture.completedFuture(StatusConverter.convert(ret));
+		} catch( Exception e ) {
+			IStatus is = new org.jboss.tools.ssp.eclipse.core.runtime.Status(IStatus.ERROR, 
+					ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred.", e);
+			return CompletableFuture.completedFuture(StatusConverter.convert(is));
+		}
+
 	}
 
 	@Override
 	public CompletableFuture<CommandLineDetails> getLaunchCommand(LaunchParameters req) {
-		IServer server = model.getServerModel().getServer(req.getParams().getId());
+		String id = req.getParams().getId();
+		IServer server = model.getServerModel().getServer(id);
+		if( server == null ) {
+			return CompletableFuture.completedFuture(null);
+		}
 		IServerDelegate del = server.getDelegate();
-		CommandLineDetails det = del.getStartLaunchCommand(req.getMode(), req.getParams());
-		return CompletableFuture.completedFuture(det);
+		if( del == null ) {
+			return CompletableFuture.completedFuture(null);
+		}
+		try {
+			CommandLineDetails det = del.getStartLaunchCommand(req.getMode(), req.getParams());
+			return CompletableFuture.completedFuture(det);
+		} catch( Exception e ) {
+			return CompletableFuture.completedFuture(null);
+		}
 	}
 
 	@Override
 	public CompletableFuture<Status> serverStartingByClient(ServerStartingAttributes attr) {
-		IServer server = model.getServerModel().getServer(attr.getRequest().getParams().getId());
+		String id = attr.getRequest().getParams().getId();
+		IServer server = model.getServerModel().getServer(id);
+		if( server == null ) {
+			IStatus is = new org.jboss.tools.ssp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server " + id + " does not exist");
+			return CompletableFuture.completedFuture(StatusConverter.convert(is));
+		}
 		IServerDelegate del = server.getDelegate();
-		IStatus s = del.clientSetServerStarting(attr);
-		return CompletableFuture.completedFuture(StatusConverter.convert(s));
+		if( del == null ) {
+			IStatus is = new org.jboss.tools.ssp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server error: Server " + id + " does not have a delegate.");
+			return CompletableFuture.completedFuture(StatusConverter.convert(is));
+		}
+		try {
+			IStatus s = del.clientSetServerStarting(attr);
+			return CompletableFuture.completedFuture(StatusConverter.convert(s));
+		} catch( Exception e ) {
+			IStatus is = new org.jboss.tools.ssp.eclipse.core.runtime.Status(IStatus.ERROR, 
+					ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred.", e);
+			return CompletableFuture.completedFuture(StatusConverter.convert(is));			
+		}
 	}
 	@Override
 	public CompletableFuture<Status> serverStartedByClient(LaunchParameters attr) {
-		IServer server = model.getServerModel().getServer(attr.getParams().getId());
+		String id = attr.getParams().getId();
+		IServer server = model.getServerModel().getServer(id);
+		if( server == null ) {
+			IStatus is = new org.jboss.tools.ssp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server " + id + " does not exist");
+			return CompletableFuture.completedFuture(StatusConverter.convert(is));
+		}
 		IServerDelegate del = server.getDelegate();
-		IStatus s = del.clientSetServerStarted(attr);
-		return CompletableFuture.completedFuture(StatusConverter.convert(s));
+		if( del == null ) {
+			IStatus is = new org.jboss.tools.ssp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server error: Server " + id + " does not have a delegate.");
+			return CompletableFuture.completedFuture(StatusConverter.convert(is));
+		}
+
+		try {
+			IStatus s = del.clientSetServerStarted(attr);
+			return CompletableFuture.completedFuture(StatusConverter.convert(s));
+		} catch( Exception e ) {
+			IStatus is = new org.jboss.tools.ssp.eclipse.core.runtime.Status(IStatus.ERROR, 
+					ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred.", e);
+			return CompletableFuture.completedFuture(StatusConverter.convert(is));			
+		}
+
 	}
 }

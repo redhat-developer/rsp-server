@@ -27,6 +27,7 @@ import org.jboss.tools.ssp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.ssp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.ssp.eclipse.core.runtime.Status;
 import org.jboss.tools.ssp.launching.LaunchingCore;
+import org.jboss.tools.ssp.server.ServerCoreActivator;
 import org.jboss.tools.ssp.server.model.internal.Server;
 import org.jboss.tools.ssp.server.spi.model.IServerModel;
 import org.jboss.tools.ssp.server.spi.model.IServerModelListener;
@@ -87,25 +88,33 @@ public class ServerModel implements IServerModel {
 	}
 	
 	public IStatus createServer(String serverType, String id, Map<String, Object> attributes) {
-		IServerType fact = serverTypes.get(serverType);
-		if( fact != null ) {
-			IStatus valid = validateAttributes(fact, attributes);
-			if( !valid.isOK()) {
-				return valid;
-			}
-			Server server = createServer2(fact, id, attributes);
-			IServerDelegate del = fact.createServerDelegate(server);
-			server.setDelegate(del);
-			
-			valid = del.validate();
-			if( !valid.isOK()) {
-				return valid;
-			}
-			addServer(server, del);
-			return Status.OK_STATUS;
-		} else {
-			return new Status(IStatus.ERROR, "org.jboss.tools.ssp.server", "Server Type " + serverType + " not found");
+		try {
+			return createServerUnprotected(serverType, id, attributes);
+		} catch(Exception e) {
+			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+					"An unexpected error occurred", e);
 		}
+	}
+	
+	private IStatus createServerUnprotected(String serverType, String id, Map<String, Object> attributes) {
+		IServerType fact = serverTypes.get(serverType);
+		if( fact == null ) {
+			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server Type " + serverType + " not found");
+		}
+		IStatus valid = validateAttributes(fact, attributes);
+		if( !valid.isOK()) {
+			return valid;
+		}
+		Server server = createServer2(fact, id, attributes);
+		IServerDelegate del = fact.createServerDelegate(server);
+		server.setDelegate(del);
+		
+		valid = del.validate();
+		if( !valid.isOK()) {
+			return valid;
+		}
+		addServer(server, del);
+		return Status.OK_STATUS;
 	}
 	
 	private IStatus validateAttributes(IServerType type, Map<String, Object> map) {
