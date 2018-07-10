@@ -108,23 +108,24 @@ public class PollThread extends Thread {
 				}
 				stateStartedOrStopped = checkServerState();
 			}
+			if (stateStartedOrStopped) {
+				// we stopped. Did we abort?
+				handleUncertainTermination();
+			} else if (abort) {
+				// Definite abort
+				poller.cleanup();
+			} else if (done) {
+				// the poller has an answer
+				handlePollerHasAnswer();
+			} else {
+				// we timed out. get response from preferences
+				handleTimeoutTermination();
+			}
 		} catch(Exception e) {
-			abort = true;
+			e.printStackTrace();
+			handleExceptionTermination();
 		}
 
-		if (stateStartedOrStopped) {
-			// we stopped. Did we abort?
-			handleUncertainTermination();
-		} else if (abort) {
-			// Definite abort
-			poller.cleanup();
-		} else if (done) {
-			// the poller has an answer
-			handlePollerHasAnswer();
-		} else {
-			// we timed out. get response from preferences
-			handleTimeoutTermination();
-		}
 	}
 
 	private void handlePollerHasAnswer() {
@@ -142,11 +143,18 @@ public class PollThread extends Thread {
 			// You don't have an answer... liar!
 		}
 	}
-	
+	private void handleExceptionTermination() {
+		cancel();
+		poller.cleanup();
+		handleTimeoutBehavior();
+	}
 	private void handleTimeoutTermination() {
 		poller.cancel(CANCELATION_CAUSE.TIMEOUT_REACHED);
-		TIMEOUT_BEHAVIOR behavior = poller.getTimeoutBehavior();
 		poller.cleanup();
+		handleTimeoutBehavior();
+	}
+	private void handleTimeoutBehavior() {
+		TIMEOUT_BEHAVIOR behavior = poller.getTimeoutBehavior();
 		// xnor;
 		// if behavior is to succeed and we're expected to go up, we're up
 		// if behavior is to fail and we're expecting to be down, we're up (failed to shutdown)
