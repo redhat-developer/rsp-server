@@ -170,13 +170,12 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	}
 	
 	private IServerStatePoller getDefaultWebPortPoller() {
-		IServerStatePoller poller = new WebPortPoller() {
+		return new WebPortPoller("Web Poller: " + this.getServer().getName()) {
 			@Override
 			protected String getURL(IServer server) {
 				return getPollURL(server);
 			}
 		};
-		return poller;
 	}
 
 	@Override

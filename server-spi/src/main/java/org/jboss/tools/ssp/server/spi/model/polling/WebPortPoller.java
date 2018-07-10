@@ -19,10 +19,7 @@ import org.jboss.tools.ssp.server.spi.servertype.IServer;
 
 public abstract class WebPortPoller extends AbstractPoller implements IServerStatePoller {
 
-	private IServer server;
-	private boolean canceled, done;
-	private SERVER_STATE state;
-	private SERVER_STATE expectedState;
+	private String name;
 
 	@Override
 	protected boolean onePing(IServer server) {
@@ -57,6 +54,11 @@ public abstract class WebPortPoller extends AbstractPoller implements IServerSta
 	
 	@Override
 	protected String getThreadName() {
-		return "Web Poller: " + server.getName();
+		return "Web Poller: " + name;
+	}
+
+	public WebPortPoller(String string) {
+		super();
+		this.name = string;
 	}
 }
