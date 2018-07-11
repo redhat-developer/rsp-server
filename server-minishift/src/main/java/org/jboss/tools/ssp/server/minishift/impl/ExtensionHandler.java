@@ -8,13 +8,14 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.server.minishift.impl;
 
+import org.jboss.tools.ssp.server.minishift.discovery.MinishiftBeanTypeProvider;
 import org.jboss.tools.ssp.server.minishift.servertype.impl.MinishiftServerTypes;
 import org.jboss.tools.ssp.server.spi.model.IServerManagementModel;
 
 public class ExtensionHandler {
 	
 	public static void addExtensionsToModel(IServerManagementModel model) {
-		//model.getServerBeanTypeManager().addTypeProvider(new JBossServerBeanTypeProvider());
+		model.getServerBeanTypeManager().addTypeProvider(new MinishiftBeanTypeProvider());
 		model.getServerModel().addServerType(MinishiftServerTypes.MINISHIFT_1_12_SERVER_TYPE);
 	}
 	

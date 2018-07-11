@@ -114,7 +114,11 @@ public class ProcessUtility {
 		return p;
 	}
 	
-
+	public Process callProcess(String rootCommand, String[] args, String dir, HashMap<String,String> envMap) throws IOException {
+		String[] envp = convertEnvironment(envMap);
+		return callProcess(rootCommand, args, dir, envp);
+	}
+	
 	/*
 	 * Convert a string/string hashmap into an array of string environment variables
 	 * as required by java.lang.Runtime This will super-impose the provided
