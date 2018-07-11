@@ -45,10 +45,7 @@ public class ServerBeanLoader {
 	
 	private void loadBeanInternal() {
 		this.type = loadTypeInternal(rootLocation);
-		String version = type.getFullVersion(rootLocation);
-		ServerBean server = new ServerBean(rootLocation.getPath(),type.getServerBeanName(rootLocation),
-				type.getId(), type.getUnderlyingTypeId(rootLocation), version, getMajorMinorVersion(version), type.getServerAdapterTypeId(version));
-		this.bean = server;
+		this.bean = type.createServerBean(rootLocation);
 	}
 	
 	private ServerBeanType loadTypeInternal(File location) {
@@ -98,28 +95,4 @@ public class ServerBeanLoader {
 		return bean.getServerAdapterTypeId();
 	}
 	
-
-	/**
-	 * Turn a version string into a major.minor version string. 
-	 * Example:
-	 *    getMajorMinorVersion("4.1.3.Alpha3") -> "4.1"
-	 *    
-	 * @param version
-	 * @return
-	 */
-	public static String getMajorMinorVersion(String version) {
-		if(version==null) 
-			return "";//$NON-NLS-1$
-
-		int firstDot = version.indexOf(".");
-		int secondDot = firstDot == -1 ? -1 : version.indexOf(".", firstDot + 1);
-		if( secondDot != -1) {
-			String currentVersion = version.substring(0, secondDot);
-			return currentVersion;
-		}
-		if( firstDot != -1)
-			// String only has one ".", and is assumed to be already in "x.y" form
-			return version;
-		return "";
-	}
 }

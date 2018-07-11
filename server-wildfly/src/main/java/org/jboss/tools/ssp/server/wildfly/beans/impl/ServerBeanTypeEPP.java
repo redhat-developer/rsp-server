@@ -29,7 +29,7 @@ public class ServerBeanTypeEPP extends JBossServerBeanType {
 	}
 	
 	@Override
-	public String getRootToAdapterRelativePath(String version) {
+	public String getRootToAdapterRelativePath(File root, String version) {
 		return JBOSS_AS_PATH;
 	}
 	public boolean superIsServerRoot(File location) {

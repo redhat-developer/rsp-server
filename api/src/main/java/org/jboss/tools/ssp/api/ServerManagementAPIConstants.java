@@ -101,8 +101,16 @@ public interface ServerManagementAPIConstants {
 	 * Debugging details: keys
 	 */
 	public static final String DEBUG_DETAILS_HOST = "debug.details.host";
+	
 	public static final String DEBUG_DETAILS_PORT = "debug.details.port";
 	
 	public static final String DEBUG_DETAILS_TYPE = "debug.details.type";
 	
+	/*
+	 * Standardized server property keys 
+	 */
+	public static final String SERVER_HOME_DIR = "server.home.dir";
+
+	public static final String SERVER_HOME_FILE = "server.home.file";
+
 }

@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jboss.tools.ssp.server.discovery.serverbeans.ServerBeanLoader;
+import org.jboss.tools.ssp.server.spi.discovery.ServerBeanType;
 import org.jboss.tools.ssp.server.wildfly.impl.util.JBossManifestUtility;
 
 /**
@@ -32,7 +32,7 @@ public class ServerBeanTypeFSW6 extends ServerBeanTypeUnknownAS71Product {
 	
 	@Override
 	public String getServerBeanName(File root) {
-		return "JBoss Fuse Service Works " + ServerBeanLoader.getMajorMinorVersion(getFullVersion(root, null));
+		return "JBoss Fuse Service Works " + ServerBeanType.getMajorMinorVersion(getFullVersion(root, null));
 	}
 	
 	@Override

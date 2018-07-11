@@ -23,7 +23,7 @@ public class ServerBeanTypeSOAP extends ServerBeanTypeEAP {
 	}
 
 	@Override
-	public String getRootToAdapterRelativePath(String version) {
+	public String getRootToAdapterRelativePath(File root, String version) {
 		return JBOSS_AS_PATH;
 	}
 

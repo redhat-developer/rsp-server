@@ -22,7 +22,7 @@ public class ServerBeanTypeSOAPStandalone extends ServerBeanTypeEnterprise {
 				asPath(JBOSS_ESB_PATH,BIN,RUN_JAR_NAME));
 	}
 	@Override
-	public String getRootToAdapterRelativePath(String version) {
+	public String getRootToAdapterRelativePath(File root, String version) {
 		return "jboss-esb";
 	}
 

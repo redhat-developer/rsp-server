@@ -10,6 +10,8 @@ package org.jboss.tools.ssp.server.spi.discovery;
 
 import java.io.File;
 
+import org.jboss.tools.ssp.api.dao.ServerBean;
+
 public abstract class ServerBeanType {
 	
 	protected static final String UNKNOWN_STR = "UNKNOWN"; //$NON-NLS-1$
@@ -91,10 +93,11 @@ public abstract class ServerBeanType {
 	 * Get the relative path from what is the server bean's root
 	 * to what would be it's server adapter's root, or null if equal. 
 	 * 
+	 * @param root
 	 * @param version
 	 * @return
 	 */
-	public String getRootToAdapterRelativePath(String version) {
+	public String getRootToAdapterRelativePath(File root, String version) {
 		return null;
 	}
 	
@@ -110,5 +113,39 @@ public abstract class ServerBeanType {
 	 */
 	public String getServerBeanName(File root) {
 		return root.getName();
+	}
+
+	public ServerBean createServerBean(File rootLocation) {
+		String version = getFullVersion(rootLocation);
+		ServerBean server = new ServerBean(
+				rootLocation.getPath(), getServerBeanName(rootLocation),
+				getId(), getUnderlyingTypeId(rootLocation), version, 
+				getMajorMinorVersion(version), getServerAdapterTypeId(version));
+		return server;
+	}
+	
+
+	/**
+	 * Turn a version string into a major.minor version string. 
+	 * Example:
+	 *    getMajorMinorVersion("4.1.3.Alpha3") -> "4.1"
+	 *    
+	 * @param version
+	 * @return
+	 */
+	public static String getMajorMinorVersion(String version) {
+		if(version==null) 
+			return "";//$NON-NLS-1$
+
+		int firstDot = version.indexOf(".");
+		int secondDot = firstDot == -1 ? -1 : version.indexOf(".", firstDot + 1);
+		if( secondDot != -1) {
+			String currentVersion = version.substring(0, secondDot);
+			return currentVersion;
+		}
+		if( firstDot != -1)
+			// String only has one ".", and is assumed to be already in "x.y" form
+			return version;
+		return "";
 	}
 }

@@ -3,6 +3,7 @@ package org.jboss.tools.ssp.server.minishift.discovery;
 import java.io.File;
 import java.util.HashMap;
 
+import org.jboss.tools.ssp.api.dao.ServerBean;
 import org.jboss.tools.ssp.server.minishift.discovery.MinishiftVersionLoader.MinishiftVersions;
 import org.jboss.tools.ssp.server.minishift.servertype.impl.MinishiftServerTypes;
 import org.jboss.tools.ssp.server.spi.discovery.IServerBeanTypeProvider;
@@ -27,9 +28,14 @@ public class MinishiftBeanTypeProvider implements IServerBeanTypeProvider {
 
 		@Override
 		public boolean isServerRoot(File location) {
-			if( location.isDirectory())
-				return false;
-			return getFullVersion(location) != null;
+			if( location.isFile()) {
+				return getFullVersion(location) != null;
+			}
+			MinishiftDiscovery disc = new MinishiftDiscovery();
+			if( disc.folderContainsMinishiftBinary(location)) {
+				return true;
+			}
+			return false;
 		}
 
 		@Override
@@ -77,5 +83,20 @@ public class MinishiftBeanTypeProvider implements IServerBeanTypeProvider {
 			return MinishiftServerTypes.MINISHIFT_1_12_ID;
 		}
 		
+		// TODO if the user put a folder here, find the right path
+		public ServerBean createServerBean(File rootLocation) {
+			if( rootLocation.isDirectory()) {
+				MinishiftDiscovery disc = new MinishiftDiscovery();
+				if( disc.folderContainsMinishiftBinary(rootLocation)) {
+					rootLocation = disc.getMinishiftBinaryFromFolder(rootLocation);
+				}
+			}
+			String version = getFullVersion(rootLocation);
+			ServerBean server = new ServerBean(
+					rootLocation.getPath(), getServerBeanName(rootLocation),
+					getId(), getUnderlyingTypeId(rootLocation), version, 
+					getMajorMinorVersion(version), getServerAdapterTypeId(version));
+			return server;
+		}
 	}
 }

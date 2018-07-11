@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 public class MinishiftDiscovery {
 	private static final Pattern WHITELIST_PATTERN = Pattern.compile("cdk-[0-9][.][0-9].*-minishift-(linux|darwin|windows)-amd64(.exe)?");
 
-	private static final String VM_DRIVER = "vm-driver";
 	private static final String MINISHIFT = "minishift";
 	private static final String MINISHIFT_EXE = "minishift.exe";
 
@@ -30,6 +29,10 @@ public class MinishiftDiscovery {
 	public boolean folderContainsMinishiftBinary(File f) {
 		File bin = getMinishiftBinaryFromFolder(f);
 		return bin != null && bin.exists() && bin.isFile();
+	}
+	
+	public File getMinishiftBinaryInFolder(File folder) {
+		return folderWhiteListBin(folder);
 	}
 	
 	private File folderWhiteListBin(File folder) {

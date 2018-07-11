@@ -8,11 +8,13 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.server.wildfly.servertype;
 
+import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
+
 public interface IJBossServerAttributes {
 	/*
 	 * Required attributes
 	 */
-	public static final String SERVER_HOME = "server.home.dir";
+	public static final String SERVER_HOME = ServerManagementAPIConstants.SERVER_HOME_DIR;
 	
 	
 	

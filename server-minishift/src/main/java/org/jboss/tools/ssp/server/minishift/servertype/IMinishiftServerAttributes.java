@@ -8,11 +8,13 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.server.minishift.servertype;
 
+import org.jboss.tools.ssp.api.ServerManagementAPIConstants;
+
 public interface IMinishiftServerAttributes {
 	/*
 	 * Required attributes
 	 */
-	public static final String MINISHIFT_BINARY = "minishift.binary.path";
+	public static final String MINISHIFT_BINARY = ServerManagementAPIConstants.SERVER_HOME_FILE;
 	
 	public static final String MINISHIFT_VM_DRIVER = "minishift.vmdriver";
 

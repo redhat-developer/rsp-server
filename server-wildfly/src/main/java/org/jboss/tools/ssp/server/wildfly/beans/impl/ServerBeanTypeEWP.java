@@ -21,7 +21,7 @@ public class ServerBeanTypeEWP extends ServerBeanTypeEnterprise {
 			asPath(JBOSS_AS_WEB_PATH,BIN,RUN_JAR_NAME));
 	}
 	@Override
-	public String getRootToAdapterRelativePath(String version) {
+	public String getRootToAdapterRelativePath(File root, String version) {
 		return "jboss-as-web";
 	}
 
