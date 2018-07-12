@@ -31,4 +31,5 @@ public class ServerBeanTypeJPP61 extends ServerBeanTypeUnknownAS71Product {
 			return v != null && v.startsWith("6.") && !v.startsWith("6.0");
 		}
 		return false;
-	}}
+	}
+}

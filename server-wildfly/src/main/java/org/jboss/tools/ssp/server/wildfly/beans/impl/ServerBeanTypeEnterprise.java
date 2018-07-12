@@ -11,9 +11,11 @@
 package org.jboss.tools.ssp.server.wildfly.beans.impl;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Properties;
 
+import org.jboss.tools.ssp.api.dao.ServerBean;
+import org.jboss.tools.ssp.eclipse.core.runtime.IPath;
+import org.jboss.tools.ssp.eclipse.core.runtime.Path;
 import org.jboss.tools.ssp.launching.utils.FileUtil;
 
 public abstract class ServerBeanTypeEnterprise extends JBossServerBeanType {
@@ -37,7 +39,7 @@ public abstract class ServerBeanTypeEnterprise extends JBossServerBeanType {
 	 */
 	public String getEAP6xVersion(File location,  String metaInfPath,
 			String versionPrefix, String slot, String releaseName) {
-		Path productConf = location.toPath().resolve(BIN).resolve(PRODUCT_CONF);
+		IPath productConf = new Path(location.getAbsolutePath()).append(BIN).append(PRODUCT_CONF);
 		if( productConf.toFile().exists()) {
 			Properties p = FileUtil.loadProperties(productConf.toFile());
 			String product = (String) p.get(PRODUCT_CONF_SLOT); //$NON-NLS-1$
@@ -49,10 +51,10 @@ public abstract class ServerBeanTypeEnterprise extends JBossServerBeanType {
 	}
 	public String getEAP6xVersionNoSlotCheck(File location,  String metaInfPath,
 			String versionPrefix, String releaseName) {
-		Path rootPath = location.toPath();
-		Path eapDir = rootPath.resolve(metaInfPath);
+		IPath rootPath = new Path(location.getAbsolutePath());
+		IPath eapDir = rootPath.append(metaInfPath);
 		if( eapDir.toFile().exists()) {
-			Path manifest = eapDir.resolve(MANIFEST_MF); //$NON-NLS-1$
+			IPath manifest = eapDir.append(MANIFEST_MF); //$NON-NLS-1$
 			Properties p2 = FileUtil.loadProperties(manifest.toFile());
 			String type = p2.getProperty(MANIFEST_PROD_RELEASE_NAME); //$NON-NLS-1$
 			String version = p2.getProperty(MANIFEST_PROD_RELEASE_VERS); //$NON-NLS-1$
@@ -76,4 +78,23 @@ public abstract class ServerBeanTypeEnterprise extends JBossServerBeanType {
 		// non-exact matches still get a non-null result.
 		return null;
 	}
+	
+	@Override
+	public ServerBean createServerBean(File rootLocation) {
+		String version = getFullVersion(rootLocation);
+		String relative = getRootToAdapterRelativePath(rootLocation, version);
+		File root = null;
+		if( relative == null ) {
+			root = rootLocation;
+		} else {
+			IPath p = new Path(rootLocation.getAbsolutePath()).append(relative);
+			root = p.toFile();
+		}
+		ServerBean server = new ServerBean(
+				root.getAbsolutePath(), getServerBeanName(rootLocation),
+				getId(), getUnderlyingTypeId(rootLocation), version, 
+				getMajorMinorVersion(version), getServerAdapterTypeId(version));
+		return server;
+	}
+
 }
