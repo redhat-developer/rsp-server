@@ -48,8 +48,8 @@ public abstract class AbstractPoller implements IServerStatePoller {
 	private void pollerRun() {
 		setStateInternal(false, state);
 		while(!canceled && !done) {
-			boolean up = onePing(server);
-			if( fromBool(up) == expectedState ) {
+			SERVER_STATE stat = onePing(server);
+			if( stat == expectedState ) {
 				setStateInternal(true, expectedState);
 			}
 			try {
@@ -58,7 +58,7 @@ public abstract class AbstractPoller implements IServerStatePoller {
 		}
 	}
 
-	protected abstract boolean onePing(IServer server);
+	protected abstract SERVER_STATE onePing(IServer server);
 	
 	public IServer getServer() {
 		return server;
@@ -87,14 +87,7 @@ public abstract class AbstractPoller implements IServerStatePoller {
 	}
 
 	public SERVER_STATE getCurrentStateSynchronous(IServer server) {
-		boolean b = onePing(server);
-		SERVER_STATE ret = null;
-		if( b ) {
-			ret = SERVER_STATE.UP;
-		} else {
-			ret = SERVER_STATE.UNKNOWN;
-		}
-		return ret;
+		return onePing(server);
 	}
 
 	@Override

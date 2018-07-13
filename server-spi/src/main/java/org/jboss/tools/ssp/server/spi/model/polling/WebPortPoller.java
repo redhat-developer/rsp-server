@@ -22,34 +22,34 @@ public abstract class WebPortPoller extends AbstractPoller implements IServerSta
 	private String name;
 
 	@Override
-	protected boolean onePing(IServer server) {
+	protected SERVER_STATE onePing(IServer server) {
 		return onePing(getURL(server));
 	}
 	
 	protected abstract String getURL(IServer server);
 	
-	private boolean onePing(String url) {
+	private SERVER_STATE onePing(String url) {
 		URLConnection conn = null;
 		try {
 			URL pingUrl = new URL(url);
 			conn = pingUrl.openConnection();
 			((HttpURLConnection)conn).getResponseCode();
-			return true;
+			return SERVER_STATE.UP;
 		} catch( FileNotFoundException fnfe ) {
-			return true;
+			return SERVER_STATE.UP;
 		} catch (MalformedURLException e) {
 			// Should NEVER happen since the URL's are hand-crafted, but whatever
 //			Status s = new Status(IStatus.ERROR, JBossServerCorePlugin.PLUGIN_ID, e.getMessage(), e);
 //			JBossServerCorePlugin.log(s);
 		} catch (IOException e) {
 			// Does not need to be logged
-			return false;
+			return SERVER_STATE.DOWN;
 		} finally {
 			if( conn != null ) {
 				((HttpURLConnection)conn).disconnect();
 			}
 		}
-		return false;
+		return SERVER_STATE.DOWN;
 	}
 	
 	@Override

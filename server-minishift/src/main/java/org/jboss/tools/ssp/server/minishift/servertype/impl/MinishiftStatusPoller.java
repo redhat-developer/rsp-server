@@ -20,6 +20,7 @@ import org.jboss.tools.ssp.server.spi.launchers.CommandTimeoutException;
 import org.jboss.tools.ssp.server.spi.launchers.internal.ProcessUtility;
 import org.jboss.tools.ssp.server.spi.model.polling.AbstractPoller;
 import org.jboss.tools.ssp.server.spi.model.polling.IServerStatePoller;
+import org.jboss.tools.ssp.server.spi.model.polling.IServerStatePoller.SERVER_STATE;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 
 public class MinishiftStatusPoller extends AbstractPoller implements IServerStatePoller {
@@ -48,23 +49,23 @@ public class MinishiftStatusPoller extends AbstractPoller implements IServerStat
 		return lines;
 	}
 	@Override
-	protected boolean onePing(IServer server) {
+	protected SERVER_STATE onePing(IServer server) {
 		String[] lines = null;
 		try {
 			lines = callMinishiftStatus(server);
 			IStatus stat = parseOutput(lines);
 			if (stat.isOK()) {
-				return true;
+				return SERVER_STATE.UP;
 			}
-			return false;
+			return SERVER_STATE.DOWN;
 //		} catch (PollingException pe) {
 //			cancel(IServerStatePoller.CANCELATION_CAUSE.FAILED);
 		} catch (TimeoutException te) {
 			cancel(IServerStatePoller.CANCELATION_CAUSE.TIMEOUT_REACHED);
-			return false;
+			return SERVER_STATE.DOWN;
 		} catch (IOException ioe) {
 			cancel(IServerStatePoller.CANCELATION_CAUSE.FAILED);
-			return false;
+			return SERVER_STATE.DOWN;
 		}
 //	return CDKCoreActivator.statusFactory().infoStatus(CDKCoreActivator.PLUGIN_ID,
 //			"Response status indicates the CDK is starting.");
