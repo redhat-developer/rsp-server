@@ -8,7 +8,12 @@ Bundle-Version: 0.0.9.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: org.jboss.tools.ssp.api.dao,
  org.jboss.tools.ssp.eclipse.core.runtime,
+ org.jboss.tools.ssp.eclipse.debug.core,
+ org.jboss.tools.ssp.eclipse.debug.core.model,
+ org.jboss.tools.ssp.eclipse.jdt.launching,
  org.jboss.tools.ssp.eclipse.osgi.util,
+ org.jboss.tools.ssp.launching.java,
+ org.jboss.tools.ssp.launching.utils,
  org.osgi.framework
 Export-Package: org.jboss.tools.ssp.server.spi.discovery,
  org.jboss.tools.ssp.server.spi.launchers,
