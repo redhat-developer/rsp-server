@@ -205,6 +205,20 @@ The protocol currently assumes that one server serves one tool. There is current
 
 This endpoint takes no parameters. 
 
+This endpoint returns a list of the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "filepath" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface DiscoveryPath {
+    filepath: string;
+}</pre></td></tr></table>
+
 #### server/findServerBeans
 
  The `server/findServerBeans` request is sent by the client to fetch a list of server beans for the given path. The SSP model will iterate through a number of `IServerBeanTypeProvider` instances and ask them if they recognize the contents of the folder underlying the discovery path. Any providers that claim to be able to handle the given path will return an object representing the details of this recognized server runtime, its version, etc. 
@@ -221,6 +235,44 @@ This endpoint takes the following json schemas as parameters:
   }
 }</pre></td><td><pre>export interface DiscoveryPath {
     filepath: string;
+}</pre></td></tr></table>
+
+This endpoint returns a list of the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "location" : {
+      "type" : "string"
+    },
+    "typeCategory" : {
+      "type" : "string"
+    },
+    "specificType" : {
+      "type" : "string"
+    },
+    "name" : {
+      "type" : "string"
+    },
+    "version" : {
+      "type" : "string"
+    },
+    "fullVersion" : {
+      "type" : "string"
+    },
+    "serverAdapterTypeId" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface ServerBean {
+    location: string;
+    typeCategory: string;
+    specificType: string;
+    name: string;
+    version: string;
+    fullVersion: string;
+    serverAdapterTypeId: string;
 }</pre></td></tr></table>
 
 #### server/addDiscoveryPath
@@ -241,6 +293,40 @@ This endpoint takes the following json schemas as parameters:
     filepath: string;
 }</pre></td></tr></table>
 
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "severity" : {
+      "type" : "integer"
+    },
+    "code" : {
+      "type" : "integer"
+    },
+    "message" : {
+      "type" : "string"
+    },
+    "trace" : {
+      "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
+    },
+    "plugin" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface Status {
+    severity: number;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+    plugin: string;
+}</pre></td></tr></table>
+
 #### server/removeDiscoveryPath
 
  The `server/removeDiscoveryPath` notification is sent by the client to remove a path from the model and prevent it from being searched by clients when discovering servers in the future. 
@@ -259,17 +345,108 @@ This endpoint takes the following json schemas as parameters:
     filepath: string;
 }</pre></td></tr></table>
 
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "severity" : {
+      "type" : "integer"
+    },
+    "code" : {
+      "type" : "integer"
+    },
+    "message" : {
+      "type" : "string"
+    },
+    "trace" : {
+      "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
+    },
+    "plugin" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface Status {
+    severity: number;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+    plugin: string;
+}</pre></td></tr></table>
+
 #### server/getServerHandles
 
  The `server/getServerHandles` request is sent by the client to list the server adapters currently configured. A server adapter is configured when a call to `server/createServer` completes without error, or, some may be pre-configured by the server upon installation. 
 
 This endpoint takes no parameters. 
 
+This endpoint returns a list of the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "type" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "visibleName" : {
+          "type" : "string"
+        },
+        "description" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface ServerHandle {
+    id: string;
+    type: ServerType;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
+    description: string;
+}</pre></td></tr></table>
+
 #### server/getServerTypes
 
  The `server/getServerTypes` request is sent by the client to list the server types currently supported. The details of how many server types are supported by an SSP, or how they are registered, is implementation-specific. 
 
 This endpoint takes no parameters. 
+
+This endpoint returns a list of the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "visibleName" : {
+      "type" : "string"
+    },
+    "description" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface ServerType {
+    id: string;
+    visibleName: string;
+    description: string;
+}</pre></td></tr></table>
 
 #### server/deleteServer
 
@@ -310,6 +487,40 @@ export interface ServerType {
     description: string;
 }</pre></td></tr></table>
 
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "severity" : {
+      "type" : "integer"
+    },
+    "code" : {
+      "type" : "integer"
+    },
+    "message" : {
+      "type" : "string"
+    },
+    "trace" : {
+      "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
+    },
+    "plugin" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface Status {
+    severity: number;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+    plugin: string;
+}</pre></td></tr></table>
+
 #### server/getRequiredAttributes
 
  The `server/getRequiredAttributes` request is sent by the client to list the required attributes that must be stored on a server object of this type, such as a server-home or other required parameters. 
@@ -336,6 +547,40 @@ This endpoint takes the following json schemas as parameters:
     description: string;
 }</pre></td></tr></table>
 
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "attributes" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "defaultVal" : {
+            "type" : "any"
+          }
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface Attributes {
+    attributes: { [index: string]: Attribute };
+}
+
+export interface Attribute {
+    type: string;
+    description: string;
+    defaultVal: any;
+}</pre></td></tr></table>
+
 #### server/getOptionalAttributes
 
  The `server/getOptionalAttributes` request is sent by the client to list the optional attributes that can be stored on a server object of this type. This may include things like customizing ports, or custom methods of interacting with various functionality specific to the server type. 
@@ -360,6 +605,40 @@ This endpoint takes the following json schemas as parameters:
     id: string;
     visibleName: string;
     description: string;
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "attributes" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "defaultVal" : {
+            "type" : "any"
+          }
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface Attributes {
+    attributes: { [index: string]: Attribute };
+}
+
+export interface Attribute {
+    type: string;
+    description: string;
+    defaultVal: any;
 }</pre></td></tr></table>
 
 #### server/createServer
@@ -391,6 +670,40 @@ This endpoint takes the following json schemas as parameters:
     attributes: { [index: string]: any };
 }</pre></td></tr></table>
 
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "severity" : {
+      "type" : "integer"
+    },
+    "code" : {
+      "type" : "integer"
+    },
+    "message" : {
+      "type" : "string"
+    },
+    "trace" : {
+      "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
+    },
+    "plugin" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface Status {
+    severity: number;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+    plugin: string;
+}</pre></td></tr></table>
+
 #### server/getLaunchModes
 
  The `server/getLaunchModes` request is sent by the client to get a list of launch modes that are applicable to this server type. Some servers can only be started. Others can be started, debugged, profiled, etc. Server types may come up with their own launch modes if desired. 
@@ -417,6 +730,24 @@ This endpoint takes the following json schemas as parameters:
     description: string;
 }</pre></td></tr></table>
 
+This endpoint returns a list of the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "mode" : {
+      "type" : "string"
+    },
+    "desc" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface ServerLaunchMode {
+    mode: string;
+    desc: string;
+}</pre></td></tr></table>
+
 #### server/getRequiredLaunchAttributes
 
  The `server/getRequiredLaunchAttributes` request is sent by the client to get any additional attributes required for launch or that can customize launch behavior. Some server types may require references to a specific library, a clear decision about which of several configurations the server should be launched with, or any other required details required to successfully start up the server. 
@@ -439,6 +770,40 @@ This endpoint takes the following json schemas as parameters:
     mode: string;
 }</pre></td></tr></table>
 
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "attributes" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "defaultVal" : {
+            "type" : "any"
+          }
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface Attributes {
+    attributes: { [index: string]: Attribute };
+}
+
+export interface Attribute {
+    type: string;
+    description: string;
+    defaultVal: any;
+}</pre></td></tr></table>
+
 #### server/getOptionalLaunchAttributes
 
  The `server/getOptionalLaunchAttributes` request is sent by the client to get any optional attributes which can be used to modify the launch behavior. Some server types may allow overrides to any number of launch flags or settings, but not require these changes in order to function. 
@@ -459,6 +824,40 @@ This endpoint takes the following json schemas as parameters:
 }</pre></td><td><pre>export interface LaunchAttributesRequest {
     id: string;
     mode: string;
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "attributes" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "defaultVal" : {
+            "type" : "any"
+          }
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface Attributes {
+    attributes: { [index: string]: Attribute };
+}
+
+export interface Attribute {
+    type: string;
+    description: string;
+    defaultVal: any;
 }</pre></td></tr></table>
 
 #### server/getLaunchCommand
@@ -501,6 +900,41 @@ export interface ServerAttributes {
     serverType: string;
     id: string;
     attributes: { [index: string]: any };
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "cmdLine" : {
+      "type" : "array",
+      "items" : {
+        "type" : "string"
+      }
+    },
+    "workingDir" : {
+      "type" : "string"
+    },
+    "envp" : {
+      "type" : "array",
+      "items" : {
+        "type" : "string"
+      }
+    },
+    "properties" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "string"
+      }
+    }
+  }
+}</pre></td><td><pre>export interface CommandLineDetails {
+    cmdLine: string[];
+    workingDir: string;
+    envp: string[];
+    properties: { [index: string]: string };
 }</pre></td></tr></table>
 
 #### server/serverStartingByClient
@@ -558,6 +992,40 @@ export interface ServerAttributes {
     attributes: { [index: string]: any };
 }</pre></td></tr></table>
 
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "severity" : {
+      "type" : "integer"
+    },
+    "code" : {
+      "type" : "integer"
+    },
+    "message" : {
+      "type" : "string"
+    },
+    "trace" : {
+      "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
+    },
+    "plugin" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface Status {
+    severity: number;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+    plugin: string;
+}</pre></td></tr></table>
+
 #### server/serverStartedByClient
 
  The `server/serverStartedByClient` request is sent by the client to the server to inform the server that the client itself has launched the server instead of asking the SSP to do so, AND that the startup has completed. 
@@ -598,6 +1066,40 @@ export interface ServerAttributes {
     serverType: string;
     id: string;
     attributes: { [index: string]: any };
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "severity" : {
+      "type" : "integer"
+    },
+    "code" : {
+      "type" : "integer"
+    },
+    "message" : {
+      "type" : "string"
+    },
+    "trace" : {
+      "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
+    },
+    "plugin" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface Status {
+    severity: number;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+    plugin: string;
 }</pre></td></tr></table>
 
 #### server/startServerAsync
@@ -642,6 +1144,83 @@ export interface ServerAttributes {
     attributes: { [index: string]: any };
 }</pre></td></tr></table>
 
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "status" : {
+      "type" : "object",
+      "properties" : {
+        "severity" : {
+          "type" : "integer"
+        },
+        "code" : {
+          "type" : "integer"
+        },
+        "message" : {
+          "type" : "string"
+        },
+        "trace" : {
+          "type" : "string"
+        },
+        "ok" : {
+          "type" : "boolean"
+        },
+        "plugin" : {
+          "type" : "string"
+        }
+      }
+    },
+    "details" : {
+      "type" : "object",
+      "properties" : {
+        "cmdLine" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "workingDir" : {
+          "type" : "string"
+        },
+        "envp" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "properties" : {
+          "type" : "object",
+          "additionalProperties" : {
+            "type" : "string"
+          }
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface StartServerResponse {
+    status: Status;
+    details: CommandLineDetails;
+}
+
+export interface Status {
+    severity: number;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+    plugin: string;
+}
+
+export interface CommandLineDetails {
+    cmdLine: string[];
+    workingDir: string;
+    envp: string[];
+    properties: { [index: string]: string };
+}</pre></td></tr></table>
+
 #### server/stopServerAsync
 
  The `server/stopServerAsync` request is sent by the client to the server to stop an existing server in the model. 
@@ -664,13 +1243,47 @@ This endpoint takes the following json schemas as parameters:
     force: boolean;
 }</pre></td></tr></table>
 
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "severity" : {
+      "type" : "integer"
+    },
+    "code" : {
+      "type" : "integer"
+    },
+    "message" : {
+      "type" : "string"
+    },
+    "trace" : {
+      "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
+    },
+    "plugin" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface Status {
+    severity: number;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+    plugin: string;
+}</pre></td></tr></table>
+
 #### server/shutdown
 
  The `server/shutdown` notification is sent by the client to shut down the SSP itself. 
 
 This endpoint takes no parameters. 
 
-
+This endpoint returns no value
 
 ### The Client Interface
 
@@ -692,7 +1305,7 @@ This endpoint takes the following json schemas as parameters:
     filepath: string;
 }</pre></td></tr></table>
 
-#### client/discoveryPathRemoved
+This endpoint returns no value#### client/discoveryPathRemoved
 
  The `client/discoveryPathRemoved` notification is sent by the server to all clients in response to the `server/removeDiscoveryPath` notification. This call indicates that a discovery path has been removed from the SSP model which keeps track of filesystem paths that may be searched for server runtimes. 
 
@@ -710,7 +1323,7 @@ This endpoint takes the following json schemas as parameters:
     filepath: string;
 }</pre></td></tr></table>
 
-#### client/serverAdded
+This endpoint returns no value#### client/serverAdded
 
  The `client/serverAdded` notification is sent by the server to all clients in a response to the `server/createServer` notification. This notification indicates that a new server adapter has been created in the SSP model of existing servers. As mentioned above, this was most likely in response to a server/createServer notification, but is not strictly limited to this entrypoint. 
 
@@ -749,7 +1362,7 @@ export interface ServerType {
     description: string;
 }</pre></td></tr></table>
 
-#### client/serverRemoved
+This endpoint returns no value#### client/serverRemoved
 
  The `client/serverRemoved` notification is sent by the server to all clients in response to the `server/deleteServer` notification. This notification indicates that a server adapter has been removed from the SSP model of existing servers. As mentioned above, this was most likely in response to a server/deleteServer notification, but is not strictly limited to this entrypoint. 
 
@@ -788,7 +1401,7 @@ export interface ServerType {
     description: string;
 }</pre></td></tr></table>
 
-#### client/serverAttributesChanged
+This endpoint returns no value#### client/serverAttributesChanged
 
  The `client/serverRemoved` notification is sent by the server to all clients when any server has had one of its attributes changed. 
 
@@ -827,7 +1440,7 @@ export interface ServerType {
     description: string;
 }</pre></td></tr></table>
 
-#### client/serverStateChanged
+This endpoint returns no value#### client/serverStateChanged
 
  The `client/serverStateChanged` notification is sent by the server to all clients when any server has had its state change. Possible values include: `0` representing an unknown state `1` representing starting `2` representing started `3` representing stopping `4` representing stopped 
 
@@ -879,7 +1492,7 @@ export interface ServerType {
     description: string;
 }</pre></td></tr></table>
 
-#### client/serverProcessCreated
+This endpoint returns no value#### client/serverProcessCreated
 
  The `client/serverProcessCreated` notification is sent by the server to all clients when any server has launched a new process which can be monitored. This notification is most often sent in response to a call to `server/startServerAsync` which will typically launch a process to run the server in question. 
 
@@ -931,7 +1544,7 @@ export interface ServerType {
     description: string;
 }</pre></td></tr></table>
 
-#### client/serverProcessTerminated
+This endpoint returns no value#### client/serverProcessTerminated
 
  The `client/serverProcessTerminated` notification is sent by the server to all clients when any process associated with a server has been terminated. This notification is most often sent as a result of a call to `server/stopServerAsync`, which should shut down a given server and cause all of that server's processes to terminate after some time. 
 
@@ -983,7 +1596,7 @@ export interface ServerType {
     description: string;
 }</pre></td></tr></table>
 
-#### client/serverProcessOutputAppended
+This endpoint returns no value#### client/serverProcessOutputAppended
 
  The `client/serverProcessOutputAppended` notification is sent by the server to all clients when any process associated with a server generated output on any of its output streams. This notification may be sent as a result of anything that causes a given server process to emit output, such as a change in configuration, a deployment, an error, normal logging, or any other number of possibilities. 
 
@@ -1043,3 +1656,4 @@ export interface ServerType {
     description: string;
 }</pre></td></tr></table>
 
+This endpoint returns no value
