@@ -270,7 +270,8 @@ public class ServerManagementCLI {
 		LaunchAttributesRequest req = new LaunchAttributesRequest(handle.getType().getId(), mode);
 		
 		Attributes attrs = launcher.getServerProxy().getRequiredLaunchAttributes(req).get();
-		HashMap<String, Object> toSend = promptForAttributes(attrs);
+		HashMap<String, Object> toSend = new HashMap<String, Object>(); 
+		promptForAttributes(attrs, toSend, true);
 		
 		ServerAttributes servAttr = new ServerAttributes(handle.getType().getId(), handle.getId(), toSend);
 		LaunchParameters getLaunchReq = 
@@ -287,31 +288,65 @@ public class ServerManagementCLI {
 		return null;
 	}
 	
-	private void runAddServer() {
+	private ServerType chooseServerType() {
 		List<ServerType> types = null;
 		try {
 			types = launcher.getServerProxy().getServerTypes().get();
+			
 			System.out.println("What type of server do you want to create?");
+			int c = 1;
 			for( ServerType it : types ) {
-				System.out.println("   " + it.getId());
+				System.out.println("   " + c + ") " + it.getId());
+				c++;
 			}
 			String type = nextLine().trim();
-			ServerType selected = null;
-			for( ServerType st1 : types ) {
-				if( st1.getId().equals(type)) {
-					selected = st1;
+			try {
+				Integer inte = Integer.parseInt(type);
+				int ind = inte-1;
+				if( ind >= 0 && ind < types.size() ) {
+					return types.get(ind);
 				}
+			} catch(NumberFormatException nfe) {
+				ServerType selected = null;
+				for( ServerType st1 : types ) {
+					if( st1.getId().equals(type)) {
+						selected = st1;
+					}
+				}
+				return selected;
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	private void runAddServer() {
+
+		try {
+			ServerType selected = chooseServerType();
+			if( selected == null ) {
+				System.out.println("Canceling request.");
+				return;
 			}
 			
 			System.out.println("Please choose a unique name: ");
 			String name = nextLine();
+			if( name == null || name.isEmpty()) {
+				System.out.println("Name cannot be empty. Canceling request.");
+				return;
+			}
 			
+			HashMap<String, Object> store = new HashMap<String, Object>();
 			Attributes required2 = launcher.getServerProxy()
 					.getRequiredAttributes(selected).get();
-
-			HashMap<String, Object> toSend = promptForAttributes(required2);
+			Attributes optional2 = launcher.getServerProxy()
+					.getOptionalAttributes(selected).get();
+			promptForAttributes(required2, store, true);
+			promptForAttributes(optional2, store, false);
+			
 			System.out.println("Adding Server...");
-			ServerAttributes csa = new ServerAttributes(type, name, toSend);
+			ServerAttributes csa = new ServerAttributes(selected.getId(), name, store);
 			Status result = launcher.getServerProxy().createServer(csa).get();
 			if( result.isOK()) {
 				System.out.println("Server Added");
@@ -324,43 +359,47 @@ public class ServerManagementCLI {
 	}
 	
 	
-	private HashMap<String, Object> promptForAttributes(Attributes attr) {
-		CreateServerAttributesUtility required = new CreateServerAttributesUtility(attr);
-		HashMap<String, Object> toSend = new HashMap<>();
-		if( required != null ) {
-			Set<String> keys = required.listAttributes();
+	private void promptForAttributes(Attributes attr, HashMap<String, Object> store, boolean required2) {
+		CreateServerAttributesUtility attrsUtil = new CreateServerAttributesUtility(attr);
+		HashMap<String, Object> toSend = store;
+		if( attrsUtil != null ) {
+			Set<String> keys = attrsUtil.listAttributes();
 			for( String k : keys ) {
-				String attrType = required.getAttributeType(k);
+				String attrType = attrsUtil.getAttributeType(k);
 				Class c = getAttributeTypeAsClass(attrType);
 				String reqType = c.getName();
-				String reqDesc = required.getAttributeDescription(k);
-				Object defVal = required.getAttributeDefaultValue(k);
+				String reqDesc = attrsUtil.getAttributeDescription(k);
+				Object defVal = attrsUtil.getAttributeDefaultValue(k);
 				
 				// Workaround to sending integers over json
 				defVal = workaroundDoubles(defVal, attrType);
-				
-				
-				StringBuffer sb = new StringBuffer();
-				sb.append("Key: ");
-				sb.append(k);
-				sb.append("\nType: ");
-				sb.append(reqType);
-				sb.append("\nDescription: ");
-				sb.append(reqDesc);
+				String toPrint = "Key: " + k + "\nType: " + reqType + "\nDescription: " + reqDesc;
 				if( defVal != null ) {
-					sb.append("\nDefault Value: ");
-					sb.append(defVal.toString());
+					toPrint += "\nDefault Value: " + defVal.toString();
+				}
+				System.out.println(toPrint);
+				if( !required2 ) {
+					System.out.println("Would you like to set this value? [y/n]");
+					String val = nextLine();
+					if( val == null || val.isEmpty() || val.toLowerCase().equals("n")) {
+						System.out.println("Skipping");
+						continue;
+					}
 				}
 				
+				String msg = null;
 				if( Integer.class.equals(c) || Boolean.class.equals(c) || String.class.equals(c)) {
-					// Simple
-					sb.append("\nPlease enter a value: ");
-					System.out.println(sb.toString());
-					String val = nextLine();
-					toSend.put(k, convertType(val, required.getAttributeType(k)));
+					msg = "Please enter a value: ";
 				} else if( List.class.equals(c)) {
-					sb.append("\nPlease enter a list value. Send a blank line to end the list.");
-					System.out.println(sb.toString());
+					msg = "Please enter a list value. Send a blank line to end the list.";
+				} else if( Map.class.equals(c)) {
+					msg = "Please enter a map value. Each line should read some.key=some.val.\nSend a blank line to end the map.";
+				}
+				System.out.println(msg);
+				if( Integer.class.equals(c) || Boolean.class.equals(c) || String.class.equals(c)) {
+					String val = nextLine();
+					toSend.put(k, convertType(val, attrsUtil.getAttributeType(k)));
+				} else if( List.class.equals(c)) {
 					List<String> arr = new ArrayList<String>();
 					String tmp = nextLine();
 					while(!tmp.trim().isEmpty()) {
@@ -369,8 +408,6 @@ public class ServerManagementCLI {
 					}
 					toSend.put(k, arr);
 				} else if( Map.class.equals(c)) {
-					sb.append("\nPlease enter a map value. Each line should read some.key=some.val.\nSend a blank line to end the map.");
-					System.out.println(sb.toString());
 					Map<String, String> map = new HashMap<String, String>();
 					String tmp = nextLine();
 					while(!tmp.trim().isEmpty()) {
@@ -386,11 +423,8 @@ public class ServerManagementCLI {
 					}
 					toSend.put(k, map);
 				}
-				
-				
 			}
 		}
-		return toSend;
 	}
 	
 	private Object workaroundDoubles(Object defaultVal, String attrType) {
