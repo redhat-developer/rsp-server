@@ -21,6 +21,9 @@ public class MinishiftStartLauncher extends AbstractLauncher {
 	@Override
 	public String getProgramArguments() {
 		String vmDriver = MinishiftPropertyUtility.getMinishiftVMDriver(getServer());
+		if( vmDriver == null || vmDriver.isEmpty()) {
+			return "start " + getCredentialsArguments();
+		}
 		return "start --vm-driver=" + vmDriver  + getCredentialsArguments();
 	}
 	

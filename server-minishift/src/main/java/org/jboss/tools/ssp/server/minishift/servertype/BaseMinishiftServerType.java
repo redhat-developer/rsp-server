@@ -58,10 +58,6 @@ public abstract class BaseMinishiftServerType implements IServerType {
 					ServerManagementAPIConstants.ATTR_TYPE_STRING,
 					"A filesystem path pointing to a minishift binary file.", null);
 
-			attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_VM_DRIVER, 
-					ServerManagementAPIConstants.ATTR_TYPE_STRING,
-					"The driver to use for the Minishift VM. Possible values: [virtualbox vmwarefusion kvm xhyve hyperv] (default \"kvm\")", null);
-			
 			if( isCDK() ) {
 				attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_REG_USERNAME, 
 						ServerManagementAPIConstants.ATTR_TYPE_STRING,
@@ -84,6 +80,11 @@ public abstract class BaseMinishiftServerType implements IServerType {
 	public Attributes getOptionalAttributes() {
 		if (optional == null) {
 			CreateServerAttributesUtility attrs = new CreateServerAttributesUtility();
+
+			attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_VM_DRIVER, 
+					ServerManagementAPIConstants.ATTR_TYPE_STRING,
+					"The driver to use for the Minishift VM. Possible values: [virtualbox vmwarefusion kvm xhyve hyperv] (default \"kvm\")", null);
+			
 			optional = attrs.toPojo();
 		}
 		return optional;
