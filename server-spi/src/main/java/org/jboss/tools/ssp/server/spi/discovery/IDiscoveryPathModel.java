@@ -12,7 +12,17 @@ public interface IDiscoveryPathModel {
 
 	public List<DiscoveryPath> getPaths();
 	
-	public void addPath(DiscoveryPath path);
+	/**
+	 * Return whether the path was added.
+	 * @param path
+	 * @return
+	 */
+	public boolean addPath(DiscoveryPath path);
 	
-	public void removePath(DiscoveryPath path);
+	/**
+	 * Return whether the path was removed
+	 * @param path
+	 * @return
+	 */
+	public boolean removePath(DiscoveryPath path);
 }

@@ -67,7 +67,7 @@ public interface SSPServer {
 	 * model, to be queried or searched later by a client.
 	 */
 	@JsonNotification
-	void addDiscoveryPath(DiscoveryPath path);
+	CompletableFuture<Status> addDiscoveryPath(DiscoveryPath path);
 
 	/**
 	 * The `server/removeDiscoveryPath` notification is sent by the client to remove
@@ -75,7 +75,7 @@ public interface SSPServer {
 	 * discovering servers in the future.
 	 */
 	@JsonNotification
-	void removeDiscoveryPath(DiscoveryPath path);
+	CompletableFuture<Status> removeDiscoveryPath(DiscoveryPath path);
 	
 	
 	
@@ -108,7 +108,7 @@ public interface SSPServer {
 	 * down, or interacted with in any fashion.
 	 */
 	@JsonNotification
-	void deleteServer(ServerHandle handle);
+	CompletableFuture<Status> deleteServer(ServerHandle handle);
 
 	/**
 	 * The `server/getRequiredAttributes` request is sent by the client to list the

@@ -39,7 +39,7 @@ public interface IServerModel {
 
 	IStatus createServer(String serverType, String id, Map<String, Object> attributes);
 
-	void removeServer(String id);
+	boolean removeServer(String id);
 
 	void fireServerStateChanged(IServer server, int state);
 

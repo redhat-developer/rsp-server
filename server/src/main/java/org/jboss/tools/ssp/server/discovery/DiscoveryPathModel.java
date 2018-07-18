@@ -38,22 +38,26 @@ public class DiscoveryPathModel implements IDiscoveryPathModel {
 		return Collections.unmodifiableList(paths);
 	}
 	
-	public void addPath(DiscoveryPath path) {
+	public boolean addPath(DiscoveryPath path) {
 		if( !paths.contains(path)) {
 			paths.add(path);
 			for(IDiscoveryPathListener l : listeners ) {
 				l.discoveryPathAdded(path);
 			}
+			return true;
 		}
+		return false;
 	}
 	
-	public void removePath(DiscoveryPath path) {
+	public boolean removePath(DiscoveryPath path) {
 		if( paths.contains(path)) {
 			paths.remove(path);
 			for(IDiscoveryPathListener l : listeners ) {
 				l.discoveryPathRemoved(path);
 			}
+			return true;
 		}
+		return false;
 	}
 
 }

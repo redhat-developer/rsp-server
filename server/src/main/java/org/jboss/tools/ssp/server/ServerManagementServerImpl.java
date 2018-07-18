@@ -140,15 +140,29 @@ public class ServerManagementServerImpl implements SSPServer {
 	 * Add a path to our list of discovery paths
 	 */
 	@Override
-	public void addDiscoveryPath(DiscoveryPath path) {
-		model.getDiscoveryPathModel().addPath(path);
+	public CompletableFuture<Status> addDiscoveryPath(DiscoveryPath path) {
+		boolean ret = model.getDiscoveryPathModel().addPath(path);
+		return booleanToStatus(ret, "Discovery path not added: " + path.getFilepath());
 	}
 
 	@Override
-	public void removeDiscoveryPath(DiscoveryPath path) {
-		model.getDiscoveryPathModel().removePath(path);
+	public CompletableFuture<Status> removeDiscoveryPath(DiscoveryPath path) {
+		boolean ret = model.getDiscoveryPathModel().removePath(path);
+		return booleanToStatus(ret, "Discovery path not removed: " + path.getFilepath());
 	}
 
+	
+	private CompletableFuture<Status> booleanToStatus(boolean b, String message) {
+		IStatus s = null;
+		if( b ) {
+			s = org.jboss.tools.ssp.eclipse.core.runtime.Status.OK_STATUS;
+		} else {
+			s = new org.jboss.tools.ssp.eclipse.core.runtime.Status(
+					IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, message);
+		}
+		return CompletableFuture.completedFuture(StatusConverter.convert(s));
+	}
+	
 	@Override
 	public CompletableFuture<List<ServerBean>> findServerBeans(DiscoveryPath path) {
 		ServerBeanLoader loader = new ServerBeanLoader(new File(path.getFilepath()));
@@ -171,8 +185,9 @@ public class ServerManagementServerImpl implements SSPServer {
 	}
 
 	@Override
-	public void deleteServer(ServerHandle handle) {
-		model.getServerModel().removeServer(handle.getId());
+	public CompletableFuture<Status> deleteServer(ServerHandle handle) {
+		boolean b = model.getServerModel().removeServer(handle.getId());
+		return booleanToStatus(b, "Server not removed: " + handle.getId());
 	}
 
 	@Override

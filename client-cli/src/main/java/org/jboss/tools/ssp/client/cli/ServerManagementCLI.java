@@ -396,6 +396,7 @@ public class ServerManagementCLI {
 					msg = "Please enter a map value. Each line should read some.key=some.val.\nSend a blank line to end the map.";
 				}
 				System.out.println(msg);
+				
 				if( Integer.class.equals(c) || Boolean.class.equals(c) || String.class.equals(c)) {
 					String val = nextLine();
 					toSend.put(k, convertType(val, attrsUtil.getAttributeType(k)));

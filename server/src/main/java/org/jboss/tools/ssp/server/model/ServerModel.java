@@ -227,13 +227,17 @@ public class ServerModel implements IServerModel {
 		return new ServerHandle(s.getId(), getServerType(typeId));
 	}
 	
-	public void removeServer(String serverId) {
+	public boolean removeServer(String serverId) {
 		IServer toRemove = servers.get(serverId);
+		if( toRemove == null ) {
+			return false;
+		}
 		servers.remove(serverId);
 		IServerDelegate s = serverDelegates.get(serverId);
 		serverDelegates.remove(serverId);
 		s.dispose();
 		fireServerRemoved(toRemove);
+		return true;
 	}
 	
 
