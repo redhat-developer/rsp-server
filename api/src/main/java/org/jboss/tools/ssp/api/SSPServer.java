@@ -62,19 +62,19 @@ public interface SSPServer {
 	CompletableFuture<List<ServerBean>> findServerBeans(DiscoveryPath path);
 
 	/**
-	 * The `server/addDiscoveryPath` notification is sent by the client to add a new
+	 * The `server/addDiscoveryPath` request is sent by the client to add a new
 	 * path to search when discovering servers. These paths will be stored in a
 	 * model, to be queried or searched later by a client.
 	 */
-	@JsonNotification
+	@JsonRequest
 	CompletableFuture<Status> addDiscoveryPath(DiscoveryPath path);
 
 	/**
-	 * The `server/removeDiscoveryPath` notification is sent by the client to remove
+	 * The `server/removeDiscoveryPath` request is sent by the client to remove
 	 * a path from the model and prevent it from being searched by clients when
 	 * discovering servers in the future.
 	 */
-	@JsonNotification
+	@JsonRequest
 	CompletableFuture<Status> removeDiscoveryPath(DiscoveryPath path);
 	
 	
@@ -103,11 +103,11 @@ public interface SSPServer {
 	CompletableFuture<List<ServerType>> getServerTypes();
 
 	/**
-	 * The `server/deleteServer` notification is sent by the client to delete a
+	 * The `server/deleteServer` request is sent by the client to delete a
 	 * server from the model. This server will no longer be able to be started, shut
 	 * down, or interacted with in any fashion.
 	 */
-	@JsonNotification
+	@JsonRequest
 	CompletableFuture<Status> deleteServer(ServerHandle handle);
 
 	/**
