@@ -38,6 +38,5 @@ Export-Package: org.jboss.tools.ssp.server,
  org.jboss.tools.ssp.server.core.internal,
  org.jboss.tools.ssp.server.discovery,
  org.jboss.tools.ssp.server.discovery.serverbeans,
- org.jboss.tools.ssp.server.discovery.serverbeans.util,
  org.jboss.tools.ssp.server.model,
  org.jboss.tools.ssp.server.model.internal
