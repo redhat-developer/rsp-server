@@ -70,7 +70,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.eclipse.lsp4j</groupId>
-			<artifactId>org.eclipse.lsp4j</artifactId>
+			<artifactId>org.eclipse.lsp4j.jsonrpc</artifactId>
 			<version>0.4.0.M6</version>
 			<scope>compile</scope>
 		</dependency>
