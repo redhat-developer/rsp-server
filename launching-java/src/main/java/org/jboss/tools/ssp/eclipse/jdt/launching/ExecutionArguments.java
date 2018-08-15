@@ -11,7 +11,7 @@
 package org.jboss.tools.ssp.eclipse.jdt.launching;
 
 
-import org.jboss.tools.ssp.eclipse.debug.internal.core.util.ArgumentUtils;
+import org.jboss.tools.ssp.eclipse.debug.core.ArgumentUtils;
 
 /**
  * The execution arguments for running a Java VM. The execution arguments are

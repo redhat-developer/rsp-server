@@ -17,7 +17,7 @@ import org.jboss.tools.ssp.eclipse.core.runtime.Status;
 import org.jboss.tools.ssp.server.minishift.impl.Activator;
 import org.jboss.tools.ssp.server.minishift.servertype.IMinishiftServerAttributes;
 import org.jboss.tools.ssp.server.spi.launchers.CommandTimeoutException;
-import org.jboss.tools.ssp.server.spi.launchers.internal.ProcessUtility;
+import org.jboss.tools.ssp.server.spi.launchers.ProcessUtility;
 import org.jboss.tools.ssp.server.spi.model.polling.AbstractPoller;
 import org.jboss.tools.ssp.server.spi.model.polling.IServerStatePoller;
 import org.jboss.tools.ssp.server.spi.model.polling.IServerStatePoller.SERVER_STATE;

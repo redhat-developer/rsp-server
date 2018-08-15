@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.jboss.tools.ssp.eclipse.debug.internal.core.util;
+package org.jboss.tools.ssp.eclipse.debug.core;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Properties;
 
 import org.jboss.tools.ssp.server.spi.launchers.CommandTimeoutException;
-import org.jboss.tools.ssp.server.spi.launchers.internal.ProcessUtility;
+import org.jboss.tools.ssp.server.spi.launchers.ProcessUtility;
 
 public class MinishiftVersionLoader {
 	public static String ERROR_KEY = "properties.load.error";
