@@ -3,7 +3,7 @@
 node('rhel7') {
 	stage('Checkout SCM') {
 		deleteDir()
-		git url: 'https://github.com/robstryker/org.jboss.tools.ssp.git'
+		git url: 'https://github.com/redhat-developer/rsp-server'
 	}
 
 	stage('Build') {
