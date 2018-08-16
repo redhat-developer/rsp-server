@@ -9,7 +9,7 @@
 	<fileSets>
 	  <fileSet>
 	    <directory>${project.basedir}/target/felix-framework-6.0.0</directory>
-	    <outputDirectory>/ssp-distribution/</outputDirectory>
+	    <outputDirectory>/rsp-distribution/</outputDirectory>
 	    <fileMode>755</fileMode>
 	  </fileSet>
 	</fileSets>

@@ -4,11 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.jboss.tools.ssp</groupId>
+  <groupId>org.jboss.tools.rsp</groupId>
   <artifactId>parent</artifactId>
   <version>0.0.9-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>Simple Server Protocol</name>
+  <name>Runtime Server Protocol</name>
  
   <properties>
   	<mockito-core.version>2.18.3</mockito-core.version>

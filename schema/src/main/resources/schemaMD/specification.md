@@ -4,9 +4,9 @@ layout: specification
 sectionid: specification
 toc: true
 ---
-# Simple Server Protocol Specification
+# Runtime Server Protocol Specification
 
-The Simple Server Protocol is based on version 3.x of the language server protocol.
+The Runtime Server Protocol is based on version 3.x of the language server protocol.
 
 ## Base Protocol
 
@@ -187,7 +187,7 @@ interface CancelParams {
 A request that got canceled still needs to return from the server and send a response back. It can not be left open / hanging. This is in line with the JSON RPC protocol that requires that every request sends a response back. In addition it allows for returning partial results on cancel. If the requests returns an error response on cancellation it is advised to set the error code to `ErrorCodes.RequestCancelled`.
 
 
-## Simple Server Protocol
+## Runtime Server Protocol
 
 The simple server protocol defines a set of JSON-RPC request, response and notification messages which are exchanged using the above base protocol. This section starts describing the basic JSON structures used in the protocol. The document uses TypeScript interfaces to describe these. Based on the basic JSON structures, the actual requests with their responses and the notifications are described.
 
@@ -201,7 +201,7 @@ The protocol currently assumes that one server serves one tool. There is current
 
 #### server/getDiscoveryPaths
 
- The `server/getDiscoveryPaths` request is sent by the client to fetch a list of discovery paths that can be searched. Discovery paths exist in the SSP model as paths suitable to be searched for server runtime installations. Additional paths may be added via the `server/addDiscoveryPath` entry point, or removed via the `server/removeDiscoveryPath` entry point. 
+ The `server/getDiscoveryPaths` request is sent by the client to fetch a list of discovery paths that can be searched. Discovery paths exist in the RSP model as paths suitable to be searched for server runtime installations. Additional paths may be added via the `server/addDiscoveryPath` entry point, or removed via the `server/removeDiscoveryPath` entry point. 
 
 This endpoint takes no parameters. 
 
@@ -221,7 +221,7 @@ This endpoint returns a list of the following schema as a return value:
 
 #### server/findServerBeans
 
- The `server/findServerBeans` request is sent by the client to fetch a list of server beans for the given path. The SSP model will iterate through a number of `IServerBeanTypeProvider` instances and ask them if they recognize the contents of the folder underlying the discovery path. Any providers that claim to be able to handle the given path will return an object representing the details of this recognized server runtime, its version, etc. 
+ The `server/findServerBeans` request is sent by the client to fetch a list of server beans for the given path. The RSP model will iterate through a number of `IServerBeanTypeProvider` instances and ask them if they recognize the contents of the folder underlying the discovery path. Any providers that claim to be able to handle the given path will return an object representing the details of this recognized server runtime, its version, etc. 
 
 This endpoint takes the following json schemas as parameters: 
 
@@ -422,7 +422,7 @@ export interface ServerType {
 
 #### server/getServerTypes
 
- The `server/getServerTypes` request is sent by the client to list the server types currently supported. The details of how many server types are supported by an SSP, or how they are registered, is implementation-specific. 
+ The `server/getServerTypes` request is sent by the client to list the server types currently supported. The details of how many server types are supported by an RSP, or how they are registered, is implementation-specific. 
 
 This endpoint takes no parameters. 
 
@@ -939,7 +939,7 @@ This endpoint returns the following schema as a return value:
 
 #### server/serverStartingByClient
 
- The `server/serverStartingByClient` request is sent by the client to the server to inform the server that the client itself has launched the server instead of asking the SSP to do so. The parameters include both the request used to get the launch command, and a boolean as to whether the server should initiate the 'state-polling' mechanism to inform the client when the selected server has completed its startup. If the `polling` boolean is false, the client is expected to also alert the SSP when the launched server has completed its startup via the `server/serverStartedByClient` request. 
+ The `server/serverStartingByClient` request is sent by the client to the server to inform the server that the client itself has launched the server instead of asking the RSP to do so. The parameters include both the request used to get the launch command, and a boolean as to whether the server should initiate the 'state-polling' mechanism to inform the client when the selected server has completed its startup. If the `polling` boolean is false, the client is expected to also alert the RSP when the launched server has completed its startup via the `server/serverStartedByClient` request. 
 
 This endpoint takes the following json schemas as parameters: 
 
@@ -1028,7 +1028,7 @@ This endpoint returns the following schema as a return value:
 
 #### server/serverStartedByClient
 
- The `server/serverStartedByClient` request is sent by the client to the server to inform the server that the client itself has launched the server instead of asking the SSP to do so, AND that the startup has completed. 
+ The `server/serverStartedByClient` request is sent by the client to the server to inform the server that the client itself has launched the server instead of asking the RSP to do so, AND that the startup has completed. 
 
 This endpoint takes the following json schemas as parameters: 
 
@@ -1279,7 +1279,7 @@ This endpoint returns the following schema as a return value:
 
 #### server/shutdown
 
- The `server/shutdown` notification is sent by the client to shut down the SSP itself. 
+ The `server/shutdown` notification is sent by the client to shut down the RSP itself. 
 
 This endpoint takes no parameters. 
 
@@ -1289,7 +1289,7 @@ This endpoint returns no value
 
 #### client/discoveryPathAdded
 
- The `client/discoveryPathAdded` notification is sent by the server to all clients in response to the `server/addDiscoveryPath` notification. This call indicates that a discovery path has been added to the SSP model which keeps track of filesystem paths that may be searched for server runtimes. 
+ The `client/discoveryPathAdded` notification is sent by the server to all clients in response to the `server/addDiscoveryPath` notification. This call indicates that a discovery path has been added to the RSP model which keeps track of filesystem paths that may be searched for server runtimes. 
 
 This endpoint takes the following json schemas as parameters: 
 
@@ -1307,7 +1307,7 @@ This endpoint takes the following json schemas as parameters:
 
 This endpoint returns no value#### client/discoveryPathRemoved
 
- The `client/discoveryPathRemoved` notification is sent by the server to all clients in response to the `server/removeDiscoveryPath` notification. This call indicates that a discovery path has been removed from the SSP model which keeps track of filesystem paths that may be searched for server runtimes. 
+ The `client/discoveryPathRemoved` notification is sent by the server to all clients in response to the `server/removeDiscoveryPath` notification. This call indicates that a discovery path has been removed from the RSP model which keeps track of filesystem paths that may be searched for server runtimes. 
 
 This endpoint takes the following json schemas as parameters: 
 
@@ -1325,7 +1325,7 @@ This endpoint takes the following json schemas as parameters:
 
 This endpoint returns no value#### client/serverAdded
 
- The `client/serverAdded` notification is sent by the server to all clients in a response to the `server/createServer` notification. This notification indicates that a new server adapter has been created in the SSP model of existing servers. As mentioned above, this was most likely in response to a server/createServer notification, but is not strictly limited to this entrypoint. 
+ The `client/serverAdded` notification is sent by the server to all clients in a response to the `server/createServer` notification. This notification indicates that a new server adapter has been created in the RSP model of existing servers. As mentioned above, this was most likely in response to a server/createServer notification, but is not strictly limited to this entrypoint. 
 
 This endpoint takes the following json schemas as parameters: 
 
@@ -1364,7 +1364,7 @@ export interface ServerType {
 
 This endpoint returns no value#### client/serverRemoved
 
- The `client/serverRemoved` notification is sent by the server to all clients in response to the `server/deleteServer` notification. This notification indicates that a server adapter has been removed from the SSP model of existing servers. As mentioned above, this was most likely in response to a server/deleteServer notification, but is not strictly limited to this entrypoint. 
+ The `client/serverRemoved` notification is sent by the server to all clients in response to the `server/deleteServer` notification. This notification indicates that a server adapter has been removed from the RSP model of existing servers. As mentioned above, this was most likely in response to a server/deleteServer notification, but is not strictly limited to this entrypoint. 
 
 This endpoint takes the following json schemas as parameters: 
 

@@ -5,14 +5,14 @@
                              http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.jboss.tools.ssp</groupId>
+		<groupId>org.jboss.tools.rsp</groupId>
 		<artifactId>parent</artifactId>
 		<version>0.0.9-SNAPSHOT</version>
 	</parent>
-	<artifactId>org.jboss.tools.ssp.distribution</artifactId>
+	<artifactId>org.jboss.tools.rsp.distribution</artifactId>
 	<packaging>pom</packaging>
 
-	<name>Simple Server Protocol : Distribution</name>
+	<name>Runtime Server Protocol : Distribution</name>
 
 	<build>
 		<pluginManagement>
@@ -36,7 +36,7 @@
 						</execution>
 					</executions>
 					<configuration>
-						<mainClass>org.jboss.tools.ssp.api.schema.GenerateSchemaMain</mainClass>
+						<mainClass>org.jboss.tools.rsp.api.schema.GenerateSchemaMain</mainClass>
 					</configuration>
 				</plugin>
 			</plugins>
@@ -110,38 +110,38 @@
 			<version>1.0.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.tools.ssp</groupId>
-			<artifactId>org.jboss.tools.ssp.api</artifactId>
+			<groupId>org.jboss.tools.rsp</groupId>
+			<artifactId>org.jboss.tools.rsp.api</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.tools.ssp</groupId>
-			<artifactId>org.jboss.tools.ssp.launching</artifactId>
+			<groupId>org.jboss.tools.rsp</groupId>
+			<artifactId>org.jboss.tools.rsp.launching</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.tools.ssp</groupId>
-			<artifactId>org.jboss.tools.ssp.launching.java</artifactId>
+			<groupId>org.jboss.tools.rsp</groupId>
+			<artifactId>org.jboss.tools.rsp.launching.java</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.tools.ssp</groupId>
-			<artifactId>org.jboss.tools.ssp.server.spi</artifactId>
+			<groupId>org.jboss.tools.rsp</groupId>
+			<artifactId>org.jboss.tools.rsp.server.spi</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.tools.ssp</groupId>
-			<artifactId>org.jboss.tools.ssp.server</artifactId>
+			<groupId>org.jboss.tools.rsp</groupId>
+			<artifactId>org.jboss.tools.rsp.server</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.tools.ssp</groupId>
-			<artifactId>org.jboss.tools.ssp.server.wildfly</artifactId>
+			<groupId>org.jboss.tools.rsp</groupId>
+			<artifactId>org.jboss.tools.rsp.server.wildfly</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.tools.ssp</groupId>
-			<artifactId>org.jboss.tools.ssp.server.minishift</artifactId>
+			<groupId>org.jboss.tools.rsp</groupId>
+			<artifactId>org.jboss.tools.rsp.server.minishift</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
 		<dependency>
