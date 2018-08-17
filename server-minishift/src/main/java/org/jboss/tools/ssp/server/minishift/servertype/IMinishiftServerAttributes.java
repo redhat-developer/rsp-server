@@ -16,7 +16,14 @@ public interface IMinishiftServerAttributes {
 	 */
 	public static final String MINISHIFT_BINARY = ServerManagementAPIConstants.SERVER_HOME_FILE;
 	
+	
+	/*
+	 * Optional
+	 */
 	public static final String MINISHIFT_VM_DRIVER = "minishift.vmdriver";
+
+	public static final String MINISHIFT_PROFILE = "minishift.profile";
+	public static final String MINISHIFT_PROFILE_DEFAULT = "minishift";
 
 	
 	// Only for CDK

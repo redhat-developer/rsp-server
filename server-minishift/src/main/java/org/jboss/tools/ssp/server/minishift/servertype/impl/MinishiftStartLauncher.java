@@ -10,6 +10,7 @@ package org.jboss.tools.ssp.server.minishift.servertype.impl;
 
 import org.jboss.tools.ssp.server.minishift.servertype.AbstractLauncher;
 import org.jboss.tools.ssp.server.minishift.servertype.MinishiftPropertyUtility;
+import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
 
 public class MinishiftStartLauncher extends AbstractLauncher {
@@ -21,13 +22,23 @@ public class MinishiftStartLauncher extends AbstractLauncher {
 	@Override
 	public String getProgramArguments() {
 		String vmDriver = MinishiftPropertyUtility.getMinishiftVMDriver(getServer());
-		if( vmDriver == null || vmDriver.isEmpty()) {
-			return "start " + getCredentialsArguments();
+		String vmd = isEmpty(vmDriver) ? "" : "--vm-driver=" + vmDriver;
+		String credentials = getCredentialsArguments();
+		String profileFlags = "";
+		if( supportsProfiles(getServer())) {
+			String profile = MinishiftPropertyUtility.getMinishiftProfile(getServer());
+			profileFlags = "--profile " + profile;
 		}
-		return "start --vm-driver=" + vmDriver  + getCredentialsArguments();
+
+		return "start " + vmd + " " + profileFlags + " " + credentials;
+	}
+	
+	protected boolean supportsProfiles(IServer server) {
+		return true;
 	}
 	
 	protected String getCredentialsArguments() {
+		// TODO for cdk, add credentials
 		return "";
 	}
 	
@@ -44,6 +55,6 @@ public class MinishiftStartLauncher extends AbstractLauncher {
 	}
 	
 	private boolean isEmpty(String s) {
-		return s == null ? true : s.length() == 0;
+		return s == null ? true : s.isEmpty();
 	}
 }

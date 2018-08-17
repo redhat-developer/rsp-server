@@ -85,6 +85,10 @@ public abstract class BaseMinishiftServerType implements IServerType {
 					ServerManagementAPIConstants.ATTR_TYPE_STRING,
 					"The driver to use for the Minishift VM. Possible values: [virtualbox vmwarefusion kvm xhyve hyperv] (default \"kvm\")", null);
 			
+			attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_PROFILE, 
+					ServerManagementAPIConstants.ATTR_TYPE_STRING,
+					"A minishift profile. Default value is 'minishift'", "minishift");
+
 			optional = attrs.toPojo();
 		}
 		return optional;

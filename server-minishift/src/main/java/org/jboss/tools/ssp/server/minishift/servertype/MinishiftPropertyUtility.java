@@ -11,6 +11,11 @@ public class MinishiftPropertyUtility {
 		return server.getAttribute(IMinishiftServerAttributes.MINISHIFT_VM_DRIVER, (String) null);
 	}
 
+	public static String getMinishiftProfile(IServer server) {
+		return server.getAttribute(IMinishiftServerAttributes.MINISHIFT_PROFILE,
+				IMinishiftServerAttributes.MINISHIFT_PROFILE_DEFAULT);
+	}
+
 	public static String getMinishiftUsername(IServer server) {
 		return server.getAttribute(IMinishiftServerAttributes.MINISHIFT_REG_USERNAME, (String) null);
 	}
