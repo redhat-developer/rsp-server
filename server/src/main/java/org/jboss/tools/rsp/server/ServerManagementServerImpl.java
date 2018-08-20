@@ -63,7 +63,7 @@ public class ServerManagementServerImpl implements RSPServer {
 	
 	/**
 	 * Connect the given chat client.
-     * Return a runnable which should be executed to disconnect the client.
+	 * Return a runnable which should be executed to disconnect the client.
 	 */
 	public Runnable addClient(SocketLauncher<RSPClient> launcher) {
 		this.launchers.add(launcher);
@@ -136,17 +136,36 @@ public class ServerManagementServerImpl implements RSPServer {
 		return CompletableFuture.completedFuture(model.getDiscoveryPathModel().getPaths());
 	}
 
+	private boolean isEmptyDiscoveryPath(DiscoveryPath path) {
+		if( path == null || isEmpty(path.getFilepath())) {
+			return true;
+		}
+		return false;
+	}
+	
+	private CompletableFuture<Status> invalidParameterError() {
+		IStatus s = new org.jboss.tools.rsp.eclipse.core.runtime.Status(
+				IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Parameter is null or missing required fields.");
+		return CompletableFuture.completedFuture(StatusConverter.convert(s));
+	}
+	
 	/**
 	 * Add a path to our list of discovery paths
 	 */
 	@Override
 	public CompletableFuture<Status> addDiscoveryPath(DiscoveryPath path) {
+		if( isEmptyDiscoveryPath(path)) 
+			return invalidParameterError();
+		
 		boolean ret = model.getDiscoveryPathModel().addPath(path);
 		return booleanToStatus(ret, "Discovery path not added: " + path.getFilepath());
 	}
 
 	@Override
 	public CompletableFuture<Status> removeDiscoveryPath(DiscoveryPath path) {
+		if( isEmptyDiscoveryPath(path)) 
+			return invalidParameterError();
+		
 		boolean ret = model.getDiscoveryPathModel().removePath(path);
 		return booleanToStatus(ret, "Discovery path not removed: " + path.getFilepath());
 	}
@@ -163,11 +182,19 @@ public class ServerManagementServerImpl implements RSPServer {
 		return CompletableFuture.completedFuture(StatusConverter.convert(s));
 	}
 	
+	private boolean isEmpty(String s) {
+		return s == null || s.isEmpty();
+	}
+	
 	@Override
 	public CompletableFuture<List<ServerBean>> findServerBeans(DiscoveryPath path) {
+		List<ServerBean> ret = new ArrayList<>();
+		if( path == null || isEmpty(path.getFilepath())) {
+			return CompletableFuture.completedFuture(ret);
+		}
+
 		ServerBeanLoader loader = new ServerBeanLoader(new File(path.getFilepath()));
 		ServerBean bean = loader.getServerBean();
-		List<ServerBean> ret = new ArrayList<>();
 		if( bean != null )
 			ret.add(bean);
 		return CompletableFuture.completedFuture(ret);
@@ -186,24 +213,38 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public CompletableFuture<Status> deleteServer(ServerHandle handle) {
+		if( handle == null || isEmpty(handle.getId())) {
+			return invalidParameterError();
+		}
+		
 		boolean b = model.getServerModel().removeServer(handle.getId());
 		return booleanToStatus(b, "Server not removed: " + handle.getId());
 	}
 
 	@Override
 	public CompletableFuture<Attributes> getRequiredAttributes(ServerType type) {
+		if( type == null || isEmpty(type.getId())) {
+			return CompletableFuture.completedFuture(null);
+		}
 		Attributes rspa = model.getServerModel().getRequiredAttributes(type.getId());
 		return CompletableFuture.completedFuture(rspa);
 	}
 
 	@Override
 	public CompletableFuture<Attributes> getOptionalAttributes(ServerType type) {
+		if( type == null || isEmpty(type.getId())) {
+			return CompletableFuture.completedFuture(null);
+		}
 		Attributes rspa = model.getServerModel().getOptionalAttributes(type.getId());
 		return CompletableFuture.completedFuture(rspa);
 	}
 	
 	@Override
 	public CompletableFuture<List<ServerLaunchMode>> getLaunchModes(ServerType type) {
+		if( type == null || isEmpty(type.getId()) ) {
+			return CompletableFuture.completedFuture(null);
+		}
+		
 		List<ServerLaunchMode> l = model.getServerModel()
 				.getLaunchModes(type.getId());
 		return CompletableFuture.completedFuture(l);
@@ -211,18 +252,28 @@ public class ServerManagementServerImpl implements RSPServer {
 	
 	@Override
 	public CompletableFuture<Attributes> getRequiredLaunchAttributes(LaunchAttributesRequest req) {
+		if( req == null || isEmpty(req.getId()) || isEmpty(req.getMode())) {
+			return CompletableFuture.completedFuture(null);
+		}
 		Attributes rspa = model.getServerModel().getRequiredLaunchAttributes(req.getId());
 		return CompletableFuture.completedFuture(rspa);
 	}
 
 	@Override
 	public CompletableFuture<Attributes> getOptionalLaunchAttributes(LaunchAttributesRequest req) {
+		if( req == null || isEmpty(req.getId()) || isEmpty(req.getMode())) {
+			return CompletableFuture.completedFuture(null);
+		}
 		Attributes rspa = model.getServerModel().getOptionalLaunchAttributes(req.getId());
 		return CompletableFuture.completedFuture(rspa);
 	}
 
 	@Override
 	public CompletableFuture<Status> createServer(ServerAttributes attr) {
+		if( attr == null || isEmpty(attr.getId()) || isEmpty(attr.getServerType())) {
+			return invalidParameterError();
+		}
+		
 		String serverType = attr.getServerType();
 		String id = attr.getId();
 		Map<String, Object> attributes = attr.getAttributes();
@@ -240,6 +291,12 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public CompletableFuture<StartServerResponse> startServerAsync(LaunchParameters attr) {
+		if( attr == null || isEmpty(attr.getMode()) || isEmpty(attr.getParams().getId())) {
+			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+					"Invalid Parameter");
+			return CompletableFuture.completedFuture(new StartServerResponse(StatusConverter.convert(is), null));
+		}
+
 		String id = attr.getParams().getId();
 		IServer server = model.getServerModel().getServer(id);
 		if( server == null ) {
@@ -265,6 +322,10 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public CompletableFuture<Status> stopServerAsync(StopServerAttributes attr) {
+		if( attr == null || isEmpty(attr.getId())) {
+			return invalidParameterError();
+		}
+
 		IServer server = model.getServerModel().getServer(attr.getId());
 		if( server == null ) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server " + attr.getId() + " does not exist");
@@ -295,6 +356,9 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public CompletableFuture<CommandLineDetails> getLaunchCommand(LaunchParameters req) {
+		if( req == null || isEmpty(req.getMode()) || isEmpty(req.getParams().getId())) {
+			return CompletableFuture.completedFuture(null);
+		}
 		String id = req.getParams().getId();
 		IServer server = model.getServerModel().getServer(id);
 		if( server == null ) {
@@ -314,6 +378,10 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public CompletableFuture<Status> serverStartingByClient(ServerStartingAttributes attr) {
+		if( attr == null || attr.getRequest() == null || isEmpty(attr.getRequest().getMode())
+				|| isEmpty(attr.getRequest().getParams().getId())) {
+			return invalidParameterError();
+		}
 		String id = attr.getRequest().getParams().getId();
 		IServer server = model.getServerModel().getServer(id);
 		if( server == null ) {
@@ -336,6 +404,10 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 	@Override
 	public CompletableFuture<Status> serverStartedByClient(LaunchParameters attr) {
+		if( attr == null || attr.getParams() == null || isEmpty(attr.getParams().getId())) {
+			return invalidParameterError();
+		}
+
 		String id = attr.getParams().getId();
 		IServer server = model.getServerModel().getServer(id);
 		if( server == null ) {

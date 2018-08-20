@@ -360,6 +360,9 @@ public class ServerManagementCLI {
 	
 	
 	private void promptForAttributes(Attributes attr, HashMap<String, Object> store, boolean required2) {
+		if( attr == null )
+			return;
+		
 		CreateServerAttributesUtility attrsUtil = new CreateServerAttributesUtility(attr);
 		HashMap<String, Object> toSend = store;
 		if( attrsUtil != null ) {
