@@ -206,9 +206,27 @@ public interface IServerDelegate {
 	 */
 	public IStatus clientSetServerStarted(LaunchParameters attr);
 	
+	/**
+	 * Start the server in the given mode
+	 * 
+	 * @param mode
+	 * @return
+	 */
 	public StartServerResponse start(String mode);
 	
+	/**
+	 * Stop the server. 
+	 * 
+	 * @param force
+	 * @return
+	 */
 	public IStatus stop(boolean force);
 
+	/**
+	 * Get the launch command for this server in the given mode
+	 * @param mode
+	 * @param params
+	 * @return
+	 */
 	public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params);
 }
