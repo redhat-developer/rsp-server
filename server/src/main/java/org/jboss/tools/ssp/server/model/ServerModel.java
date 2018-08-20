@@ -97,6 +97,9 @@ public class ServerModel implements IServerModel {
 	}
 	
 	private IStatus createServerUnprotected(String serverType, String id, Map<String, Object> attributes) {
+		if( servers.get(id) != null ) {
+			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server with id " + id + " already exists.");
+		}
 		IServerType fact = serverTypes.get(serverType);
 		if( fact == null ) {
 			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server Type " + serverType + " not found");
