@@ -275,6 +275,13 @@ public class ServerManagementServerImpl implements RSPServer {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred: Server " + attr.getId() + " has no delegate.");
 			return CompletableFuture.completedFuture(StatusConverter.convert(is));
 		}
+		
+		if(del.getServerState() == IServerDelegate.STATE_STOPPED && !attr.isForce()) {
+			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+					"The server is already marked as stopped. If you wish to force a stop request, please set the force flag to true.");
+			return CompletableFuture.completedFuture(StatusConverter.convert(is));
+		}
+		
 		try {
 			IStatus ret = del.stop(attr.isForce());
 			return CompletableFuture.completedFuture(StatusConverter.convert(ret));
