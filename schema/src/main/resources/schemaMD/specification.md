@@ -523,7 +523,7 @@ This endpoint returns the following schema as a return value:
 
 #### server/getRequiredAttributes
 
- The `server/getRequiredAttributes` request is sent by the client to list the required attributes that must be stored on a server object of this type, such as a server-home or other required parameters. 
+ The `server/getRequiredAttributes` request is sent by the client to list the required attributes that must be stored on a server object of this type, such as a server-home or other required parameters. This request may return null in case of error. 
 
 This endpoint takes the following json schemas as parameters: 
 
@@ -583,7 +583,7 @@ export interface Attribute {
 
 #### server/getOptionalAttributes
 
- The `server/getOptionalAttributes` request is sent by the client to list the optional attributes that can be stored on a server object of this type. This may include things like customizing ports, or custom methods of interacting with various functionality specific to the server type. 
+ The `server/getOptionalAttributes` request is sent by the client to list the optional attributes that can be stored on a server object of this type. This may include things like customizing ports, or custom methods of interacting with various functionality specific to the server type.This request may return null in case of error. 
 
 This endpoint takes the following json schemas as parameters: 
 
@@ -706,7 +706,7 @@ This endpoint returns the following schema as a return value:
 
 #### server/getLaunchModes
 
- The `server/getLaunchModes` request is sent by the client to get a list of launch modes that are applicable to this server type. Some servers can only be started. Others can be started, debugged, profiled, etc. Server types may come up with their own launch modes if desired. 
+ The `server/getLaunchModes` request is sent by the client to get a list of launch modes that are applicable to this server type. Some servers can only be started. Others can be started, debugged, profiled, etc. Server types may come up with their own launch modes if desired. This method may return null if an error occurs on the server or the parameter is invalid. 
 
 This endpoint takes the following json schemas as parameters: 
 
@@ -750,7 +750,7 @@ This endpoint returns a list of the following schema as a return value:
 
 #### server/getRequiredLaunchAttributes
 
- The `server/getRequiredLaunchAttributes` request is sent by the client to get any additional attributes required for launch or that can customize launch behavior. Some server types may require references to a specific library, a clear decision about which of several configurations the server should be launched with, or any other required details required to successfully start up the server. 
+ The `server/getRequiredLaunchAttributes` request is sent by the client to get any additional attributes required for launch or that can customize launch behavior. Some server types may require references to a specific library, a clear decision about which of several configurations the server should be launched with, or any other required details required to successfully start up the server. This request may return null if the parameter is invalid. 
 
 This endpoint takes the following json schemas as parameters: 
 
@@ -806,7 +806,7 @@ export interface Attribute {
 
 #### server/getOptionalLaunchAttributes
 
- The `server/getOptionalLaunchAttributes` request is sent by the client to get any optional attributes which can be used to modify the launch behavior. Some server types may allow overrides to any number of launch flags or settings, but not require these changes in order to function. 
+ The `server/getOptionalLaunchAttributes` request is sent by the client to get any optional attributes which can be used to modify the launch behavior. Some server types may allow overrides to any number of launch flags or settings, but not require these changes in order to function. This request may return null if the parameter is invalid. 
 
 This endpoint takes the following json schemas as parameters: 
 
@@ -862,7 +862,7 @@ export interface Attribute {
 
 #### server/getLaunchCommand
 
- The `server/getLaunchCommand` request is sent by the client to the server to get the command which can be used to launch the server. This entry point is most often used if an editor or IDE wishes to start the server by itself, but does not know the servertype-specific command that must be launched. The parameter will include a mode the server should run in (run, debug, etc), as well as any custom attributes that may have an effect on the generation of the launch command. 
+ The `server/getLaunchCommand` request is sent by the client to the server to get the command which can be used to launch the server. This entry point is most often used if an editor or IDE wishes to start the server by itself, but does not know the servertype-specific command that must be launched. The parameter will include a mode the server should run in (run, debug, etc), as well as any custom attributes that may have an effect on the generation of the launch command. This request may return null if the parameter is invalid. 
 
 This endpoint takes the following json schemas as parameters: 
 

@@ -113,7 +113,8 @@ public interface RSPServer {
 	/**
 	 * The `server/getRequiredAttributes` request is sent by the client to list the
 	 * required attributes that must be stored on a server object of this type, such
-	 * as a server-home or other required parameters.
+	 * as a server-home or other required parameters. This request may return null in
+	 * case of error.
 	 */
 	@JsonRequest
 	CompletableFuture<Attributes> getRequiredAttributes(ServerType type);
@@ -122,7 +123,8 @@ public interface RSPServer {
 	 * The `server/getOptionalAttributes` request is sent by the client to list the
 	 * optional attributes that can be stored on a server object of this type. This
 	 * may include things like customizing ports, or custom methods of interacting
-	 * with various functionality specific to the server type.
+	 * with various functionality specific to the server type.This request may return 
+	 * null in case of error.
 	 */
 	@JsonRequest
 	CompletableFuture<Attributes> getOptionalAttributes(ServerType type);
@@ -154,6 +156,8 @@ public interface RSPServer {
 	 * Others can be started, debugged, profiled, etc. 
 	 * 
 	 * Server types may come up with their own launch modes if desired.
+	 * This method may return null if an error occurs on the server or 
+	 * the parameter is invalid.
 	 */
 	@JsonRequest
 	CompletableFuture<List<ServerLaunchMode>> getLaunchModes(ServerType type);
@@ -166,6 +170,8 @@ public interface RSPServer {
 	 * clear decision about which of several configurations the server should be
 	 * launched with, or any other required details required to successfully start
 	 * up the server.
+	 * 
+	 * This request may return null if the parameter is invalid. 
 	 */
 	@JsonRequest
 	CompletableFuture<Attributes> getRequiredLaunchAttributes(LaunchAttributesRequest req);
@@ -174,7 +180,9 @@ public interface RSPServer {
 	 * The `server/getOptionalLaunchAttributes` request is sent by the client to get
 	 * any optional attributes which can be used to modify the launch behavior. Some
 	 * server types may allow overrides to any number of launch flags or settings, 
-	 * but not require these changes in order to function. 
+	 * but not require these changes in order to function.
+	 * 
+	 * This request may return null if the parameter is invalid. 
 	 */
 	@JsonRequest
 	CompletableFuture<Attributes> getOptionalLaunchAttributes(LaunchAttributesRequest req);
@@ -188,6 +196,8 @@ public interface RSPServer {
 	 * that must be launched. The parameter will include a mode the server
 	 * should run in (run, debug, etc), as well as any custom attributes
 	 * that may have an effect on the generation of the launch command.
+	 * 
+	 * This request may return null if the parameter is invalid. 
 	 */
 	@JsonRequest
 	CompletableFuture<CommandLineDetails> getLaunchCommand(LaunchParameters req);
