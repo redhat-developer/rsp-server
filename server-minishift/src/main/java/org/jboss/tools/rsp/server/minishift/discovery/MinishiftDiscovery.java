@@ -36,6 +36,9 @@ public class MinishiftDiscovery {
 	}
 	
 	private File folderWhiteListBin(File folder) {
+		if( folder == null || !folder.exists()) {
+			return null;
+		}
 		String[] children = folder.list();
 		for( int i = 0; i < children.length; i++ ) {
 			if( whitelistMatchesName(children[i])) {
