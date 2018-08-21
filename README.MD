@@ -18,9 +18,9 @@ This client / server code can be found for the time being at this location:  htt
 The easiest way to get started with the code is to [create your own fork](http://help.github.com/forking/),
 and then clone your fork:
 
-    $ git clone git@github.com:<you>/org.jboss.tools.rsp.git
-    $ cd org.jboss.tools.rsp
-    $ git remote add upstream git://github.com/robstryker/org.jboss.tools.rsp.git
+    $ git clone git@github.com:<you>/rsp-server
+    $ cd rsp-server
+    $ git remote add upstream git://github.com/redhat-developer/rsp-server
 
 At any time, you can pull changes from the upstream and merge them onto your master:
 
@@ -47,11 +47,11 @@ But *do not* push changes without having the new and existing unit tests pass!
 
 To run the server, first build the entire project.
 
-    [org.jboss.tools.rsp] $ mvn clean verify
+    [rsp-server] $ mvn clean verify
 
 Next, run the following command to launch the server:
 
-    [org.jboss.tools.rsp] $ cd server-wildfly
+    [rsp-server] $ cd server-wildfly
     [server-wildfly] $ mvn exec:java
 
 To customize the hosts or ports, you can either edit the pom.xml for these modules or pass flags. See https://www.mojohaus.org/exec-maven-plugin/usage.html  for more information. 
@@ -63,7 +63,7 @@ The CLI is a proof-of-concept only, currently demonstrating only that the RSP co
 
 To run the client, in a new shell, run the following:
 
-    [org.jboss.tools.rsp] $ cd client-cli
+    [rsp-server] $ cd client-cli
     [client-cli] $ mvn exec:java
 
 
