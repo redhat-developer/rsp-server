@@ -19,5 +19,4 @@ Export-Package: org.jboss.tools.rsp.eclipse.core.runtime,
  org.jboss.tools.rsp.eclipse.debug.core.model,
  org.jboss.tools.rsp.eclipse.osgi.util,
  org.jboss.tools.rsp.launching,
- org.jboss.tools.rsp.launching.internal,
  org.jboss.tools.rsp.launching.utils

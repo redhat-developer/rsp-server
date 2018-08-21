@@ -30,8 +30,6 @@ Import-Package: org.eclipse.lsp4j.jsonrpc,
  org.osgi.framework,
  org.osgi.service.log
 Export-Package: org.jboss.tools.rsp.server,
- org.jboss.tools.rsp.server.core.internal,
  org.jboss.tools.rsp.server.discovery,
  org.jboss.tools.rsp.server.discovery.serverbeans,
- org.jboss.tools.rsp.server.model,
- org.jboss.tools.rsp.server.model.internal
+ org.jboss.tools.rsp.server.model
