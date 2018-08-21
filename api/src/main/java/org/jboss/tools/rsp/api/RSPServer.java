@@ -57,6 +57,9 @@ public interface RSPServer {
 	 * underlying the discovery path. Any providers that claim to be able to handle
 	 * the given path will return an object representing the details of this
 	 * recognized server runtime, its version, etc.
+	 * 
+	 * The path parameter must be an absolute file-system path, and 
+	 * may not be a relative path.
 	 */
 	@JsonRequest
 	CompletableFuture<List<ServerBean>> findServerBeans(DiscoveryPath path);
@@ -65,6 +68,9 @@ public interface RSPServer {
 	 * The `server/addDiscoveryPath` request is sent by the client to add a new
 	 * path to search when discovering servers. These paths will be stored in a
 	 * model, to be queried or searched later by a client.
+	 * 
+	 * The path parameter must be an absolute file-system path, and 
+	 * may not be a relative path.
 	 */
 	@JsonRequest
 	CompletableFuture<Status> addDiscoveryPath(DiscoveryPath path);
@@ -73,6 +79,9 @@ public interface RSPServer {
 	 * The `server/removeDiscoveryPath` request is sent by the client to remove
 	 * a path from the model and prevent it from being searched by clients when
 	 * discovering servers in the future.
+	 * 
+	 * The path parameter must be an absolute file-system path, and 
+	 * may not be a relative path.
 	 */
 	@JsonRequest
 	CompletableFuture<Status> removeDiscoveryPath(DiscoveryPath path);

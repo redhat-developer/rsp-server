@@ -33,7 +33,9 @@ import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.api.dao.StopServerAttributes;
+import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
+import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.launching.utils.StatusConverter;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.rsp.server.model.RemoteEventManager;
@@ -145,7 +147,7 @@ public class ServerManagementServerImpl implements RSPServer {
 	
 	private CompletableFuture<Status> invalidParameterError() {
 		IStatus s = new org.jboss.tools.rsp.eclipse.core.runtime.Status(
-				IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Parameter is null or missing required fields.");
+				IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Parameter is invalid. It may be null, missing required fields, or unacceptable values.");
 		return CompletableFuture.completedFuture(StatusConverter.convert(s));
 	}
 	
@@ -156,7 +158,12 @@ public class ServerManagementServerImpl implements RSPServer {
 	public CompletableFuture<Status> addDiscoveryPath(DiscoveryPath path) {
 		if( isEmptyDiscoveryPath(path)) 
 			return invalidParameterError();
-		
+		String fp = path.getFilepath();
+		IPath ipath = new Path(fp);
+		if( !ipath.isAbsolute()) {
+			return invalidParameterError();
+		}
+
 		boolean ret = model.getDiscoveryPathModel().addPath(path);
 		return booleanToStatus(ret, "Discovery path not added: " + path.getFilepath());
 	}
@@ -165,7 +172,12 @@ public class ServerManagementServerImpl implements RSPServer {
 	public CompletableFuture<Status> removeDiscoveryPath(DiscoveryPath path) {
 		if( isEmptyDiscoveryPath(path)) 
 			return invalidParameterError();
-		
+		String fp = path.getFilepath();
+		IPath ipath = new Path(fp);
+		if( !ipath.isAbsolute()) {
+			return invalidParameterError();
+		}
+
 		boolean ret = model.getDiscoveryPathModel().removePath(path);
 		return booleanToStatus(ret, "Discovery path not removed: " + path.getFilepath());
 	}
@@ -190,6 +202,12 @@ public class ServerManagementServerImpl implements RSPServer {
 	public CompletableFuture<List<ServerBean>> findServerBeans(DiscoveryPath path) {
 		List<ServerBean> ret = new ArrayList<>();
 		if( path == null || isEmpty(path.getFilepath())) {
+			return CompletableFuture.completedFuture(ret);
+		}
+		
+		String fp = path.getFilepath();
+		IPath ipath = new Path(fp);
+		if( !ipath.isAbsolute()) {
 			return CompletableFuture.completedFuture(ret);
 		}
 
