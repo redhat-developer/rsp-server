@@ -270,19 +270,19 @@ public class ServerManagementServerImpl implements RSPServer {
 	
 	@Override
 	public CompletableFuture<Attributes> getRequiredLaunchAttributes(LaunchAttributesRequest req) {
-		if( req == null || isEmpty(req.getId()) || isEmpty(req.getMode())) {
+		if( req == null || isEmpty(req.getServerTypeId()) || isEmpty(req.getMode())) {
 			return CompletableFuture.completedFuture(null);
 		}
-		Attributes rspa = model.getServerModel().getRequiredLaunchAttributes(req.getId());
+		Attributes rspa = model.getServerModel().getRequiredLaunchAttributes(req.getServerTypeId());
 		return CompletableFuture.completedFuture(rspa);
 	}
 
 	@Override
 	public CompletableFuture<Attributes> getOptionalLaunchAttributes(LaunchAttributesRequest req) {
-		if( req == null || isEmpty(req.getId()) || isEmpty(req.getMode())) {
+		if( req == null || isEmpty(req.getServerTypeId()) || isEmpty(req.getMode())) {
 			return CompletableFuture.completedFuture(null);
 		}
-		Attributes rspa = model.getServerModel().getOptionalLaunchAttributes(req.getId());
+		Attributes rspa = model.getServerModel().getOptionalLaunchAttributes(req.getServerTypeId());
 		return CompletableFuture.completedFuture(rspa);
 	}
 

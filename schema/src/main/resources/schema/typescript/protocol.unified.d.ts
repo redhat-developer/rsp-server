@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2018-08-21 14:04:38.
+// Generated using typescript-generator version 2.2.413 on 2018-08-21 17:47:18.
 
 export interface Attribute {
     type: string;
@@ -23,7 +23,7 @@ export interface DiscoveryPath {
 }
 
 export interface LaunchAttributesRequest {
-    id: string;
+    serverTypeId: string;
     mode: string;
 }
 

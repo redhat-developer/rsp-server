@@ -758,7 +758,7 @@ This endpoint takes the following json schemas as parameters:
 <tr><td>0</td><td><pre>{
   "type" : "object",
   "properties" : {
-    "id" : {
+    "serverTypeId" : {
       "type" : "string"
     },
     "mode" : {
@@ -766,7 +766,7 @@ This endpoint takes the following json schemas as parameters:
     }
   }
 }</pre></td><td><pre>export interface LaunchAttributesRequest {
-    id: string;
+    serverTypeId: string;
     mode: string;
 }</pre></td></tr></table>
 
@@ -814,7 +814,7 @@ This endpoint takes the following json schemas as parameters:
 <tr><td>0</td><td><pre>{
   "type" : "object",
   "properties" : {
-    "id" : {
+    "serverTypeId" : {
       "type" : "string"
     },
     "mode" : {
@@ -822,7 +822,7 @@ This endpoint takes the following json schemas as parameters:
     }
   }
 }</pre></td><td><pre>export interface LaunchAttributesRequest {
-    id: string;
+    serverTypeId: string;
     mode: string;
 }</pre></td></tr></table>
 
