@@ -1,4 +1,4 @@
-# The Simple Server Protocol 
+# The Runtime Server Protocol 
 
 ## Summary
 
@@ -7,20 +7,20 @@ This protocol will allow an IDE or other client to control various types of appl
 The protocol is based on LSP4J, though the messages that can be sent or received are completely unrelated to the language server protocol itself. In short, the base protocol is the same as LSP, but the specification of the messages is different. 
 
 The base protocol of LSP can be found [here](https://microsoft.github.io/language-server-protocol/specification). 
-The SSP Extensions to the base protocol can be found [here](https://github.com/robstryker/org.jboss.tools.ssp/blob/master/schema/src/main/resources/schemaMD/specification.md)
+The RSP Extensions to the base protocol can be found [here](https://github.com/redhat-developer/rsp-server/blob/master/schema/src/main/resources/schemaMD/specification.md)
 
 ## Install
 
-This client / server code can be found for the time being at this location:  https://github.com/robstryker/org.jboss.tools.ssp/
+This client / server code can be found for the time being at this location:  https://github.com/redhat-developer/rsp-server
 
 ## Get the code
 
 The easiest way to get started with the code is to [create your own fork](http://help.github.com/forking/),
 and then clone your fork:
 
-    $ git clone git@github.com:<you>/org.jboss.tools.ssp.git
-    $ cd org.jboss.tools.ssp
-    $ git remote add upstream git://github.com/robstryker/org.jboss.tools.ssp.git
+    $ git clone git@github.com:<you>/rsp-server
+    $ cd rsp-server
+    $ git remote add upstream git://github.com/redhat-developer/rsp-server
 
 At any time, you can pull changes from the upstream and merge them onto your master:
 
@@ -47,23 +47,23 @@ But *do not* push changes without having the new and existing unit tests pass!
 
 To run the server, first build the entire project.
 
-    [org.jboss.tools.ssp] $ mvn clean verify
+    [rsp-server] $ mvn clean verify
 
 Next, run the following command to launch the server:
 
-    [org.jboss.tools.ssp] $ cd server-wildfly
+    [rsp-server] $ cd server-wildfly
     [server-wildfly] $ mvn exec:java
 
 To customize the hosts or ports, you can either edit the pom.xml for these modules or pass flags. See https://www.mojohaus.org/exec-maven-plugin/usage.html  for more information. 
 
 ## Using the CLI
 
-The CLI is a proof-of-concept only, currently demonstrating only that the SSP connection and ability to pass communications back and forth works as expected. 
+The CLI is a proof-of-concept only, currently demonstrating only that the RSP connection and ability to pass communications back and forth works as expected. 
 
 
 To run the client, in a new shell, run the following:
 
-    [org.jboss.tools.ssp] $ cd client-cli
+    [rsp-server] $ cd client-cli
     [client-cli] $ mvn exec:java
 
 
@@ -103,7 +103,7 @@ See this example session:
 
 ## Contribute fixes and features
 
-_SSP_ is open source, and we welcome anybody that wants to
+_RSP_ is open source, and we welcome anybody that wants to
 participate and contribute!
 
 If you want to fix a bug or make any changes, please log an issue in
@@ -131,7 +131,7 @@ tests enabled to make sure your changes are still good.
 
 You can then push your topic branch and its changes into your public fork repository:
 
-	$ git push origin jbide-1234         # pushes your topic branch into your public fork of SSP
+	$ git push origin jbide-1234         # pushes your topic branch into your public fork of RSP
 
 And then [generate a pull-request](http://help.github.com/pull-requests/) where we can
 review the proposed changes, comment on them, discuss them with you,

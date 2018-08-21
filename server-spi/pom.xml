@@ -5,14 +5,14 @@
                              http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.jboss.tools.ssp</groupId>
+		<groupId>org.jboss.tools.rsp</groupId>
 		<artifactId>parent</artifactId>
 		<version>0.0.9-SNAPSHOT</version>
 	</parent>
-	<artifactId>org.jboss.tools.ssp.server.spi</artifactId>
+	<artifactId>org.jboss.tools.rsp.server.spi</artifactId>
 	<packaging>jar</packaging>
 
-	<name>Simple Server Protocol : Server SPI</name>
+	<name>Runtime Server Protocol : Server SPI</name>
 
 	<properties>
 		<tycho-version>1.1.0</tycho-version>
@@ -58,18 +58,18 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.tools.ssp</groupId>
-			<artifactId>org.jboss.tools.ssp.api</artifactId>
+			<groupId>org.jboss.tools.rsp</groupId>
+			<artifactId>org.jboss.tools.rsp.api</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.tools.ssp</groupId>
-			<artifactId>org.jboss.tools.ssp.launching</artifactId>
+			<groupId>org.jboss.tools.rsp</groupId>
+			<artifactId>org.jboss.tools.rsp.launching</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.tools.ssp</groupId>
-			<artifactId>org.jboss.tools.ssp.launching.java</artifactId>
+			<groupId>org.jboss.tools.rsp</groupId>
+			<artifactId>org.jboss.tools.rsp.launching.java</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
 	</dependencies>

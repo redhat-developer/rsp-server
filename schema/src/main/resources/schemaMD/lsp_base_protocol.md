@@ -4,9 +4,9 @@ layout: specification
 sectionid: specification
 toc: true
 ---
-# Simple Server Protocol Specification
+# Runtime Server Protocol Specification
 
-The Simple Server Protocol is based on version 3.x of the language server protocol.
+The Runtime Server Protocol is based on version 3.x of the language server protocol.
 
 ## Base Protocol
 
@@ -187,7 +187,7 @@ interface CancelParams {
 A request that got canceled still needs to return from the server and send a response back. It can not be left open / hanging. This is in line with the JSON RPC protocol that requires that every request sends a response back. In addition it allows for returning partial results on cancel. If the requests returns an error response on cancellation it is advised to set the error code to `ErrorCodes.RequestCancelled`.
 
 
-## Simple Server Protocol
+## Runtime Server Protocol
 
 The simple server protocol defines a set of JSON-RPC request, response and notification messages which are exchanged using the above base protocol. This section starts describing the basic JSON structures used in the protocol. The document uses TypeScript interfaces to describe these. Based on the basic JSON structures, the actual requests with their responses and the notifications are described.
 

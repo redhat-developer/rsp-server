@@ -13,7 +13,7 @@ node('rhel7') {
 		sh 'mvn clean install'
 		sh 'mvn clean package -f distribution/pom.xml'
 
-		archiveArtifacts artifacts: 'distribution/target/org.jboss.tools.ssp.distribution-*.zip'	
+		archiveArtifacts artifacts: 'distribution/target/org.jboss.tools.rsp.distribution-*.zip'	
 	}
 
 	stage('Snapshot') {
