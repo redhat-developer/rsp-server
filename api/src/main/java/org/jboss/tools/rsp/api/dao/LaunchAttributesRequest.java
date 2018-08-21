@@ -9,20 +9,21 @@
 package org.jboss.tools.rsp.api.dao;
 
 public class LaunchAttributesRequest {
-	private String id;
+	private String serverTypeId;
 	private String mode;
 	public LaunchAttributesRequest() {
 		
 	}
-	public LaunchAttributesRequest(String id, String mode) {
-		this.id = id;
+	public LaunchAttributesRequest(String serverTypeId, String mode) {
+		this.serverTypeId = serverTypeId;
 		this.mode = mode;
 	}
-	public String getId() {
-		return id;
+
+	public String getServerTypeId() {
+		return serverTypeId;
 	}
-	public void setId(String id) {
-		this.id = id;
+	public void setServerTypeId(String serverTypeId) {
+		this.serverTypeId = serverTypeId;
 	}
 	public String getMode() {
 		return mode;

@@ -1,4 +1,4 @@
 export interface LaunchAttributesRequest {
-    id: string;
+    serverTypeId: string;
     mode: string;
 }

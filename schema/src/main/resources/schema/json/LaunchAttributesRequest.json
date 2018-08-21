@@ -1,7 +1,7 @@
 {
   "type" : "object",
   "properties" : {
-    "id" : {
+    "serverTypeId" : {
       "type" : "string"
     },
     "mode" : {
