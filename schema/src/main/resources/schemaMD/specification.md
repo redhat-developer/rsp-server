@@ -221,7 +221,7 @@ This endpoint returns a list of the following schema as a return value:
 
 #### server/findServerBeans
 
- The `server/findServerBeans` request is sent by the client to fetch a list of server beans for the given path. The RSP model will iterate through a number of `IServerBeanTypeProvider` instances and ask them if they recognize the contents of the folder underlying the discovery path. Any providers that claim to be able to handle the given path will return an object representing the details of this recognized server runtime, its version, etc. 
+ The `server/findServerBeans` request is sent by the client to fetch a list of server beans for the given path. The RSP model will iterate through a number of `IServerBeanTypeProvider` instances and ask them if they recognize the contents of the folder underlying the discovery path. Any providers that claim to be able to handle the given path will return an object representing the details of this recognized server runtime, its version, etc. The path parameter must be an absolute file-system path, and may not be a relative path. 
 
 This endpoint takes the following json schemas as parameters: 
 
@@ -277,7 +277,7 @@ This endpoint returns a list of the following schema as a return value:
 
 #### server/addDiscoveryPath
 
- The `server/addDiscoveryPath` request is sent by the client to add a new path to search when discovering servers. These paths will be stored in a model, to be queried or searched later by a client. 
+ The `server/addDiscoveryPath` request is sent by the client to add a new path to search when discovering servers. These paths will be stored in a model, to be queried or searched later by a client. The path parameter must be an absolute file-system path, and may not be a relative path. 
 
 This endpoint takes the following json schemas as parameters: 
 
@@ -329,7 +329,7 @@ This endpoint returns the following schema as a return value:
 
 #### server/removeDiscoveryPath
 
- The `server/removeDiscoveryPath` request is sent by the client to remove a path from the model and prevent it from being searched by clients when discovering servers in the future. 
+ The `server/removeDiscoveryPath` request is sent by the client to remove a path from the model and prevent it from being searched by clients when discovering servers in the future. The path parameter must be an absolute file-system path, and may not be a relative path. 
 
 This endpoint takes the following json schemas as parameters: 
 
