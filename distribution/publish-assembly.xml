@@ -8,7 +8,7 @@
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<fileSets>
 	  <fileSet>
-	    <directory>${project.basedir}/target/felix-framework-6.0.0</directory>
+	    <directory>${project.basedir}/target/felix-framework-6.0.1</directory>
 	    <outputDirectory>/rsp-distribution/</outputDirectory>
 	    <fileMode>755</fileMode>
 	  </fileSet>
