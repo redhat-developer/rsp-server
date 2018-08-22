@@ -50,13 +50,13 @@ public class ServerManagementServerImpl implements RSPServer {
 	private final List<SocketLauncher<RSPClient>> launchers = new CopyOnWriteArrayList<>();
 	
 	private final ServerManagementModel model;
-	private final RemoteEventManager eventManager;
+	private final RemoteEventManager remoteEventManager;
 	private ServerManagementServerLauncher launcher;
 	
 	public ServerManagementServerImpl(ServerManagementServerLauncher launcher) {
 		this.launcher = launcher;
 		model = new ServerManagementModel();
-		eventManager = new RemoteEventManager(this);
+		remoteEventManager = new RemoteEventManager(this);
 	}
 	
 	public List<RSPClient> getClients() {

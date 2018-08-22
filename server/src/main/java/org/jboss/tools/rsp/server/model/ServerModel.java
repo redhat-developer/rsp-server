@@ -24,11 +24,14 @@ import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
+import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
+import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
 import org.jboss.tools.rsp.server.model.internal.Server;
+import org.jboss.tools.rsp.server.model.internal.ServerUtils;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModelListener;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
@@ -59,8 +62,6 @@ public class ServerModel implements IServerModel {
 		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_LIST);
 		// Map must be Map<String, String>
 		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_MAP);
-		
-		// TODO load / save of servers?
 	}
 	
 	public void addServerModelListener(IServerModelListener l) {
@@ -87,6 +88,23 @@ public class ServerModel implements IServerModel {
 		return servers.get(id);
 	}
 	
+	public Map<String, IServer> getServers() {
+		return servers;
+	} 
+	
+	public void loadServers() throws CoreException {
+		File data = LaunchingCore.getDataLocation();
+		File servers = new File(data, "servers");
+		if (!servers.exists()) {
+			return;
+		}
+		for (File serverFile: servers.listFiles()) {
+			Server server = new Server(serverFile);
+			server.load(new NullProgressMonitor());	
+			addServer(server, server.getDelegate());
+		}
+	}
+	
 	public IStatus createServer(String serverType, String id, Map<String, Object> attributes) {
 		try {
 			return createServerUnprotected(serverType, id, attributes);
@@ -96,7 +114,7 @@ public class ServerModel implements IServerModel {
 		}
 	}
 	
-	private IStatus createServerUnprotected(String serverType, String id, Map<String, Object> attributes) {
+	private IStatus createServerUnprotected(String serverType, String id, Map<String, Object> attributes) throws CoreException {
 		if( servers.get(id) != null ) {
 			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server with id " + id + " already exists.");
 		}
@@ -117,6 +135,7 @@ public class ServerModel implements IServerModel {
 			return valid;
 		}
 		addServer(server, del);
+		server.save(new NullProgressMonitor());
 		return Status.OK_STATUS;
 	}
 	
@@ -130,7 +149,7 @@ public class ServerModel implements IServerModel {
 			}
 			Object v = map.get(attrKey);
 			Class actual = v.getClass();
-			Class expected = getAttributeTypeAsClass(util.getAttributeType(attrKey));
+			Class expected = ServerUtils.getAttributeTypeClass(util.getAttributeType(attrKey));
 			if( !actual.equals(expected)) {
 				// Something's different than expectations based on json transfer
 				// Try to convert it
@@ -240,6 +259,12 @@ public class ServerModel implements IServerModel {
 		serverDelegates.remove(serverId);
 		s.dispose();
 		fireServerRemoved(toRemove);
+		try {
+			toRemove.delete();
+		} catch (CoreException e) {
+			//log silently. Looks like nothing crucial
+			LaunchingCore.log(e);
+		}
 		return true;
 	}
 	
@@ -259,6 +284,10 @@ public class ServerModel implements IServerModel {
 		IServerType st = serverTypes.get(typeId);
 		return new ServerType(typeId, st.getName(), st.getDescription());
 		
+	}
+	
+	public IServerType getIServerTypeById(String typeId) {
+		return serverTypes.get(typeId);
 	}
 	
 	public ServerType[] getServerTypes() {
@@ -316,20 +345,4 @@ public class ServerModel implements IServerModel {
 		}
 		return ret;
 	}
-	
-	private Class getAttributeTypeAsClass(String type) {
-		if( ServerManagementAPIConstants.ATTR_TYPE_INT.equals(type)) {
-			return Integer.class;
-		} else if( ServerManagementAPIConstants.ATTR_TYPE_BOOL.equals(type)) {
-			return Boolean.class;
-		} else if( ServerManagementAPIConstants.ATTR_TYPE_STRING.equals(type)) {
-			return String.class;
-		} else if( ServerManagementAPIConstants.ATTR_TYPE_LIST.equals(type)) {
-			return List.class;
-		} else if( ServerManagementAPIConstants.ATTR_TYPE_MAP.equals(type)) {
-			return Map.class;
-		}
-		return null;
-	}
-
 }

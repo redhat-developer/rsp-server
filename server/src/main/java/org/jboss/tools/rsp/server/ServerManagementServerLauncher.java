@@ -8,18 +8,41 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.SocketLauncher;
+import org.jboss.tools.rsp.api.dao.DiscoveryPath;
+import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
+import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
+import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
+import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallType;
+import org.jboss.tools.rsp.launching.LaunchingCore;
+import org.jboss.tools.rsp.server.core.internal.IMemento;
+import org.jboss.tools.rsp.server.core.internal.XMLMemento;
+import org.jboss.tools.rsp.server.model.ServerPersistenceManager;
+import org.jboss.tools.rsp.server.spi.discovery.IDiscoveryPathModel;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
+import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
 public class ServerManagementServerLauncher {
+	
+	private final ServerPersistenceManager persistenceEventManager;
+	
 	public static void main(String[] args) throws Exception {
 		ServerManagementServerLauncher instance = new ServerManagementServerLauncher();
 		instance.launch(args[0]);
@@ -37,6 +60,7 @@ public class ServerManagementServerLauncher {
 	private ServerSocket serverSocket;
 	public ServerManagementServerLauncher() {
 		serverImpl = new ServerManagementServerImpl(this);
+		this.persistenceEventManager = new ServerPersistenceManager(this);
 	}
 	
 	public IServerManagementModel getModel() {
@@ -52,8 +76,36 @@ public class ServerManagementServerLauncher {
 	}
 
 	public void launch(int port) throws Exception {
+		loadState();
 		// create the chat server
 		startListening(port, serverImpl);
+	}
+	
+	private void loadState() {
+		try {
+			loadVMs();
+			loadDiscoveryPaths();
+			serverImpl.getModel().getServerModel().loadServers();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void loadDiscoveryPaths() throws IOException {
+		File discoveryPathFile = new File(LaunchingCore.getDataLocation(), "discovery-paths");
+		if (!discoveryPathFile.exists()) {
+			return;
+		}
+		Scanner scanner = new Scanner(discoveryPathFile);
+		IDiscoveryPathModel discoveryPathModel = serverImpl.getModel().getDiscoveryPathModel();
+		while (scanner.hasNextLine()) {
+			String discoveryPathString = scanner.nextLine();
+			if (StringUtils.isEmpty(discoveryPathString)) {
+				continue;
+			}
+			discoveryPathModel.addPath(new DiscoveryPath(discoveryPathString));
+		}
+		scanner.close();
 	}
 
 	protected void startListening(int port, ServerManagementServerImpl server) throws IOException {
@@ -123,6 +175,7 @@ public class ServerManagementServerLauncher {
 	}
 
 	public void shutdown() {
+		saveState();
 		closeAllConnections();
 		socketRunnable.stopListening();
 		try {
@@ -130,14 +183,85 @@ public class ServerManagementServerLauncher {
 		} catch(IOException ioe) {
 			ioe.printStackTrace();
 		}
-		saveAllModels();
 		ShutdownExecutor.getExecutor().shutdown();
 	}
 	
-	private void saveAllModels() {
-		// TODO Auto-generated method stub
+	public void saveState() {
+		try {
+			saveDiscoveryPaths();
+			saveVMs();
+			saveServers();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void saveServers() throws CoreException {
+		for (IServer server : serverImpl.getModel().getServerModel().getServers().values()) {
+			server.save(new NullProgressMonitor());
+		}
+	}
+	
+	public void saveDiscoveryPaths() throws IOException {
+		File discoveryPathFile = new File(LaunchingCore.getDataLocation(), "discovery-paths");
+		if (!discoveryPathFile.exists()) {
+			discoveryPathFile.createNewFile();
+		}
+		PrintWriter pw = new PrintWriter(discoveryPathFile);
+		serverImpl.getModel().getDiscoveryPathModel().getPaths()
+			.forEach(path -> pw.println(path.getFilepath()));
+		pw.close();
+	}
+	
+	public void saveVMs() throws IOException {
+		File vmsFile = new File(LaunchingCore.getDataLocation(), "vms");
+		if (!vmsFile.exists()) {
+			vmsFile.createNewFile();
+		}
+		XMLMemento memento = XMLMemento.createWriteRoot("vms");
+		for (IVMInstall vmInstall : serverImpl.getModel().getVMInstallModel().getVMs()) {
+			IMemento vmMemento = memento.createChild("vm");
+			vmMemento.putString("id", vmInstall.getId());
+			vmMemento.putString("installLocation", vmInstall.getInstallLocation().getAbsolutePath());
+			vmMemento.putString("type", vmInstall.getVMInstallType().getClass().getName());			
+		}
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		memento.save(out);
+		byte[] bytes = out.toByteArray();
+		Files.write(vmsFile.toPath(), bytes);
+	}
+	
+	public void loadVMs() throws InstantiationException, IllegalAccessException, ClassNotFoundException, FileNotFoundException {
+		File vmsFile = new File(LaunchingCore.getDataLocation(), "vms");
+		if (!vmsFile.exists()) {
+			return;
+		}
+		IMemento vmsMemento = XMLMemento.loadMemento(new FileInputStream(vmsFile));
+		for (IMemento vmMemento : vmsMemento.getChildren()) {
+			String id = vmMemento.getString("id");
+			if (serverImpl.getModel().getVMInstallModel().findVMInstall(id) != null) {
+				continue;
+			}
+			String installLocation = vmMemento.getString("installLocation");
+			String type = vmMemento.getString("type");
+			
+			@SuppressWarnings("unchecked")
+			Class<IVMInstallType> typeClass = (Class<IVMInstallType>)Class.forName(type).asSubclass(IVMInstallType.class);
+			IVMInstallType vmType = null;
+
+			try {
+				vmType = (IVMInstallType)typeClass.getMethod("getDefault").invoke(null);
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				vmType = typeClass.newInstance();
+			}
+			IVMInstall newVM = vmType.createVMInstall(id);
+			newVM.setInstallLocation(new File(installLocation));
+			serverImpl.getModel().getVMInstallModel().addVMInstall(newVM);
+		}
 		
 	}
+	
+	
 
 	private void closeAllConnections() {
 		List<SocketLauncher<RSPClient>> all = 
