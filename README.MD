@@ -107,13 +107,12 @@ _RSP_ is open source, and we welcome anybody that wants to
 participate and contribute!
 
 If you want to fix a bug or make any changes, please log an issue in
-the [JBoss Tools JIRA](https://issues.jboss.org/browse/JBIDE)
-describing the bug or new feature and give it a component type of
-`stack-server-protocol`. Then we highly recommend making the changes on a
-topic branch named with the JIRA issue number. For example, this
+the [GitHub issue tracker](https://github.com/redhat-developer/rsp-server/issues)
+describing the bug or new feature request. Then, we highly recommend 
+making the changes on a topic branch named with the issue number. For example, this
 command creates a branch for the JBIDE-1234 issue:
 
-	$ git checkout -b jbide-1234
+	$ git checkout -b issue23
 
 After you're happy with your changes and a full build (with unit
 tests) runs successfully, commit your changes on your topic branch
@@ -122,7 +121,7 @@ that were made in the official repository:
 
 	$ git checkout master               # switches to the 'master' branch
 	$ git pull upstream master          # fetches all 'upstream' changes and merges 'upstream/master' onto your 'master' branch
-	$ git checkout jbide-1234           # switches to your topic branch
+	$ git checkout issue23              # switches to your topic branch
 	$ git rebase master                 # reapplies your changes on top of the latest in master
 	                                      (i.e., the latest from master will be the new base for your changes)
 
@@ -131,7 +130,7 @@ tests enabled to make sure your changes are still good.
 
 You can then push your topic branch and its changes into your public fork repository:
 
-	$ git push origin jbide-1234         # pushes your topic branch into your public fork of RSP
+	$ git push origin issue23         # pushes your topic branch into your public fork of RSP
 
 And then [generate a pull-request](http://help.github.com/pull-requests/) where we can
 review the proposed changes, comment on them, discuss them with you,
