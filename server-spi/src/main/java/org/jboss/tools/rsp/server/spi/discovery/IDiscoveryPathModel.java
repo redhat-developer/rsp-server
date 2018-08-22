@@ -1,5 +1,7 @@
 package org.jboss.tools.rsp.server.spi.discovery;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
@@ -25,4 +27,8 @@ public interface IDiscoveryPathModel {
 	 * @return
 	 */
 	public boolean removePath(DiscoveryPath path);
+	
+	public void loadDiscoveryPaths(File data) throws IOException;
+	
+	public void saveDiscoveryPaths(File data) throws IOException;
 }

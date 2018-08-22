@@ -8,9 +8,13 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.discovery;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.server.spi.discovery.IDiscoveryPathListener;
@@ -19,8 +23,7 @@ import org.jboss.tools.rsp.server.spi.discovery.IDiscoveryPathModel;
 public class DiscoveryPathModel implements IDiscoveryPathModel {
 	private List<DiscoveryPath> paths;
 	private List<IDiscoveryPathListener> listeners;
-	
-	// TODO persistence? 
+
 	public DiscoveryPathModel() {
 		paths = new ArrayList<DiscoveryPath>();
 		listeners = new ArrayList<IDiscoveryPathListener>();
@@ -60,4 +63,27 @@ public class DiscoveryPathModel implements IDiscoveryPathModel {
 		return false;
 	}
 
+	public void loadDiscoveryPaths(File discoveryPathFile) throws IOException {
+		if (!discoveryPathFile.exists()) {
+			return;
+		}
+		Scanner scanner = new Scanner(discoveryPathFile);
+		while (scanner.hasNextLine()) {
+			String discoveryPathString = scanner.nextLine();
+			if( discoveryPathFile == null || discoveryPathFile.length() == 0 ) {
+				continue;
+			}
+			addPath(new DiscoveryPath(discoveryPathString));
+		}
+		scanner.close();
+	}
+
+	public void saveDiscoveryPaths(File discoveryPathFile) throws IOException {
+		if (!discoveryPathFile.exists()) {
+			discoveryPathFile.createNewFile();
+		}
+		PrintWriter pw = new PrintWriter(discoveryPathFile);
+		getPaths().forEach(path -> pw.println(path.getFilepath()));
+		pw.close();
+	}
 }

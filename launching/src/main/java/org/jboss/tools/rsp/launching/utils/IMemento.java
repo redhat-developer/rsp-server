@@ -9,7 +9,7 @@
  *     Red Hat Incorporated - initial API and implementation
  *******************************************************************************/
 
-package org.jboss.tools.rsp.server.core.internal;
+package org.jboss.tools.rsp.launching.utils;
 
 import java.util.List;
 

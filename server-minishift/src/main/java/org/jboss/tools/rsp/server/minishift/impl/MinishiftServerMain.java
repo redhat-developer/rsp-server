@@ -28,6 +28,6 @@ public class MinishiftServerMain extends ServerManagementServerLauncher {
 	public void launch(int port) throws Exception {
 		// create the chat server
 		ExtensionHandler.addExtensionsToModel(serverImpl.getModel());
-		startListening(port, serverImpl);
+		launch(port);
 	}
 }

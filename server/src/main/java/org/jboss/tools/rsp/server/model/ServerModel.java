@@ -30,8 +30,8 @@ import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
+import org.jboss.tools.rsp.server.model.internal.DaoUtilities;
 import org.jboss.tools.rsp.server.model.internal.Server;
-import org.jboss.tools.rsp.server.model.internal.ServerUtils;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModelListener;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
@@ -89,9 +89,17 @@ public class ServerModel implements IServerModel {
 	}
 	
 	public Map<String, IServer> getServers() {
-		return servers;
+		return Collections.unmodifiableMap(servers);
 	} 
 	
+	@Override
+	public void saveServers() throws CoreException {
+		for (IServer server : getServers().values()) {
+			server.save(new NullProgressMonitor());
+		}
+	}
+	
+	@Override
 	public void loadServers() throws CoreException {
 		File data = LaunchingCore.getDataLocation();
 		File servers = new File(data, "servers");
@@ -149,7 +157,7 @@ public class ServerModel implements IServerModel {
 			}
 			Object v = map.get(attrKey);
 			Class actual = v.getClass();
-			Class expected = ServerUtils.getAttributeTypeClass(util.getAttributeType(attrKey));
+			Class expected = DaoUtilities.getAttributeTypeClass(util.getAttributeType(attrKey));
 			if( !actual.equals(expected)) {
 				// Something's different than expectations based on json transfer
 				// Try to convert it
@@ -286,7 +294,8 @@ public class ServerModel implements IServerModel {
 		
 	}
 	
-	public IServerType getIServerTypeById(String typeId) {
+	@Override
+	public IServerType getIServerType(String typeId) {
 		return serverTypes.get(typeId);
 	}
 	

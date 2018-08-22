@@ -26,7 +26,7 @@ public interface IServerModel {
 
 	IServer getServer(String id);
 	
-	IServerType getIServerTypeById(String typeId);
+	IServerType getIServerType(String typeId);
 	
 	Map<String, IServer> getServers();
 
@@ -60,6 +60,8 @@ public interface IServerModel {
 	void removeServerType(IServerType serverType);
 	
 	void loadServers() throws CoreException;
+
+	void saveServers() throws CoreException;
 	
 
 }

@@ -31,6 +31,8 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
+import org.jboss.tools.rsp.launching.utils.IMemento;
+import org.jboss.tools.rsp.launching.utils.XMLMemento;
 /**
  * Helper class for storing runtime and server attributes.
  */
