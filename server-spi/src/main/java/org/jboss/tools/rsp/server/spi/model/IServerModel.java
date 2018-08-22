@@ -15,6 +15,7 @@ import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerType;
+import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
@@ -24,6 +25,10 @@ public interface IServerModel {
 	ServerType[] getServerTypes();
 
 	IServer getServer(String id);
+	
+	IServerType getIServerTypeById(String typeId);
+	
+	Map<String, IServer> getServers();
 
 	ServerHandle[] getServerHandles();
 
@@ -53,6 +58,8 @@ public interface IServerModel {
 
 	void addServerType(IServerType serverType);
 	void removeServerType(IServerType serverType);
+	
+	void loadServers() throws CoreException;
 	
 
 }
