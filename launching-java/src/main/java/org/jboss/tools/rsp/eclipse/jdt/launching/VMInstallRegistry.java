@@ -8,13 +8,21 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.eclipse.jdt.launching;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.jboss.tools.rsp.launching.LaunchingCore;
+import org.jboss.tools.rsp.launching.utils.IMemento;
+import org.jboss.tools.rsp.launching.utils.XMLMemento;
 
 public class VMInstallRegistry implements IVMInstallRegistry {
 
@@ -114,4 +122,50 @@ public class VMInstallRegistry implements IVMInstallRegistry {
 		listeners.forEach(listener -> listener.vmAdded(vm));
 	}
 
+	public void save(File vmsFile) throws IOException {
+		if (!vmsFile.exists()) {
+			vmsFile.createNewFile();
+		}
+		XMLMemento memento = XMLMemento.createWriteRoot("vms");
+		for (IVMInstall vmInstall : getVMs()) {
+			IMemento vmMemento = memento.createChild("vm");
+			vmMemento.putString("id", vmInstall.getId());
+			vmMemento.putString("installLocation", vmInstall.getInstallLocation().getAbsolutePath());
+			vmMemento.putString("type", vmInstall.getVMInstallType().getClass().getName());			
+		}
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		memento.save(out);
+		byte[] bytes = out.toByteArray();
+		Files.write(vmsFile.toPath(), bytes);
+	}
+	
+	public void load(File vmsFile) throws InstantiationException, IllegalAccessException, ClassNotFoundException, FileNotFoundException {
+		if (!vmsFile.exists()) {
+			return;
+		}
+		IMemento vmsMemento = XMLMemento.loadMemento(new FileInputStream(vmsFile));
+		for (IMemento vmMemento : vmsMemento.getChildren()) {
+			String id = vmMemento.getString("id");
+			if (findVMInstall(id) != null) {
+				continue;
+			}
+			String installLocation = vmMemento.getString("installLocation");
+			String type = vmMemento.getString("type");
+			
+			@SuppressWarnings("unchecked")
+			Class<IVMInstallType> typeClass = (Class<IVMInstallType>)Class.forName(type).asSubclass(IVMInstallType.class);
+			IVMInstallType vmType = null;
+
+			try {
+				vmType = (IVMInstallType)typeClass.getMethod("getDefault").invoke(null);
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				vmType = typeClass.newInstance();
+			}
+			IVMInstall newVM = vmType.createVMInstall(id);
+			newVM.setInstallLocation(new File(installLocation));
+			addVMInstall(newVM);
+		}
+		
+	}
+	
 }

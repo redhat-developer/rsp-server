@@ -9,6 +9,8 @@
 package org.jboss.tools.rsp.eclipse.jdt.launching;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public interface IVMInstallRegistry {
 
@@ -33,4 +35,9 @@ public interface IVMInstallRegistry {
 	public void fireVMChanged(PropertyChangeEvent event);
 
 	public IVMInstall getDefaultVMInstall();
+	
+	public void load(File f) throws InstantiationException, IllegalAccessException, ClassNotFoundException, FileNotFoundException;
+	
+	public void save(File f) throws IOException;
+
 }
