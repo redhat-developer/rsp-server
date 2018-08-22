@@ -26,8 +26,7 @@ public class WildflyServerMain extends ServerManagementServerLauncher {
 	
 	@Override
 	public void launch(int port) throws Exception {
-		// create the chat server
 		ExtensionHandler.addExtensionsToModel(serverImpl.getModel());
-		startListening(port, serverImpl);
+		super.launch(port);
 	}
 }

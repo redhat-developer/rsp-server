@@ -38,6 +38,7 @@ import org.jboss.tools.ssp.launching.utils.StatusConverter;
 import org.jboss.tools.ssp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.ssp.server.model.RemoteEventManager;
 import org.jboss.tools.ssp.server.model.ServerManagementModel;
+import org.jboss.tools.ssp.server.model.ServerPersistenceManager;
 import org.jboss.tools.ssp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.ssp.server.spi.servertype.IServer;
 import org.jboss.tools.ssp.server.spi.servertype.IServerDelegate;
@@ -48,13 +49,13 @@ public class ServerManagementServerImpl implements SSPServer {
 	private final List<SocketLauncher<SSPClient>> launchers = new CopyOnWriteArrayList<>();
 	
 	private final ServerManagementModel model;
-	private final RemoteEventManager eventManager;
+	private final RemoteEventManager remoteEventManager;
 	private ServerManagementServerLauncher launcher;
 	
 	public ServerManagementServerImpl(ServerManagementServerLauncher launcher) {
 		this.launcher = launcher;
 		model = new ServerManagementModel();
-		eventManager = new RemoteEventManager(this);
+		remoteEventManager = new RemoteEventManager(this);
 	}
 	
 	public List<SSPClient> getClients() {

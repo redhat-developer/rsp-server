@@ -8,13 +8,23 @@
  ******************************************************************************/
 package org.jboss.tools.ssp.server.spi.servertype;
 
+import org.jboss.tools.ssp.eclipse.core.runtime.CoreException;
+import org.jboss.tools.ssp.eclipse.core.runtime.IProgressMonitor;
+
 public interface IServer extends IServerAttributes {
 	
-	public String getId();
+	String getId();
 	
-	public String getTypeId();
+	String getTypeId();
 	
-	public IServerType getServerType();
+	IServerType getServerType();
 	
-	public IServerDelegate getDelegate();
+	IServerDelegate getDelegate();
+	
+	void save(IProgressMonitor monitor) throws CoreException;
+	
+	void load(IProgressMonitor monitor) throws CoreException;
+	
+	void delete() throws CoreException;
+	
 }

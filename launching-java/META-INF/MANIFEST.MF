@@ -9,7 +9,6 @@ Bundle-Activator: org.jboss.tools.ssp.launching.java.JavaLaunchingActivator
 Bundle-ClassPath: .
 Import-Package: com.google.gson,
  javax.xml.parsers,
- org.xml.sax,	
  org.jboss.tools.ssp.api,
  org.jboss.tools.ssp.api.dao,
  org.jboss.tools.ssp.api.dao.util,
@@ -21,8 +20,10 @@ Import-Package: com.google.gson,
  org.jboss.tools.ssp.eclipse.osgi.util,
  org.jboss.tools.ssp.launching,
  org.jboss.tools.ssp.launching.utils,
+ org.jboss.tools.ssp.server.core.internal,
  org.osgi.framework,
- org.osgi.service.log
+ org.osgi.service.log,
+ org.xml.sax
 Export-Package: org.jboss.tools.ssp.eclipse.jdt.core,
  org.jboss.tools.ssp.eclipse.jdt.launching,
  org.jboss.tools.ssp.launching.java

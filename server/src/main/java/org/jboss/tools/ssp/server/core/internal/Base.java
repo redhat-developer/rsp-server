@@ -310,11 +310,6 @@ public abstract class Base {
 		}
 	}
 
-	protected void doSave(IProgressMonitor monitor) throws CoreException {
-		if (file != null)
-			saveToFile(monitor);
-	}
-
 	protected void saveToMetadata(IProgressMonitor monitor) {
 		// do nothing
 	}
@@ -343,8 +338,11 @@ public abstract class Base {
 		loadState(memento);
 	}
 
-	protected void loadMap(IMemento memento) {
-		String key = memento.getString("key");
+	protected void loadMap(IMemento memento) {		
+		map.put(memento.getString("key"), getMapFromMemento(memento));
+	}
+	
+	protected Map getMapFromMemento(IMemento memento) {
 		Map<String, String> vMap = new HashMap<String, String>();
 		Iterator<String> iterator = memento.getNames().iterator();
 		while(iterator.hasNext()) {
@@ -352,11 +350,14 @@ public abstract class Base {
 			String v = memento.getString(s);
 			vMap.put(s,v);
 		}
-		map.put(key, vMap);
+		return vMap;
 	}
 
 	protected void loadList(IMemento memento) {
-		String key = memento.getString("key");
+		map.put(memento.getString("key"), getListFromMemento(memento));
+	}
+	
+	protected List getListFromMemento(IMemento memento) {
 		List<String> list = new ArrayList<String>();
 		int i = 0;
 		String key2 = memento.getString("value" + (i++));
@@ -364,7 +365,7 @@ public abstract class Base {
 			list.add(key2);
 			key2 = memento.getString("value" + (i++));
 		}
-		map.put(key, list);
+		return list;
 	}
 	
 	protected abstract void loadState(IMemento memento);

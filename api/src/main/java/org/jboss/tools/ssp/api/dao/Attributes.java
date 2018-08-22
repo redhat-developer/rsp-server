@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Attributes {
-	private HashMap<String, Attribute> attributes;
+	private Map<String, Attribute> attributes;
 	
 	public Attributes() {
 		attributes = new HashMap<>();
@@ -21,11 +21,11 @@ public class Attributes {
 		attributes = new HashMap<>(a);
 	}
 
-	public HashMap<String, Attribute> getAttributes() {
+	public Map<String, Attribute> getAttributes() {
 		return attributes;
 	}
 
-	public void setAttributes(HashMap<String, Attribute> attrs) {
+	public void setAttributes(Map<String, Attribute> attrs) {
 		this.attributes = attrs;
 	}
 }
