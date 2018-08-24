@@ -18,8 +18,7 @@ public class JBossASServerType extends BaseJBossServerType {
 	}
 
 	@Override
-	public IServerDelegate createServerDelegate(IServer server) {
-		JBossASServerDelegate ret = new JBossASServerDelegate(server);
-		return ret;
+	public IServerDelegate createServerDelegateImpl(IServer server) {
+		return new JBossASServerDelegate(server);
 	}
 }

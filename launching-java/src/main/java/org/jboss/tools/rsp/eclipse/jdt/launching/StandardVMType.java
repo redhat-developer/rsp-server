@@ -651,21 +651,6 @@ public class StandardVMType extends AbstractVMInstallType {
 		}
 		return null;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jdt.launching.IVMInstallType#disposeVMInstall(java.lang.String)
-	 */
-	@Override
-	public void disposeVMInstall(String id) {
-		IVMInstall vm = findVMInstall(id);
-		if (vm != null) {
-			String path = vm.getInstallLocation().getAbsolutePath();
-            LibraryInfoCache.getDefault().put(path, null);
-            fgFailedInstallPath.remove(path);
-            fgDefaultLibLocs.remove(path);
-		}
-		super.disposeVMInstall(id);
-	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jdt.launching.AbstractVMInstallType#getDefaultJavadocLocation(java.io.File)

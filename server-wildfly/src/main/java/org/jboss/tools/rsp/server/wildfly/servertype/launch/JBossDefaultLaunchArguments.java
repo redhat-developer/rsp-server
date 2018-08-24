@@ -74,7 +74,7 @@ public class JBossDefaultLaunchArguments implements IDefaultLaunchArguments, IJB
 		// We assume that even if the server is in remote mode, the remote configuration
 		// matches the local very closely. 
 		// But if there's no local runtime, we'll just not include the -server flag
-		IVMInstall install = JBossVMRegistryDiscovery.findVMInstall(server.getDelegate());
+		IVMInstall install = new JBossVMRegistryDiscovery().findVMInstall(server.getDelegate());
 		if( JavaUtils.supportsServerMode(install))
 			return SERVER_ARG + SPACE;
 		return new String();

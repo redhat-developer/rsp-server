@@ -56,11 +56,11 @@ public abstract class AbstractLauncher extends AbstractJavaLauncher implements I
 
 	@Override
 	protected IVMInstallRegistry getDefaultRegistry() {
-		return JBossVMRegistryDiscovery.getDefaultRegistry();
+		return new JBossVMRegistryDiscovery().getDefaultRegistry();
 	}
 	
 	@Override
 	protected IVMInstall getVMInstall(IServerDelegate delegate) {
-		return JBossVMRegistryDiscovery.findVMInstall(delegate);
+		return new JBossVMRegistryDiscovery().findVMInstall(delegate);
 	}
 }

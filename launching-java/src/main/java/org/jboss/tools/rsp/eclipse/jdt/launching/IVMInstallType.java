@@ -41,37 +41,6 @@ public interface IVMInstallType {
 	 */
 	IVMInstall createVMInstall(String id);
 	/**
-	 * Finds the VM with the given id.
-	 *
-	 * @param id the VM id
-	 * @return a VM instance, or <code>null</code> if not found
-	 */
-	IVMInstall findVMInstall(String id);
-	/**
-	 * Finds the VM with the given name.
-	 *
-	 * @param name the VM name
-	 * @return a VM instance, or <code>null</code> if not found
-	 * @since 2.0
-	 */
-	IVMInstall findVMInstallByName(String name);
-
-	/**
-	 * Remove the VM associated with the given id from the set of VMs managed by
-	 * this VM type. Has no effect if a VM with the given id is not currently managed
-	 * by this type.
-	 * A VM install that is disposed may not be used anymore.
-	 *
-	 * @param id the id of the VM to be disposed.
-	 */
-	void disposeVMInstall(String id);
-	/**
-	 * Returns all VM instances managed by this VM type.
-	 *
-	 * @return the list of VM instances managed by this VM type
-	 */
-	IVMInstall[] getVMInstalls();
-	/**
 	 * Returns the display name of this VM type.
 	 *
 	 * @return the name of this IVMInstallType

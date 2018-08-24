@@ -45,8 +45,12 @@ public abstract class BaseJBossServerType implements IServerType{
 	}
 	
 	@Override
-	public abstract IServerDelegate createServerDelegate(IServer server);
-
+	public IServerDelegate createServerDelegate(IServer server) {
+		new JBossVMRegistryDiscovery().ensureVMInstallAdded(server);
+		return createServerDelegateImpl(server);
+	}
+	
+	protected abstract IServerDelegate createServerDelegateImpl(IServer server);
 
 	@Override
 	public Attributes getRequiredAttributes() {
