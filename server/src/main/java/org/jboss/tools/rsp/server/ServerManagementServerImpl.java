@@ -75,9 +75,8 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	private void removeClient(SocketLauncher<RSPClient> launcher) {
-		this.launchers.add(launcher);
+		this.launchers.remove(launcher);
 		this.clients.remove(launcher.getRemoteProxy());
-		
 	}
 	
 	public List<SocketLauncher<RSPClient>> getActiveLaunchers() {
