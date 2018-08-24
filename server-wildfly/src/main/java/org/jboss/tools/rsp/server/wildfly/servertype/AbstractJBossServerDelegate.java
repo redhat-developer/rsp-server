@@ -60,8 +60,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, "Server home must exist");
 		}
 		
-		
-		IVMInstall vmi = JBossVMRegistryDiscovery.findVMInstall(this);
+		IVMInstall vmi = new JBossVMRegistryDiscovery().findVMInstall(this);
 		if( vmi == null ) {
 			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
 					"Server " + getServer().getId() + " can not find a valid virtual machine to use.");

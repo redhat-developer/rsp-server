@@ -36,68 +36,12 @@ public abstract class AbstractVMInstallType implements IVMInstallType {
 	private static final String vmInstallType_duplicateVM="Duplicate VM: {0}";
 	
 	
-	private List<IVMInstall> fVMs;
 	private String fId;
 
 	/**
 	 * Constructs a new VM install type.
 	 */
 	protected AbstractVMInstallType() {
-		fVMs = new ArrayList<>(10);
-	}
-
-	/* (non-Javadoc)
-	 * Subclasses should not override this method.
-	 * @see IVMType#getVMs()
-	 */
-	@Override
-	public synchronized IVMInstall[] getVMInstalls() {
-		IVMInstall[] vms= new IVMInstall[fVMs.size()];
-		return fVMs.toArray(vms);
-	}
-
-	/* (non-Javadoc)
-	 * Subclasses should not override this method.
-	 * @see IVMType#disposeVM(String)
-	 */
-	@Override
-	public void disposeVMInstall(String id) {
-		IVMInstall removedVM = null;
-		synchronized (this) {
-			for (int i= 0; i < fVMs.size(); i++) {
-				if (fVMs.get(i).getId().equals(id)) {
-					removedVM = fVMs.remove(i);
-					break;
-				}
-			}
-		}
-		if (removedVM != null) {
-			fireVMRemoved(removedVM);
-		}
-	}
-
-	protected void fireVMRemoved(IVMInstall install) {
-		if( install != null && install.getRegistry() != null ) {
-			install.getRegistry().removeVMInstall(install);
-		}
-	}
-	
-	
-	/* (non-Javadoc)
-	 * Subclasses should not override this method.
-	 * @see IVMType#getVM(String)
-	 */
-	@Override
-	public IVMInstall findVMInstall(String id) {
-		synchronized (this) {
-			for (int i = 0; i < fVMs.size(); i++) {
-				IVMInstall vm = fVMs.get(i);
-				if (vm.getId().equals(id)) {
-					return vm;
-				}
-			}
-		}
-		return null;
 	}
 
 	/* (non-Javadoc)
@@ -106,12 +50,7 @@ public abstract class AbstractVMInstallType implements IVMInstallType {
 	 */
 	@Override
 	public synchronized IVMInstall createVMInstall(String id) throws IllegalArgumentException {
-		if (findVMInstall(id) != null) {
-			String format= vmInstallType_duplicateVM;
-			throw new IllegalArgumentException(NLS.bind(format, new String[] { id }));
-		}
 		IVMInstall vm = doCreateVMInstall(id);
-		fVMs.add(vm);
 		return vm;
 	}
 
@@ -142,22 +81,6 @@ public abstract class AbstractVMInstallType implements IVMInstallType {
 	@Override
 	public String getId() {
 		return fId;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jdt.launching.IVMInstallType#findVMInstallByName(java.lang.String)
-	 */
-	@Override
-	public IVMInstall findVMInstallByName(String name) {
-		synchronized (this) {
-			for (int i = 0; i < fVMs.size(); i++) {
-				IVMInstall vm = fVMs.get(i);
-				if (Objects.equals(vm.getName(), name)) {
-					return vm;
-				}
-			}
-		}
-		return null;
 	}
 
 	/**
