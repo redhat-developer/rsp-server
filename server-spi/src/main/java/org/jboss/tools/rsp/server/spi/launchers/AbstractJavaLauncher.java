@@ -122,7 +122,8 @@ public abstract class AbstractJavaLauncher implements IStartLauncher {
 		return Status.OK_STATUS;
 
 	}
-	private IVMInstall getVMInstall(IServerDelegate delegate) {
+	
+	protected IVMInstall getVMInstall(IServerDelegate delegate) {
 		return getDefaultRegistry().getDefaultVMInstall();
 	}
 

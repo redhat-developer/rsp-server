@@ -8,6 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.wildfly.servertype;
 
+import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.server.spi.launchers.AbstractJavaLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IStartLauncher;
@@ -56,5 +57,10 @@ public abstract class AbstractLauncher extends AbstractJavaLauncher implements I
 	@Override
 	protected IVMInstallRegistry getDefaultRegistry() {
 		return JBossVMRegistryDiscovery.getDefaultRegistry();
+	}
+	
+	@Override
+	protected IVMInstall getVMInstall(IServerDelegate delegate) {
+		return JBossVMRegistryDiscovery.findVMInstall(delegate);
 	}
 }

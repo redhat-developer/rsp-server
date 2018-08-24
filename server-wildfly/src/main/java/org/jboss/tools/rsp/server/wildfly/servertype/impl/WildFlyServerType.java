@@ -8,9 +8,17 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.wildfly.servertype.impl;
 
+import java.io.File;
+
+import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
+import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
+import org.jboss.tools.rsp.eclipse.jdt.launching.StandardVMType;
+import org.jboss.tools.rsp.server.LauncherSingleton;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.wildfly.servertype.BaseJBossServerType;
+import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
+import org.jboss.tools.rsp.server.wildfly.servertype.JBossVMRegistryDiscovery;
 
 public class WildFlyServerType extends BaseJBossServerType {
 	public WildFlyServerType(String id, String name, String desc) {
@@ -19,7 +27,10 @@ public class WildFlyServerType extends BaseJBossServerType {
 
 	@Override
 	public IServerDelegate createServerDelegate(IServer server) {
+		JBossVMRegistryDiscovery.ensureVMInstallAdded(server);
 		WildFlyServerDelegate ret = new WildFlyServerDelegate(server);
 		return ret;
 	}
+	
+
 }
