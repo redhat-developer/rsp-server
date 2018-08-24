@@ -76,9 +76,6 @@ public class ServerManagementCLI {
 		cli.readCommands();
 	}
 	
-	
-	
-	
 	private Scanner scanner = null;
 	private ServerManagementClientLauncher launcher;
 	

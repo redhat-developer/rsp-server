@@ -108,8 +108,23 @@ public class ServerModel implements IServerModel {
 		}
 		for (File serverFile: servers.listFiles()) {
 			Server server = new Server(serverFile);
-			server.load(new NullProgressMonitor());	
-			addServer(server, server.getDelegate());
+			try {
+				server.load(new NullProgressMonitor());
+				if( server.getServerType() == null ) {
+					String typeId = server.getAttribute(Server.TYPE_ID, (String)null);
+					if( typeId == null ) {
+						LaunchingCore.log(new Exception(
+								"Unable to load server from file " + serverFile.getAbsolutePath() + "; server type is null."));
+					} else if( getServerType(typeId) == null ) {
+						LaunchingCore.log(new Exception(
+								"Unable to load server from file " + serverFile.getAbsolutePath() + "; server type " + typeId + " is not found."));
+					}
+				} else {
+					addServer(server, server.getDelegate());
+				}
+			} catch(CoreException ce) {
+				LaunchingCore.log(new Exception("Unable to load server from file " + serverFile.getAbsolutePath(), ce));
+			}
 		}
 	}
 	
@@ -290,6 +305,8 @@ public class ServerModel implements IServerModel {
 	
 	private ServerType getServerType(String typeId) {
 		IServerType st = serverTypes.get(typeId);
+		if( st == null )
+			return null;
 		return new ServerType(typeId, st.getName(), st.getDescription());
 		
 	}

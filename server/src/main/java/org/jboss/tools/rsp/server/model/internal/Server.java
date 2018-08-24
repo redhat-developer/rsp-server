@@ -20,7 +20,7 @@ import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
 
 public class Server extends Base implements IServer {
-	private static final String TYPE_ID = "org.jboss.tools.rsp.server.typeId";
+	public static final String TYPE_ID = "org.jboss.tools.rsp.server.typeId";
 	private IServerDelegate delegate;
 	private IServerType serverType;
 	
@@ -53,7 +53,8 @@ public class Server extends Base implements IServer {
 	@Override
 	protected void loadState(IMemento memento) {
 		loadServerType(memento);
-		this.delegate = this.serverType.createServerDelegate(this);
+		if( this.serverType != null )
+			this.delegate = this.serverType.createServerDelegate(this);
 	}
 	
 	protected void loadServerType(IMemento memento) {
