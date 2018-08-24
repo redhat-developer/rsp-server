@@ -13,6 +13,8 @@
   <properties>
   	<mockito-core.version>2.18.3</mockito-core.version>
   	<assertj-core.version>3.10.0</assertj-core.version>
+    <jacoco.version>0.8.2</jacoco.version>
+    <jacoco.reportRoot>${project.basedir}/../target</jacoco.reportRoot>
   </properties>
   
   <modules>
@@ -41,6 +43,37 @@
       </plugin>
     </plugins>
     </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.2</version>
+        <executions>
+          <execution>
+            <id>jacoco-initialize</id>
+            <goals>
+                <goal>prepare-agent</goal>
+            </goals>
+            <configuration>
+              <append>true</append>
+              <destFile>${jacoco.reportRoot}/jacoco.exec</destFile>
+            </configuration>
+          </execution>
+          <execution>
+            <id>jacoco-site</id>
+            <phase>verify</phase>
+            <goals>
+                <goal>report</goal>
+            </goals>
+            <configuration>
+              <dataFile>${jacoco.reportRoot}/jacoco.exec</dataFile>
+              <outputDirectory>${jacoco.reportRoot}/jacoco-ut</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 
   <dependencies>
