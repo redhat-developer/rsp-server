@@ -48,27 +48,22 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.2</version>
+        <version>${jacoco.version}</version>
         <executions>
           <execution>
             <id>jacoco-initialize</id>
             <goals>
                 <goal>prepare-agent</goal>
             </goals>
-            <configuration>
-              <append>true</append>
-              <destFile>${jacoco.reportRoot}/jacoco.exec</destFile>
-            </configuration>
           </execution>
           <execution>
             <id>jacoco-site</id>
             <phase>verify</phase>
             <goals>
-                <goal>report</goal>
+                <goal>report-aggregate</goal>
             </goals>
             <configuration>
-              <dataFile>${jacoco.reportRoot}/jacoco.exec</dataFile>
-              <outputDirectory>${jacoco.reportRoot}/jacoco-ut</outputDirectory>
+              <outputDirectory>${jacoco.reportRoot}/jacoco-report</outputDirectory>
             </configuration>
           </execution>
         </executions>
