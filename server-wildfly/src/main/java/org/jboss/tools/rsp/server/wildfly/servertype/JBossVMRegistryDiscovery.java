@@ -13,7 +13,9 @@ import java.io.File;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMRunner;
+import org.jboss.tools.rsp.eclipse.jdt.launching.StandardVMType;
 import org.jboss.tools.rsp.server.LauncherSingleton;
+import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
 public class JBossVMRegistryDiscovery {
@@ -37,5 +39,51 @@ public class JBossVMRegistryDiscovery {
 	
 	public static IVMInstallRegistry getDefaultRegistry() {
 		return LauncherSingleton.getDefault().getLauncher().getModel().getVMInstallModel();
+	}
+	
+	public static boolean ensureVMInstallAdded(IServer server) {
+		String vmi = server.getAttribute(IJBossServerAttributes.VM_INSTALL_PATH, (String)null);
+		IVMInstallRegistry reg = LauncherSingleton.getDefault().getLauncher().getModel().getVMInstallModel();
+		File fVMI = vmi == null ? null : new File(vmi);
+		if( fVMI == null ) {
+			return true;
+		}
+		if( !fVMI.exists() || !fVMI.isDirectory()) {
+			// Cannot be a java installation. Bad parameter.
+			return false;
+		}
+		if( reg.findVMInstall(fVMI) == null) {
+			// this java installation is not in the model yet
+			String name = getNewVmName(fVMI.getName());
+			IVMInstall ivmi = StandardVMType.getDefault().createVMInstall(name);
+			ivmi.setInstallLocation(fVMI);
+			try {
+				String vers = ivmi.getJavaVersion();
+				if( vers == null ) {
+					StandardVMType.getDefault().disposeVMInstall(name);
+					return false;
+				}
+				reg.addVMInstall(ivmi);
+			} catch(IllegalArgumentException iae) {
+				// TODO
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private static String getNewVmName(String base) {
+		IVMInstall vmi = StandardVMType.getDefault().findVMInstall(base);
+		if( vmi == null )
+			return base;
+		String tmpName = null;
+		int i = 1;
+		while(true) {
+			tmpName = base + " (" + i + ")";
+			vmi = StandardVMType.getDefault().findVMInstall(tmpName);
+			if( vmi == null )
+				return tmpName;
+			i++;
+		}
 	}
 }
