@@ -422,6 +422,9 @@ public abstract class Base {
 		try {
 			String content = new String(Files.readAllBytes(file.toPath()));
 			IMemento memento = XMLMemento.loadMemento(new ByteArrayInputStream(content.getBytes()));
+			if( memento == null ) {
+				throw new Exception("Error reading server file " + file.getAbsolutePath() + ". Please check logs for more info.");
+			}
 			load(memento);
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.wst.server.core", 0, NLS.bind("Could not load server from file {0}", file.getAbsolutePath()), e));

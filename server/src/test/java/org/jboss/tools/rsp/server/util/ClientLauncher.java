@@ -8,7 +8,10 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.util;
 
+import java.io.IOException;
 import java.net.Socket;
+import java.nio.channels.SocketChannel;
+import java.util.concurrent.Future;
 
 import org.jboss.tools.rsp.api.RSPServer;
 import org.jboss.tools.rsp.api.SocketLauncher;
@@ -61,6 +64,10 @@ public class ClientLauncher {
 		return this.myClient;
 	}
 	
+	public SocketLauncher<RSPServer> getLauncher() {
+		return launcher;
+	}
+	
 	public boolean isConnectionActive() {
 		return connectionOpen;
 	}
@@ -70,5 +77,9 @@ public class ClientLauncher {
 			return myClient.getProxy();
 		}
 		return null;
+	}
+	
+	public Future<Void> getStartListeningResult() {
+		return launcher.getStartListeningResult();
 	}
 }

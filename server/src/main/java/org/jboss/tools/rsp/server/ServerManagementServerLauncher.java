@@ -40,8 +40,12 @@ public class ServerManagementServerLauncher {
 	private ListenOnSocketRunnable socketRunnable;
 	private ServerSocket serverSocket;
 	public ServerManagementServerLauncher() {
-		serverImpl = new ServerManagementServerImpl(this);
+		this.serverImpl = createImpl();
 		this.persistenceEventManager = new ServerPersistenceManager(this);
+	}
+	
+	protected ServerManagementServerImpl createImpl() {
+		return new ServerManagementServerImpl(this);
 	}
 	
 	public IServerManagementModel getModel() {
@@ -130,12 +134,11 @@ public class ServerManagementServerLauncher {
 
 	public void shutdown() {
 		persistenceEventManager.saveState();
-		closeAllConnections();
 		socketRunnable.stopListening();
+		closeAllConnections();
 		try {
 			serverSocket.close();
 		} catch(IOException ioe) {
-			ioe.printStackTrace();
 		}
 		ShutdownExecutor.getExecutor().shutdown();
 	}
