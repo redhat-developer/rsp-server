@@ -14,7 +14,6 @@ import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.launching.utils.IMemento;
 import org.jboss.tools.rsp.server.core.internal.Base;
-import org.jboss.tools.rsp.server.model.ServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
@@ -31,7 +30,10 @@ public class Server extends Base implements IServer {
 	public Server(File file, IServerType type) {
 		super(file, type.getId());
 		this.serverType = type;
-		setAttribute(TYPE_ID, type.getId());
+		if( this.serverType != null ) {
+			setAttribute(TYPE_ID, type.getId());
+			this.delegate = this.serverType.createServerDelegate(this);
+		}
 	}
 	
 	@Override
@@ -46,19 +48,14 @@ public class Server extends Base implements IServer {
 
 	@Override
 	protected void saveState(IMemento memento) {
-		memento.putString("mode", this.delegate.getMode());
-		memento.putInteger("state", this.delegate.getServerState());
+		if( this.delegate != null ) {
+			memento.putString("mode", this.delegate.getMode());
+			memento.putInteger("state", this.delegate.getServerState());
+		}
 	}
 	
 	@Override
 	protected void loadState(IMemento memento) {
-		loadServerType(memento);
-		if( this.serverType != null )
-			this.delegate = this.serverType.createServerDelegate(this);
-	}
-	
-	protected void loadServerType(IMemento memento) {
-		this.serverType = ServerManagementModel.getDefault().getServerModel().getIServerType(getTypeId());
 	}
 	
 	@Override
@@ -68,6 +65,12 @@ public class Server extends Base implements IServer {
 
 	public IServerType getServerType() {
 		return serverType;
+	}
+	
+	public void setServerType(IServerType type) {
+		this.serverType = type;
+		if( type != null ) 
+			setAttribute(TYPE_ID, type.getId());
 	}
 	
 	public void setDelegate(IServerDelegate del) {

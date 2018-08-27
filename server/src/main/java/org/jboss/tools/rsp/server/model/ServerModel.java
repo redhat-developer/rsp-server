@@ -103,21 +103,31 @@ public class ServerModel implements IServerModel {
 	public void loadServers() throws CoreException {
 		File data = LaunchingCore.getDataLocation();
 		File servers = new File(data, "servers");
-		if (!servers.exists()) {
+		loadServers(servers);
+	}
+	public void loadServers(File folder) throws CoreException {
+		if (!folder.exists()) {
 			return;
 		}
-		for (File serverFile: servers.listFiles()) {
+		for (File serverFile: folder.listFiles()) {
 			Server server = new Server(serverFile);
 			try {
 				server.load(new NullProgressMonitor());
+				String tid = server.getTypeId();
+				IServerType st = getIServerType(tid);
+				if( st != null ) {
+					server.setServerType(st);
+					server.setDelegate(st.createServerDelegate(server));
+				}
+				
 				if( server.getServerType() == null ) {
 					String typeId = server.getAttribute(Server.TYPE_ID, (String)null);
 					if( typeId == null ) {
 						LaunchingCore.log(new Exception(
-								"Unable to load server from file " + serverFile.getAbsolutePath() + "; server type is null."));
+								"Unable to load server from file " + serverFile.getAbsolutePath() + "; server type is missing or null."));
 					} else if( getServerType(typeId) == null ) {
 						LaunchingCore.log(new Exception(
-								"Unable to load server from file " + serverFile.getAbsolutePath() + "; server type " + typeId + " is not found."));
+								"Unable to load server from file " + serverFile.getAbsolutePath() + "; server type " + typeId + " is not found in model."));
 					}
 				} else {
 					addServer(server, server.getDelegate());
