@@ -14,8 +14,8 @@ public interface ServerManagementAPIConstants {
 	public static final int STREAM_TYPE_SYSOUT = 2;
 	public static final int STREAM_TYPE_OTHER = 3;
 	
-	public static final String ATTR_TYPE_INT = "int";
 	public static final String ATTR_TYPE_BOOL = "bool";
+	public static final String ATTR_TYPE_INT = "int";
 	public static final String ATTR_TYPE_STRING= "string";
 	public static final String ATTR_TYPE_LIST = "list";
 	public static final String ATTR_TYPE_MAP = "map";

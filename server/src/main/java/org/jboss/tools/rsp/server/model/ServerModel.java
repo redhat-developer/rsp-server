@@ -375,10 +375,12 @@ public class ServerModel implements IServerModel {
 			for( String all1 : all ) {
 				String attrType = util.getAttributeType(all1);
 				if( !approvedAttributeTypes.contains(attrType)) {
-					LaunchingCore.log("Extension for servertype " + serverType + " is invalid and requires an attribute of an invalid class.");
+					LaunchingCore.log("Extension for servertype " + serverType + " is invalid and requires an attribute of an invalid type.");
+					util.removeAttribute(all1);
 				}
 			}
+			return util.toPojo();
 		}
-		return ret;
+		return null;
 	}
 }
