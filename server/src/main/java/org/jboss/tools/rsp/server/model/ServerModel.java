@@ -325,8 +325,8 @@ public class ServerModel implements IServerModel {
 
 	public List<ServerLaunchMode> getLaunchModes(String serverType) {
 		IServerType t = serverTypes.get(serverType);
-		ServerLaunchMode[] ret = t.getLaunchModes();
-		return Arrays.asList(ret);
+		ServerLaunchMode[] ret = t == null ? null : t.getLaunchModes();
+		return ret == null ? null : Arrays.asList(ret);
 	}
 	
 	public Attributes getRequiredLaunchAttributes(String type) {
