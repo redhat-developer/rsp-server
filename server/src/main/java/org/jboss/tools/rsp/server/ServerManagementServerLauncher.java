@@ -134,10 +134,12 @@ public class ServerManagementServerLauncher {
 
 	public void shutdown() {
 		persistenceEventManager.saveState();
-		socketRunnable.stopListening();
+		if( socketRunnable != null )
+			socketRunnable.stopListening();
 		closeAllConnections();
 		try {
-			serverSocket.close();
+			if( serverSocket != null )
+				serverSocket.close();
 		} catch(IOException ioe) {
 		}
 		ShutdownExecutor.getExecutor().shutdown();
