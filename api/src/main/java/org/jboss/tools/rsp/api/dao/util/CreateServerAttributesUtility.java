@@ -55,6 +55,10 @@ public class CreateServerAttributesUtility {
 		attrs.put(key,  a);
 	}
 
+	public void removeAttribute(String key) {
+		attrs.remove(key);
+	}
+
 	public Attributes toPojo() {
 		return new Attributes(attrs);
 	}
