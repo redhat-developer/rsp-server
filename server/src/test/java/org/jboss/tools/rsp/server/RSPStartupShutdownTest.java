@@ -74,12 +74,14 @@ public class RSPStartupShutdownTest {
 	
 	@Test
 	public void testStart() {
+		System.out.println("Testing testStart");
 		initNew();
 		cleanup(rspInstance, clientInstance);
 	}
 	
 	@Test
 	public void testShutdown() {
+		System.out.println("Testing testShutdown");
 		initNew(true);
 		startSignal.countDown();
 		try {
@@ -106,6 +108,7 @@ public class RSPStartupShutdownTest {
 
 	@Test
 	public void testClientClosed() {
+		System.out.println("Testing testClientClosed");
 		initNew(true);
 		startSignal.countDown();
 		try {

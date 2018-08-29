@@ -9,6 +9,8 @@
 package org.jboss.tools.rsp.server;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
@@ -19,6 +21,7 @@ import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.SocketLauncher;
 import org.jboss.tools.rsp.server.model.ServerPersistenceManager;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
+import org.osgi.service.log.LogService;
 
 public class ServerManagementServerLauncher {
 	
@@ -113,7 +116,7 @@ public class ServerManagementServerLauncher {
 			Socket socket = serverSocket.accept();
 			// create a JSON-RPC connection for the accepted socket
 			SocketLauncher<RSPClient> launcher = new SocketLauncher<>(server,
-					RSPClient.class, socket);
+					RSPClient.class, socket, createLoggingPrintWriter());
 			// connect a remote client proxy to the server
 			Runnable removeClient = server.addClient(launcher);
 			/*
@@ -132,6 +135,30 @@ public class ServerManagementServerLauncher {
 
 	}
 
+	private class LoggingStringWriter extends StringWriter {
+	    public void flush() {
+	    	String val = null;
+	    	synchronized(this) {
+	    		val = getBuffer().toString();
+	    		getBuffer().setLength(0);
+	    	}
+	    	RSPLogger.log(LogService.LOG_DEBUG, val);
+	    }
+	}
+	private LoggingPrintWriter createLoggingPrintWriter() {
+		LoggingStringWriter sw = new LoggingStringWriter();
+		LoggingPrintWriter writer = new LoggingPrintWriter(sw);
+		return writer;
+	}
+	private static class LoggingPrintWriter extends PrintWriter {
+		private StringWriter sw;
+		public LoggingPrintWriter(LoggingStringWriter writer) {
+			super(writer);
+			this.sw = writer;
+		}
+		
+	}
+	
 	public void shutdown() {
 		persistenceEventManager.saveState();
 		if( socketRunnable != null )
