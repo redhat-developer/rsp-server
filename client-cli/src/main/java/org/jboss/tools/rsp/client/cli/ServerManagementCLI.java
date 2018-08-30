@@ -71,7 +71,13 @@ public class ServerManagementCLI {
 	
 	public static void main(String[] args) {
 		ServerManagementCLI cli = new ServerManagementCLI();
-		cli.connect(args[0], args[1]);
+		try {
+			cli.connect(args[0], args[1]);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return;
+		}
+		
 		System.out.println("Connected to: " + args[0] + ":" + args[1]);
 		cli.readCommands();
 	}
@@ -79,7 +85,7 @@ public class ServerManagementCLI {
 	private Scanner scanner = null;
 	private ServerManagementClientLauncher launcher;
 	
-	public void connect(String host, String port) {
+	public void connect(String host, String port) throws Exception {
 		if( host == null ) {
 			System.out.print("Enter server host: ");
 			host = nextLine();
@@ -89,12 +95,8 @@ public class ServerManagementCLI {
 			port = nextLine();
 		}
 		
-		try {
-			launcher = new ServerManagementClientLauncher(host, Integer.parseInt(port));
-			launcher.launch();
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
+		launcher = new ServerManagementClientLauncher(host, Integer.parseInt(port));
+		launcher.launch();
 	}
 	
 	protected String nextLine() {

@@ -43,15 +43,12 @@ public class ServerCoreActivator implements BundleActivator {
 		return LauncherSingleton.getDefault().getLauncher();
 	}
 	
-	private String getPort() {
-		// TODO from sysprops?
-		int port = 27511;
-		return Integer.toString(port);
+	private int getPort() {
+		return RSPFlags.getServerPort();
 	}
 	
 	private void startServer() {
-		// TODO from sysprops?
-		String port = getPort();
+		int port = getPort();
 		ServerManagementServerLauncher launcher = new ServerManagementServerLauncher();
 		LauncherSingleton.getDefault().setLauncher(launcher);
 		
@@ -60,7 +57,7 @@ public class ServerCoreActivator implements BundleActivator {
 				try {
 					launcher.launch(port);
 				} catch( Exception e) {
-					e.printStackTrace();
+					RSPLogger.log(RSPLogger.LOG_ERROR, "Unable to launch RSP server", e);
 				}
 			}
 		}.start();
