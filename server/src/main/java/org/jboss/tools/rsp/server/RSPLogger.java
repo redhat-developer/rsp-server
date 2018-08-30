@@ -181,17 +181,7 @@ public class RSPLogger {
 		getLogger().log(level, message, exception);
 	}
 
-	public static final String SYSPROP_LOG_LEVEL_FLAG = "rsp.log.level";
 	private static void setLogLevelFromFlags() {
-		String debuggingTmp = System.getProperty(SYSPROP_LOG_LEVEL_FLAG);
-		if( debuggingTmp != null ) {
-			int logLevel = RSPLogger.LOG_WARNING;
-			try {
-				logLevel = Integer.parseInt(debuggingTmp);
-			} catch(NumberFormatException nfe) {
-				// ignore
-			}
-			RSPLogger.setLogLevel(logLevel);
-		}
+		RSPLogger.setLogLevel(RSPFlags.getLogLevel());
 	}
 }
