@@ -8,6 +8,9 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.api.dao;
 
+import java.util.Objects;
+import org.jboss.tools.rsp.api.dao.util.EqualsUtility;
+
 public class ServerLaunchMode {
 	private String mode;
 	private String desc;
@@ -36,4 +39,25 @@ public class ServerLaunchMode {
 	public void setDesc(String desc) {
 		this.desc = desc;
 	}
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            }
+            if (o == null) {
+                return false;
+            }
+            if (!(o instanceof ServerLaunchMode)) {
+                return false;
+            }
+            ServerLaunchMode temp = (ServerLaunchMode) o;
+            return EqualsUtility.areEqual(this.mode, temp.mode)
+                    && EqualsUtility.areEqual(this.desc, temp.desc);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(mode, desc);
+        }
 }

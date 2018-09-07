@@ -8,6 +8,9 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.api.dao;
 
+import java.util.Objects;
+import org.jboss.tools.rsp.api.dao.util.EqualsUtility;
+
 public class ServerHandle {
 	private String id;
 	private ServerType type;
@@ -40,4 +43,25 @@ public class ServerHandle {
 	public void setType(ServerType type) {
 		this.type = type;
 	}
+        
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            }
+            if (o == null) {
+                return false;
+            }
+            if (!(o instanceof ServerHandle)) {
+                return false;
+            }
+            ServerHandle temp = (ServerHandle) o;
+            return EqualsUtility.areEqual(this.id, temp.id)
+                    && EqualsUtility.areEqual(this.type, temp.type);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(id, type);
+        }
 }

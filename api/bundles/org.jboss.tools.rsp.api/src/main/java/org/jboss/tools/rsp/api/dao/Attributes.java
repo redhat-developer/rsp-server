@@ -10,6 +10,7 @@ package org.jboss.tools.rsp.api.dao;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.jboss.tools.rsp.api.dao.util.EqualsUtility;
 
 public class Attributes {
 	private Map<String, Attribute> attributes;
@@ -29,4 +30,23 @@ public class Attributes {
 	public void setAttributes(Map<String, Attribute> attrs) {
 		this.attributes = attrs;
 	}
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            }
+            if (o == null) {
+                return false;
+            }
+            if (!(o instanceof Attributes)) {
+                return false;
+            }
+            return EqualsUtility.areEqual(this.attributes, ((Attributes) o).attributes);
+        }
+
+        @Override
+        public int hashCode() {
+            return attributes.hashCode();
+        }
 }
