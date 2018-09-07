@@ -8,6 +8,9 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.api.dao;
 
+import java.util.Objects;
+import org.jboss.tools.rsp.api.dao.util.EqualsUtility;
+
 public class Attribute {
 	private String type;
 	private String description;
@@ -47,4 +50,25 @@ public class Attribute {
 		this.defaultVal = defaultVal;
 	}
 
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            }
+            if (o == null) {
+                return false;
+            }
+            if (!(o instanceof Attribute)) {
+                return false;
+            }
+            Attribute temp = (Attribute) o;
+            return EqualsUtility.areEqual(this.type, temp.type) 
+                    && EqualsUtility.areEqual(this.description, temp.description)
+                    && EqualsUtility.areEqual(this.defaultVal, temp.defaultVal);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(defaultVal, description, type);
+        }
 }

@@ -13,7 +13,7 @@
 	<properties>
 		<tycho-version>1.2.0</tycho-version>
 		<jacoco.version>0.8.2</jacoco.version>
-		<jacoco.reportRoot>${project.basedir}/../target</jacoco.reportRoot>
+		<jacoco.reportRoot>${session.executionRootDirectory}/target</jacoco.reportRoot>
 	</properties>
 
 	<modules>
@@ -23,6 +23,7 @@
 		<module>framework</module>
 		<module>runtimes</module>
 		<module>distribution</module>
+                <module>integration-tests</module>
 	</modules>
 
 	<build>
@@ -102,16 +103,6 @@
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
-					</execution>
-					<execution>
-						<id>jacoco-site</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>report-aggregate</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${jacoco.reportRoot}/jacoco-report</outputDirectory>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
