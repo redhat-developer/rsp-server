@@ -61,6 +61,8 @@ public class ExtendedServerPropertiesAdapterFactory implements IServerConstants 
 				return new Wildfly120ExtendedProperties(s);
 			if( SERVER_WILDFLY_130.equals(typeId) )
 				return new Wildfly130ExtendedProperties(s);
+			if( SERVER_WILDFLY_140.equals(typeId) )
+				return new Wildfly140ExtendedProperties(s);
 
 		}
 		return null;
