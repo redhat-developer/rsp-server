@@ -19,8 +19,7 @@ import java.util.HashMap;
 
 import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
 import org.jboss.tools.rsp.server.wildfly.test.util.IOUtil;
-
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * This class is intended to assist in the creation ONLY 
@@ -80,8 +79,12 @@ public class MockServerCreationUtilities extends Assert {
 	
 	
 	public static final String[] TEST_SERVER_TYPES_TO_MOCK = new String[] { 
-		TEST_SERVER_TYPE_GATEIN_34, TEST_SERVER_TYPE_GATEIN_35,TEST_SERVER_TYPE_GATEIN_36,
-		TEST_SERVER_TYPE_JPP_60, TEST_SERVER_TYPE_JPP_61, TEST_SERVER_TYPE_EAP_65,
+		TEST_SERVER_TYPE_GATEIN_34, 
+		TEST_SERVER_TYPE_GATEIN_35,
+		TEST_SERVER_TYPE_GATEIN_36,
+		TEST_SERVER_TYPE_JPP_60,
+		TEST_SERVER_TYPE_JPP_61,
+		TEST_SERVER_TYPE_EAP_65,
 		TEST_SERVER_TYPE_WONKA_1
 	};
 	
@@ -113,21 +116,17 @@ public class MockServerCreationUtilities extends Assert {
 		asSystemJar.put(TEST_SERVER_TYPE_WONKA_1, eap_server_6_1_jar);
 		asSystemJar.put(TEST_SERVER_TYPE_GATEIN_34, gatein_3_4_0_jar);
 		// NEW_SERVER_ADAPTER Add the new runtime constant above this line
-		
-		
 	}
+
 	public static String[] getJBossServerTypeParameters() {
 		return IServerConstants.ALL_JBOSS_SERVERS;
 	}
-	
+
 	public static Object[] getJBossServerTypeParametersPlusAdditionalMocks() {
 		ArrayList<Object> l = new ArrayList<Object>(Arrays.asList(getJBossServerTypeParameters()));
 		l.addAll(Arrays.asList(TEST_SERVER_TYPES_TO_MOCK));
 		return (String[]) l.toArray(new String[l.size()]);
 	}
-
-	
-	
 	
 	/*
 	 * Only for use with JBoss servers, since deploy-only has no custom layout
@@ -138,7 +137,7 @@ public class MockServerCreationUtilities extends Assert {
 			isEap = true;
 		String name = serverType;
 		File serverDir = null;
-		if( IServerConstants.SERVER_AS_32.equals(serverType) ||
+		if (IServerConstants.SERVER_AS_32.equals(serverType) ||
 				IServerConstants.SERVER_AS_40.equals(serverType) ||
 				IServerConstants.SERVER_AS_42.equals(serverType) ||
 				IServerConstants.SERVER_AS_50.equals(serverType) ||
@@ -149,44 +148,44 @@ public class MockServerCreationUtilities extends Assert {
 			name += (isEap ? "/jbossas" : "");
 			serverDir = createAS6AndBelowMockServerDirectory(serverType + getRandomString(), 
 					asSystemJar.get(serverType), "default");
-		} else if( IServerConstants.SERVER_AS_70.equals(serverType) ||
-				 IServerConstants.SERVER_AS_71.equals(serverType)) {
-			serverDir = createAS7StyleMockServerDirectory(name, serverType, asSystemJar.get(serverType));			
-		} else if( IServerConstants.SERVER_EAP_60.equals(serverType)) {
+		} else if (IServerConstants.SERVER_AS_70.equals(serverType)
+				|| IServerConstants.SERVER_AS_71.equals(serverType)) {
+			serverDir = createAS7StyleMockServerDirectory(name, serverType, asSystemJar.get(serverType));
+		} else if (IServerConstants.SERVER_EAP_60.equals(serverType)) {
 			serverDir = createEAP6StyleMockServerDirectory(name, serverType, asSystemJar.get(serverType));
-		} else if( IServerConstants.SERVER_EAP_61.equals(serverType)) {
+		} else if (IServerConstants.SERVER_EAP_61.equals(serverType)) {
 			serverDir = createAS72EAP61StyleMockServerDirectory(name, serverType, asSystemJar.get(serverType));
-		} else if( IServerConstants.SERVER_EAP_70.equals(serverType)) {
+		} else if (IServerConstants.SERVER_EAP_70.equals(serverType)) {
 			serverDir = createEAP70StyleMockServerDirectory(name, serverType, asSystemJar.get(serverType));
-		} else if( IServerConstants.SERVER_EAP_71.equals(serverType)) {
+		} else if (IServerConstants.SERVER_EAP_71.equals(serverType)) {
 			serverDir = createEAP71StyleMockServerDirectory(name, serverType, asSystemJar.get(serverType));
-		} else if( IServerConstants.SERVER_WILDFLY_80.equals(serverType)) {
+		} else if (IServerConstants.SERVER_WILDFLY_80.equals(serverType)) {
 			serverDir = createWildfly80MockServerDirectory(name, serverType, asSystemJar.get(serverType));
-		} else if( IServerConstants.SERVER_WILDFLY_90.equals(serverType)) {
+		} else if (IServerConstants.SERVER_WILDFLY_90.equals(serverType)) {
 			serverDir = createWildfly90MockServerDirectory(name, serverType, asSystemJar.get(serverType));
-		} else if( IServerConstants.SERVER_WILDFLY_100.equals(serverType)) {
+		} else if (IServerConstants.SERVER_WILDFLY_100.equals(serverType)) {
 			serverDir = createWildfly100MockServerDirectory(name, serverType, asSystemJar.get(serverType));
-		} else if( IServerConstants.SERVER_WILDFLY_110.equals(serverType)) {
+		} else if (IServerConstants.SERVER_WILDFLY_110.equals(serverType)) {
 			serverDir = createWildfly110MockServerDirectory(name, serverType, asSystemJar.get(serverType));
-		} else if( IServerConstants.SERVER_WILDFLY_120.equals(serverType)) {
+		} else if (IServerConstants.SERVER_WILDFLY_120.equals(serverType)) {
 			serverDir = createWildfly120MockServerDirectory(name, serverType, asSystemJar.get(serverType));
-		} else if( IServerConstants.SERVER_WILDFLY_130.equals(serverType)) {
+		} else if (IServerConstants.SERVER_WILDFLY_130.equals(serverType)) {
 			serverDir = createWildfly130MockServerDirectory(name, serverType, asSystemJar.get(serverType));
-		} else if( IServerConstants.SERVER_WILDFLY_140.equals(serverType)) {
+		} else if (IServerConstants.SERVER_WILDFLY_140.equals(serverType)) {
 			serverDir = createWildfly140MockServerDirectory(name, serverType, asSystemJar.get(serverType));
-		} else if( TEST_SERVER_TYPE_GATEIN_34.equals(serverType)) {
+		} else if (TEST_SERVER_TYPE_GATEIN_34.equals(serverType)) {
 			serverDir = createGateIn34MockServerDirectory(name);
-		} else if( TEST_SERVER_TYPE_GATEIN_35.equals(serverType)) {
+		} else if (TEST_SERVER_TYPE_GATEIN_35.equals(serverType)) {
 			serverDir = createGateIn35MockServerDirectory(name);
-		} else if( TEST_SERVER_TYPE_GATEIN_36.equals(serverType)) {
+		} else if (TEST_SERVER_TYPE_GATEIN_36.equals(serverType)) {
 			serverDir = createGateIn36MockServerDirectory(name);
-		}else if( TEST_SERVER_TYPE_JPP_60.equals(serverType)) {
-			serverDir = createJPP60MockServerDirectory(name,serverType, asSystemJar.get(serverType));
-		}else if( TEST_SERVER_TYPE_JPP_61.equals(serverType)) {
-			serverDir = createJPP61MockServerDirectory(name,serverType, asSystemJar.get(serverType));
-		} else if( TEST_SERVER_TYPE_EAP_65.equals(serverType)) {
+		} else if (TEST_SERVER_TYPE_JPP_60.equals(serverType)) {
+			serverDir = createJPP60MockServerDirectory(name, serverType, asSystemJar.get(serverType));
+		} else if (TEST_SERVER_TYPE_JPP_61.equals(serverType)) {
+			serverDir = createJPP61MockServerDirectory(name, serverType, asSystemJar.get(serverType));
+		} else if (TEST_SERVER_TYPE_EAP_65.equals(serverType)) {
 			serverDir = createAS72EAP65StyleMockServerDirectory(name, serverType, asSystemJar.get(serverType));
-		}else if( TEST_SERVER_TYPE_WONKA_1.equals(serverType)) {
+		} else if (TEST_SERVER_TYPE_WONKA_1.equals(serverType)) {
 			serverDir = createAS72Wonka1MockServerDirectory(name, serverType, asSystemJar.get(serverType));
 		}
 		// NEW_SERVER_ADAPTER add mock folder structure above
@@ -266,80 +265,39 @@ public class MockServerCreationUtilities extends Assert {
 	}
 	
 	private static File createWildfly90MockServerDirectory(String name, String serverTypeId, String serverJar) {
-		File loc = new File(getMocksBaseDir(), name);
-		createAS7xProductStructure(loc, true, serverJar, null, null);
-		File productDir = new File(loc, "modules/system/layers/base/org/jboss/as/product/wildfly-full/dir/META-INF/");
-		productDir.mkdirs();
-		String manString = "JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 9.0.0.Beta2\n";
-		try {
-			IOUtil.setContents(new File(productDir, "manifest.mf"), manString);
-		} catch(IOException ioe) {
-			
-		}
-		return loc;
+		return createWildflyServerDirectory(name, serverTypeId, serverJar,
+				"JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 9.0.0.Beta2\n");
 	}
 
 	private static File createWildfly100MockServerDirectory(String name, String serverTypeId, String serverJar) {
-		File loc = new File(getMocksBaseDir(), name);
-		createAS7xProductStructure(loc, true, serverJar, null, null);
-		File productDir = new File(loc,"modules/system/layers/base/org/jboss/as/product/wildfly-full/dir/META-INF/");
-		productDir.mkdirs();
-		String manString = "JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 10.0.0.Final\n";
-		try {
-			IOUtil.setContents(new File(productDir, "manifest.mf"), manString);
-		} catch(IOException ioe) {
-			
-		}
-		return loc;
+		return createWildflyServerDirectory(name, serverTypeId, serverJar, 
+				"JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 10.0.0.Final\n");
 	}
 	
 	private static File createWildfly110MockServerDirectory(String name, String serverTypeId, String serverJar) {
-		File loc = new File(getMocksBaseDir(), name);
-		createAS7xProductStructure(loc, true, serverJar, null, null);
-		File productDir = new File(loc, "modules/system/layers/base/org/jboss/as/product/wildfly-full/dir/META-INF/");
-		productDir.mkdirs();
-		String manString = "JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 11.0.0.Alpha1-SNAPSHOT\n"; 
-		try {
-			IOUtil.setContents(new File(productDir, "manifest.mf"), manString);
-		} catch(IOException ioe) {
-			
-		}
-		return loc;
+		return createWildflyServerDirectory(name, serverTypeId, serverJar, 
+				"JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 11.0.0.Alpha1-SNAPSHOT\n");
 	}
 	
 	private static File createWildfly120MockServerDirectory(String name, String serverTypeId, String serverJar) {
-		File loc = new File(getMocksBaseDir(), name);
-		createAS7xProductStructure(loc, true, serverJar, null, null);
-		File productDir = new File(loc, "modules/system/layers/base/org/jboss/as/product/wildfly-full/dir/META-INF/");
-		productDir.mkdirs();
-		String manString = "JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 12.0.0.Alpha1-SNAPSHOT\n"; 
-		try {
-			IOUtil.setContents(new File(productDir, "manifest.mf"), manString);
-		} catch(IOException ioe) {
-			
-		}
-		return loc;
+		return createWildflyServerDirectory(name, serverTypeId, serverJar, 
+				"JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 12.0.0.Alpha1-SNAPSHOT\n");
 	}
 	private static File createWildfly130MockServerDirectory(String name, String serverTypeId, String serverJar) {
-		File loc = new File(getMocksBaseDir(), name);
-		createAS7xProductStructure(loc, true, serverJar, null, null);
-		File productDir = new File(loc, "modules/system/layers/base/org/jboss/as/product/wildfly-full/dir/META-INF/");
-		productDir.mkdirs();
-		String manString = "JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 13.0.0.xyz\n"; 
-		try {
-			IOUtil.setContents(new File(productDir, "manifest.mf"), manString);
-		} catch(IOException ioe) {
-			
-		}
-		return loc;
+		return createWildflyServerDirectory(name, serverTypeId, serverJar, 
+				"JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 13.0.0.xyz\n");
 	}
 
 	private static File createWildfly140MockServerDirectory(String name, String serverTypeId, String serverJar) {
+		return createWildflyServerDirectory(name, serverTypeId, serverJar, 
+				"JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 14.0.0.Final\n"); 
+	}
+
+	private static File createWildflyServerDirectory(String name, String serverTypeId, String serverJar, String manString) {
 		File loc = new File(getMocksBaseDir(), name);
 		createAS7xProductStructure(loc, true, serverJar, null, null);
 		File productDir = new File(loc, "modules/system/layers/base/org/jboss/as/product/wildfly-full/dir/META-INF/");
 		productDir.mkdirs();
-		String manString = "JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 14.0.0.Final\n"; 
 		try {
 			IOUtil.setContents(new File(productDir, "manifest.mf"), manString);
 		} catch(IOException ioe) {
@@ -418,8 +376,6 @@ public class MockServerCreationUtilities extends Assert {
 		return loc;
 	}
 
-
-	
 	private static void createAS7xProductStructure(File loc,  boolean includeLayers, String serverJar, String slot,
 			String manifestContents ) {
 		try {
@@ -444,23 +400,25 @@ public class MockServerCreationUtilities extends Assert {
 		File serverJarLoc = getServerMockResource(serverJar);
 		IOUtil.fileSafeCopy(serverJarLoc, new File(serverJarBelongs,"anything.jar"));
 	}
+
 	private static void createProductMetaInfFolder(File loc, String slot, boolean includeLayers, String manifestContents) throws IOException {
 		File metainf = new File(loc, getProductMetaInfFolderPath(slot, includeLayers));
 		createProductMetaInfFolder(metainf, manifestContents);
 	}
+
 	private static void createProductMetaInfFolder(File metainf, String manifestContents) throws IOException {
 		metainf.mkdirs();
 		File manifest = new File(metainf, "MANIFEST.MF");
 		IOUtil.setContents(manifest, manifestContents);		
 	}
-	
+
 	private static String getProductMetaInfFolderPath(String slot, boolean includeLayers) {
 		return getProductMetaInfFolderPath(slot, includeLayers, null);
 	}
-	
+
 	private static String getProductMetaInfFolderPath(String slot, boolean includeLayers, String insideLayer) {
-		if( insideLayer == null ) {
-			if( !includeLayers ) {
+		if (insideLayer == null) {
+			if (!includeLayers) {
 				return "modules/org/jboss/as/product/" + slot + "/dir/META-INF";
 			}
 			return "modules/system/layers/base/org/jboss/as/product/" + slot + "/dir/META-INF";
@@ -475,10 +433,10 @@ public class MockServerCreationUtilities extends Assert {
 		bin.mkdirs();
 		File productConf = new File(bin, "product.conf");
 		IOUtil.setContents(productConf, "slot=" + slot);
-		if( layers != null && layers.length > 0 ) {
+		if (layers != null && layers.length > 0) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("layers=");
-			for( int i = 0; i < layers.length; i++ ) {
+			for (int i = 0; i < layers.length; i++) {
 				sb.append(layers[i]);
 				if( i < layers.length-1) {
 					sb.append(",");
