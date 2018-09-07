@@ -34,10 +34,10 @@ public class ExtendedPropertiesTest {
 			String serverType = toTest[i];
 			IServer s = createServer(serverType);
 			ServerExtendedProperties props = fact.getExtendedProperties(s);
-			assertNotNull(props);
+			assertNotNull("Server " + serverType + " has no properties,", props);
 			assertTrue(props instanceof JBossExtendedProperties);
 			JBossExtendedProperties t = (JBossExtendedProperties)props;
-			assertNotNull(t.getDefaultLaunchArguments());
+			assertNotNull("Server " + serverType + " has no default launch arguments.", t.getDefaultLaunchArguments());
 		}
 	}
 	
