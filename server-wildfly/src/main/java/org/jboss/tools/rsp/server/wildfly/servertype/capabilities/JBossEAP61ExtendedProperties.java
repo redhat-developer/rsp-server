@@ -26,10 +26,6 @@ public class JBossEAP61ExtendedProperties extends JBossAS710ExtendedProperties {
 	public IDefaultLaunchArguments getDefaultLaunchArguments() {
 		return new JBoss72Eap61DefaultLaunchArguments(server);
 	}
-	
-//	public IExecutionEnvironment getDefaultExecutionEnvironment() {
-//		return JavaRuntime.getExecutionEnvironmentsManager().getEnvironment("JavaSE-1.7"); //$NON-NLS-1$
-//	}
 //
 //	public String getManagerServiceId() {
 //		return IJBoss7ManagerService.EAP_VERSION_61PLUS;

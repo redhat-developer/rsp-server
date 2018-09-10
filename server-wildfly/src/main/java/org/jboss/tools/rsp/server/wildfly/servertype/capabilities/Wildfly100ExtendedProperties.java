@@ -40,11 +40,7 @@ public class Wildfly100ExtendedProperties extends JBossAS710ExtendedProperties {
 	public boolean requiresJDK() {
 		return true;
 	}
-	
-//	@Override
-//	public IExecutionEnvironment getDefaultExecutionEnvironment() {
-//		return JavaRuntime.getExecutionEnvironmentsManager().getEnvironment("JavaSE-1.8"); //$NON-NLS-1$
-//	}
+
 //	@Override
 //	public String getManagerServiceId() {
 //		return IJBoss7ManagerService.WILDFLY_VERSION_900;

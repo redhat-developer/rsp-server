@@ -56,18 +56,6 @@ public class Wildfly120ExtendedProperties extends JBossAS710ExtendedProperties {
 //	public String getManagerServiceId() {
 //		return IJBoss7ManagerService.WILDFLY_VERSION_110;
 //	}
-//	/**
-//	 * Wildfly 11 appears to work through java 9 to varying degrees
-//	 */
-//	@Override
-//	public IExecutionEnvironment getMaximumExecutionEnvironment() {
-//		return null;
-//	}
-//
-//	@Override
-//	public IExecutionEnvironment getDefaultExecutionEnvironment() {
-//		return JavaRuntime.getExecutionEnvironmentsManager().getEnvironment("JavaSE-1.8"); //$NON-NLS-1$
-//	}
 //	
 //	@Override
 //	public IDefaultLaunchArguments getDefaultLaunchArguments() {

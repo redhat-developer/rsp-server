@@ -69,11 +69,6 @@ public class JBossAS7ExtendedProperties extends JBossExtendedProperties { //impl
 //		return new LocalJBoss7DeploymentScannerAdditions();
 //	}
 //
-//	
-//	public IExecutionEnvironment getDefaultExecutionEnvironment() {
-//		return JavaRuntime.getExecutionEnvironmentsManager().getEnvironment("JavaSE-1.6"); //$NON-NLS-1$
-//	}
-//	
 //	/**
 //	 * @since 3.0
 //	 */

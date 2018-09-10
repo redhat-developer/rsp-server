@@ -28,20 +28,4 @@ public class JBossAS6ExtendedProperties extends JBossExtendedProperties {
 	public IDefaultLaunchArguments getDefaultLaunchArguments() {
 		return new JBoss6xDefaultLaunchArguments(server);
 	}
-	
-//
-//	public IServerModuleStateVerifier getModuleStateVerifier() {
-//		return new JBoss6ModuleStateVerifier();
-//	}
-//	@Override
-//	public IExecutionEnvironment getDefaultExecutionEnvironment() {
-//		// NEW_SERVER_ADAPTER  Subclasses override this
-//		return JavaRuntime.getExecutionEnvironmentsManager().getEnvironment("JavaSE-1.6"); //$NON-NLS-1$
-//	}
-//	
-//	@Override
-//	public IExecutionEnvironment getMaximumExecutionEnvironment() {
-//		// NEW_SERVER_ADAPTER  Subclasses override this
-//		return null;
-//	}
 }
