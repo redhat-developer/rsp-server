@@ -9,17 +9,18 @@
 package org.jboss.tools.rsp.server.discovery.serverbeans;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 import org.jboss.tools.rsp.server.spi.discovery.IServerBeanTypeManager;
 import org.jboss.tools.rsp.server.spi.discovery.IServerBeanTypeProvider;
 import org.jboss.tools.rsp.server.spi.discovery.ServerBeanType;
 
 public class ServerBeanTypeManager implements IServerBeanTypeManager {
-	private ArrayList<IServerBeanTypeProvider> typeProviders;
+
+	private List<IServerBeanTypeProvider> typeProviders;
 	
 	public ServerBeanTypeManager() {
-		typeProviders = new ArrayList<IServerBeanTypeProvider>();
+		typeProviders = new ArrayList<>();
 	}
 	
 	public void addTypeProvider(IServerBeanTypeProvider provider) {
@@ -27,10 +28,8 @@ public class ServerBeanTypeManager implements IServerBeanTypeManager {
 	}
 	
 	public ServerBeanType[] getAllRegisteredTypes() {
-		ArrayList<ServerBeanType> ret = new ArrayList<ServerBeanType>();
-		for( IServerBeanTypeProvider prov : typeProviders) {
-			ret.addAll(Arrays.asList(prov.getServerBeanTypes()));
-		}
-		return (ServerBeanType[]) ret.toArray(new ServerBeanType[ret.size()]);
+		return typeProviders.stream()
+			.map(IServerBeanTypeProvider::getServerBeanTypes)
+			.toArray(size -> new ServerBeanType[size]);
 	}
 }
