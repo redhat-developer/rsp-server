@@ -45,20 +45,6 @@ public class JBossEAP71ExtendedProperties extends JBossAS710ExtendedProperties {
 	public boolean allowExplodedModulesInEars() {
 		return true;
 	}
-//	/**
-//	 * EAP 7.1 appears to work through java 9 to varying degrees
-//	 */
-//	@Override
-//	public IExecutionEnvironment getMaximumExecutionEnvironment() {
-//		return null;
-//	}
-//
-//	
-//	@Override
-//	public IExecutionEnvironment getDefaultExecutionEnvironment() {
-//		return JavaRuntime.getExecutionEnvironmentsManager().getEnvironment("JavaSE-1.8"); //$NON-NLS-1$
-//	}
-//	
 //	@Override
 //	public String getManagerServiceId() {
 //		return IJBoss7ManagerService.WILDFLY_VERSION_110;

@@ -54,11 +54,5 @@ public class Wildfly80ExtendedProperties extends JBossAS710ExtendedProperties {
 //	public String getManagerServiceId() {
 //		return IJBoss7ManagerService.WILDFLY_VERSION_900;
 //	}
-//	
-//	@Override
-//	public IExecutionEnvironment getDefaultExecutionEnvironment() {
-//		return JavaRuntime.getExecutionEnvironmentsManager().getEnvironment("JavaSE-1.7"); //$NON-NLS-1$
-//	}
-//	
-
+//
 }

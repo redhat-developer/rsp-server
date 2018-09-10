@@ -25,10 +25,4 @@ public class JBossEAP5ExtendedProperties extends JBossExtendedProperties {
 //	public IServerModuleStateVerifier getModuleStateVerifier() {
 //		return new JBoss6ModuleStateVerifier();
 //	}
-//	
-//	public IExecutionEnvironment getDefaultExecutionEnvironment() {
-//		return JavaRuntime.getExecutionEnvironmentsManager().getEnvironment("JavaSE-1.6"); //$NON-NLS-1$
-//	}
-
-	
 }
