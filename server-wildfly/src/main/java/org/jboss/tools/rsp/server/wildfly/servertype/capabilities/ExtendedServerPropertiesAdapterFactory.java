@@ -16,56 +16,50 @@ import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
 public class ExtendedServerPropertiesAdapterFactory implements IServerConstants {
 
 	public ServerExtendedProperties getExtendedProperties(IServer s) {
-		String typeId = null;
-		typeId = s.getServerType().getId();
-		if( typeId != null ) {
-			if( SERVER_AS_32.equals(typeId) )
-				return new JBossExtendedProperties(s);
-			if( SERVER_AS_40.equals(typeId))
-				return new JBossExtendedProperties(s);
-			if( SERVER_AS_42.equals(typeId) )
-				return new JBossExtendedProperties(s);
-			if( SERVER_AS_50.equals(typeId) )
-				return new JBossExtendedProperties(s);
-			if( SERVER_AS_51.equals(typeId) )
-				return new JBossExtendedProperties(s);
-			if( SERVER_AS_60.equals(typeId) )
-				return new JBossAS6ExtendedProperties(s);
-			if( SERVER_EAP_43.equals(typeId) )
-				return new JBossExtendedProperties(s);
-			if( SERVER_EAP_50.equals(typeId) )
-				return new JBossEAP5ExtendedProperties(s);
-			
-			if( SERVER_AS_70.equals(typeId) )
-				return new JBossAS7ExtendedProperties(s);
-			if( SERVER_AS_71.equals(typeId) )
-				return new JBossAS710ExtendedProperties(s);
-			if( SERVER_EAP_60.equals(typeId) )
-				return new JBossEAP60ExtendedProperties(s);
-			if( SERVER_EAP_61.equals(typeId) )
-				return new JBossEAP61ExtendedProperties(s);
-			if( SERVER_EAP_70.equals(typeId) )
-				return new JBossEAP70ExtendedProperties(s);
-			if( SERVER_EAP_71.equals(typeId))
-				return new JBossEAP71ExtendedProperties(s);
+		switch(s.getServerType().getId()) {
+		case SERVER_AS_32:
+		case SERVER_AS_40:
+		case SERVER_AS_42:
+		case SERVER_AS_50:
+		case SERVER_AS_51:
+			return new JBossExtendedProperties(s);
+		case SERVER_AS_60:
+			return new JBossAS6ExtendedProperties(s);
+		case SERVER_EAP_43:
+			return new JBossExtendedProperties(s);
+		case SERVER_EAP_50:
+			return new JBossEAP5ExtendedProperties(s);
+		
+		case SERVER_AS_70:
+			return new JBossAS7ExtendedProperties(s);
+		case SERVER_AS_71:
+			return new JBossAS710ExtendedProperties(s);
+		case SERVER_EAP_60:
+			return new JBossEAP60ExtendedProperties(s);
+		case SERVER_EAP_61:
+			return new JBossEAP61ExtendedProperties(s);
+		case SERVER_EAP_70:
+			return new JBossEAP70ExtendedProperties(s);
+		case SERVER_EAP_71:
+			return new JBossEAP71ExtendedProperties(s);
 
-			if( SERVER_WILDFLY_80.equals(typeId) )
-				return new Wildfly80ExtendedProperties(s);
-			if( SERVER_WILDFLY_90.equals(typeId) )
-				return new Wildfly90ExtendedProperties(s);
-			if( SERVER_WILDFLY_100.equals(typeId) )
-				return new Wildfly100ExtendedProperties(s);
-			if( SERVER_WILDFLY_110.equals(typeId) )
-				return new Wildfly110ExtendedProperties(s);
-			if( SERVER_WILDFLY_120.equals(typeId) )
-				return new Wildfly120ExtendedProperties(s);
-			if( SERVER_WILDFLY_130.equals(typeId) )
-				return new Wildfly130ExtendedProperties(s);
-			if( SERVER_WILDFLY_140.equals(typeId) )
-				return new Wildfly140ExtendedProperties(s);
-
+		case SERVER_WILDFLY_80:
+			return new Wildfly80ExtendedProperties(s);
+		case SERVER_WILDFLY_90:
+			return new Wildfly90ExtendedProperties(s);
+		case SERVER_WILDFLY_100:
+			return new Wildfly100ExtendedProperties(s);
+		case SERVER_WILDFLY_110:
+			return new Wildfly110ExtendedProperties(s);
+		case SERVER_WILDFLY_120:
+			return new Wildfly120ExtendedProperties(s);
+		case SERVER_WILDFLY_130:
+			return new Wildfly130ExtendedProperties(s);
+		case SERVER_WILDFLY_140:
+			return new Wildfly140ExtendedProperties(s);
+		default:
+			return null;
 		}
-		return null;
 	}
 	
 }
