@@ -81,8 +81,6 @@ public abstract class AbstractLauncher implements IStartLauncher {
 	public abstract String getProgramArguments();
 	
 	
-	//protected abstract IDefaultLaunchArguments getLaunchArgs();
-	
 	public GenericProcessRunner configureRunner() {
 		if( runner == null ) {
 			runner = new GenericProcessRunner(delegate, getCommandConfig());

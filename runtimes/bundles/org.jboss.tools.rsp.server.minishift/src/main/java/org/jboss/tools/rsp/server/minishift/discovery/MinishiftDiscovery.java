@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.rsp.server.minishift.discovery;
 
 import java.io.File;
@@ -15,6 +23,8 @@ public class MinishiftDiscovery {
 		if( file.isFile() && file.exists() && file.canExecute()) {
 			if( name.equals(MINISHIFT) || name.equals( MINISHIFT_EXE))
 				return true;
+			if( whitelistMatchesName(name))
+				return true;
 		}
 		return false;
 	}
@@ -29,10 +39,6 @@ public class MinishiftDiscovery {
 	public boolean folderContainsMinishiftBinary(File f) {
 		File bin = getMinishiftBinaryFromFolder(f);
 		return bin != null && bin.exists() && bin.isFile();
-	}
-	
-	public File getMinishiftBinaryInFolder(File folder) {
-		return folderWhiteListBin(folder);
 	}
 	
 	private File folderWhiteListBin(File folder) {

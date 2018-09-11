@@ -17,6 +17,7 @@ public class ExtensionHandler {
 	public static void addExtensionsToModel(IServerManagementModel model) {
 		model.getServerBeanTypeManager().addTypeProvider(new MinishiftBeanTypeProvider());
 		model.getServerModel().addServerType(MinishiftServerTypes.MINISHIFT_1_12_SERVER_TYPE);
+		model.getServerModel().addServerType(MinishiftServerTypes.CDK_3X_SERVER_TYPE);
 	}
 	
 }

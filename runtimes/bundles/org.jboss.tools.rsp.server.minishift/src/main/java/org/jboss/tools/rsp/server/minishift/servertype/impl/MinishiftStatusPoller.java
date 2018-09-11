@@ -20,7 +20,6 @@ import org.jboss.tools.rsp.server.spi.launchers.CommandTimeoutException;
 import org.jboss.tools.rsp.server.spi.launchers.ProcessUtility;
 import org.jboss.tools.rsp.server.spi.model.polling.AbstractPoller;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller;
-import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller.SERVER_STATE;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
 public class MinishiftStatusPoller extends AbstractPoller implements IServerStatePoller {
@@ -45,7 +44,7 @@ public class MinishiftStatusPoller extends AbstractPoller implements IServerStat
 		ProcessUtility util = new ProcessUtility();
 		String[] lines = util.callMachineReadable(
 				cmd, args, getWorkingDirectory(server), 
-				new EnvironmentUtility(server).getEnvironment());
+				new EnvironmentUtility(server).getEnvironment(true, false));
 		return lines;
 	}
 	@Override
@@ -55,6 +54,7 @@ public class MinishiftStatusPoller extends AbstractPoller implements IServerStat
 			lines = callMinishiftStatus(server);
 			IStatus stat = parseOutput(lines);
 			if (stat.isOK()) {
+				//checkOpenShiftHealth(server, 4000); TODO 
 				return SERVER_STATE.UP;
 			}
 			return SERVER_STATE.DOWN;
@@ -66,6 +66,9 @@ public class MinishiftStatusPoller extends AbstractPoller implements IServerStat
 		} catch (IOException ioe) {
 			cancel(IServerStatePoller.CANCELATION_CAUSE.FAILED);
 			return SERVER_STATE.DOWN;
+//		} catch(PollingException pe) {  // TODO
+//			cancel(IServerStatePoller.CANCELATION_CAUSE.FAILED);
+//			return SERVER_STATE.DOWN;
 		}
 //	return CDKCoreActivator.statusFactory().infoStatus(CDKCoreActivator.PLUGIN_ID,
 //			"Response status indicates the CDK is starting.");
@@ -110,4 +113,47 @@ public class MinishiftStatusPoller extends AbstractPoller implements IServerStat
 		return new Status(IStatus.INFO, Activator.BUNDLE_ID, 
 				"minishift status indicates the CDK is starting.");
 	}
+	
+	/*
+	 * TODO 
+	 * These methods are added in preparation of a proper tycho build which
+	 * can depend on, and bundle, the java rest client. Until then, 
+	 * we cannot properly check the openshift health after a startup
+	 */
+//
+//	private boolean checkOpenShiftHealth(IServer server, int timeout) throws PollingException {
+//		ServiceManagerEnvironment adb = null;
+//		//ServiceManagerEnvironmentLoader.type(server).getOrLoadServiceManagerEnvironment(server, true, true);
+//
+//		if (adb == null) {
+//			return false;
+//		}
+//		String url = adb.getOpenShiftHost() + ":" + adb.getOpenShiftPort();
+//		return checkOpenShiftHealth(url, timeout);
+//	}
+//
+//	protected boolean checkOpenShiftHealth(String url, int timeout) throws PollingException {
+//		ISSLCertificateCallback sslCallback = new LazySSLCertificateCallback();
+//		IClient client = new ClientBuilder(url).sslCertificateCallback(sslCallback)
+//				.withConnectTimeout(timeout, TimeUnit.MILLISECONDS).build();
+//
+//		Exception e = null;
+//		try {
+//			String v = client.getServerReadyStatus();
+//			if ("ok".equals(v))
+//				return true;
+//		} catch (OpenShiftException ex) {
+//			e = ex;
+//		}
+//
+//		String msg = NLS.bind(
+//				"The CDK VM is up and running, but OpenShift is unreachable at url {0}. "
+//						+ "The VM may not have been registered successfully. Please check your console output for more information",
+//				url);
+//		throw new OpenShiftNotReadyPollingException(
+//				new Status(IStatus.ERROR, Activator.BUNDLE_ID,
+//						OpenShiftNotReadyPollingException.OPENSHIFT_UNREACHABLE_CODE,
+//						msg, e));
+//	}
+
 }

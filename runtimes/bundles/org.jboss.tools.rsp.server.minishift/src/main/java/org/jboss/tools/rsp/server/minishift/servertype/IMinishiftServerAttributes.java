@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.server.minishift.servertype;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.server.spi.model.IServerModel;
 
 public interface IMinishiftServerAttributes {
 	/*
@@ -27,9 +28,9 @@ public interface IMinishiftServerAttributes {
 
 	
 	// Only for CDK
-	public static final String MINISHIFT_REG_USERNAME = "minishift.username";
+	public static final String MINISHIFT_REG_USERNAME = IServerModel.SECURE_ATTRIBUTE_PREFIX + "minishift.username";
 
-	public static final String MINISHIFT_REG_PASSWORD = "minishift.password";
+	public static final String MINISHIFT_REG_PASSWORD = IServerModel.SECURE_ATTRIBUTE_PREFIX + "minishift.password";
 
 	
 	/*

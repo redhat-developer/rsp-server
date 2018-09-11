@@ -23,23 +23,16 @@ public class MinishiftStartLauncher extends AbstractLauncher {
 	public String getProgramArguments() {
 		String vmDriver = MinishiftPropertyUtility.getMinishiftVMDriver(getServer());
 		String vmd = isEmpty(vmDriver) ? "" : "--vm-driver=" + vmDriver;
-		String credentials = getCredentialsArguments();
 		String profileFlags = "";
 		if( supportsProfiles(getServer())) {
 			String profile = MinishiftPropertyUtility.getMinishiftProfile(getServer());
 			profileFlags = "--profile " + profile;
 		}
-
-		return "start " + vmd + " " + profileFlags + " " + credentials;
+		return "start " + vmd + " " + profileFlags;
 	}
 	
 	protected boolean supportsProfiles(IServer server) {
 		return true;
-	}
-	
-	protected String getCredentialsArguments() {
-		// TODO for cdk, add credentials
-		return "";
 	}
 	
 	protected String getCDKCredentialArguments() {
