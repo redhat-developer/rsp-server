@@ -74,8 +74,21 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 			if( !v.isOK() )
 				return v;
 			return Status.OK_STATUS;
+		} else {
+			String stateString = null;
+			switch(getServerState()) {
+			case IServerDelegate.STATE_STARTED:
+				stateString = "started";break;
+			case IServerDelegate.STATE_STARTING:
+				stateString = "starting";break;
+			case IServerDelegate.STATE_STOPPED:
+				stateString = "stopped";break;
+			case IServerDelegate.STATE_STOPPING:
+				stateString = "stopping";break;
+			}
+			return new Status(IStatus.CANCEL, Activator.BUNDLE_ID,
+					"Server cannot be started. It is in state " + stateString);
 		}
-		return Status.CANCEL_STATUS;
 	}
 	
 	private boolean modesContains(String needle) {
@@ -99,7 +112,6 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 		setServerState(IServerDelegate.STATE_STARTING);
 		CommandLineDetails launchedDetails = null;
 		try {
-			//launchPoller(IServerStatePoller.SERVER_STATE.UP);
 			IStartLauncher launcher = getStartLauncher();
 			startLaunch = launcher.launch(mode);
 			launchedDetails = launcher.getLaunchedDetails();

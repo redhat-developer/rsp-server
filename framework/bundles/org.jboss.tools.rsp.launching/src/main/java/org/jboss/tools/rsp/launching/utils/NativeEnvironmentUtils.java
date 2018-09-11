@@ -196,13 +196,14 @@ public class NativeEnvironmentUtils {
 
 	
 	public String[] getEnvironment(Map<String, String> configEnv, boolean appendNativeEnv) {
-		if (configEnv == null) {
-			return null;
-		}
 		Map<String, String> env = new HashMap<String, String>();
 		if (appendNativeEnv) {
 			env.putAll(NativeEnvironmentUtils.getDefault().getNativeEnvironmentCasePreserved());
 		}
+		if( configEnv != null ) {
+			env.putAll(configEnv);
+		}
+		
 		List<String> strings = new ArrayList<String>(env.size());
 		StringBuffer buffer = null;
 		for (Entry<String, String> entry : env.entrySet()) {
