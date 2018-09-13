@@ -12,6 +12,8 @@ package org.jboss.tools.rsp.server.wildfly.test.beans;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -398,7 +400,8 @@ public class MockServerCreationUtilities extends Assert {
 				new File(loc, "modules/org/jboss/as/server/main");
 		serverJarBelongs.mkdirs();
 		File serverJarLoc = getServerMockResource(serverJar);
-		IOUtil.fileSafeCopy(serverJarLoc, new File(serverJarBelongs,"anything.jar"));
+		if( serverJarLoc != null ) 
+			IOUtil.fileSafeCopy(serverJarLoc, new File(serverJarBelongs,"anything.jar"));
 	}
 
 	private static void createProductMetaInfFolder(File loc, String slot, boolean includeLayers, String manifestContents) throws IOException {
@@ -473,22 +476,46 @@ public class MockServerCreationUtilities extends Assert {
 		return ret;
 	}
 
-
+	private static File MOCK_TMP_DIR = null;
 	/*
 	 * Find a specific resource required to mock a server
 	 */
 	public static File getServerMockResource(String path) {
-		File f = getServerMockResourcesRoot();
-		return new File(f, path);
+		if( MOCK_TMP_DIR == null ) {
+			createTmpDir();
+		}
+		File expected = new File(MOCK_TMP_DIR, path); 
+		if( !expected.exists()) {
+			return extractToTmpDir(path);
+		}
+		return expected;
 	}
 	
-	/*
-	 * Find the folder that has critical jars or resources used
-	 * when mocking a server
-	 */
-	public static File getServerMockResourcesRoot() {
-		// TODO 
-		return new File(".", "src/test/resources/serverMock/");
-	}	
+	private static void createTmpDir() {
+		try {
+			MOCK_TMP_DIR = Files.createTempDirectory("serverMock").toFile();
+			MOCK_TMP_DIR.mkdirs();
+		} catch(IOException ioe) {
+			throw new RuntimeException();
+		}
 
+	}
+
+	protected static File extractToTmpDir(String path) {
+		File pathFile = new File(MOCK_TMP_DIR, path);
+		if( !pathFile.exists()) {
+			ClassLoader classLoader = MockServerCreationUtilities.class.getClassLoader();
+			InputStream is = classLoader.getResourceAsStream("serverMock/" + path);
+			if( is == null )
+				return null;
+			
+			try {
+				Files.copy(is, pathFile.toPath());
+			} catch(IOException ioe) {
+				throw new RuntimeException();
+			}
+		}
+		return pathFile;
+	}
+	
 }

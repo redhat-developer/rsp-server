@@ -15,8 +15,5 @@ public class ServerBeanTypeProviderTest {
     	assertNotNull(provider);
     	ServerBeanType[] types = provider.getServerBeanTypes();
     	assertNotNull(types);
-    	
-    	File root = MockServerCreationUtilities.getServerMockResourcesRoot();
-    	assertNotNull(root);
     }
 }
