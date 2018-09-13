@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.jboss.tools.rsp.runtimes</groupId>
+	  <artifactId>bundles</artifactId>
+		<version>0.0.9-SNAPSHOT</version>
+	</parent>
+	<groupId>org.jboss.tools.rsp.runtimes.bundles</groupId>
+	<artifactId>org.jboss.tools.rsp.server.wildfly</artifactId>
+	<packaging>eclipse-plugin</packaging>
+
+	<name>Runtime Server Protocol : Server WildFly Implementation</name>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>1.6.0</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>java</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<mainClass>org.jboss.tools.rsp.server.wildfly.impl.WildflyServerMain</mainClass>
+						<arguments>
+							<argument>27511</argument>
+						</arguments>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+</project>

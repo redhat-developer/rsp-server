@@ -6,14 +6,17 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.jboss.tools.rsp</groupId>
-    <artifactId>parent</artifactId>
+    <artifactId>framework</artifactId>
     <version>0.0.9-SNAPSHOT</version>
   </parent>
-  <artifactId>api</artifactId>
+  <groupId>org.jboss.tools.rsp.framework</groupId>
+  <artifactId>bundles</artifactId>
   <packaging>pom</packaging>
 
   <modules>
-    <module>bundles</module>
-    <module>docs</module>
+    <module>org.jboss.tools.rsp.launching</module>
+    <module>org.jboss.tools.rsp.launching.java</module>
+    <module>org.jboss.tools.rsp.server</module>
+    <module>org.jboss.tools.rsp.server.spi</module>
   </modules>
 </project>

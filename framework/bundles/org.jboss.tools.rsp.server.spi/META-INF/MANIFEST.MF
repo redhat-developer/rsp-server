@@ -1,0 +1,26 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.jboss.tools.rsp.server.spi
+Bundle-SymbolicName: org.jboss.tools.rsp.server.spi
+Automatic-Module-Name: org.jboss.tools.rsp.server.spi
+Bundle-Activator: org.jboss.tools.rsp.server.spi.SPIActivator
+Bundle-Version: 0.0.9.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: org.jboss.tools.rsp.api.dao,
+ org.jboss.tools.rsp.eclipse.core.runtime,
+ org.jboss.tools.rsp.eclipse.debug.core,
+ org.jboss.tools.rsp.eclipse.debug.core.model,
+ org.jboss.tools.rsp.eclipse.jdt.launching,
+ org.jboss.tools.rsp.eclipse.osgi.util,
+ org.jboss.tools.rsp.launching.java,
+ org.jboss.tools.rsp.launching.utils,
+ org.osgi.framework
+Export-Package: org.jboss.tools.rsp.server.spi.discovery,
+ org.jboss.tools.rsp.server.spi.launchers,
+ org.jboss.tools.rsp.server.spi.model,
+ org.jboss.tools.rsp.server.spi.model.polling,
+ org.jboss.tools.rsp.server.spi.servertype
+Require-Bundle: org.jboss.tools.rsp.api;bundle-version="0.0.9",
+ org.jboss.tools.rsp.launching;bundle-version="0.0.9",
+ org.jboss.tools.rsp.launching.java;bundle-version="0.0.9"
+

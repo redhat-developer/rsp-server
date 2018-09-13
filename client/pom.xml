@@ -9,11 +9,10 @@
     <artifactId>parent</artifactId>
     <version>0.0.9-SNAPSHOT</version>
   </parent>
-  <artifactId>api</artifactId>
+  <artifactId>client</artifactId>
   <packaging>pom</packaging>
 
   <modules>
-    <module>bundles</module>
-    <module>docs</module>
+    <module>jars</module>
   </modules>
 </project>
