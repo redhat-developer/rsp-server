@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.jboss.tools.rsp.api</groupId>
+		<artifactId>bundles</artifactId>
+		<version>0.0.9-SNAPSHOT</version>
+	</parent>
+	<groupId>org.jboss.tools.rsp.api.bundles</groupId>
+	<artifactId>org.jboss.tools.rsp.api</artifactId>
+	<packaging>eclipse-plugin</packaging>
+	<name>Runtime Server Protocol : API</name>
+
+	<properties>
+	  <gson.version>2.7</gson.version>
+	  <lsp4j.jsonrpc.version>0.4.1</lsp4j.jsonrpc.version>
+	</properties>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.7</version>
+				<executions>
+				  <execution>
+				    <id>get-libs</id>
+				    <goals>
+				      <goal>copy</goal>
+				    </goals>
+				    <phase>generate-resources</phase>
+				   </execution>
+				</executions>
+				<configuration>
+				      <skip>false</skip>
+				      <artifactItems>
+					<artifactItem>
+						<groupId>com.google.code.gson</groupId>
+						<artifactId>gson</artifactId>
+						<version>${gson.version}</version>
+					</artifactItem>
+					<artifactItem>
+						<groupId>org.eclipse.lsp4j</groupId>
+						<artifactId>org.eclipse.lsp4j.jsonrpc</artifactId>
+						<version>${lsp4j.jsonrpc.version}</version>
+					</artifactItem>
+				      </artifactItems>
+				      <skip>false</skip>
+				      <outputDirectory>${basedir}/lib/</outputDirectory>
+				</configuration>
+			</plugin>
+
+			
+			<plugin>
+			  <!-- make sure lib dir is removed after clean to avoid "dirty" build -->
+			  <artifactId>maven-clean-plugin</artifactId>
+			  <version>2.5</version>
+			  <configuration>
+			    <filesets>
+			      <fileset>
+				     <directory>${basedir}/lib</directory>
+				        <includes>
+                           <include>*.jar</include>
+                        </includes>
+			      </fileset>
+			    </filesets>
+			  </configuration>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-dependency-plugin
+										</artifactId>
+										<versionRange>
+											[2.7,)
+										</versionRange>
+										<goals>
+											<goal>copy</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute runOnConfiguration="true"></execute>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+
+</project>

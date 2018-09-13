@@ -110,37 +110,37 @@
 			<version>1.0.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.tools.rsp</groupId>
+			<groupId>org.jboss.tools.rsp.api.bundles</groupId>
 			<artifactId>org.jboss.tools.rsp.api</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.tools.rsp</groupId>
+			<groupId>org.jboss.tools.rsp.framework</groupId>
 			<artifactId>org.jboss.tools.rsp.launching</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.tools.rsp</groupId>
+			<groupId>org.jboss.tools.rsp.framework</groupId>
 			<artifactId>org.jboss.tools.rsp.launching.java</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.tools.rsp</groupId>
+			<groupId>org.jboss.tools.rsp.framework</groupId>
 			<artifactId>org.jboss.tools.rsp.server.spi</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.tools.rsp</groupId>
+			<groupId>org.jboss.tools.rsp.framework</groupId>
 			<artifactId>org.jboss.tools.rsp.server</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.tools.rsp</groupId>
+			<groupId>org.jboss.tools.rsp.runtimes.bundles</groupId>
 			<artifactId>org.jboss.tools.rsp.server.wildfly</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.tools.rsp</groupId>
+			<groupId>org.jboss.tools.rsp.runtimes.bundles</groupId>
 			<artifactId>org.jboss.tools.rsp.server.minishift</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>

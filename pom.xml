@@ -1,51 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.jboss.tools.rsp</groupId>
-  <artifactId>parent</artifactId>
-  <version>0.0.9-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  <name>Runtime Server Protocol</name>
- 
-  <properties>
-  	<mockito-core.version>2.18.3</mockito-core.version>
-  	<assertj-core.version>3.10.0</assertj-core.version>
-    <jacoco.version>0.8.2</jacoco.version>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.jboss.tools.rsp</groupId>
+	<artifactId>parent</artifactId>
+	<version>0.0.9-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>Runtime Server Protocol</name>
+
+	<properties>
+		<mockito-core.version>2.18.3</mockito-core.version>
+		<assertj-core.version>3.10.0</assertj-core.version>
+		<tycho-version>1.2.0</tycho-version>
+		<jacoco.version>0.8.2</jacoco.version>
     <jacoco.reportRoot>${project.basedir}/../target</jacoco.reportRoot>
-  </properties>
-  
-  <modules>
-	  <module>api</module>
-	  <module>schema</module>
-	  <module>client-cli</module>
-	  <module>launching</module>
-	  <module>launching-java</module>
-	  <module>server-spi</module>
-	  <module>server</module>
-	  <module>server-wildfly</module>
-	  <module>server-minishift</module>
-	  <module>distribution</module>
-  </modules>
+	</properties>
 
-  <build>
-    <pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-      </plugin>
-    </plugins>
-    </pluginManagement>
+	<modules>
+		<module>api</module>
+		<module>client</module>
+		<module>framework</module>
+		<module>runtimes</module>
+		<module>distribution</module>
+	</modules>
 
-    <plugins>
-      <plugin>
+	<repositories>
+	    <repository>
+        	<id>tp-site-simrel</id>
+	        <url>http://download.jboss.org/jbosstools/updates/requirements/photon/201806191120-Photon.0.RC4a/</url>
+	        <layout>p2</layout>
+	    </repository>
+	    <repository>
+	        <id>tp-site-orbit</id>
+	        <url>http://download.jboss.org/jbosstools/updates/requirements/orbit/R20180606145124/</url>
+	        <layout>p2</layout>
+	    </repository>
+	    <repository>
+	        <id>tp-site-locus</id>
+	        <url>http://repository.jboss.org/nexus/content/unzip/unzip/org/jboss/tools/locus/jbosstools-locus/1.7.0/jbosstools-locus-1.7.0-updatesite.zip-unzip/</url>
+	        <layout>p2</layout>
+	    </repository>
+	</repositories>
+
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<source>1.8</source>
+						<target>1.8</target>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-surefire-plugin</artifactId>
+				<version>${tycho-version}</version>
+			</plugin>
+			<plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <version>${jacoco.version}</version>
@@ -68,27 +94,13 @@
           </execution>
         </executions>
       </plugin>
-    </plugins>
-  </build>
+		</plugins>
+	</build>
 
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
-    </dependency>
-	<dependency>
-	    <groupId>org.mockito</groupId>
-	    <artifactId>mockito-core</artifactId>
-	    <version>${mockito-core.version}</version>
-	    <scope>test</scope>
-	</dependency>
-	<dependency>
-	    <groupId>org.assertj</groupId>
-	    <artifactId>assertj-core</artifactId>
-	    <version>${assertj-core.version}</version>
-	    <scope>test</scope>
-	</dependency>
-  </dependencies>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>tycho-snapshots</id>
+			<url>https://repo.eclipse.org/content/repositories/tycho-snapshots/</url>
+		</pluginRepository>
+	</pluginRepositories>
 </project>

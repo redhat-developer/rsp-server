@@ -9,11 +9,12 @@
     <artifactId>parent</artifactId>
     <version>0.0.9-SNAPSHOT</version>
   </parent>
-  <artifactId>api</artifactId>
+  <groupId>org.jboss.tools.rsp</groupId>
+  <artifactId>runtimes</artifactId>
   <packaging>pom</packaging>
 
   <modules>
     <module>bundles</module>
-    <module>docs</module>
+    <module>tests</module>
   </modules>
 </project>

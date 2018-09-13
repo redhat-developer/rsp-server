@@ -6,14 +6,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.jboss.tools.rsp</groupId>
-    <artifactId>parent</artifactId>
+    <artifactId>runtimes</artifactId>
     <version>0.0.9-SNAPSHOT</version>
   </parent>
-  <artifactId>api</artifactId>
+  <groupId>org.jboss.tools.rsp.runtimes</groupId>
+  <artifactId>tests</artifactId>
   <packaging>pom</packaging>
 
   <modules>
-    <module>bundles</module>
-    <module>docs</module>
+    <module>org.jboss.tools.rsp.server.wildfly.test</module>
   </modules>
 </project>
