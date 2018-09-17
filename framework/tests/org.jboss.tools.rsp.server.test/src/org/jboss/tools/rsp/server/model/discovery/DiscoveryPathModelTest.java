@@ -127,7 +127,7 @@ public class DiscoveryPathModelTest {
 			out.deleteOnExit();
 			dpm.saveDiscoveryPaths(out);
 			String contents = new String(Files.readAllBytes(out.toPath()));
-			String expected = "/some/path/from/user\n/some/path/from/user2\n";
+			String expected = "/some/path/from/user" + System.lineSeparator() + "/some/path/from/user2" + System.lineSeparator();
 			assertEquals(contents, expected);
 		} catch(IOException ioe) {
 			fail();
