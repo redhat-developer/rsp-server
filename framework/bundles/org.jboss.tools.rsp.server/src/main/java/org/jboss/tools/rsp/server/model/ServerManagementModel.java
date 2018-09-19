@@ -8,11 +8,20 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.model;
 
+import java.io.File;
+import java.util.concurrent.ExecutionException;
+
+import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.eclipse.jdt.launching.VMInstallRegistry;
+import org.jboss.tools.rsp.launching.LaunchingCore;
+import org.jboss.tools.rsp.server.CapabilityManagement;
+import org.jboss.tools.rsp.server.RSPLogger;
 import org.jboss.tools.rsp.server.discovery.DiscoveryPathModel;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanTypeManager;
+import org.jboss.tools.rsp.server.secure.SecureStorageGuardian;
 import org.jboss.tools.rsp.server.spi.discovery.IDiscoveryPathModel;
 import org.jboss.tools.rsp.server.spi.discovery.IServerBeanTypeManager;
+import org.jboss.tools.rsp.server.spi.model.ICapabilityManagement;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
 
@@ -21,18 +30,25 @@ public class ServerManagementModel implements IServerManagementModel {
 	public static ServerManagementModel getDefault() {
 		return instance;
 	}
+
 	
+	private SecureStorageGuardian secureStorage;
+	private CapabilityManagement capabilities;
+
 	private DiscoveryPathModel rpm;
 	private ServerBeanTypeManager serverBeanTypeManager;
 	private ServerModel serverModel;
 	private VMInstallRegistry vmModel;
 	
 	public ServerManagementModel() {
-		rpm = new DiscoveryPathModel();
-		serverBeanTypeManager = new ServerBeanTypeManager();
-		serverModel = new ServerModel();
-		vmModel = new VMInstallRegistry();
-		vmModel.addActiveVM();
+		this.capabilities = new CapabilityManagement();
+		this.secureStorage = new SecureStorageGuardian(getSecureStorageFile());
+		this.rpm = new DiscoveryPathModel();
+		this.serverBeanTypeManager = new ServerBeanTypeManager();
+		this.serverModel = new ServerModel(secureStorage);
+		this.vmModel = new VMInstallRegistry();
+		this.vmModel.addActiveVM();
+		
 		instance = this;
 	}
 	
@@ -51,4 +67,28 @@ public class ServerManagementModel implements IServerManagementModel {
 	public VMInstallRegistry getVMInstallModel() {
 		return vmModel;
 	}
+	
+	public ICapabilityManagement getCapabilityManagement() {
+		return capabilities;
+	}
+
+	public void removeClient(RSPClient client) {
+		capabilities.clientRemoved(client);
+	}
+
+	public void clientAdded(RSPClient client) {
+		capabilities.clientAdded(client);
+		try {
+			secureStorage.authenticateClient(client, capabilities);
+		} catch(InterruptedException | ExecutionException e) {
+			RSPLogger.log(RSPLogger.LOG_ERROR, "Unable to initialize secure storage", e);
+		}
+	}
+	
+	private File getSecureStorageFile() {
+		File data = LaunchingCore.getDataLocation();
+		File secure = new File(data, "securestorage");
+		return secure;
+	}
+
 }

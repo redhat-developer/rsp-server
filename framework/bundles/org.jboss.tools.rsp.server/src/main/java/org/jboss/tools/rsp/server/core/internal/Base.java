@@ -63,7 +63,7 @@ public abstract class Base {
 	 * @param id
 	 */
 	public Base(File file, String id) {
-		this.file = file;
+		this(file);
 		if (id != null && id.length() > 0) {
 			map.put(PROP_ID, id);
 			map.put(PROP_ID_SET, Boolean.toString(true));

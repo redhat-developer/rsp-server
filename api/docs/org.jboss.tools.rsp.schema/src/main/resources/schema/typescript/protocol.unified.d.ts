@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2018-08-21 17:47:18.
+// Generated using typescript-generator version 2.2.413 on 2018-09-24 14:10:43.
 
 export interface Attribute {
     type: string;
@@ -9,6 +9,14 @@ export interface Attribute {
 
 export interface Attributes {
     attributes: { [index: string]: Attribute };
+}
+
+export interface CapabilitiesRequest {
+    list: string[];
+}
+
+export interface CapabilitiesResponse {
+    map: { [index: string]: string };
 }
 
 export interface CommandLineDetails {
@@ -103,6 +111,11 @@ export interface Status {
 export interface StopServerAttributes {
     id: string;
     force: boolean;
+}
+
+export interface StringPrompt {
+    code: number;
+    prompt: string;
 }
 
 export interface VMDescription {

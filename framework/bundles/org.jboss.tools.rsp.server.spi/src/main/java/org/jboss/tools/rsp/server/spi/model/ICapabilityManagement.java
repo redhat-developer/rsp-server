@@ -8,14 +8,10 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.spi.model;
 
-import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
-import org.jboss.tools.rsp.server.spi.discovery.IDiscoveryPathModel;
-import org.jboss.tools.rsp.server.spi.discovery.IServerBeanTypeManager;
+import org.jboss.tools.rsp.api.RSPClient;
 
-public interface IServerManagementModel {
-	public IServerBeanTypeManager getServerBeanTypeManager();
-	public IServerModel getServerModel();
-	public IDiscoveryPathModel getDiscoveryPathModel();
-	public IVMInstallRegistry getVMInstallModel();
-	public ICapabilityManagement getCapabilityManagement();
+public interface ICapabilityManagement {
+	public void clientAdded(RSPClient client);
+	public void clientRemoved(RSPClient client);
+	public String getCapabilityProperty(RSPClient c, String key);
 }

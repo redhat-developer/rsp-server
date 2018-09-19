@@ -8,16 +8,36 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.api;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
+import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
+import org.jboss.tools.rsp.api.dao.CapabilitiesRequest;
+import org.jboss.tools.rsp.api.dao.CapabilitiesResponse;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerProcess;
 import org.jboss.tools.rsp.api.dao.ServerProcessOutput;
 import org.jboss.tools.rsp.api.dao.ServerStateChange;
+import org.jboss.tools.rsp.api.dao.StringPrompt;
 
 @JsonSegment("client")
 public interface RSPClient {
+
+	/** 
+	 * Get capabilities so the server knows what this client can support
+	 */
+	@JsonRequest
+	CompletableFuture<CapabilitiesResponse> getClientCapabilities(CapabilitiesRequest request);
+
+	/** 
+	 * Prompt the user for some feature
+	 */
+	@JsonRequest
+	CompletableFuture<String> promptString(StringPrompt prompt);
+
+	
 
 	/**
 	 * The `client/discoveryPathAdded` notification is sent by the server to all

@@ -470,6 +470,7 @@ public class MockServerCreationUtilities extends Assert {
 	}
 	
 	private static File MOCKS_BASE_DIR = null;
+
 	/*
 	 * Where to create our mocked servers
 	 */

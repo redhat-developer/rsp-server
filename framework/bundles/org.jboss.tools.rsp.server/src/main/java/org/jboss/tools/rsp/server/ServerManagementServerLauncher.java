@@ -115,15 +115,21 @@ public class ServerManagementServerLauncher {
 			// wait for clients to connect
 			Socket socket = serverSocket.accept();
 			// create a JSON-RPC connection for the accepted socket
-			SocketLauncher<RSPClient> launcher = new SocketLauncher<>(server,
+			ServerSocketLauncher<RSPClient> launcher = createSocketLauncher(server,
 					RSPClient.class, socket, createLoggingPrintWriter());
-			// connect a remote client proxy to the server
+
+			// Alert the models a new client has been added before they start making requests
 			Runnable removeClient = server.addClient(launcher);
 			/*
 			 * Start listening for incoming messages. When the JSON-RPC connection is closed
 			 * disconnect the remote client from the server.
 			 */
 			launcher.startListening().thenRun(removeClient);
+			
+			// Alert the models they may begin requesting information from the client, 
+			// now that we are actually listening to their responses
+			server.clientAdded(launcher);
+			
 			System.out.println(
 					"Client " + socket.getInetAddress().getCanonicalHostName() +
 							":"+ socket.getPort() + " is connected");
@@ -132,9 +138,13 @@ public class ServerManagementServerLauncher {
 			if (socketRunnable != null && socketRunnable.isListening())
 				ioe.printStackTrace();
 		}
-
 	}
-
+	
+	protected RSPServerSocketLauncher<RSPClient> createSocketLauncher(ServerManagementServerImpl server, Class<RSPClient> class1, Socket socket, LoggingPrintWriter loggingPrintWriter) throws IOException {
+		 return new RSPServerSocketLauncher<>(server,
+					RSPClient.class, socket, createLoggingPrintWriter());
+	}
+	
 	private class LoggingStringWriter extends StringWriter {
 	    public void flush() {
 	    	String val = null;

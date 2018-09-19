@@ -11,14 +11,20 @@ package org.jboss.tools.rsp.server.util;
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
+import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
+
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.RSPServer;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.CapabilitiesRequest;
+import org.jboss.tools.rsp.api.dao.CapabilitiesResponse;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerProcess;
 import org.jboss.tools.rsp.api.dao.ServerProcessOutput;
 import org.jboss.tools.rsp.api.dao.ServerStateChange;
+import org.jboss.tools.rsp.api.dao.StringPrompt;
 
 public class ClientImpl implements RSPClient {
 	
@@ -109,5 +115,17 @@ public class ClientImpl implements RSPClient {
 				+ out.getServer().toString() + " ["
 				+ out.getProcessId() + "][" 
 				+ out.getStreamType() + "] " + out.getText());
+	}
+
+
+	@Override
+	public CompletableFuture<CapabilitiesResponse> getClientCapabilities(CapabilitiesRequest request) {
+		return CompletableFuture.completedFuture(
+				new CapabilitiesResponse(new HashMap<String,String>()));
+	}
+
+	@Override
+	public CompletableFuture<String> promptString(StringPrompt prompt) {
+		return CompletableFuture.completedFuture("this_is_a_password"); 
 	}
 }

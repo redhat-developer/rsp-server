@@ -21,6 +21,8 @@ import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
 
 public interface IServerModel {
+	
+	public static final String SECURE_ATTRIBUTE_PREFIX = ":secure:server:";
 
 	ServerType[] getServerTypes();
 

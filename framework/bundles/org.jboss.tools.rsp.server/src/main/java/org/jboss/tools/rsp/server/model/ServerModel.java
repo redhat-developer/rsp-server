@@ -29,6 +29,8 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.launching.LaunchingCore;
+import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
+import org.jboss.tools.rsp.secure.model.NullSecureStorageProvider;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
 import org.jboss.tools.rsp.server.model.internal.DaoUtilities;
 import org.jboss.tools.rsp.server.model.internal.Server;
@@ -45,16 +47,22 @@ public class ServerModel implements IServerModel {
 	private List<IServerModelListener> listeners;
 	
 	private Set<String> approvedAttributeTypes;
+	private ISecureStorageProvider secureStorageProvider;
 
 	
 	public ServerModel() {
-		serverTypes = new HashMap<String, IServerType>();
-		servers = new HashMap<String, IServer>();
-		serverDelegates = new HashMap<String, IServerDelegate>();
-		listeners = new ArrayList<IServerModelListener>();
+		this(new NullSecureStorageProvider());
+	}
+	
+	public ServerModel(ISecureStorageProvider provider) {
+		this.secureStorageProvider = provider;
+		this.serverTypes = new HashMap<>();
+		this.servers = new HashMap<>();
+		this.serverDelegates = new HashMap<>();
+		this.listeners = new ArrayList<>();
 		
 		// Server attributes must be one of the following types
-		approvedAttributeTypes = new HashSet<String>();
+		this.approvedAttributeTypes = new HashSet<String>();
 		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_INT);
 		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_BOOL);
 		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_STRING);
@@ -110,31 +118,40 @@ public class ServerModel implements IServerModel {
 			return;
 		}
 		for (File serverFile: folder.listFiles()) {
-			Server server = new Server(serverFile);
-			try {
-				server.load(new NullProgressMonitor());
-				String tid = server.getTypeId();
-				IServerType st = getIServerType(tid);
-				if( st != null ) {
-					server.setServerType(st);
-					server.setDelegate(st.createServerDelegate(server));
-				}
-				
-				if( server.getServerType() == null ) {
-					String typeId = server.getAttribute(Server.TYPE_ID, (String)null);
-					if( typeId == null ) {
-						LaunchingCore.log(new Exception(
-								"Unable to load server from file " + serverFile.getAbsolutePath() + "; server type is missing or null."));
-					} else if( getServerType(typeId) == null ) {
-						LaunchingCore.log(new Exception(
-								"Unable to load server from file " + serverFile.getAbsolutePath() + "; server type " + typeId + " is not found in model."));
-					}
-				} else {
-					addServer(server, server.getDelegate());
-				}
-			} catch(CoreException ce) {
-				LaunchingCore.log(new Exception("Unable to load server from file " + serverFile.getAbsolutePath(), ce));
+			Server server = loadServer(serverFile);
+			if( server != null )
+				addServer(server, server.getDelegate());
+
+		}
+	}
+	
+	private Server loadServer(File serverFile) {
+		Server server = new Server(serverFile, secureStorageProvider);
+		try {
+			server.load(new NullProgressMonitor());
+			String tid = server.getTypeId();
+			IServerType st = getIServerType(tid);
+			if( st != null ) {
+				server.setServerType(st);
+				server.setDelegate(st.createServerDelegate(server));
 			}
+			
+			if( server.getServerType() == null ) {
+				String typeId = server.getAttribute(Server.TYPE_ID, (String)null);
+				if( typeId == null ) {
+					LaunchingCore.log(new Exception(
+							"Unable to load server from file " + serverFile.getAbsolutePath() + "; server type is missing or null."));
+				} else if( getServerType(typeId) == null ) {
+					LaunchingCore.log(new Exception(
+							"Unable to load server from file " + serverFile.getAbsolutePath() + "; server type " + typeId + " is not found in model."));
+				}
+				return null;
+			} else {
+				return server;
+			}
+		} catch(CoreException ce) {
+			LaunchingCore.log(new Exception("Unable to load server from file " + serverFile.getAbsolutePath(), ce));
+			return null;
 		}
 	}
 	
@@ -208,7 +225,8 @@ public class ServerModel implements IServerModel {
 		return null;
 	}
 	
-	private Server createServer2(IServerType serverType, String id, Map<String, Object> attributes) {
+	private Server createServer2(IServerType serverType, String id, 
+			Map<String, Object> attributes) throws CoreException {
 		File data = LaunchingCore.getDataLocation();
 		File servers = new File(data, "servers");
 		if( !servers.exists()) {
@@ -216,28 +234,30 @@ public class ServerModel implements IServerModel {
 		}
 		// TODO check for duplicates
 		File thisServer = new File(servers, id);
-		Server s = new Server(thisServer, serverType);
+		Server s = new Server(thisServer, serverType, secureStorageProvider);
 		s.setAttribute("id", id);
 		
 		Set<String> keys = attributes.keySet();
 		for( String k : keys) {
-			Object val = attributes.get(k);
-			if( val instanceof Integer) {
-				s.setAttribute(k, ((Integer)val).intValue());
-			} else if( val instanceof Boolean) {
-				s.setAttribute(k, ((Boolean)val).booleanValue());
-			} else if( val instanceof String ) {
-				s.setAttribute(k, (String)val);
-			} else if( val instanceof List) {
-				s.setAttribute(k, (List)val);
-			} else if( val instanceof Map) {
-				s.setAttribute(k, (Map)val);
-			}
+			store(s, k, attributes.get(k));
 		}
 		return s;
 	}
 	
-
+	private void store(Server s, String k, Object val) {
+		if( val instanceof Integer) {
+			s.setAttribute(k, ((Integer)val).intValue());
+		} else if( val instanceof Boolean) {
+			s.setAttribute(k, ((Boolean)val).booleanValue());
+		} else if( val instanceof String ) {
+			s.setAttribute(k, (String)val);
+		} else if( val instanceof List) {
+			s.setAttribute(k, (List)val);
+		} else if( val instanceof Map) {
+			s.setAttribute(k, (Map)val);
+		}
+	}
+	
 	private void addServer(IServer server, IServerDelegate del) {
 		servers.put(server.getId(), server);
 		serverDelegates.put(server.getId(), del);
