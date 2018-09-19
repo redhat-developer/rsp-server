@@ -13,29 +13,30 @@ import java.io.File;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.launching.utils.IMemento;
-import org.jboss.tools.rsp.server.core.internal.Base;
+import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
+import org.jboss.tools.rsp.server.core.internal.SecuredBase;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
 
-public class Server extends Base implements IServer {
+public class Server extends SecuredBase implements IServer {
 	public static final String TYPE_ID = "org.jboss.tools.rsp.server.typeId";
 	private IServerDelegate delegate;
 	private IServerType serverType;
 	
-	public Server(File file) {
-		super(file);
+	public Server(File file, ISecureStorageProvider storage) {
+		super(file, storage);
 	}
 	
-	public Server(File file, IServerType type) {
-		super(file, type.getId());
+	public Server(File file, IServerType type, ISecureStorageProvider storage) {
+		super(file, type.getId(), storage);
 		this.serverType = type;
 		if( this.serverType != null ) {
 			setAttribute(TYPE_ID, type.getId());
 			this.delegate = this.serverType.createServerDelegate(this);
 		}
 	}
-	
+
 	@Override
 	public String getName() {
 		return getId();

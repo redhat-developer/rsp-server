@@ -23,25 +23,24 @@ public class SocketLauncher<T> implements Launcher<T> {
 	private final Launcher<T> launcher;
 	private Future<Void> startListeningResult;
 	private Socket socket;
-	
 
 	public SocketLauncher(Object localService, Class<T> remoteInterface, Socket socket) throws IOException {
-		this.launcher = Launcher.createLauncher(localService, remoteInterface, socket.getInputStream(), socket.getOutputStream());
+		this.launcher = Launcher.createLauncher(localService, remoteInterface, socket.getInputStream(),
+				socket.getOutputStream());
 		this.socket = socket;
 	}
 
-	public SocketLauncher(Object localService, Class<T> remoteInterface, Socket socket, PrintWriter tracing) throws IOException {
-		Launcher<T> launcherTmp = new Builder<T>()
-				.setLocalService(localService)
-				.setRemoteInterface(remoteInterface)
-				.setInput(socket.getInputStream())
-				.setOutput(socket.getOutputStream())
-				.traceMessages(tracing)
-				.create();
+	public SocketLauncher(Object localService, Class<T> remoteInterface, Socket socket, PrintWriter tracing)
+			throws IOException {
+		Launcher<T> launcherTmp = createBuilder(remoteInterface).setLocalService(localService).setRemoteInterface(remoteInterface)
+				.setInput(socket.getInputStream()).setOutput(socket.getOutputStream()).traceMessages(tracing).create();
 		this.launcher = launcherTmp;
 		this.socket = socket;
 	}
 
+	protected Builder<T> createBuilder(Class<T> remoteInterface) {
+		return new Builder<T>();
+	}
 	
 	
 	public CompletableFuture<Void> startListening() {

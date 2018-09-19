@@ -37,9 +37,11 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.launching.utils.StatusConverter;
+import org.jboss.tools.rsp.secure.model.RSPSecureStorage;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.rsp.server.model.RemoteEventManager;
 import org.jboss.tools.rsp.server.model.ServerManagementModel;
+import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
@@ -49,14 +51,15 @@ public class ServerManagementServerImpl implements RSPServer {
 	private final List<RSPClient> clients = new CopyOnWriteArrayList<>();
 	private final List<SocketLauncher<RSPClient>> launchers = new CopyOnWriteArrayList<>();
 	
+	
 	private final ServerManagementModel model;
 	private final RemoteEventManager remoteEventManager;
 	private ServerManagementServerLauncher launcher;
 	
 	public ServerManagementServerImpl(ServerManagementServerLauncher launcher) {
 		this.launcher = launcher;
-		model = new ServerManagementModel();
-		remoteEventManager = new RemoteEventManager(this);
+		this.model = new ServerManagementModel();
+		this.remoteEventManager = new RemoteEventManager(this);
 	}
 	
 	public List<RSPClient> getClients() {
@@ -64,8 +67,12 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 	
 	/**
-	 * Connect the given chat client.
+	 * Connect the given client.
 	 * Return a runnable which should be executed to disconnect the client.
+	 * This method is called *before* the server begins actually listening to the socket.
+	 * Any functionality which requires sending a jsonrequest to the client
+	 * should NOT be performed in this method, and should instead be performed
+	 * in clientAdded instead.
 	 */
 	public Runnable addClient(SocketLauncher<RSPClient> launcher) {
 		this.launchers.add(launcher);
@@ -74,8 +81,13 @@ public class ServerManagementServerImpl implements RSPServer {
 		return () -> this.removeClient(launcher);
 	}
 
+	public void clientAdded(SocketLauncher<RSPClient> launcher) {
+		this.model.clientAdded(launcher.getRemoteProxy());
+	}
+	
 	protected void removeClient(SocketLauncher<RSPClient> launcher) {
 		this.launchers.remove(launcher);
+		this.model.removeClient(launcher.getRemoteProxy());
 		this.clients.remove(launcher.getRemoteProxy());
 	}
 	

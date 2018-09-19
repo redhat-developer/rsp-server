@@ -12,24 +12,21 @@ import java.net.Socket;
 
 import org.jboss.tools.rsp.api.RSPServer;
 import org.jboss.tools.rsp.api.SocketLauncher;
+import org.jboss.tools.rsp.client.cli.InputProvider;
 
 public class ServerManagementClientLauncher {
 
-	public static void main(String[] args) throws Exception {
-		// todo verify args
-		new ServerManagementClientLauncher(args[0], Integer.parseInt(args[1])).launch();
-	}
-	
-	
 	private ServerManagementClientImpl myClient;
 	private SocketLauncher<RSPServer> launcher;
 	private Socket socket;
 	private String host;
 	private int port;
 	private boolean connectionOpen = false;
-	public ServerManagementClientLauncher(String host, int port) {
+	private InputProvider provider;
+	public ServerManagementClientLauncher(String host, int port, InputProvider provider) {
 		this.host = host;
 		this.port = port;
+		this.provider = provider;
 	}
 	
 	public void launch() throws Exception {
@@ -47,7 +44,7 @@ public class ServerManagementClientLauncher {
          */
 		launcher.startListening().thenRun(() -> clientClosed());
 		// start the chat session with a remote chat server proxy
-		client.initialize(launcher.getRemoteProxy());
+		client.initialize(launcher.getRemoteProxy(), provider);
 		myClient = client;
 		connectionOpen = true;
 	}

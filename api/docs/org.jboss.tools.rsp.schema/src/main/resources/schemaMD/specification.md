@@ -1287,6 +1287,71 @@ This endpoint returns no value
 
 ### The Client Interface
 
+#### client/getClientCapabilities
+
+ Get capabilities so the server knows what this client can support 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "list" : {
+      "type" : "array",
+      "items" : {
+        "type" : "string"
+      }
+    }
+  }
+}</pre></td><td><pre>export interface CapabilitiesRequest {
+    list: string[];
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "map" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "string"
+      }
+    }
+  }
+}</pre></td><td><pre>export interface CapabilitiesResponse {
+    map: { [index: string]: string };
+}</pre></td></tr></table>
+
+#### client/promptString
+
+ Prompt the user for some feature 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "code" : {
+      "type" : "integer"
+    },
+    "prompt" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface StringPrompt {
+    code: number;
+    prompt: string;
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre></pre></td><td><pre></pre></td></tr></table>
+
 #### client/discoveryPathAdded
 
  The `client/discoveryPathAdded` notification is sent by the server to all clients in response to the `server/addDiscoveryPath` notification. This call indicates that a discovery path has been added to the RSP model which keeps track of filesystem paths that may be searched for server runtimes. 

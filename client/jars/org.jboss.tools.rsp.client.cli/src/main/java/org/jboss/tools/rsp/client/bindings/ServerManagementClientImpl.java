@@ -7,26 +7,38 @@
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
 package org.jboss.tools.rsp.client.bindings;
-/* --------------------------------------------------------------------------------------------
- * Licensed under the MIT License. See License.txt in the project root for license information.
- * ------------------------------------------------------------------------------------------ */
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
+import org.jboss.tools.rsp.api.ICapabilityKeys;
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.RSPServer;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.CapabilitiesRequest;
+import org.jboss.tools.rsp.api.dao.CapabilitiesResponse;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerProcess;
 import org.jboss.tools.rsp.api.dao.ServerProcessOutput;
 import org.jboss.tools.rsp.api.dao.ServerStateChange;
+import org.jboss.tools.rsp.api.dao.StringPrompt;
+import org.jboss.tools.rsp.client.cli.InputHandler;
+import org.jboss.tools.rsp.client.cli.InputProvider;
 
 public class ServerManagementClientImpl implements RSPClient {
 	
-	public RSPServer server;
+	private RSPServer server;
+	private InputProvider inputProvider;
+	public ServerManagementClientImpl() {
+		super();
+		// here for debugging
+	}
 	
-	
-	public void initialize(RSPServer server) throws Exception {
+	public void initialize(RSPServer server, InputProvider inputProvider) throws Exception {
 		this.server = server;
+		this.inputProvider = inputProvider;
 	}
 
 	public RSPServer getProxy() {
@@ -42,17 +54,7 @@ public class ServerManagementClientImpl implements RSPClient {
 	public void discoveryPathRemoved(DiscoveryPath message) {
 		System.out.println("Removed discovery path: " + message.getFilepath());
 	}
-
-//	@Override
-//	public void vmAdded(VMDescription vmd) {
-//		System.out.println("VM added: " + vmd.getId() + ":" + vmd.getInstallLocation());
-//	}
-//
-//	@Override
-//	public void vmRemoved(VMDescription vmd) {
-//		System.out.println("VM removed: " + vmd.getId() + ":" + vmd.getInstallLocation());
-//	}
-//
+	
 	@Override
 	public void serverAdded(ServerHandle server) {
 		System.out.println("Server added: " + server.getType() + ":" + server.getId());
@@ -110,4 +112,53 @@ public class ServerManagementClientImpl implements RSPClient {
 				+ out.getProcessId() + "][" 
 				+ out.getStreamType() + "] " + out.getText());
 	}
+
+	@Override
+	public CompletableFuture<CapabilitiesResponse> getClientCapabilities(CapabilitiesRequest request) {
+		Map<String,String> ret = new HashMap<String,String>();
+		ret.put(ICapabilityKeys.STRING_PROTOCOL_VERSION, ICapabilityKeys.PROTOCOL_VERSION_CURRENT);
+		ret.put(ICapabilityKeys.BOOLEAN_STRING_PROMPT, Boolean.toString(true));
+		return CompletableFuture.completedFuture(new CapabilitiesResponse(ret));
+	}
+
+	@Override
+	public CompletableFuture<String> promptString(StringPrompt prompt) {
+		final CompletableFuture<String>[] ret = new CompletableFuture[1];
+		ret[0] = null;
+		
+		PromptStringHandler h2 = new PromptStringHandler(prompt.getPrompt()) {
+			public void handleInput(String line) throws Exception {
+				ret[0] = CompletableFuture.completedFuture(line);
+			}
+		};
+		inputProvider.addInputRequest(h2);
+		
+		long init = System.currentTimeMillis();
+		while( System.currentTimeMillis() < (init + 120000)) {
+			try {
+				Thread.sleep(1000);
+			} catch(InterruptedException ie) {
+				
+			}
+			if( ret[0] != null ) {
+				return ret[0];
+			}
+		}
+		return CompletableFuture.completedFuture(null);
+	}
+	
+	private abstract class PromptStringHandler implements InputHandler {
+		private String prompt;
+		public PromptStringHandler(String prompt) {
+			this.prompt = prompt;
+		}
+
+		@Override
+		public String getPrompt() {
+			return prompt;
+		}
+
+		public abstract void handleInput(String line) throws Exception;
+	}
+
 }
