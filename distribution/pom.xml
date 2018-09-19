@@ -116,6 +116,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.tools.rsp.framework</groupId>
+			<artifactId>org.jboss.tools.rsp.secure</artifactId>
+			<version>0.0.9-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.tools.rsp.framework</groupId>
 			<artifactId>org.jboss.tools.rsp.launching</artifactId>
 			<version>0.0.9-SNAPSHOT</version>
 		</dependency>
