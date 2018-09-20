@@ -1,6 +1,7 @@
 .gradle
 .settings
 .vscode
+.project
 bin
 build
 target/
@@ -9,3 +10,4 @@ target/
 */*/*/target/
 */*/*/.classpath
 */*/*/.project
+*/*/.project
