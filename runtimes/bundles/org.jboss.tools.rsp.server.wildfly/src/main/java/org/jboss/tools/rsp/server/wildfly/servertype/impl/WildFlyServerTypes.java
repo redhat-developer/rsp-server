@@ -11,6 +11,8 @@ package org.jboss.tools.rsp.server.wildfly.servertype.impl;
 import org.jboss.tools.rsp.server.wildfly.servertype.BaseJBossServerType;
 
 public class WildFlyServerTypes implements ServerTypeStringConstants{
+	public static final BaseJBossServerType WF14_SERVER_TYPE = 
+			new WildFlyServerType(WF14_ID, WF14_NAME, WF14_DESC);
 	public static final BaseJBossServerType WF13_SERVER_TYPE = 
 			new WildFlyServerType(WF13_ID, WF13_NAME, WF13_DESC);
 	public static final BaseJBossServerType WF12_SERVER_TYPE = 
