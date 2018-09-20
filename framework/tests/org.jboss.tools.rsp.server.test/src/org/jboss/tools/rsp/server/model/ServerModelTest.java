@@ -19,6 +19,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,13 +27,36 @@ import java.nio.file.Path;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
+import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.server.spi.model.ServerModelListenerAdapter;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ServerModelTest {
+	private static String ORIGINAL_DATA_LOC = null;
+	
+	@BeforeClass 
+	public static void beforeClass() {
+		ORIGINAL_DATA_LOC = System.getProperty(LaunchingCore.SYSPROP_DATA_LOCATION);
+		try {
+			File tmp = Files.createTempDirectory("RSPStartupShutdownTest").toFile();
+			System.setProperty(LaunchingCore.SYSPROP_DATA_LOCATION, tmp.getAbsolutePath());
+		} catch(IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
+	}
+	
+	@AfterClass
+	public static void afterClass() {
+		if( ORIGINAL_DATA_LOC == null )
+			System.clearProperty(LaunchingCore.SYSPROP_DATA_LOCATION);
+		else
+			System.setProperty(LaunchingCore.SYSPROP_DATA_LOCATION, ORIGINAL_DATA_LOC);
+	}
 	
 	@Test
 	public void testGibberishFile() {

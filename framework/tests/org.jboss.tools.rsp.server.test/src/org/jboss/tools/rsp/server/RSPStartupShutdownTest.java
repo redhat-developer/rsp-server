@@ -13,16 +13,22 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.SocketLauncher;
+import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.server.ShutdownExecutor.IShutdownHandler;
 import org.jboss.tools.rsp.server.util.ClientLauncher;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class RSPStartupShutdownTest {
@@ -31,6 +37,27 @@ public class RSPStartupShutdownTest {
 	private TestShutdownHandler shutdownHandler;
 	private CountDownLatch startSignal;
 	private CountDownLatch doneSignal;
+	
+	private static String ORIGINAL_DATA_LOC = null;
+	
+	@BeforeClass 
+	public static void beforeClass() {
+		ORIGINAL_DATA_LOC = System.getProperty(LaunchingCore.SYSPROP_DATA_LOCATION);
+		try {
+			File tmp = Files.createTempDirectory("RSPStartupShutdownTest").toFile();
+			System.setProperty(LaunchingCore.SYSPROP_DATA_LOCATION, tmp.getAbsolutePath());
+		} catch(IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
+	}
+	
+	@AfterClass
+	public static void afterClass() {
+		if( ORIGINAL_DATA_LOC == null )
+			System.clearProperty(LaunchingCore.SYSPROP_DATA_LOCATION);
+		else
+			System.setProperty(LaunchingCore.SYSPROP_DATA_LOCATION, ORIGINAL_DATA_LOC);
+	}
 	
 	@Before
 	public void setup() {
