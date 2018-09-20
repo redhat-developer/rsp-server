@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import javax.management.RuntimeErrorException;
+
 import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
 import org.jboss.tools.rsp.server.wildfly.test.util.IOUtil;
 import org.junit.Assert;
@@ -466,14 +468,22 @@ public class MockServerCreationUtilities extends Assert {
 	private static String getRandomString() {
 		return String.valueOf(System.currentTimeMillis());
 	}
+	
+	private static File MOCKS_BASE_DIR = null;
 	/*
 	 * Where to create our mocked servers
 	 */
 	public static File getMocksBaseDir() {
-		// TODO 
-		File ret =  new File(".", "src/test/resources/output/");
-		ret.mkdirs();
-		return ret;
+		if( MOCKS_BASE_DIR == null ) {
+			try {
+				MOCKS_BASE_DIR = Files.createTempDirectory("rsp_mocks").toFile();
+				MOCKS_BASE_DIR.deleteOnExit();
+				MOCKS_BASE_DIR.mkdirs();
+			} catch(IOException ioe) {
+				throw new RuntimeException(ioe);
+			}
+		}
+		return MOCKS_BASE_DIR;
 	}
 
 	private static File MOCK_TMP_DIR = null;

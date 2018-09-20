@@ -19,6 +19,5 @@ public class MockCreationTest {
     	
     	File output = MockServerCreationUtilities.getMocksBaseDir();
     	assertNotNull(output);
-    	assertEquals(output.getName(), "output");
     }
   }
