@@ -11,6 +11,9 @@
 	    <directory>${project.basedir}/target/felix-framework-6.0.1</directory>
 	    <outputDirectory>/rsp-distribution/</outputDirectory>
 	    <fileMode>755</fileMode>
+			<excludes>
+				<exclude>**/*gogo*</exclude>
+			</excludes>
 	  </fileSet>
 	</fileSets>
 </assembly>
