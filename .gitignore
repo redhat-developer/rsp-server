@@ -3,4 +3,9 @@
 .vscode
 bin
 build
-/target/
+target/
+*/target/
+*/*/target/
+*/*/*/target/
+*/*/*/.classpath
+*/*/*/.project
