@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.server.discovery.serverbeans;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jboss.tools.rsp.server.spi.discovery.IServerBeanTypeManager;
@@ -30,6 +31,7 @@ public class ServerBeanTypeManager implements IServerBeanTypeManager {
 	public ServerBeanType[] getAllRegisteredTypes() {
 		return typeProviders.stream()
 			.map(IServerBeanTypeProvider::getServerBeanTypes)
+			.flatMap(Arrays::stream)
 			.toArray(size -> new ServerBeanType[size]);
 	}
 }
