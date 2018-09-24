@@ -9,24 +9,19 @@ import org.junit.Test;
 
 public class CryptoUtilsTest {
 	
-	@Test
-	public void testBadKey() {
+	@Test(expected = CryptoException.class)
+	public void testBadKey() throws CryptoException {
 		byte[] key = "i am very smrt".getBytes();
 		String plain = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque ut massa gravida, suscipit velit sed, fermentum ex. Interdum et malesuada fames ac ante ipsum primis in faucibus. Maecenas scelerisque diam in quam luctus dignissim. Suspendisse sit amet condimentum elit. Nulla ex enim, euismod faucibus risus nec, efficitur accumsan eros. Nunc sodales pharetra risus. Sed sit amet leo in tellus volutpat rhoncus. Nulla sem ex, consequat at felis eget, fringilla euismod libero. Vestibulum pretium purus non viverra mollis. Curabitur ut lorem non arcu commodo elementum et venenatis enim.";
-		CryptoUtils util = new CryptoUtils();
-		try {
-			byte[] encrypted = util.encrypt(key, plain.getBytes());
-			fail();
-		} catch(CryptoException ce) {
-			return;
-		}
+		CryptoUtils util = new CryptoUtils("AES","AES");
+		byte[] encrypted = util.encrypt(key, plain.getBytes());
 	}
 	
 	@Test
 	public void testPadding() {
 		byte[] key = "i am very smrt".getBytes();
 		String plain = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque ut massa gravida, suscipit velit sed, fermentum ex. Interdum et malesuada fames ac ante ipsum primis in faucibus. Maecenas scelerisque diam in quam luctus dignissim. Suspendisse sit amet condimentum elit. Nulla ex enim, euismod faucibus risus nec, efficitur accumsan eros. Nunc sodales pharetra risus. Sed sit amet leo in tellus volutpat rhoncus. Nulla sem ex, consequat at felis eget, fringilla euismod libero. Vestibulum pretium purus non viverra mollis. Curabitur ut lorem non arcu commodo elementum et venenatis enim.";
-		CryptoUtils util = new CryptoUtils();
+		CryptoUtils util = new CryptoUtils("AES","AES");
 		try {
 			byte[] encrypted = util.encrypt(key, plain.getBytes());
 			fail();
@@ -51,7 +46,7 @@ public class CryptoUtilsTest {
 	public void testEncryptDecrypt() {
 		byte[] key = "i am very smrt!!".getBytes();
 		String plain = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque ut massa gravida, suscipit velit sed, fermentum ex. Interdum et malesuada fames ac ante ipsum primis in faucibus. Maecenas scelerisque diam in quam luctus dignissim. Suspendisse sit amet condimentum elit. Nulla ex enim, euismod faucibus risus nec, efficitur accumsan eros. Nunc sodales pharetra risus. Sed sit amet leo in tellus volutpat rhoncus. Nulla sem ex, consequat at felis eget, fringilla euismod libero. Vestibulum pretium purus non viverra mollis. Curabitur ut lorem non arcu commodo elementum et venenatis enim.";
-		CryptoUtils util = new CryptoUtils();
+		CryptoUtils util = new CryptoUtils("AES","AES");
 		try {
 			byte[] encrypted = util.encrypt(key, plain.getBytes());
 			byte[] decrypted = util.decrypt(key, encrypted);

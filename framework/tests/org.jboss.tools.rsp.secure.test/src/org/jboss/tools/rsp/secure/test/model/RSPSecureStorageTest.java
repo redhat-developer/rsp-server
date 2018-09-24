@@ -11,10 +11,6 @@ import java.io.IOException;
 import org.jboss.tools.rsp.secure.crypto.CryptoException;
 import org.jboss.tools.rsp.secure.model.ISecureStorage.ISecureNode;
 import org.jboss.tools.rsp.secure.model.RSPSecureStorage;
-import org.jboss.tools.rsp.secure.model.RSPSecureStorage;
-import org.jboss.tools.rsp.secure.model.RSPSecureStorage.SecureNode;
-import org.jboss.tools.rsp.secure.model.ISecureStorage.ISecureNode;
-import org.jboss.tools.rsp.secure.model.RSPSecureStorage;
 import org.junit.Test;
 
 public class RSPSecureStorageTest {
