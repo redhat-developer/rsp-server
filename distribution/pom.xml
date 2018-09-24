@@ -149,5 +149,24 @@
 			<artifactId>org.everit.osgi.bundles.org.apache.xmlcommons.full</artifactId>
 			<version>1.4.1-20150918</version>
 		</dependency>
+		<dependency>
+			<groupId>org.jboss.tools.rsp.framework</groupId>
+			<artifactId>org.jboss.tools.rsp.launching.java.test</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.tools.rsp.framework</groupId>
+			<artifactId>org.jboss.tools.rsp.server.test</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.tools.rsp.runtimes.tests</groupId>
+			<artifactId>org.jboss.tools.rsp.server.wildfly.test</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
 	</dependencies>
 </project>
