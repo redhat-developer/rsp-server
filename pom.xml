@@ -15,7 +15,7 @@
 		<assertj-core.version>3.10.0</assertj-core.version>
 		<tycho-version>1.2.0</tycho-version>
 		<jacoco.version>0.8.2</jacoco.version>
-    <jacoco.reportRoot>${project.basedir}/../target</jacoco.reportRoot>
+   		<jacoco.reportRoot>${session.executionRootDirectory}/target</jacoco.reportRoot>
 	</properties>
 
 	<modules>
