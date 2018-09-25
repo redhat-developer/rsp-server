@@ -7,14 +7,15 @@
   <parent>
     <groupId>org.jboss.tools.rsp</groupId>
     <artifactId>framework</artifactId>
-    <version>0.0.9-SNAPSHOT</version>
+    <version>0.10.0-SNAPSHOT</version>
   </parent>
   <groupId>org.jboss.tools.rsp.framework</groupId>
   <artifactId>tests</artifactId>
   <packaging>pom</packaging>
 
   <modules>
-    <module>org.jboss.tools.rsp.server.test</module>
     <module>org.jboss.tools.rsp.launching.java.test</module>
+    <module>org.jboss.tools.rsp.secure.test</module>
+    <module>org.jboss.tools.rsp.server.test</module>
   </modules>
 </project>
