@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -370,7 +371,38 @@ public class ServerModel implements IServerModel {
 		}
 		return (ServerType[]) ret.toArray(new ServerType[ret.size()]);
 	}
+
+	public ServerType[] getAccessibleServerTypes() {
+		boolean hasPerms = secureStorageProvider.getSecureStorage() != null;
+		if( hasPerms )
+			return getServerTypes();
+		
+		Set<String> types = serverTypes.keySet();
+		ArrayList<String> types2 = new ArrayList<String>(types);
+		Collections.sort(types2);
+		ArrayList<ServerType> ret = new ArrayList<ServerType>();
+		for( String t : types2 ) {
+			IServerType type = serverTypes.get(t);
+			if( !hasSecureAttributes(type)) {
+				ret.add(new ServerType(t, type.getName(), type.getDescription()));
+			}
+		}
+		return (ServerType[]) ret.toArray(new ServerType[ret.size()]);
+	}
 	
+	private boolean hasSecureAttributes(IServerType type) {
+		Attributes a = type.getRequiredAttributes();
+		Attributes b = type.getOptionalAttributes();
+		Set<String> all = new HashSet<String>();
+		all.addAll(a.getAttributes().keySet());
+		all.addAll(b.getAttributes().keySet());
+		for( Iterator<String> i = all.iterator(); i.hasNext(); ) {
+			if( i.next().startsWith(IServerModel.SECURE_ATTRIBUTE_PREFIX)) 
+				return true;
+		}
+		return false;
+	}
+
 	public Attributes getRequiredAttributes(String type) {
 		IServerType t = serverTypes.get(type);
 		Attributes ret = t == null ? null : t.getRequiredAttributes();

@@ -28,6 +28,9 @@ public interface IServerModel {
 	ISecureStorageProvider getSecureStorageProvider();
 	
 	ServerType[] getServerTypes();
+	
+	ServerType[] getAccessibleServerTypes();
+	
 
 	IServer getServer(String id);
 	
