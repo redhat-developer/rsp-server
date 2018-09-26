@@ -314,7 +314,7 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public CompletableFuture<List<ServerType>> getServerTypes() {
-		ServerType[] types = model.getServerModel().getServerTypes();
+		ServerType[] types = model.getServerModel().getAccessibleServerTypes();
 		List<ServerType> asList = Arrays.asList(types);
 		return CompletableFuture.completedFuture(asList);
 	}
