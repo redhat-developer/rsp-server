@@ -23,7 +23,13 @@ import com.fasterxml.jackson.module.jsonSchema.factories.WrapperFactory;
 
 public class JSONUtility {
 	
-	public static void cleanFolder() {
+	private String baseDir;
+
+	public JSONUtility(String baseDir) {
+		this.baseDir = baseDir;
+	}
+
+	public void cleanFolder() {
 		Path folder = getDaoJsonFolder();
 		File[] jsons = folder.toFile().listFiles();
 		for( int i = 0; i < jsons.length; i++ ) {
@@ -31,7 +37,7 @@ public class JSONUtility {
 		}
 	}
 	
-	public static void writeJsonDAOSchemas(Class[] daoClasses) throws Exception {
+	public void writeJsonDAOSchemas(Class[] daoClasses) throws Exception {
 		File daoFolder = getDaoJsonFolder().toFile();
 		daoFolder.mkdirs();
 		System.out.println("Writing schemas to " + daoFolder.getAbsolutePath());
@@ -84,12 +90,12 @@ public class JSONUtility {
     }
     	
 
-	public static Path getDaoJsonFolder() {
-		return new File(".").toPath().resolve("src").resolve("main")
+	public Path getDaoJsonFolder() {
+		return new File(baseDir).toPath().resolve("src").resolve("main")
 				.resolve("resources").resolve("schema").resolve("json");
 	}
 
-	public static Path getDaoJsonFile(String simpleClassName) {
+	public Path getDaoJsonFile(String simpleClassName) {
 		Path folder = getDaoJsonFolder();
 		Path out = folder.resolve(simpleClassName + ".json");
 		return out;

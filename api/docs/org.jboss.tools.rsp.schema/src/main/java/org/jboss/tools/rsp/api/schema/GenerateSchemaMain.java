@@ -35,16 +35,17 @@ import org.jboss.tools.rsp.api.schema.SpecificationGenerator;
 
 public class GenerateSchemaMain {
 	public static void main(String[] args) throws Exception {
+		String baseDir = args.length > 0 ? args[0] : ".";
 		Class[] daos = getDAOClasses();
-		JSONUtility json = new JSONUtility();
+		JSONUtility json = new JSONUtility(baseDir);
 		json.cleanFolder();
 		json.writeJsonDAOSchemas(daos);
 		
-		TypescriptUtility ts = new TypescriptUtility();
+		TypescriptUtility ts = new TypescriptUtility(baseDir);
 		ts.cleanFolder();
 		ts.writeTypescriptSchemas(daos);
 
-		SpecificationGenerator generator = new SpecificationGenerator(json, ts);
+		SpecificationGenerator generator = new SpecificationGenerator(json, ts, baseDir);
 		generator.generate();
 		// Write MD docs
 	}

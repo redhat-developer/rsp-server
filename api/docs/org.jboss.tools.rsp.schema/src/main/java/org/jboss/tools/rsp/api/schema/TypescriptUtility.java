@@ -25,7 +25,13 @@ import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.TypeScriptOutputKind;
 
 public class TypescriptUtility {
-	public static void cleanFolder() {
+	private String baseDir;
+
+	public TypescriptUtility(String baseDir) {
+		this.baseDir = baseDir;
+	}
+
+	public void cleanFolder() {
 		Path folder = getDaoTypescriptFolder();
 		File[] ts = folder.toFile().listFiles();
 		for( int i = 0; i < ts.length; i++ ) {
@@ -33,7 +39,7 @@ public class TypescriptUtility {
 		}
 	}
 	
-	public static void writeTypescriptSchemas(Class[] daoClasses) throws Exception {
+	public void writeTypescriptSchemas(Class[] daoClasses) throws Exception {
 		File daoFolder = getDaoTypescriptFolder().toFile();
 		if (!daoFolder.exists()) {
 			daoFolder.mkdirs();
@@ -78,14 +84,14 @@ public class TypescriptUtility {
 		return contents.substring(beginning).trim();
 	}
 
-	public static Path getDaoTypescriptFile(String simpleClassName) {
+	public Path getDaoTypescriptFile(String simpleClassName) {
 		Path folder = getDaoTypescriptFolder();
 		Path out = folder.resolve(simpleClassName + ".d.ts");
 		return out;
 	}
 
-	public static Path getDaoTypescriptFolder() {
-		return new File(".").toPath().resolve("src").resolve("main").resolve("resources").resolve("schema")
+	public Path getDaoTypescriptFolder() {
+		return new File(baseDir).toPath().resolve("src").resolve("main").resolve("resources").resolve("schema")
 				.resolve("typescript");
 	}
 	
