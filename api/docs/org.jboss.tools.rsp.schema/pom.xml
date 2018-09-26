@@ -31,6 +31,9 @@
 					</executions>
 					<configuration>
 						<mainClass>org.jboss.tools.rsp.api.schema.GenerateSchemaMain</mainClass>
+						<arguments>
+						  <argument>${basedir}</argument>
+						</arguments>
 					</configuration>
 				</plugin>
 			</plugins>

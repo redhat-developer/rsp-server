@@ -27,21 +27,23 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 public class SpecificationGenerator {
 	private JSONUtility json;
 	private TypescriptUtility ts;
+	private String baseDir;
 
-	public SpecificationGenerator(JSONUtility json, TypescriptUtility ts) {
+	public SpecificationGenerator(JSONUtility json, TypescriptUtility ts, String baseDir) {
 		this.json = json;
 		this.ts = ts;
+		this.baseDir = baseDir;
 	}
 
-	private static File getClientInterfaceFile() throws IOException {
-		File f2 = new File(".");
-		File f = new File(f2, "../api/src/main/java/org/jboss/tools/rsp/api/RSPClient.java").getCanonicalFile();
+	private File getClientInterfaceFile() throws IOException {
+		File f2 = new File(baseDir);
+		File f = new File(f2, "../../bundles/org.jboss.tools.rsp.api/src/main/java/org/jboss/tools/rsp/api/RSPClient.java").getCanonicalFile();
 		return f;
 	}
 
-	private static File getServerInterfaceFile() throws IOException {
-		File f2 = new File(".");
-		File f = new File(f2, "../api/src/main/java/org/jboss/tools/rsp/api/RSPServer.java").getCanonicalFile();
+	private File getServerInterfaceFile() throws IOException {
+		File f2 = new File(baseDir);
+		File f = new File(f2, "../../bundles/org.jboss.tools.rsp.api/src/main/java/org/jboss/tools/rsp/api/RSPServer.java").getCanonicalFile();
 		return f;
 	}
 
@@ -173,6 +175,7 @@ public class SpecificationGenerator {
 
 		String protocolDocs = protocol1 + protocol2;
 		Path out = getMdFile("specification.md");
+		Files.createDirectories(out.getParent());
 		Files.write(out, protocolDocs.getBytes());
 		System.out.println("Wrote specification to " + out.toFile().getAbsolutePath());
 	}
@@ -189,11 +192,11 @@ public class SpecificationGenerator {
 		return "";
 	}
 
-	public static Path getMdFolder() {
-		return new File(".").toPath().resolve("src").resolve("main").resolve("resources").resolve("schemaMD");
+	public Path getMdFolder() {
+		return new File(baseDir).toPath().resolve("src").resolve("main").resolve("resources").resolve("schemaMD");
 	}
 
-	public static Path getMdFile(String fileName) {
+	public Path getMdFile(String fileName) {
 		Path folder = getMdFolder();
 		Path out = folder.resolve(fileName);
 		return out;
