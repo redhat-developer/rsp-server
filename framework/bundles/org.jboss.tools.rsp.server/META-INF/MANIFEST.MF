@@ -23,6 +23,7 @@ Import-Package: org.eclipse.lsp4j.jsonrpc,
  org.jboss.tools.rsp.eclipse.osgi.util,
  org.jboss.tools.rsp.launching,
  org.jboss.tools.rsp.launching.utils,
+ org.jboss.tools.rsp.logging,
  org.jboss.tools.rsp.secure.crypto,
  org.jboss.tools.rsp.secure.model,
  org.jboss.tools.rsp.server.spi.client,
@@ -31,12 +32,10 @@ Import-Package: org.eclipse.lsp4j.jsonrpc,
  org.jboss.tools.rsp.server.spi.model.polling,
  org.jboss.tools.rsp.server.spi.servertype,
  org.osgi.framework,
- org.osgi.service.log
+ org.osgi.service.log,
+ org.slf4j
 Export-Package: org.jboss.tools.rsp.server,
  org.jboss.tools.rsp.server.discovery,
  org.jboss.tools.rsp.server.discovery.serverbeans,
  org.jboss.tools.rsp.server.model
-Require-Bundle: org.jboss.tools.rsp.api;bundle-version="0.0.9",
- org.jboss.tools.rsp.launching;bundle-version="0.0.9",
- org.jboss.tools.rsp.launching.java;bundle-version="0.0.9",
- org.jboss.tools.rsp.server.spi;bundle-version="0.0.9"
+Require-Bundle: org.jboss.tools.rsp.api

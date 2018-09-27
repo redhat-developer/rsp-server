@@ -20,7 +20,8 @@ import org.jboss.tools.rsp.eclipse.core.runtime.ListenerList;
 import org.jboss.tools.rsp.eclipse.core.runtime.SafeRunner;
 import org.jboss.tools.rsp.eclipse.debug.core.IStreamListener;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IFlushableStreamMonitor;
-import org.jboss.tools.rsp.launching.LaunchingCore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Monitors the output stream of a system process and notifies
@@ -30,6 +31,9 @@ import org.jboss.tools.rsp.launching.LaunchingCore;
  * and input stream.
  */
 public class OutputStreamMonitor implements IFlushableStreamMonitor {
+	private static final Logger LOG = LoggerFactory.getLogger(OutputStreamMonitor.class);
+
+	
 	/**
 	 * The stream being monitored (connected system out or err).
 	 */
@@ -282,6 +286,7 @@ public class OutputStreamMonitor implements IFlushableStreamMonitor {
 	}
 	
 	private void log(Throwable t) {
-		LaunchingCore.log(t);
+		String msg = (t == null || t.getMessage() == null ? "Unknown Error" : t.getMessage());
+		LOG.error(msg, t);
 	}
 }

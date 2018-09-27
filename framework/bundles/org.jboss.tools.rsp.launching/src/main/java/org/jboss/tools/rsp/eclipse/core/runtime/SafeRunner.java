@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.jboss.tools.rsp.eclipse.core.runtime;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Runs the given ISafeRunnable in a protected mode: exceptions and certain
  * errors thrown in the runnable are logged and passed to the runnable's
@@ -20,6 +23,7 @@ package org.jboss.tools.rsp.eclipse.core.runtime;
  * @since org.eclipse.equinox.common 3.2
  */
 public final class SafeRunner {
+	private static final Logger LOG = LoggerFactory.getLogger(SafeRunner.class);
 
 	/**
 	 * Runs the given runnable in a protected mode.   Exceptions
@@ -47,37 +51,13 @@ public final class SafeRunner {
 	}
 
 	private static void log(Throwable t) {
-		t.printStackTrace();
+		if( t == null || t.getMessage() == null )
+			LOG.error("Unknown Error");
+		else
+			LOG.error(t.getMessage() , t);
 	}
 	
 	private static void handleException(ISafeRunnable code, Throwable e) {
-		// TODO handle this exception better? Depends on our logging implementation I guess. 
-		//e.printStackTrace();
 		log(e);
-		
-		
-//		if (!(e instanceof OperationCanceledException)) {
-//			// try to obtain the correct plug-in id for the bundle providing the safe runnable 
-//			Activator activator = Activator.getDefault();
-//			String pluginId = null;
-//			if (activator != null)
-//				pluginId = activator.getBundleId(code);
-//			if (pluginId == null)
-//				pluginId = IRuntimeConstants.PI_COMMON;
-//			String message = NLS.bind(CommonMessages.meta_pluginProblems, pluginId);
-//			IStatus status;
-//			if (e instanceof CoreException) {
-//				status = new MultiStatus(pluginId, IRuntimeConstants.PLUGIN_ERROR, message, e);
-//				((MultiStatus) status).merge(((CoreException) e).getStatus());
-//			} else {
-//				status = new Status(IStatus.ERROR, pluginId, IRuntimeConstants.PLUGIN_ERROR, message, e);
-//			}
-//			// Make sure user sees the exception: if the log is empty, log the exceptions on stderr 
-//			if (!RuntimeLog.isEmpty())
-//				RuntimeLog.log(status);
-//			else
-//				e.printStackTrace();
-//		}
-//		code.handleException(e);
 	}
 }

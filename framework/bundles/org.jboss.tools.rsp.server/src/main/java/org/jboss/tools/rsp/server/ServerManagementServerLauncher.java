@@ -21,10 +21,12 @@ import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.SocketLauncher;
 import org.jboss.tools.rsp.server.model.ServerPersistenceManager;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
-import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServerManagementServerLauncher {
-	
+	private static final Logger LOG = LoggerFactory.getLogger(ServerManagementServerLauncher.class);
+
 	private final ServerPersistenceManager persistenceEventManager;
 	
 	public static void main(String[] args) throws Exception {
@@ -152,7 +154,7 @@ public class ServerManagementServerLauncher {
 	    		val = getBuffer().toString();
 	    		getBuffer().setLength(0);
 	    	}
-	    	RSPLogger.log(LogService.LOG_DEBUG, val);
+	    	LOG.debug(val);
 	    }
 	}
 	private LoggingPrintWriter createLoggingPrintWriter() {

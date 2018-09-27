@@ -15,7 +15,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Vector;
 
-import org.jboss.tools.rsp.launching.LaunchingCore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Writes to the input stream of a system process,
@@ -25,6 +26,7 @@ import org.jboss.tools.rsp.launching.LaunchingCore;
  * an output stream.
  */
 public class InputStreamMonitor {
+	private static final Logger LOG = LoggerFactory.getLogger(InputStreamMonitor.class);
 
 	/**
 	 * The stream which is being written to (connected to system in).
@@ -174,9 +176,9 @@ public class InputStreamMonitor {
         }
 
     }
-    
-    private void log(Throwable t) {
-    	LaunchingCore.log(t);
-    }
+	private void log(Throwable t) {
+		String msg = (t == null || t.getMessage() == null ? "Unknown Error" : t.getMessage());
+		LOG.error(msg, t);
+	}
 }
 

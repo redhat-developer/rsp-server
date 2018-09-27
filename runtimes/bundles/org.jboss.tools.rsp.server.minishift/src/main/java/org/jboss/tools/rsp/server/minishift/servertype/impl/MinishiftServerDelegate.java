@@ -23,7 +23,6 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.debug.core.DebugException;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
-import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.launching.utils.StatusConverter;
 import org.jboss.tools.rsp.server.minishift.impl.Activator;
 import org.jboss.tools.rsp.server.minishift.servertype.IMinishiftServerAttributes;
@@ -36,8 +35,12 @@ import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller.SERVER_ST
 import org.jboss.tools.rsp.server.spi.model.polling.PollThreadUtils;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MinishiftServerDelegate extends AbstractServerDelegate {
+	private static final Logger LOG = LoggerFactory.getLogger(MinishiftServerDelegate.class);
+
 	private ILaunch startLaunch;
 	public MinishiftServerDelegate(IServer server) {
 		super(server);
@@ -123,7 +126,7 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 					try {
 						processes[i].terminate();
 					} catch(DebugException de) {
-						LaunchingCore.log(de);
+						LOG.error(de.getMessage(), de);
 					}
 				}
 			}
@@ -203,7 +206,7 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 		try {
 			return getStartLauncher().getLaunchCommand(mode);
 		} catch(CoreException ce) {
-			LaunchingCore.log(ce);
+			LOG.error(ce.getMessage(), ce);
 			return null;
 		}
 	}

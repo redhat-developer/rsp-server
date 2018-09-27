@@ -43,6 +43,8 @@ import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.launching.utils.ExecUtil;
 import org.jboss.tools.rsp.launching.utils.NativeEnvironmentUtils;
 import org.jboss.tools.rsp.launching.utils.OSUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -51,6 +53,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class LaunchingSupportUtils {
+	private static final Logger LOG = LoggerFactory.getLogger(LaunchingSupportUtils.class);
+
+	
 	private static final String BAR = "|"; //$NON-NLS-1$
 	protected static final String JAVA_JVM_VERSION = "JAVA_JVM_VERSION"; //$NON-NLS-1$
 	private static final String AbstractVMInstall_4="Exception retrieving system properties: {0}";
@@ -322,10 +327,10 @@ public class LaunchingSupportUtils {
 	}
 	
 	private static void log(Throwable t) {
-		LaunchingCore.log(t);
+		LOG.error(t.getMessage(), t);
 	}
 	private void log(String bind) {
-		LaunchingCore.log(bind);
+		LOG.error(bind);
 	}
 
 	protected static void abort(String message, Throwable exception) throws CoreException {

@@ -20,8 +20,11 @@ import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.server.ServerManagementServerLauncher;
 import org.jboss.tools.rsp.server.spi.discovery.IDiscoveryPathListener;
 import org.jboss.tools.rsp.server.spi.discovery.IDiscoveryPathModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServerPersistenceManager implements IDiscoveryPathListener, IVMInstallChangedListener {
+	private static final Logger LOG = LoggerFactory.getLogger(ServerPersistenceManager.class);
 
 	private ServerManagementServerLauncher serverLauncher;
 	public ServerPersistenceManager(ServerManagementServerLauncher serverLauncher) {
@@ -59,7 +62,7 @@ public class ServerPersistenceManager implements IDiscoveryPathListener, IVMInst
 		try {
 			saveVMs();
 		} catch (IOException e) {
-			LaunchingCore.log(e);
+			LOG.error(e.getMessage(), e);
 		}
 	}
 	
@@ -67,7 +70,7 @@ public class ServerPersistenceManager implements IDiscoveryPathListener, IVMInst
 		try {
 			saveDiscoveryPaths();
 		} catch (IOException e) {
-			LaunchingCore.log(e);
+			LOG.error(e.getMessage(), e);
 		}
 	}
 	
@@ -78,7 +81,7 @@ public class ServerPersistenceManager implements IDiscoveryPathListener, IVMInst
 			saveVMs();
 			serverLauncher.getModel().getServerModel().saveServers();
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error(e.getMessage(), e);
 		}
 	}
 
@@ -88,7 +91,7 @@ public class ServerPersistenceManager implements IDiscoveryPathListener, IVMInst
 			loadDiscoveryPaths();
 			serverLauncher.getModel().getServerModel().loadServers();
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error(e.getMessage(), e);
 		}
 	}
 	

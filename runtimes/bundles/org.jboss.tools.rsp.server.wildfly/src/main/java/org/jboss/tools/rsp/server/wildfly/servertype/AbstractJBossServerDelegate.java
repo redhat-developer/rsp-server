@@ -23,7 +23,6 @@ import org.jboss.tools.rsp.eclipse.debug.core.DebugException;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
-import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.launching.utils.StatusConverter;
 import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
 import org.jboss.tools.rsp.server.spi.launchers.IShutdownLauncher;
@@ -35,8 +34,13 @@ import org.jboss.tools.rsp.server.spi.model.polling.WebPortPoller;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.wildfly.impl.Activator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(AbstractJBossServerDelegate.class);
+
 	private ILaunch startLaunch;
 	
 	public AbstractJBossServerDelegate(IServer server) {
@@ -115,7 +119,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 					try {
 						processes[i].terminate();
 					} catch(DebugException de) {
-						LaunchingCore.log(de);
+						LOG.error(de.getMessage(), de);
 					}
 				}
 			}
@@ -198,7 +202,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		try {
 			return getStartLauncher().getLaunchCommand(mode);
 		} catch(CoreException ce) {
-			LaunchingCore.log(ce);
+			LOG.error(ce.getMessage(), ce);
 			return null;
 		}
 	}

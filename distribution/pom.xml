@@ -110,6 +110,21 @@
 			<version>1.0.1</version>
 		</dependency>
 		<dependency>
+		    <groupId>ch.qos.logback</groupId>
+		    <artifactId>logback-classic</artifactId>
+		    <version>1.2.3</version>
+		</dependency>
+		<dependency>
+		    <groupId>ch.qos.logback</groupId>
+		    <artifactId>logback-core</artifactId>
+		    <version>1.2.3</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-api</artifactId>
+		    <version>1.7.25</version>
+		</dependency>
+		<dependency>
 			<groupId>org.jboss.tools.rsp.api.bundles</groupId>
 			<artifactId>org.jboss.tools.rsp.api</artifactId>
 			<version>0.10.0-SNAPSHOT</version>
@@ -117,6 +132,11 @@
 		<dependency>
 			<groupId>org.jboss.tools.rsp.framework</groupId>
 			<artifactId>org.jboss.tools.rsp.secure</artifactId>
+			<version>0.10.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.tools.rsp.framework</groupId>
+			<artifactId>org.jboss.tools.rsp.logging</artifactId>
 			<version>0.10.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
@@ -150,7 +170,7 @@
 			<version>0.10.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-		<groupId>org.everit.osgi.bundles</groupId>
+			<groupId>org.everit.osgi.bundles</groupId>
 			<artifactId>org.everit.osgi.bundles.org.apache.xmlcommons.full</artifactId>
 			<version>1.4.1-20150918</version>
 		</dependency>
@@ -172,6 +192,5 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
 	</dependencies>
 </project>

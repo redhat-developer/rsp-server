@@ -36,8 +36,9 @@ import org.jboss.tools.rsp.eclipse.jdt.internal.launching.StandardVM;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.internal.launching.java.LibraryInfoCache;
 import org.jboss.tools.rsp.internal.launching.java.util.LaunchingSupportUtils;
-import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.launching.utils.OSUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -45,6 +46,8 @@ import org.jboss.tools.rsp.launching.utils.OSUtils;
  * JDK installation layout.
  */
 public class StandardVMType extends AbstractVMInstallType {
+	private static final Logger LOG = LoggerFactory.getLogger(StandardVMType.class);
+
 	private static final String StandardVMType_Not_a_JDK_Root__Java_executable_was_not_found_1="Target is not a JDK Root. Java executable was not found";
 	private static final String StandardVMType_ok_2="ok";
 	private static final String StandardVMType_Standard_VM_3="Standard VM";
@@ -546,11 +549,11 @@ public class StandardVMType extends AbstractVMInstallType {
 	}
 	
 	
-	private static void log(Throwable t) {
-		LaunchingCore.log(t);
+	private static void log(Throwable ce) {
+		LOG.error(ce.getMessage(),ce);
 	}
 	private void log(String bind) {
-		LaunchingCore.log(bind);
+		LOG.error(bind);
 	}
 
 	/**
