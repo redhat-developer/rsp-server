@@ -14,7 +14,7 @@ node('rhel7') {
 		sh 'mvn clean package -f distribution/pom.xml'
 		sh 'mvn clean compile exec:java package -f api/docs/org.jboss.tools.rsp.schema/pom.xml'
 
-		archiveArtifacts artifacts: 'distribution/target/org.jboss.tools.rsp.distribution-*.zip','api/docs/org.jboss.tools.rsp.schema/target/*.jar	
+		archiveArtifacts artifacts: 'distribution/target/org.jboss.tools.rsp.distribution-*.zip','api/docs/org.jboss.tools.rsp.schema/target/*.jar'
 	}
 
 	stage('Coverage Report') {
