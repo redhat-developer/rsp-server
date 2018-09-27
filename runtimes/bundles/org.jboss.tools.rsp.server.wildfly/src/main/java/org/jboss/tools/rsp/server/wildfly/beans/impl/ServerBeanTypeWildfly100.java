@@ -12,8 +12,6 @@ package org.jboss.tools.rsp.server.wildfly.beans.impl;
 
 import java.io.File;
 
-import org.jboss.tools.rsp.server.wildfly.impl.util.JBossManifestUtility;
-
 public class ServerBeanTypeWildfly100 extends JBossServerBeanType {
 	public ServerBeanTypeWildfly100() {
 		super(ID_WILDFLY, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN);

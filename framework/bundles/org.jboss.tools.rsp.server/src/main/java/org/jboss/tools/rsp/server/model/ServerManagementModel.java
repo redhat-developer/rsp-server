@@ -15,7 +15,7 @@ import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.eclipse.jdt.launching.VMInstallRegistry;
 import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.server.CapabilityManagement;
-import org.jboss.tools.rsp.server.RSPLogger;
+import org.jboss.tools.rsp.server.ServerManagementServerLauncher;
 import org.jboss.tools.rsp.server.discovery.DiscoveryPathModel;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanTypeManager;
 import org.jboss.tools.rsp.server.secure.SecureStorageGuardian;
@@ -24,8 +24,12 @@ import org.jboss.tools.rsp.server.spi.discovery.IServerBeanTypeManager;
 import org.jboss.tools.rsp.server.spi.model.ICapabilityManagement;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServerManagementModel implements IServerManagementModel {
+	private static final Logger LOG = LoggerFactory.getLogger(ServerManagementModel.class);
+
 	private static ServerManagementModel instance;
 	public static ServerManagementModel getDefault() {
 		return instance;
@@ -81,7 +85,7 @@ public class ServerManagementModel implements IServerManagementModel {
 		try {
 			secureStorage.authenticateClient(client, capabilities);
 		} catch(InterruptedException | ExecutionException e) {
-			RSPLogger.log(RSPLogger.LOG_ERROR, "Unable to initialize secure storage", e);
+			LOG.error("Unable to initialize secure storage", e);
 		}
 	}
 	

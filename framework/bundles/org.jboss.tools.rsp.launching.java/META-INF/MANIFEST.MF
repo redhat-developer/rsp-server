@@ -10,6 +10,7 @@ Bundle-ClassPath: .
 Import-Package: com.google.gson,
  javax.xml.parsers,
  org.xml.sax,
+ org.slf4j,
  org.jboss.tools.rsp.api,
  org.jboss.tools.rsp.api.dao,
  org.jboss.tools.rsp.api.dao.util,

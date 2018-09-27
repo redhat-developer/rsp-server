@@ -13,11 +13,6 @@ package org.jboss.tools.rsp.eclipse.jdt.launching;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 
 /**
  * Abstract implementation of a VM install type.

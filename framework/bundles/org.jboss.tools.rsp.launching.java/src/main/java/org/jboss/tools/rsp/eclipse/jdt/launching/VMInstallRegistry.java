@@ -20,11 +20,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.launching.utils.IMemento;
 import org.jboss.tools.rsp.launching.utils.XMLMemento;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VMInstallRegistry implements IVMInstallRegistry {
+	private static final Logger LOG = LoggerFactory.getLogger(VMInstallRegistry.class);
 
 	private static final String JAVA_HOME = "java.home";
 	private static final String RUNNING_VM_ID = "running";
@@ -47,7 +49,7 @@ public class VMInstallRegistry implements IVMInstallRegistry {
 				addVMInstall(vmi);
 			}
 		} catch(IllegalArgumentException e) {
-			LaunchingCore.log(e);
+			LOG.error(e.getMessage(), e);
 		}
 	}
 

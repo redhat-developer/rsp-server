@@ -8,9 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.util;
 
-import java.io.IOException;
 import java.net.Socket;
-import java.nio.channels.SocketChannel;
 import java.util.concurrent.Future;
 
 import org.jboss.tools.rsp.api.RSPServer;

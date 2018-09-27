@@ -11,7 +11,6 @@ package org.jboss.tools.rsp.server.spi.model.polling;
 import java.util.List;
 import java.util.Properties;
 
-import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
 public interface IServerStatePoller {

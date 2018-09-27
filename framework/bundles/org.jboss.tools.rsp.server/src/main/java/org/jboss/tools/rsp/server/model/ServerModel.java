@@ -39,8 +39,13 @@ import org.jboss.tools.rsp.server.spi.model.IServerModelListener;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServerModel implements IServerModel {
+	private static final Logger LOG = LoggerFactory.getLogger(ServerModel.class);
+
+
 	private HashMap<String, IServerType> serverTypes;
 	private HashMap<String, IServer> servers;
 	private HashMap<String, IServerDelegate> serverDelegates;
@@ -139,10 +144,10 @@ public class ServerModel implements IServerModel {
 			if( server.getServerType() == null ) {
 				String typeId = server.getAttribute(Server.TYPE_ID, (String)null);
 				if( typeId == null ) {
-					LaunchingCore.log(new Exception(
+					log(new Exception(
 							"Unable to load server from file " + serverFile.getAbsolutePath() + "; server type is missing or null."));
 				} else if( getServerType(typeId) == null ) {
-					LaunchingCore.log(new Exception(
+					log(new Exception(
 							"Unable to load server from file " + serverFile.getAbsolutePath() + "; server type " + typeId + " is not found in model."));
 				}
 				return null;
@@ -150,9 +155,13 @@ public class ServerModel implements IServerModel {
 				return server;
 			}
 		} catch(CoreException ce) {
-			LaunchingCore.log(new Exception("Unable to load server from file " + serverFile.getAbsolutePath(), ce));
+			log(new Exception("Unable to load server from file " + serverFile.getAbsolutePath(), ce));
 			return null;
 		}
+	}
+	
+	private void log(Exception e) {
+		LOG.error(e.getMessage(), e);
 	}
 	
 	public IStatus createServer(String serverType, String id, Map<String, Object> attributes) {
@@ -316,7 +325,7 @@ public class ServerModel implements IServerModel {
 			toRemove.delete();
 		} catch (CoreException e) {
 			//log silently. Looks like nothing crucial
-			LaunchingCore.log(e);
+			log(e);
 		}
 		return true;
 	}
@@ -395,7 +404,7 @@ public class ServerModel implements IServerModel {
 			for( String all1 : all ) {
 				String attrType = util.getAttributeType(all1);
 				if( !approvedAttributeTypes.contains(attrType)) {
-					LaunchingCore.log("Extension for servertype " + serverType + " is invalid and requires an attribute of an invalid type.");
+					LOG.error("Extension for servertype " + serverType + " is invalid and requires an attribute of an invalid type.");
 					util.removeAttribute(all1);
 				}
 			}

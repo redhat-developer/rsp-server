@@ -36,7 +36,8 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.jboss.tools.rsp.launching.LaunchingCore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -53,6 +54,8 @@ import org.xml.sax.SAXException;
  * @since 1.1
  */
 public final class XMLMemento implements IMemento {
+	private static final Logger LOG = LoggerFactory.getLogger(XMLMemento.class);
+
 	private Document factory;
 	private Element element;
 
@@ -99,11 +102,11 @@ public final class XMLMemento implements IMemento {
 			
 			// ignore
 		} catch (ParserConfigurationException e) {
-			LaunchingCore.log(e);
+			logError(e);
 		} catch (SAXException e) {
-			LaunchingCore.log(e);
+			logError(e);
 		} catch (IOException e) {
-			LaunchingCore.log(e);
+			logError(e);
 		} finally {
 			try {
 				in.close();
@@ -112,6 +115,11 @@ public final class XMLMemento implements IMemento {
 			}
 		}
 		return null;
+	}
+	
+	private static void logError(Exception t) {
+		String msg = (t == null || t.getMessage() == null ? "Unknown Error" : t.getMessage());
+		LOG.error(msg, t);
 	}
 
 	/**

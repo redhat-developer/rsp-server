@@ -25,14 +25,6 @@ public class LaunchingCore {
 		return instance;
 	}
 
-	public static void log(Throwable t) {
-		t.printStackTrace();
-	}
-
-	public static void log(String bind) {
-		System.out.println(bind);
-	}
-	
 	public static File getDataLocation() {
 		File data = null;
 		String prop = System.getProperty(SYSPROP_DATA_LOCATION);

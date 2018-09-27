@@ -33,7 +33,8 @@ Import-Package: org.eclipse.lsp4j.jsonrpc,
  org.jboss.tools.rsp.server.spi.model,
  org.jboss.tools.rsp.server.spi.model.polling,
  org.jboss.tools.rsp.server.spi.servertype,
- org.osgi.framework
+ org.osgi.framework,
+ org.slf4j
 Export-Package: org.jboss.tools.rsp.server.wildfly.impl,
  org.jboss.tools.rsp.server.wildfly.servertype,
  org.jboss.tools.rsp.server.wildfly.servertype.launch,
@@ -41,4 +42,3 @@ Export-Package: org.jboss.tools.rsp.server.wildfly.impl,
  org.jboss.tools.rsp.server.wildfly.servertype.capabilities.util,
  org.jboss.tools.rsp.server.wildfly.servertype.impl,
  org.jboss.tools.rsp.server.wildfly.beans.impl
-Require-Bundle: org.jboss.tools.rsp.server;bundle-version="0.0.9"

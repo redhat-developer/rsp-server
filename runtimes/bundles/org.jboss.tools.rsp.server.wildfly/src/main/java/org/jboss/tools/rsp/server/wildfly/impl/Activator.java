@@ -11,13 +11,16 @@ package org.jboss.tools.rsp.server.wildfly.impl;
 import org.jboss.tools.rsp.server.LauncherSingleton;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Activator implements BundleActivator {
+	private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
 	public static final String BUNDLE_ID = "org.jboss.tools.rsp.server.wildfly";
 	
 	@Override
 	public void start(BundleContext context) throws Exception {
-		System.out.println("Wildfly Server bundle started");
+		LOG.info("Wildfly Server bundle started");
 		ExtensionHandler.addExtensionsToModel(LauncherSingleton.getDefault().getLauncher().getModel());
 	}
 

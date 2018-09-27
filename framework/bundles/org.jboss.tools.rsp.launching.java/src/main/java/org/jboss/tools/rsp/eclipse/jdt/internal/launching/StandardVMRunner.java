@@ -39,9 +39,10 @@ import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.StandardVMType;
 import org.jboss.tools.rsp.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
-import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.launching.utils.NativeEnvironmentUtils;
 import org.jboss.tools.rsp.launching.utils.OSUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A launcher for running Java main classes.
@@ -50,6 +51,9 @@ import org.jboss.tools.rsp.launching.utils.OSUtils;
  * 
  */
 public class StandardVMRunner extends AbstractVMRunner {
+	private static final Logger LOG = LoggerFactory.getLogger(StandardVMRunner.class);
+
+	
 	public static final String StandardVMRunner__0____1___2="{0} ({1})";
 	public static final String StandardVMRunner__0__at_localhost__1__1="{0} at localhost:{1}";
 	public static final String StandardVMRunner_Specified_working_directory_does_not_exist_or_is_not_a_directory___0__3="Specified working directory does not exist or is not a directory: {0}";
@@ -161,7 +165,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 			return wrap(configuration, cmdLine);
 		}
 		catch(CoreException ce) {
-			LaunchingCore.log(ce);
+			LOG.error(ce.getMessage(),ce);
 		}
 		return cmdLine;
 	}

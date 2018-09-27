@@ -13,10 +13,12 @@ import org.jboss.tools.rsp.server.ShutdownExecutor.IShutdownHandler;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
-import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServerCoreActivator implements BundleActivator {
 	public static final String BUNDLE_ID = "org.jboss.tools.rsp.server";
+	private static final Logger LOG = LoggerFactory.getLogger(ServerCoreActivator.class);
 
 	private static BundleContext context;
 	private static ServerCoreActivator activator;
@@ -33,10 +35,9 @@ public class ServerCoreActivator implements BundleActivator {
 	public void start(final BundleContext context2) throws Exception {
 		activator = this;
 		context = context2;
-		RSPLogger.useService();
 		setShutdownHandler();
 		startServer();
-		RSPLogger.log(LogService.LOG_INFO, NLS.bind("{0} bundle activated.", BUNDLE_ID));
+		LOG.info(NLS.bind("{0} bundle activated.", BUNDLE_ID));
 	}
 	
 	public ServerManagementServerLauncher getLauncher() {
@@ -57,7 +58,7 @@ public class ServerCoreActivator implements BundleActivator {
 				try {
 					launcher.launch(port);
 				} catch( Exception e) {
-					RSPLogger.log(RSPLogger.LOG_ERROR, "Unable to launch RSP server", e);
+					LOG.error("Unable to launch RSP server", e);
 				}
 			}
 		}.start();

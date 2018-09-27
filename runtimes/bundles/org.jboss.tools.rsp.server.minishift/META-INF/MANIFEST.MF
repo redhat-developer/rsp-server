@@ -33,5 +33,6 @@ Import-Package: org.eclipse.lsp4j.jsonrpc,
  org.jboss.tools.rsp.server.spi.model,
  org.jboss.tools.rsp.server.spi.model.polling,
  org.jboss.tools.rsp.server.spi.servertype,
- org.osgi.framework
-Require-Bundle: org.jboss.tools.rsp.server;bundle-version="0.0.9"
+ org.jboss.tools.rsp.secure.crypto,
+ org.osgi.framework,
+ org.slf4j
