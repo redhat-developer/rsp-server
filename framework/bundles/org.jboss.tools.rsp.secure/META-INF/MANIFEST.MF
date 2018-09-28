@@ -1,11 +1,26 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: RSP - Secure Storage
+Bundle-Name: org.jboss.tools.rsp.secure
 Bundle-SymbolicName: org.jboss.tools.rsp.secure
-Bundle-Version: 0.10.0.qualifier
-Bundle-Activator: org.jboss.tools.rsp.secure.SecureActivator
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Import-Package: org.osgi.framework;version="1.3.0"
 Automatic-Module-Name: org.jboss.tools.rsp.secure
-Export-Package: org.jboss.tools.rsp.secure.crypto,
+Bundle-Version: 0.10.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-Activator: org.jboss.tools.rsp.secure.SecureActivator
+Bundle-ClassPath: .
+Import-Package: com.google.gson,
+ javax.xml.parsers,
+ javax.xml.transform,
+ javax.xml.transform.dom,
+ javax.xml.transform.stream,
+ org.jboss.tools.rsp.api,
+ org.jboss.tools.rsp.api.dao,
+ org.jboss.tools.rsp.api.dao.util,
+ org.jboss.tools.rsp.eclipse.osgi.util,
+ org.osgi.framework,
+ org.osgi.service.log,
+ org.slf4j,
+ org.w3c.dom,
+ org.xml.sax
+Export-Package: org.jboss.tools.rsp.secure,
+ org.jboss.tools.rsp.secure.crypto,
  org.jboss.tools.rsp.secure.model
