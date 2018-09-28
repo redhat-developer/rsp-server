@@ -18,10 +18,10 @@ Import-Package: com.google.gson,
  org.jboss.tools.rsp.launching,
  org.jboss.tools.rsp.launching.utils,
  org.osgi.framework,
- org.osgi.service.log
+ org.osgi.service.log,
+ org.assertj.core.api
 Require-Bundle: org.jboss.tools.rsp.api;bundle-version="0.0.9",
  org.jboss.tools.rsp.launching;bundle-version="0.0.9",
  org.jboss.tools.rsp.launching.java;bundle-version="0.0.9",
  org.junit,
- org.assertj.core,
  org.mockito

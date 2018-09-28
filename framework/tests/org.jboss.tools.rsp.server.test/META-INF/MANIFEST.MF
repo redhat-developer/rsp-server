@@ -34,5 +34,4 @@ Require-Bundle: org.jboss.tools.rsp.api;bundle-version="0.0.9",
  org.jboss.tools.rsp.server.spi;bundle-version="0.0.9",
  org.jboss.tools.rsp.server;bundle-version="0.0.9",
  org.junit,
- org.assertj.core,
  org.mockito
