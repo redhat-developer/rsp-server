@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.logging.internal;
 
 import org.osgi.service.log.LogEntry;
+import org.osgi.service.log.LogLevel;
 import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogService;
 import org.slf4j.Logger;
@@ -23,21 +24,21 @@ public final class SLF4JLogReader implements LogListener {
 
 	@Override
 	public void logged(final LogEntry entry) {
-		final int level = entry.getLevel();
+		final LogLevel level = entry.getLogLevel();
 		switch (level) {
-		case LogService.LOG_DEBUG: {
+		case DEBUG: {
 			SLF4JLogReader.debug(entry);
 			break;
 		}
-		case LogService.LOG_ERROR: {
+		case ERROR: {
 			SLF4JLogReader.error(entry);
 			break;
 		}
-		case LogService.LOG_INFO: {
+		case INFO: {
 			SLF4JLogReader.info(entry);
 			break;
 		}
-		case LogService.LOG_WARNING: {
+		case WARN: {
 			SLF4JLogReader.warn(entry);
 			break;
 		}

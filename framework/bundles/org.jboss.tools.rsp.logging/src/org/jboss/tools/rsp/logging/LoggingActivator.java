@@ -15,13 +15,8 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LoggingActivator implements BundleActivator {
-	public static final String SYSPROP_LOG_LEVEL_FLAG = "rsp.log.level";
+public class LoggingActivator implements BundleActivator, LoggingConstants {
 
-	public static final int LOG_ERROR = 1;
-	public static final int LOG_WARNING = 2;
-	public static final int LOG_INFO = 3;
-	public static final int LOG_DEBUG = 4;
 
 	private static final Logger LOG = LoggerFactory.getLogger(LoggingActivator.class);
 

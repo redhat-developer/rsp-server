@@ -61,15 +61,15 @@ public class OSGILogReaderInitializer {
 
 	private LogReaderService[] getAllReaders(BundleContext context) {
 		ServiceTracker<LogReaderService, LogReaderService> tracker = getTracker(context);
-		List<LogReaderService> list = new ArrayList<LogReaderService>();
-		final Object[] current_readers = tracker.getServices();
-		if (current_readers != null) {
-			for (int index = 0; index < current_readers.length; index++) {
-				final LogReaderService reader = (LogReaderService) current_readers[index];
+		List<LogReaderService> list = new ArrayList<>();
+		final Object[] currentReaders = tracker.getServices();
+		if (currentReaders != null) {
+			for (int index = 0; index < currentReaders.length; index++) {
+				final LogReaderService reader = (LogReaderService) currentReaders[index];
 				list.add(reader);
 			}
 		}
-		return (LogReaderService[]) list.toArray(new LogReaderService[list.size()]);
+		return list.toArray(new LogReaderService[list.size()]);
 	}
 
 	private ServiceTracker<LogReaderService, LogReaderService> getTracker(BundleContext context) {
