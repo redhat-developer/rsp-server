@@ -51,10 +51,8 @@ public final class SafeRunner {
 	}
 
 	private static void log(Throwable t) {
-		if( t == null || t.getMessage() == null )
-			LOG.error("Unknown Error");
-		else
-			LOG.error(t.getMessage() , t);
+		String msg = (t == null || t.getMessage() == null ? "Unknown Error" : t.getMessage());
+		LOG.error(msg, t);
 	}
 	
 	private static void handleException(ISafeRunnable code, Throwable e) {

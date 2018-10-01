@@ -14,24 +14,28 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 
 public class LogLevelInitializer {
-	
+	private static final Logger LOG = LoggerFactory.getLogger(LogLevelInitializer.class);
 	public static void initLogLevel() {
-		String sysprop = System.getProperty(LoggingActivator.SYSPROP_LOG_LEVEL_FLAG);
+		String sysprop = System.getProperty(LoggingConstants.SYSPROP_LOG_LEVEL_FLAG);
 		if( sysprop != null ) {
-			int i = Integer.parseInt(sysprop);
-			setLogLevel(i);
+			try {
+				int i = Integer.parseInt(sysprop);
+				setLogLevel(i);
+			} catch(NumberFormatException nfe) {
+				LOG.error("Unable to read system property for log level (" + LoggingConstants.SYSPROP_LOG_LEVEL_FLAG + ")", nfe);
+			}
 		}
 	}
 
 	private static void setLogLevel(int level) {
 		Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-		if( level == LoggingActivator.LOG_ERROR ) 
+		if( level == LoggingConstants.LOG_ERROR ) 
 			((ch.qos.logback.classic.Logger)root).setLevel(Level.ERROR);
-		else if( level == LoggingActivator.LOG_WARNING ) 
+		else if( level == LoggingConstants.LOG_WARNING ) 
 			((ch.qos.logback.classic.Logger)root).setLevel(Level.WARN);
-		else if( level == LoggingActivator.LOG_INFO ) 
+		else if( level == LoggingConstants.LOG_INFO ) 
 			((ch.qos.logback.classic.Logger)root).setLevel(Level.INFO);
-		else if( level == LoggingActivator.LOG_DEBUG ) 
+		else if( level == LoggingConstants.LOG_DEBUG ) 
 			((ch.qos.logback.classic.Logger)root).setLevel(Level.DEBUG);
 	}
 }
