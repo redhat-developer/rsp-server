@@ -199,6 +199,84 @@ The protocol currently assumes that one server serves one tool. There is current
 
 ### The Server Interface
 
+#### server/registerClientCapabilities
+
+ Register client capabilities so the server knows what this client can support 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "map" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "string"
+      }
+    }
+  }
+}</pre></td><td><pre>export interface ClientCapabilitiesRequest {
+    map: { [index: string]: string };
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "severity" : {
+      "type" : "integer"
+    },
+    "code" : {
+      "type" : "integer"
+    },
+    "message" : {
+      "type" : "string"
+    },
+    "trace" : {
+      "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
+    },
+    "plugin" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface Status {
+    severity: number;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+    plugin: string;
+}</pre></td></tr></table>
+
+#### server/requestServerCapabilities
+
+ Ask the server what capability keys the server is requesting from the client @return 
+
+This endpoint takes no parameters. 
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "map" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "string"
+      }
+    }
+  }
+}</pre></td><td><pre>export interface ServerCapabilitiesResponse {
+    map: { [index: string]: string };
+}</pre></td></tr></table>
+
 #### server/getDiscoveryPaths
 
  The `server/getDiscoveryPaths` request is sent by the client to fetch a list of discovery paths that can be searched. Discovery paths exist in the RSP model as paths suitable to be searched for server runtime installations. Additional paths may be added via the `server/addDiscoveryPath` entry point, or removed via the `server/removeDiscoveryPath` entry point. 
@@ -1286,44 +1364,6 @@ This endpoint takes no parameters.
 This endpoint returns no value
 
 ### The Client Interface
-
-#### client/getClientCapabilities
-
- Get capabilities so the server knows what this client can support 
-
-This endpoint takes the following json schemas as parameters: 
-
-<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
-<tr><td>0</td><td><pre>{
-  "type" : "object",
-  "properties" : {
-    "list" : {
-      "type" : "array",
-      "items" : {
-        "type" : "string"
-      }
-    }
-  }
-}</pre></td><td><pre>export interface CapabilitiesRequest {
-    list: string[];
-}</pre></td></tr></table>
-
-This endpoint returns the following schema as a return value: 
-
-<table><tr><th>json</th><th>typescript</th></tr>
-<tr><td><pre>{
-  "type" : "object",
-  "properties" : {
-    "map" : {
-      "type" : "object",
-      "additionalProperties" : {
-        "type" : "string"
-      }
-    }
-  }
-}</pre></td><td><pre>export interface CapabilitiesResponse {
-    map: { [index: string]: string };
-}</pre></td></tr></table>
 
 #### client/promptString
 
