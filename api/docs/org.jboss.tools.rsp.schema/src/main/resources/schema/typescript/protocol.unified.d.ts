@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2018-09-24 14:10:43.
+// Generated using typescript-generator version 2.2.413 on 2018-10-02 13:38:05.
 
 export interface Attribute {
     type: string;
@@ -11,11 +11,11 @@ export interface Attributes {
     attributes: { [index: string]: Attribute };
 }
 
-export interface CapabilitiesRequest {
-    list: string[];
+export interface ServerCapabilitiesResponse {
+    map: { [index: string]: string };
 }
 
-export interface CapabilitiesResponse {
+export interface ClientCapabilitiesRequest {
     map: { [index: string]: string };
 }
 
