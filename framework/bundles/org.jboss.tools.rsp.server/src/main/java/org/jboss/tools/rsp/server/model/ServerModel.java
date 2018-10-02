@@ -77,6 +77,10 @@ public class ServerModel implements IServerModel {
 		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_MAP);
 	}
 	
+	public ISecureStorageProvider getSecureStorageProvider() {
+		return secureStorageProvider;
+	}
+	
 	public void addServerModelListener(IServerModelListener l) {
 		listeners.add(l);
 	}

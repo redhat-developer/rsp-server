@@ -13,4 +13,9 @@ public class NullSecureStorageProvider implements ISecureStorageProvider {
 	public ISecureStorage getSecureStorage() {
 		return null;
 	}
+
+	@Override
+	public ISecureStorage getSecureStorage(boolean prompt) {
+		return null;
+	}
 }

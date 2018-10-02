@@ -15,6 +15,8 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 import org.jboss.tools.rsp.api.dao.Attributes;
+import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
+import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
@@ -31,11 +33,24 @@ import org.jboss.tools.rsp.api.dao.StopServerAttributes;
 
 @JsonSegment("server")
 public interface RSPServer {
+	
+
+	/** 
+	 * Register client capabilities so the server knows what this client can support
+	 */
+	@JsonRequest
+	CompletableFuture<Status> registerClientCapabilities(ClientCapabilitiesRequest request);
+
+	/**
+	 * Ask the server what capability keys the server is requesting from the client
+	 * @return
+	 */
+	@JsonRequest
+	CompletableFuture<ServerCapabilitiesResponse> requestServerCapabilities();
+	
 	/*
 	 * Discovery
 	 */
-	
-	
 	/**
 	 * The `server/getDiscoveryPaths` request is sent by the client to fetch a list
 	 * of discovery paths that can be searched.

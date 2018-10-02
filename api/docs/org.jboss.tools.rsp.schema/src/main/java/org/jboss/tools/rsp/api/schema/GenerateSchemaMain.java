@@ -11,8 +11,8 @@ package org.jboss.tools.rsp.api.schema;
 
 import org.jboss.tools.rsp.api.dao.Attribute;
 import org.jboss.tools.rsp.api.dao.Attributes;
-import org.jboss.tools.rsp.api.dao.CapabilitiesRequest;
-import org.jboss.tools.rsp.api.dao.CapabilitiesResponse;
+import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
+import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
@@ -58,8 +58,8 @@ public class GenerateSchemaMain {
 		Class[] daoClasses = new Class[] {
 				Attribute.class,
 				Attributes.class,
-				CapabilitiesRequest.class,
-				CapabilitiesResponse.class,
+				ServerCapabilitiesResponse.class,
+				ClientCapabilitiesRequest.class,
 				CommandLineDetails.class,
 				DiscoveryPath.class,
 				LaunchAttributesRequest.class,

@@ -9,13 +9,11 @@
 package org.jboss.tools.rsp.server.model;
 
 import java.io.File;
-import java.util.concurrent.ExecutionException;
 
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.eclipse.jdt.launching.VMInstallRegistry;
 import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.server.CapabilityManagement;
-import org.jboss.tools.rsp.server.ServerManagementServerLauncher;
 import org.jboss.tools.rsp.server.discovery.DiscoveryPathModel;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanTypeManager;
 import org.jboss.tools.rsp.server.secure.SecureStorageGuardian;
@@ -46,7 +44,7 @@ public class ServerManagementModel implements IServerManagementModel {
 	
 	public ServerManagementModel() {
 		this.capabilities = new CapabilityManagement();
-		this.secureStorage = new SecureStorageGuardian(getSecureStorageFile());
+		this.secureStorage = new SecureStorageGuardian(getSecureStorageFile(), capabilities);
 		this.rpm = new DiscoveryPathModel();
 		this.serverBeanTypeManager = new ServerBeanTypeManager();
 		this.serverModel = new ServerModel(secureStorage);
@@ -82,11 +80,6 @@ public class ServerManagementModel implements IServerManagementModel {
 
 	public void clientAdded(RSPClient client) {
 		capabilities.clientAdded(client);
-		try {
-			secureStorage.authenticateClient(client, capabilities);
-		} catch(InterruptedException | ExecutionException e) {
-			LOG.error("Unable to initialize secure storage", e);
-		}
 	}
 	
 	private File getSecureStorageFile() {
