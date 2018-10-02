@@ -61,7 +61,7 @@ public abstract class SecuredBase extends Base {
 	public boolean isAttributeSet(String attributeName) {
 		if( !isSecureKey(attributeName))
 			return super.isAttributeSet(attributeName);
-		if( secureStorage != null && secureStorage.getSecureStorage() != null) {
+		if( canAccessSecureStorage()) {
 			String securedNode = getSecuredKey();
 			try {
 				return secureStorage.getSecureStorage().propertyExists(securedNode, attributeName);
@@ -76,7 +76,7 @@ public abstract class SecuredBase extends Base {
 	public String getAttribute(String attributeName, String defaultValue) {
 		if( !isSecureKey(attributeName))
 			return super.getAttribute(attributeName, defaultValue);
-		if( secureStorage != null && secureStorage.getSecureStorage() != null ) {
+		if( canAccessSecureStorage() ) {
 			String securedNode = getSecuredKey();
 			try {
 				return secureStorage.getSecureStorage().getNode(securedNode)
@@ -92,7 +92,7 @@ public abstract class SecuredBase extends Base {
 	public int getAttribute(String attributeName, int defaultValue) {
 		if( !isSecureKey(attributeName))
 			return super.getAttribute(attributeName, defaultValue);
-		if( secureStorage != null && secureStorage.getSecureStorage() != null ) {
+		if( canAccessSecureStorage() ) {
 			String securedNode = getSecuredKey();
 			try {
 				return secureStorage.getSecureStorage().getNode(securedNode)
@@ -108,7 +108,7 @@ public abstract class SecuredBase extends Base {
 	public boolean getAttribute(String attributeName, boolean defaultValue) {
 		if( !isSecureKey(attributeName))
 			return super.getAttribute(attributeName, defaultValue);
-		if( secureStorage != null && secureStorage.getSecureStorage() != null ) {
+		if( canAccessSecureStorage() ) {
 			String securedNode = getSecuredKey();
 			try {
 				return secureStorage.getSecureStorage().getNode(securedNode)
@@ -125,7 +125,7 @@ public abstract class SecuredBase extends Base {
 	public List<String> getAttribute(String attributeName, List<String> defaultValue) {
 		if( !isSecureKey(attributeName))
 			return super.getAttribute(attributeName, defaultValue);
-		if( secureStorage != null && secureStorage.getSecureStorage() != null ) {
+		if( canAccessSecureStorage() ) {
 			String securedNode = getSecuredKey();
 			try {
 				String fromSecure = secureStorage.getSecureStorage().getNode(securedNode)
@@ -145,7 +145,7 @@ public abstract class SecuredBase extends Base {
 	public Map getAttribute(String attributeName, Map defaultValue) {
 		if( !isSecureKey(attributeName))
 			return super.getAttribute(attributeName, defaultValue);
-		if( secureStorage != null && secureStorage.getSecureStorage() != null ) {
+		if( canAccessSecureStorage() ) {
 			String securedNode = getSecuredKey();
 			try {
 				String fromSecure = secureStorage.getSecureStorage().getNode(securedNode)
@@ -167,7 +167,7 @@ public abstract class SecuredBase extends Base {
 			super.setAttribute(attributeName, value);
 			return;
 		}
-		if( secureStorage != null && secureStorage.getSecureStorage() != null ) {
+		if( canAccessSecureStorage() ) {
 			String securedNode = getSecuredKey();
 			try {
 				secureStorage.getSecureStorage().getNode(securedNode)
@@ -184,7 +184,7 @@ public abstract class SecuredBase extends Base {
 			super.setAttribute(attributeName, value);
 			return;
 		}
-		if( secureStorage != null && secureStorage.getSecureStorage() != null ) {
+		if( canAccessSecureStorage() ) {
 			String securedNode = getSecuredKey();
 			try {
 				secureStorage.getSecureStorage().getNode(securedNode)
@@ -202,7 +202,7 @@ public abstract class SecuredBase extends Base {
 			return;
 		}
 		
-		if( secureStorage != null && secureStorage.getSecureStorage() != null ) {
+		if( canAccessSecureStorage() ) {
 			String securedNode = getSecuredKey();
 			try {
 				secureStorage.getSecureStorage().getNode(securedNode)
@@ -220,7 +220,7 @@ public abstract class SecuredBase extends Base {
 			return;
 		}
 		
-		if( secureStorage != null && secureStorage.getSecureStorage() != null ) {
+		if( canAccessSecureStorage() ) {
 			String securedNode = getSecuredKey();
 			Gson gson = new Gson();
 			String val = gson.toJson(value);
@@ -240,7 +240,7 @@ public abstract class SecuredBase extends Base {
 			return;
 		}
 		
-		if( secureStorage != null && secureStorage.getSecureStorage() != null ) {
+		if( canAccessSecureStorage() ) {
 			String securedNode = getSecuredKey();
 			Gson gson = new Gson();
 			String val = gson.toJson(value);
@@ -256,6 +256,17 @@ public abstract class SecuredBase extends Base {
 	
 	private String getSecuredKey() {
 		return ServerCoreActivator.BUNDLE_ID + "/servers/" + getId() + "/"; 
+	}
+	
+	private boolean canAccessSecureStorage() {
+		return canAccessSecureStorage(true);
+	}
+	
+	private boolean canAccessSecureStorage(boolean prompt) {
+		if( secureStorage != null && secureStorage.getSecureStorage(prompt) != null ) {
+			return true;
+		}
+		return false;
 	}
 	
 }

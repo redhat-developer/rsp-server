@@ -8,16 +8,11 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.client.bindings;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import org.jboss.tools.rsp.api.ICapabilityKeys;
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.RSPServer;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
-import org.jboss.tools.rsp.api.dao.CapabilitiesRequest;
-import org.jboss.tools.rsp.api.dao.CapabilitiesResponse;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerProcess;
@@ -111,14 +106,6 @@ public class ServerManagementClientImpl implements RSPClient {
 				+ out.getServer().toString() + " ["
 				+ out.getProcessId() + "][" 
 				+ out.getStreamType() + "] " + out.getText());
-	}
-
-	@Override
-	public CompletableFuture<CapabilitiesResponse> getClientCapabilities(CapabilitiesRequest request) {
-		Map<String,String> ret = new HashMap<String,String>();
-		ret.put(ICapabilityKeys.STRING_PROTOCOL_VERSION, ICapabilityKeys.PROTOCOL_VERSION_CURRENT);
-		ret.put(ICapabilityKeys.BOOLEAN_STRING_PROMPT, Boolean.toString(true));
-		return CompletableFuture.completedFuture(new CapabilitiesResponse(ret));
 	}
 
 	@Override

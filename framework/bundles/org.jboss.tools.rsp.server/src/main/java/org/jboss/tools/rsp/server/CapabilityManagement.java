@@ -8,15 +8,13 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import org.jboss.tools.rsp.api.ICapabilityKeys;
 import org.jboss.tools.rsp.api.RSPClient;
-import org.jboss.tools.rsp.api.dao.CapabilitiesRequest;
-import org.jboss.tools.rsp.api.dao.CapabilitiesResponse;
+import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
+import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
 import org.jboss.tools.rsp.server.spi.model.ICapabilityManagement;
 
 public class CapabilityManagement implements ICapabilityManagement, ICapabilityKeys {
@@ -29,7 +27,8 @@ public class CapabilityManagement implements ICapabilityManagement, ICapabilityK
 	}
 	
 	public void clientAdded(RSPClient client) {
-		Capabilities cap = new Capabilities(client);
+		// add a default implementation until a client registers their capabilities
+		Capabilities cap = new Capabilities009();
 		this.capabilities.put(client, cap);
 	}
 
@@ -45,31 +44,45 @@ public class CapabilityManagement implements ICapabilityManagement, ICapabilityK
 		return null;
 	}
 	
-	private class Capabilities {
-		
+	public void registerClientCapabilities(RSPClient client, ClientCapabilitiesRequest response) {
+		ClientCapabilities cc = new ClientCapabilities(response);
+		this.capabilities.put(client, cc);
+	}
+	
+	private static class Capabilities {
 		private Map<String,String> data;
-		private RSPClient client;
-		public Capabilities(RSPClient client) {
-			this.client = client;
-			requestCapabilitiesSync();
-		}
-		
-
-		private void requestCapabilitiesSync() {
-			String[] requested = new String[] {STRING_PROTOCOL_VERSION, BOOLEAN_STRING_PROMPT};
-			try {
-				// Get a list of capabilities, whatever they may be
-				CapabilitiesRequest req = new CapabilitiesRequest(Arrays.asList(requested));
-				CapabilitiesResponse resp = client.getClientCapabilities(req).get();
-				data = resp.getMap();
-			} catch(ExecutionException | InterruptedException e) {
-				data = new HashMap<>();
-				data.put(STRING_PROTOCOL_VERSION, PROTOCOL_VERSION_0_9_0);
-			}
+		public Capabilities(Map<String,String> data) {
+			this.data = data;
 		}
 		
 		public String getProperty(String key) {
 			return data.get(key);
 		}
+	}
+	
+	private static class ClientCapabilities extends Capabilities {
+		public ClientCapabilities(ClientCapabilitiesRequest response) {
+			super(response == null ? null : response.getMap());
+		}
+	}
+	
+	private static class Capabilities009 extends Capabilities {
+		public Capabilities009() {
+			super(defaultCapabilities());
+		}
+		private static Map<String,String> defaultCapabilities() {
+            Map<String,String> ret = new HashMap<String,String>();
+            ret.put(ICapabilityKeys.STRING_PROTOCOL_VERSION, ICapabilityKeys.PROTOCOL_VERSION_0_9_0);
+            ret.put(ICapabilityKeys.BOOLEAN_STRING_PROMPT, Boolean.toString(false));
+            return ret;
+		}
+	}
+
+	@Override
+	public ServerCapabilitiesResponse getServerCapabilities() {
+        Map<String,String> ret = new HashMap<String,String>();
+        ret.put(ICapabilityKeys.STRING_PROTOCOL_VERSION, ICapabilityKeys.PROTOCOL_VERSION_CURRENT);
+        ret.put(ICapabilityKeys.BOOLEAN_STRING_PROMPT, Boolean.toString(true));
+        return new ServerCapabilitiesResponse(ret);
 	}
 }

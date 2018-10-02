@@ -22,13 +22,21 @@ import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
 import org.jboss.tools.rsp.secure.model.RSPSecureStorage;
 import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
 import org.jboss.tools.rsp.server.spi.model.ICapabilityManagement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SecureStorageGuardian implements ISecureStorageProvider {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(SecureStorageGuardian.class);
+	
+	
 	private File file;
 	private Map<RSPClient, byte[]> permissions;
 	private ISecureStorage storage = null;
-	public SecureStorageGuardian(File file) {
+	private ICapabilityManagement capabilities;
+	public SecureStorageGuardian(File file, ICapabilityManagement capabilities) {
 		this.file = file;
+		this.capabilities = capabilities;
 		this.permissions = new HashMap<>();
 	}
 	
@@ -64,20 +72,19 @@ public class SecureStorageGuardian implements ISecureStorageProvider {
 	 * @throws InterruptedException
 	 * @throws ExecutionException
 	 */
-	public void authenticateClient(RSPClient client, ICapabilityManagement capabilities) throws InterruptedException, ExecutionException {
+	public void authenticateClient(RSPClient client, int maxTries) throws InterruptedException, ExecutionException {
 		if( canPromptClient(client, capabilities)) {
 			String msg = "Please provide a secure-storage password to either create a new, or load an existing, secure storage."; 
 			StringPrompt prompt = new StringPrompt(100, msg);
 			String secureKey = client.promptString(prompt).get();
 			int tries = 0;
-			while(secureKey != null && secureKey.length() != 0 && tries < 10) {
+			while(secureKey != null && secureKey.length() != 0 && tries < maxTries) {
 				try {
 					addClient(client, secureKey.getBytes());
 					// success at decrypting the file, or, file didn't exist yet
 					return;
 				} catch(CryptoException ce) {
-					// TODO log
-					ce.printStackTrace();
+					LOG.error(ce.getMessage(), ce);
 				}
 				tries += 1;
 			}
@@ -103,4 +110,19 @@ public class SecureStorageGuardian implements ISecureStorageProvider {
 		}
 		return null;
 	}
+	
+	public ISecureStorage getSecureStorage(boolean prompt) {
+		ISecureStorage storage = getSecureStorage();
+		if( storage == null && prompt) {
+			RSPClient rspc = ClientThreadLocal.getActiveClient();
+			try {
+				authenticateClient(rspc, 10);
+				return getSecureStorage();
+			} catch(InterruptedException | ExecutionException ie) {
+				LOG.error(ie.getMessage(), ie);
+			}
+		}
+		return storage;
+	}
+
 }

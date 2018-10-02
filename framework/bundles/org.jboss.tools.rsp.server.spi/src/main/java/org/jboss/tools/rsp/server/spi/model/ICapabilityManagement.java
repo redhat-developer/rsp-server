@@ -9,9 +9,13 @@
 package org.jboss.tools.rsp.server.spi.model;
 
 import org.jboss.tools.rsp.api.RSPClient;
+import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
+import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
 
 public interface ICapabilityManagement {
 	public void clientAdded(RSPClient client);
 	public void clientRemoved(RSPClient client);
 	public String getCapabilityProperty(RSPClient c, String key);
+	public void registerClientCapabilities(RSPClient c, ClientCapabilitiesRequest response);
+	public ServerCapabilitiesResponse getServerCapabilities();
 }

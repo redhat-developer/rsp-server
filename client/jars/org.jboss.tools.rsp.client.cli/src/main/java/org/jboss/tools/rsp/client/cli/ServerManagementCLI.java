@@ -8,9 +8,14 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.client.cli;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.jboss.tools.rsp.api.ICapabilityKeys;
+import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
+import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
 import org.jboss.tools.rsp.client.bindings.ServerManagementClientLauncher;
 
 public class ServerManagementCLI implements InputProvider{
@@ -44,6 +49,16 @@ public class ServerManagementCLI implements InputProvider{
 		
 		launcher = new ServerManagementClientLauncher(host, Integer.parseInt(port), this);
 		launcher.launch();
+		
+		// possibly unnecessary?
+		ServerCapabilitiesResponse serverCap = launcher.getServerProxy().requestServerCapabilities().get();
+		
+		Map<String,String> clientCap2 = new HashMap<String,String>();
+		clientCap2.put(ICapabilityKeys.STRING_PROTOCOL_VERSION, ICapabilityKeys.PROTOCOL_VERSION_0_10_0);
+		clientCap2.put(ICapabilityKeys.BOOLEAN_STRING_PROMPT, Boolean.toString(true));
+		ClientCapabilitiesRequest clientCap = new ClientCapabilitiesRequest(clientCap2);
+		launcher.getServerProxy().registerClientCapabilities(clientCap);
+		
 		defaultHandler = new StandardCommandHandler(launcher, this);
 	}
 	

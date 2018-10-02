@@ -20,12 +20,14 @@ import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.RSPServer;
 import org.jboss.tools.rsp.api.SocketLauncher;
 import org.jboss.tools.rsp.api.dao.Attributes;
+import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerBean;
+import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
@@ -37,9 +39,11 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.launching.utils.StatusConverter;
+import org.jboss.tools.rsp.secure.model.ISecureStorage;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.rsp.server.model.RemoteEventManager;
 import org.jboss.tools.rsp.server.model.ServerManagementModel;
+import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
@@ -48,7 +52,6 @@ public class ServerManagementServerImpl implements RSPServer {
 	
 	private final List<RSPClient> clients = new CopyOnWriteArrayList<>();
 	private final List<SocketLauncher<RSPClient>> launchers = new CopyOnWriteArrayList<>();
-	
 	
 	private final ServerManagementModel model;
 	private final RemoteEventManager remoteEventManager;
@@ -456,5 +459,38 @@ public class ServerManagementServerImpl implements RSPServer {
 			return CompletableFuture.completedFuture(StatusConverter.convert(is));			
 		}
 
+	}
+
+	@Override
+	public CompletableFuture<Status> registerClientCapabilities(ClientCapabilitiesRequest request) {
+		RSPClient rspc = ClientThreadLocal.getActiveClient();
+		model.getCapabilityManagement().registerClientCapabilities(rspc, request);
+		
+		initSecureStorage();
+		
+		IStatus s = org.jboss.tools.rsp.eclipse.core.runtime.Status.OK_STATUS;
+		return CompletableFuture.completedFuture(StatusConverter.convert(s));
+	}
+	
+	private void initSecureStorage() {
+		// TODO fix this workflow
+		final RSPClient rspc = ClientThreadLocal.getActiveClient();
+		final ISecureStorage storage = model.getServerModel().getSecureStorageProvider().getSecureStorage(false);
+		if( storage == null ) {
+			new Thread("Initialize Secure Storage") {
+				public void run() {
+					ClientThreadLocal.setActiveClient(rspc);
+					model.getServerModel().getSecureStorageProvider().getSecureStorage(true);
+					ClientThreadLocal.setActiveClient(null);
+				}
+			}.start();
+		}
+	}
+	
+
+	@Override
+	public CompletableFuture<ServerCapabilitiesResponse> requestServerCapabilities() {
+		ServerCapabilitiesResponse resp = model.getCapabilityManagement().getServerCapabilities();
+		return CompletableFuture.completedFuture(resp);
 	}
 }
