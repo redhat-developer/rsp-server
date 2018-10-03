@@ -373,8 +373,7 @@ public class ServerModel implements IServerModel {
 	}
 
 	public ServerType[] getAccessibleServerTypes() {
-		boolean hasPerms = secureStorageProvider.getSecureStorage() != null;
-		if( hasPerms )
+		if( hasPermissions() )
 			return getServerTypes();
 		
 		Set<String> types = serverTypes.keySet();
@@ -390,6 +389,9 @@ public class ServerModel implements IServerModel {
 		return (ServerType[]) ret.toArray(new ServerType[ret.size()]);
 	}
 	
+	private boolean hasPermissions() {
+		return secureStorageProvider.getSecureStorage(true) != null;
+	}
 	private boolean hasSecureAttributes(IServerType type) {
 		Attributes a = type.getRequiredAttributes();
 		Attributes b = type.getOptionalAttributes();

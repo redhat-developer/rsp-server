@@ -18,11 +18,5 @@ public interface InputProvider {
 	 * @param handler
 	 */
 	public void addInputRequest(InputHandler handler);
-	
-	/**
-	 * To be used when your input handler has not yet finished 
-	 * handling one string of input but needs additional input
-	 * @return
-	 */
-	public String requestInput();
+
 }

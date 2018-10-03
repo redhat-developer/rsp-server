@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
@@ -418,9 +419,43 @@ public class StandardCommandHandler implements InputHandler {
 
 	
 	public String nextLine() {
-		return provider.requestInput();
+		return nextLine(null);
 	}
+	
+	public String nextLine(String prompt) {
+		String p = (prompt == null ? "" : prompt);
+		StandardPrompt sp = new StandardPrompt(p);
+		provider.addInputRequest(sp);
+		sp.await();
+		return sp.ret;
+	}
+	private static class StandardPrompt implements InputHandler {
+		private String prompt;
+		private String ret;
+		private CountDownLatch doneSignal = new CountDownLatch(1);
+		public StandardPrompt(String prompt) {
+			this.prompt = prompt;
+		}
+		@Override
+		public String getPrompt() {
+			return prompt;
+		}
 
+		@Override
+		public void handleInput(String line) throws Exception {
+			this.ret = line;
+			doneSignal.countDown();
+		}
+		
+		public void await() {
+			try {
+				doneSignal.await();
+			} catch(InterruptedException ie) {
+				ie.printStackTrace();
+			}
+		}
+		
+	}
 
 	@Override
 	public String getPrompt() {
