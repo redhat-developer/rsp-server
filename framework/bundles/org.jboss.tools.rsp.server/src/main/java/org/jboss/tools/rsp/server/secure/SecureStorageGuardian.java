@@ -9,7 +9,9 @@
 package org.jboss.tools.rsp.server.secure;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -32,12 +34,14 @@ public class SecureStorageGuardian implements ISecureStorageProvider {
 	
 	private File file;
 	private Map<RSPClient, byte[]> permissions;
+	private List<RSPClient> maxTriesReached;
 	private ISecureStorage storage = null;
 	private ICapabilityManagement capabilities;
 	public SecureStorageGuardian(File file, ICapabilityManagement capabilities) {
 		this.file = file;
 		this.capabilities = capabilities;
 		this.permissions = new HashMap<>();
+		this.maxTriesReached = new ArrayList<>();
 	}
 	
 	public void addClient(RSPClient client, byte[] key) throws CryptoException {
@@ -76,15 +80,17 @@ public class SecureStorageGuardian implements ISecureStorageProvider {
 		if( canPromptClient(client, capabilities)) {
 			String msg = "Please provide a secure-storage password to either create a new, or load an existing, secure storage."; 
 			StringPrompt prompt = new StringPrompt(100, msg);
-			String secureKey = client.promptString(prompt).get();
 			int tries = 0;
-			while(secureKey != null && secureKey.length() != 0 && tries < maxTries) {
-				try {
-					addClient(client, secureKey.getBytes());
-					// success at decrypting the file, or, file didn't exist yet
-					return;
-				} catch(CryptoException ce) {
-					LOG.error(ce.getMessage(), ce);
+			while(tries < maxTries) {
+				String secureKey = client.promptString(prompt).get();
+				if( secureKey != null && secureKey.length() != 0 && secureKey.trim().length() != 0) {
+					try {
+						addClient(client, secureKey.getBytes());
+						// success at decrypting the file, or, file didn't exist yet
+						return;
+					} catch(CryptoException ce) {
+						LOG.error(ce.getMessage(), ce);
+					}
 				}
 				tries += 1;
 			}
@@ -113,13 +119,18 @@ public class SecureStorageGuardian implements ISecureStorageProvider {
 	
 	public ISecureStorage getSecureStorage(boolean prompt) {
 		ISecureStorage storage = getSecureStorage();
-		if( storage == null && prompt) {
-			RSPClient rspc = ClientThreadLocal.getActiveClient();
+		RSPClient rspc = ClientThreadLocal.getActiveClient();
+		if( storage == null && prompt && !maxTriesReached.contains(rspc)) {
 			try {
-				authenticateClient(rspc, 10);
-				return getSecureStorage();
+				authenticateClient(rspc, 4);
+				if( getSecureStorage() != null ) {
+					return getSecureStorage();
+				}
 			} catch(InterruptedException | ExecutionException ie) {
 				LOG.error(ie.getMessage(), ie);
+			}
+			if( storage == null ) {
+				maxTriesReached.add(rspc);
 			}
 		}
 		return storage;

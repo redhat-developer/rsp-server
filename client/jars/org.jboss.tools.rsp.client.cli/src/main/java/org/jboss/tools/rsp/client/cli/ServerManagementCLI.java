@@ -18,97 +18,96 @@ import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
 import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
 import org.jboss.tools.rsp.client.bindings.ServerManagementClientLauncher;
 
-public class ServerManagementCLI implements InputProvider{
+public class ServerManagementCLI implements InputProvider {
 	public static void main(String[] args) {
 		ServerManagementCLI cli = new ServerManagementCLI();
 		try {
 			cli.connect(args[0], args[1]);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return;
 		}
-		
+
 		System.out.println("Connected to: " + args[0] + ":" + args[1]);
 		cli.readInput();
 	}
-	
+
 	private Scanner scanner = null;
 	private ServerManagementClientLauncher launcher;
 	private ConcurrentLinkedQueue<InputHandler> q = new ConcurrentLinkedQueue<>();
 	private StandardCommandHandler defaultHandler;
-	
+
 	public void connect(String host, String port) throws Exception {
-		if( host == null ) {
+		if (host == null) {
 			System.out.print("Enter server host: ");
 			host = nextLine();
 		}
-		if( port == null ) {
+		if (port == null) {
 			System.out.print("Enter server port: ");
 			port = nextLine();
 		}
-		
+
 		launcher = new ServerManagementClientLauncher(host, Integer.parseInt(port), this);
 		launcher.launch();
-		
+
 		// possibly unnecessary?
 		ServerCapabilitiesResponse serverCap = launcher.getServerProxy().requestServerCapabilities().get();
-		
-		Map<String,String> clientCap2 = new HashMap<String,String>();
+
+		Map<String, String> clientCap2 = new HashMap<String, String>();
 		clientCap2.put(ICapabilityKeys.STRING_PROTOCOL_VERSION, ICapabilityKeys.PROTOCOL_VERSION_0_10_0);
 		clientCap2.put(ICapabilityKeys.BOOLEAN_STRING_PROMPT, Boolean.toString(true));
 		ClientCapabilitiesRequest clientCap = new ClientCapabilitiesRequest(clientCap2);
 		launcher.getServerProxy().registerClientCapabilities(clientCap);
-		
+
 		defaultHandler = new StandardCommandHandler(launcher, this);
 	}
-	
+
 	public void addInputRequest(InputHandler handler) {
-		if( q.peek() == null ) {
+		if (q.peek() == null) {
 			String prompt = handler.getPrompt();
-			if( prompt != null ) {
+			if (prompt != null) {
 				System.out.println(prompt);
 			}
 		}
 		q.add(handler);
 	}
-	
+
 	protected String nextLine() {
-		if( scanner == null ) {
-			 scanner = new Scanner(System.in);
+		if (scanner == null) {
+			scanner = new Scanner(System.in);
 		}
 		return scanner.nextLine();
 	}
 
 	private void readInput() {
 		while (true) {
-			if( q.peek() != null ) {
+			if (q.peek() != null) {
 				InputHandler handler = q.peek();
 				String prompt = handler.getPrompt();
-				if( prompt != null ) {
+				if (prompt != null) {
 					System.out.println(prompt);
 				}
 			}
 			String content = nextLine();
-			try {
-				if( q.peek() == null ) {
-					defaultHandler.handleInput(content);
-				} else {
-					InputHandler handler = q.remove();
-					if( handler != null ) {
-						handler.handleInput(content);
+			InputHandler h = null;
+			if (q.peek() == null) {
+				h = defaultHandler;
+			} else {
+				h = q.remove();
+			}
+			if (h != null) {
+				final InputHandler h2 = h;
+				new Thread("Handle input") {
+					public void run() {
+						try {
+							h2.handleInput(content);
+						} catch (Exception e) {
+							e.printStackTrace();
+							// Try to recover
+						}
 					}
-				}
-			} catch(Exception e) {
-				e.printStackTrace();
-				// Try to recover
+				}.start();
 			}
 		}
 	}
-
-	@Override
-	public String requestInput() {
-		return nextLine();
-	}
-
-
 }

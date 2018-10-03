@@ -39,7 +39,6 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.launching.utils.StatusConverter;
-import org.jboss.tools.rsp.secure.model.ISecureStorage;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.rsp.server.model.RemoteEventManager;
 import org.jboss.tools.rsp.server.model.ServerManagementModel;
@@ -99,49 +98,7 @@ public class ServerManagementServerImpl implements RSPServer {
 	public IServerManagementModel getModel() {
 		return model;
 	}
-	
-	/*
-	 * Some methods for adding or removing VMs
-	 */
-	
-//	/**
-//	 * Get a list of VMs currently registered
-//	 * @return
-//	 */
-//	@Override
-//	public CompletableFuture<List<VMDescription>> getVMs() {
-//		IVMInstall[] arr = VMInstallModel.getDefault().getVMs();
-//		VMDescription[] vmd = new VMDescription[arr.length];
-//		for( int i = 0; i < arr.length; i++ ) {
-//			vmd[i] = getDescription(arr[i]);
-//		}
-//		return CompletableFuture.completedFuture(Arrays.asList(vmd));
-//	}
-//	
-//	private VMDescription getDescription(IVMInstall vmi) {
-//		String vers = vmi instanceof IVMInstall2 ? ((IVMInstall2)vmi).getJavaVersion() : null;
-//		return new VMDescription(vmi.getId(), vmi.getInstallLocation().getAbsolutePath(), vers);
-//	}
-//	
-//	@Override
-//	public void addVM(VMDescription desc) {
-//		
-//		try {
-//			IVMInstall vmi = StandardVMType.getDefault().createVMInstall(desc.getId());
-//			vmi.setInstallLocation(new File(desc.getInstallLocation()));
-//			VMInstallModel.getDefault().addVMInstall(vmi);
-//		} catch(IllegalArgumentException arg) {
-//			LaunchingCore.log(arg);
-//		}
-//	}
-//
-//	@Override
-//	public void removeVM(VMHandle handle) {
-//		VMInstallModel.getDefault().removeVMInstall(handle.getId());
-//	}
-//
-//	
-	
+
 	/**
 	 * Return existing messages.
 	 */
@@ -156,78 +113,67 @@ public class ServerManagementServerImpl implements RSPServer {
 		}
 		return false;
 	}
-	
-	private CompletableFuture<Status> invalidParameterError() {
-		IStatus s = new org.jboss.tools.rsp.eclipse.core.runtime.Status(
-				IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Parameter is invalid. It may be null, missing required fields, or unacceptable values.");
-		return CompletableFuture.completedFuture(StatusConverter.convert(s));
-	}
-	
+
 	/**
 	 * Add a path to our list of discovery paths
 	 */
 	@Override
 	public CompletableFuture<Status> addDiscoveryPath(DiscoveryPath path) {
+		return teeFuture(() -> addDiscoveryPathSync(path));
+	}
+	
+	private Status addDiscoveryPathSync(DiscoveryPath path) {
 		if( isEmptyDiscoveryPath(path)) 
-			return invalidParameterError();
+			return invalidParameterStatus();
 		String fp = path.getFilepath();
 		IPath ipath = new Path(fp);
 		if( !ipath.isAbsolute()) {
-			return invalidParameterError();
+			return invalidParameterStatus();
 		}
-
 		boolean ret = model.getDiscoveryPathModel().addPath(path);
 		return booleanToStatus(ret, "Discovery path not added: " + path.getFilepath());
 	}
 
+
 	@Override
 	public CompletableFuture<Status> removeDiscoveryPath(DiscoveryPath path) {
+		return teeFuture(() -> removeDiscoveryPathSync(path));
+	}
+	
+	public Status removeDiscoveryPathSync(DiscoveryPath path) {
 		if( isEmptyDiscoveryPath(path)) 
-			return invalidParameterError();
+			return invalidParameterStatus();
 		String fp = path.getFilepath();
 		IPath ipath = new Path(fp);
 		if( !ipath.isAbsolute()) {
-			return invalidParameterError();
+			return invalidParameterStatus();
 		}
-
 		boolean ret = model.getDiscoveryPathModel().removePath(path);
 		return booleanToStatus(ret, "Discovery path not removed: " + path.getFilepath());
 	}
 
 	
-	private CompletableFuture<Status> booleanToStatus(boolean b, String message) {
-		IStatus s = null;
-		if( b ) {
-			s = org.jboss.tools.rsp.eclipse.core.runtime.Status.OK_STATUS;
-		} else {
-			s = new org.jboss.tools.rsp.eclipse.core.runtime.Status(
-					IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, message);
-		}
-		return CompletableFuture.completedFuture(StatusConverter.convert(s));
-	}
-	
-	private boolean isEmpty(String s) {
-		return s == null || s.isEmpty();
-	}
-	
 	@Override
 	public CompletableFuture<List<ServerBean>> findServerBeans(DiscoveryPath path) {
+		return teeFuture(() -> findServerBeansSync(path));
+	}
+	private List<ServerBean> findServerBeansSync(DiscoveryPath path) {
 		List<ServerBean> ret = new ArrayList<>();
 		if( path == null || isEmpty(path.getFilepath())) {
-			return CompletableFuture.completedFuture(ret);
+			return ret;
 		}
 		
 		String fp = path.getFilepath();
 		IPath ipath = new Path(fp);
 		if( !ipath.isAbsolute()) {
-			return CompletableFuture.completedFuture(ret);
+			return ret;
 		}
 
 		ServerBeanLoader loader = new ServerBeanLoader(new File(path.getFilepath()));
 		ServerBean bean = loader.getServerBean();
 		if( bean != null )
 			ret.add(bean);
-		return CompletableFuture.completedFuture(ret);
+		return ret;	
 	}
 
 	@Override
@@ -237,14 +183,22 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public CompletableFuture<List<ServerHandle>> getServerHandles() {
+		return teeFuture(() -> getServerHandlesSync());
+	}
+	
+	private List<ServerHandle> getServerHandlesSync() {
 		ServerHandle[] all = model.getServerModel().getServerHandles();
-		return CompletableFuture.completedFuture(Arrays.asList(all));
+		return Arrays.asList(all);
 	}
 
 	@Override
 	public CompletableFuture<Status> deleteServer(ServerHandle handle) {
+		return teeFuture(() -> deleteServerSync(handle));
+	}
+	
+	private Status deleteServerSync(ServerHandle handle) {
 		if( handle == null || isEmpty(handle.getId())) {
-			return invalidParameterError();
+			return invalidParameterStatus();
 		}
 		
 		boolean b = model.getServerModel().removeServer(handle.getId());
@@ -253,55 +207,73 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public CompletableFuture<Attributes> getRequiredAttributes(ServerType type) {
+		return teeFuture(() -> getRequiredAttributesSync(type));
+	}
+	
+	private Attributes getRequiredAttributesSync(ServerType type) {
 		if( type == null || isEmpty(type.getId())) {
-			return CompletableFuture.completedFuture(null);
+			return null;
 		}
 		Attributes rspa = model.getServerModel().getRequiredAttributes(type.getId());
-		return CompletableFuture.completedFuture(rspa);
+		return rspa;
 	}
 
 	@Override
 	public CompletableFuture<Attributes> getOptionalAttributes(ServerType type) {
+		return teeFuture(() -> getOptionalAttributesSync(type));
+	}
+	private Attributes getOptionalAttributesSync(ServerType type) {
 		if( type == null || isEmpty(type.getId())) {
-			return CompletableFuture.completedFuture(null);
+			return null;
 		}
-		Attributes rspa = model.getServerModel().getOptionalAttributes(type.getId());
-		return CompletableFuture.completedFuture(rspa);
+		return model.getServerModel().getOptionalAttributes(type.getId());
 	}
 	
 	@Override
 	public CompletableFuture<List<ServerLaunchMode>> getLaunchModes(ServerType type) {
+		return teeFuture(() -> getLaunchModesSync(type));
+	}
+	private List<ServerLaunchMode> getLaunchModesSync(ServerType type) {
 		if( type == null || isEmpty(type.getId()) ) {
-			return CompletableFuture.completedFuture(null);
+			return null;
 		}
-		
 		List<ServerLaunchMode> l = model.getServerModel()
 				.getLaunchModes(type.getId());
-		return CompletableFuture.completedFuture(l);
+		return l;
 	}
 	
 	@Override
 	public CompletableFuture<Attributes> getRequiredLaunchAttributes(LaunchAttributesRequest req) {
+		return teeFuture(() -> getRequiredLaunchAttributesSync(req));
+	}
+	private Attributes getRequiredLaunchAttributesSync(LaunchAttributesRequest req) {
 		if( req == null || isEmpty(req.getServerTypeId()) || isEmpty(req.getMode())) {
-			return CompletableFuture.completedFuture(null);
+			return null;
 		}
 		Attributes rspa = model.getServerModel().getRequiredLaunchAttributes(req.getServerTypeId());
-		return CompletableFuture.completedFuture(rspa);
+		return rspa;
 	}
 
 	@Override
 	public CompletableFuture<Attributes> getOptionalLaunchAttributes(LaunchAttributesRequest req) {
+		return teeFuture(() -> getOptionalLaunchAttributesSync(req));
+	}
+	private Attributes getOptionalLaunchAttributesSync(LaunchAttributesRequest req) {
 		if( req == null || isEmpty(req.getServerTypeId()) || isEmpty(req.getMode())) {
-			return CompletableFuture.completedFuture(null);
+			return null;
 		}
 		Attributes rspa = model.getServerModel().getOptionalLaunchAttributes(req.getServerTypeId());
-		return CompletableFuture.completedFuture(rspa);
+		return rspa;
 	}
 
+	
 	@Override
 	public CompletableFuture<Status> createServer(ServerAttributes attr) {
+		return teeFuture(() -> createServerSync(attr));
+	}
+	private Status createServerSync(ServerAttributes attr) {
 		if( attr == null || isEmpty(attr.getId()) || isEmpty(attr.getServerType())) {
-			return invalidParameterError();
+			return invalidParameterStatus();
 		}
 		
 		String serverType = attr.getServerType();
@@ -309,154 +281,174 @@ public class ServerManagementServerImpl implements RSPServer {
 		Map<String, Object> attributes = attr.getAttributes();
 		
 		IStatus ret = model.getServerModel().createServer(serverType, id, attributes);
-		return CompletableFuture.completedFuture(StatusConverter.convert(ret));
+		return StatusConverter.convert(ret);
 	}
 
 	@Override
 	public CompletableFuture<List<ServerType>> getServerTypes() {
+		return teeFuture(() -> getServerTypesSync());
+	}
+	private List<ServerType> getServerTypesSync() {
 		ServerType[] types = model.getServerModel().getAccessibleServerTypes();
-		List<ServerType> asList = Arrays.asList(types);
-		return CompletableFuture.completedFuture(asList);
+		return Arrays.asList(types);
 	}
 
 	@Override
 	public CompletableFuture<StartServerResponse> startServerAsync(LaunchParameters attr) {
+		return teeFuture(() -> startServerImpl(attr));
+	}
+	private StartServerResponse startServerImpl(LaunchParameters attr) {
 		if( attr == null || isEmpty(attr.getMode()) || isEmpty(attr.getParams().getId())) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
 					"Invalid Parameter");
-			return CompletableFuture.completedFuture(new StartServerResponse(StatusConverter.convert(is), null));
+			return (new StartServerResponse(StatusConverter.convert(is), null));
 		}
 
 		String id = attr.getParams().getId();
 		IServer server = model.getServerModel().getServer(id);
 		if( server == null ) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server " + id + " does not exist");
-			return CompletableFuture.completedFuture(new StartServerResponse(StatusConverter.convert(is), null));
+			return (new StartServerResponse(StatusConverter.convert(is), null));
 		}
 
 		IServerDelegate del = server.getDelegate();
 		if( del == null ) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred: Server " + id + " has no delegate.");
-			return CompletableFuture.completedFuture(new StartServerResponse(StatusConverter.convert(is), null));
+			return (new StartServerResponse(StatusConverter.convert(is), null));
 		}
 		
 		try {
 			StartServerResponse ret = del.start(attr.getMode());
-			return CompletableFuture.completedFuture(ret);
+			return ret;
 		} catch( Exception e ) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, 
 					ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred.", e);
-			return CompletableFuture.completedFuture(new StartServerResponse(StatusConverter.convert(is), null));
+			return (new StartServerResponse(StatusConverter.convert(is), null));
 		}
 	}
 
+	
 	@Override
 	public CompletableFuture<Status> stopServerAsync(StopServerAttributes attr) {
+		return teeFuture(() -> stopServerImpl(attr));
+	}
+	private Status stopServerImpl(StopServerAttributes attr) {
 		if( attr == null || isEmpty(attr.getId())) {
-			return invalidParameterError();
+			return invalidParameterStatus();
 		}
 
 		IServer server = model.getServerModel().getServer(attr.getId());
 		if( server == null ) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server " + attr.getId() + " does not exist");
-			return CompletableFuture.completedFuture(StatusConverter.convert(is));
+			return (StatusConverter.convert(is));
 		}
 		IServerDelegate del = server.getDelegate();
 		if( del == null ) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred: Server " + attr.getId() + " has no delegate.");
-			return CompletableFuture.completedFuture(StatusConverter.convert(is));
+			return (StatusConverter.convert(is));
 		}
 		
 		if(del.getServerState() == IServerDelegate.STATE_STOPPED && !attr.isForce()) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
 					"The server is already marked as stopped. If you wish to force a stop request, please set the force flag to true.");
-			return CompletableFuture.completedFuture(StatusConverter.convert(is));
+			return (StatusConverter.convert(is));
 		}
 		
 		try {
 			IStatus ret = del.stop(attr.isForce());
-			return CompletableFuture.completedFuture(StatusConverter.convert(ret));
+			return (StatusConverter.convert(ret));
 		} catch( Exception e ) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, 
 					ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred.", e);
-			return CompletableFuture.completedFuture(StatusConverter.convert(is));
+			return (StatusConverter.convert(is));
 		}
 
 	}
 
 	@Override
 	public CompletableFuture<CommandLineDetails> getLaunchCommand(LaunchParameters req) {
+		return teeFuture(() -> getLaunchCommandSync(req));
+	}
+	private CommandLineDetails getLaunchCommandSync(LaunchParameters req) {
 		if( req == null || isEmpty(req.getMode()) || isEmpty(req.getParams().getId())) {
-			return CompletableFuture.completedFuture(null);
+			return null;
 		}
 		String id = req.getParams().getId();
 		IServer server = model.getServerModel().getServer(id);
 		if( server == null ) {
-			return CompletableFuture.completedFuture(null);
+			return null;
 		}
 		IServerDelegate del = server.getDelegate();
 		if( del == null ) {
-			return CompletableFuture.completedFuture(null);
+			return null;
 		}
 		try {
 			CommandLineDetails det = del.getStartLaunchCommand(req.getMode(), req.getParams());
-			return CompletableFuture.completedFuture(det);
+			return det;
 		} catch( Exception e ) {
-			return CompletableFuture.completedFuture(null);
+			return null;
 		}
 	}
 
 	@Override
 	public CompletableFuture<Status> serverStartingByClient(ServerStartingAttributes attr) {
+		return teeFuture(() -> serverStartingByClientSync(attr));
+	}
+
+	private Status serverStartingByClientSync(ServerStartingAttributes attr) {
 		if( attr == null || attr.getRequest() == null || isEmpty(attr.getRequest().getMode())
 				|| isEmpty(attr.getRequest().getParams().getId())) {
-			return invalidParameterError();
+			return invalidParameterStatus();
 		}
 		String id = attr.getRequest().getParams().getId();
 		IServer server = model.getServerModel().getServer(id);
 		if( server == null ) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server " + id + " does not exist");
-			return CompletableFuture.completedFuture(StatusConverter.convert(is));
+			return StatusConverter.convert(is);
 		}
 		IServerDelegate del = server.getDelegate();
 		if( del == null ) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server error: Server " + id + " does not have a delegate.");
-			return CompletableFuture.completedFuture(StatusConverter.convert(is));
+			return StatusConverter.convert(is);
 		}
 		try {
 			IStatus s = del.clientSetServerStarting(attr);
-			return CompletableFuture.completedFuture(StatusConverter.convert(s));
+			return StatusConverter.convert(s);
 		} catch( Exception e ) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, 
 					ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred.", e);
-			return CompletableFuture.completedFuture(StatusConverter.convert(is));			
+			return StatusConverter.convert(is);
 		}
 	}
+	
 	@Override
 	public CompletableFuture<Status> serverStartedByClient(LaunchParameters attr) {
+		return teeFuture(() -> serverStartedByClientSync(attr));
+	}
+	private Status serverStartedByClientSync(LaunchParameters attr) {
 		if( attr == null || attr.getParams() == null || isEmpty(attr.getParams().getId())) {
-			return invalidParameterError();
+			return invalidParameterStatus();
 		}
 
 		String id = attr.getParams().getId();
 		IServer server = model.getServerModel().getServer(id);
 		if( server == null ) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server " + id + " does not exist");
-			return CompletableFuture.completedFuture(StatusConverter.convert(is));
+			return StatusConverter.convert(is);
 		}
 		IServerDelegate del = server.getDelegate();
 		if( del == null ) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server error: Server " + id + " does not have a delegate.");
-			return CompletableFuture.completedFuture(StatusConverter.convert(is));
+			return StatusConverter.convert(is);
 		}
 
 		try {
 			IStatus s = del.clientSetServerStarted(attr);
-			return CompletableFuture.completedFuture(StatusConverter.convert(s));
+			return StatusConverter.convert(s);
 		} catch( Exception e ) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, 
 					ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred.", e);
-			return CompletableFuture.completedFuture(StatusConverter.convert(is));			
+			return StatusConverter.convert(is);
 		}
 
 	}
@@ -466,31 +458,59 @@ public class ServerManagementServerImpl implements RSPServer {
 		RSPClient rspc = ClientThreadLocal.getActiveClient();
 		model.getCapabilityManagement().registerClientCapabilities(rspc, request);
 		
-		initSecureStorage();
-		
 		IStatus s = org.jboss.tools.rsp.eclipse.core.runtime.Status.OK_STATUS;
 		return CompletableFuture.completedFuture(StatusConverter.convert(s));
 	}
 	
-	private void initSecureStorage() {
-		// TODO fix this workflow
-		final RSPClient rspc = ClientThreadLocal.getActiveClient();
-		final ISecureStorage storage = model.getServerModel().getSecureStorageProvider().getSecureStorage(false);
-		if( storage == null ) {
-			new Thread("Initialize Secure Storage") {
-				public void run() {
-					ClientThreadLocal.setActiveClient(rspc);
-					model.getServerModel().getSecureStorageProvider().getSecureStorage(true);
-					ClientThreadLocal.setActiveClient(null);
-				}
-			}.start();
-		}
-	}
-	
-
 	@Override
 	public CompletableFuture<ServerCapabilitiesResponse> requestServerCapabilities() {
 		ServerCapabilitiesResponse resp = model.getCapabilityManagement().getServerCapabilities();
 		return CompletableFuture.completedFuture(resp);
+	}
+	
+	
+	/*
+	 * Utility methods below
+	 */	
+	private Status booleanToStatus(boolean b, String message) {
+		IStatus s = null;
+		if( b ) {
+			s = org.jboss.tools.rsp.eclipse.core.runtime.Status.OK_STATUS;
+		} else {
+			s = new org.jboss.tools.rsp.eclipse.core.runtime.Status(
+					IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, message);
+		}
+		return StatusConverter.convert(s);
+	}
+	
+	private boolean isEmpty(String s) {
+		return s == null || s.isEmpty();
+	}
+
+	private Status invalidParameterStatus() {
+		IStatus s = new org.jboss.tools.rsp.eclipse.core.runtime.Status(
+				IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Parameter is invalid. It may be null, missing required fields, or unacceptable values.");
+		return StatusConverter.convert(s);
+	}
+
+	private static interface IMethodProvider<T> {
+		public T method();
+	}
+	
+	private static class RSPCompletableFuture<T> {
+		public CompletableFuture<T> method(IMethodProvider<T> provider) {
+			final RSPClient rspc = ClientThreadLocal.getActiveClient();
+			CompletableFuture<T> completableFuture = new CompletableFuture<>();
+			CompletableFuture.runAsync(() -> {
+				ClientThreadLocal.setActiveClient(rspc);
+				completableFuture.complete(provider.method());
+				ClientThreadLocal.setActiveClient(null);
+			});
+			return completableFuture;
+		}
+	}
+
+	<T> CompletableFuture<T> teeFuture(IMethodProvider<T> provider) {
+		return new RSPCompletableFuture<T>().method(provider);
 	}
 }
