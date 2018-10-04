@@ -2,6 +2,7 @@ package org.jboss.tools.rsp.client.cli;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,6 +10,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.Attribute;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
@@ -27,10 +29,6 @@ import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.client.bindings.ServerManagementClientLauncher;
 
 public class StandardCommandHandler implements InputHandler {
-	private static final String LIST_VM = "list vm";
-	private static final String ADD_VM = "add vm ";
-	private static final String REMOVE_VM = "remove vm ";
-
 	private static final String LIST_PATHS = "list paths";
 	private static final String ADD_PATH = "add path ";
 	private static final String REMOVE_PATH = "remove path ";
@@ -38,6 +36,10 @@ public class StandardCommandHandler implements InputHandler {
 	
 	
 	private static final String LIST_SERVERS = "list servers";
+	private static final String LIST_SERVER_TYPES = "list servertypes";
+	private static final String LIST_SERVERTYPE_ATTRIBUTES_REQUIRED = "list attributes required";
+	private static final String LIST_SERVERTYPE_ATTRIBUTES_OPTIONAL = "list attributes optional";
+	
 	private static final String ADD_SERVER = "add server";
 	private static final String REMOVE_SERVER = "remove server ";
 	
@@ -54,7 +56,9 @@ public class StandardCommandHandler implements InputHandler {
 	private static final String[] CMD_ARR = new String[] {
 			LIST_PATHS, ADD_PATH, REMOVE_PATH, SEARCH_PATH, 
 			// LIST_VM, ADD_VM, REMOVE_VM,
-			LIST_SERVERS, ADD_SERVER, REMOVE_SERVER, 
+			LIST_SERVERS, LIST_SERVER_TYPES, 
+			LIST_SERVERTYPE_ATTRIBUTES_REQUIRED, LIST_SERVERTYPE_ATTRIBUTES_OPTIONAL,
+			ADD_SERVER, REMOVE_SERVER, 
 			LAUNCH_COMMAND, LAUNCH_LOCAL, START_SERVER, STOP_SERVER,
 			EXIT, SHUTDOWN
 	};
@@ -130,6 +134,25 @@ public class StandardCommandHandler implements InputHandler {
 					System.out.println("   " + b.toString());
 				}
 			}
+		} else if( s.trim().equals(LIST_SERVER_TYPES)) {
+			List<ServerType> handles = launcher.getServerProxy().getServerTypes().get();
+			System.out.println(handles.size() + " servers found:");
+			for( ServerType sh : handles ) {
+				System.out.println("   " + sh.getId() + ": " + sh.getVisibleName());
+			}
+						
+		} else if( s.trim().equals(LIST_SERVERTYPE_ATTRIBUTES_REQUIRED)) {
+			ServerType st = chooseServerType();
+			if( st != null ) {
+				Attributes attr = launcher.getServerProxy().getRequiredAttributes(st).get();
+				printAttr(attr);
+			}
+		} else if( s.trim().equals(LIST_SERVERTYPE_ATTRIBUTES_OPTIONAL)) {
+			ServerType st = chooseServerType();
+			if( st != null ) {
+				Attributes attr = launcher.getServerProxy().getOptionalAttributes(st).get();
+				printAttr(attr);
+			}
 		} else if( s.trim().equals(LIST_SERVERS)) {
 			List<ServerHandle> handles = launcher.getServerProxy().getServerHandles().get();
 			System.out.println(handles.size() + " servers found:");
@@ -153,6 +176,20 @@ public class StandardCommandHandler implements InputHandler {
 		}
 	}
 	
+	private void printAttr(Attributes attr) {
+		Map<String, Attribute> map = attr.getAttributes();
+		Iterator<String> kit = map.keySet().iterator();
+		while(kit.hasNext()) {
+			String key = kit.next();
+			Attribute val = map.get(key);
+			System.out.println(key);
+			System.out.println("    type=" + val.getType());
+			System.out.println("    desc=" + val.getDescription());
+			System.out.println("    defaultVal=" + val.getDefaultVal());
+		}
+	}
+
+
 	private void runLocalLaunchScenario(String s) throws Exception {
 		LaunchParameters getLaunchReq = getLaunchCommandRequest();
 		printLocalLaunchCommandDetails(getLaunchReq);
