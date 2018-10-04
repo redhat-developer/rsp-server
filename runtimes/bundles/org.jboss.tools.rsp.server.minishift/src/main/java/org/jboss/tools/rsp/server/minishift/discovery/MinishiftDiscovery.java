@@ -31,7 +31,10 @@ public class MinishiftDiscovery {
 	
 	public File getMinishiftBinaryFromFolder(File root) {
 		File ms = new File(root, MINISHIFT);
-		if( ms.exists()) 
+		if (isMinishiftBinaryFile(ms)) 
+			return ms;
+		ms = new File(root, MINISHIFT_EXE);
+		if (isMinishiftBinaryFile(ms)) 
 			return ms;
 		return folderWhiteListBin(root);
 	}
