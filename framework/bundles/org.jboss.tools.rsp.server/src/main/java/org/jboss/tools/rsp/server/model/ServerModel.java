@@ -373,20 +373,28 @@ public class ServerModel implements IServerModel {
 	}
 
 	public ServerType[] getAccessibleServerTypes() {
-		if( hasPermissions() )
-			return getServerTypes();
+		List<ServerType> free = new ArrayList<ServerType>();
+		List<ServerType> all = new ArrayList<ServerType>();
 		
 		Set<String> types = serverTypes.keySet();
 		ArrayList<String> types2 = new ArrayList<String>(types);
 		Collections.sort(types2);
-		ArrayList<ServerType> ret = new ArrayList<ServerType>();
 		for( String t : types2 ) {
+			// Always add to 'all',   add to 'free' if type does not require secure storage
 			IServerType type = serverTypes.get(t);
+			ServerType st = new ServerType(t, type.getName(), type.getDescription());
 			if( !hasSecureAttributes(type)) {
-				ret.add(new ServerType(t, type.getName(), type.getDescription()));
+				free.add(st);
 			}
+			all.add(st);
 		}
-		return (ServerType[]) ret.toArray(new ServerType[ret.size()]);
+		
+		if( all.size() > free.size()) {
+			if( !hasPermissions() )
+				return (ServerType[]) free.toArray(new ServerType[free.size()]);
+		}
+		
+		return (ServerType[]) all.toArray(new ServerType[all.size()]);
 	}
 	
 	private boolean hasPermissions() {
