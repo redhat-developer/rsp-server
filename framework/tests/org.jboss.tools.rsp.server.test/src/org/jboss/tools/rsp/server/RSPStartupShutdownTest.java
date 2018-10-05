@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
 import org.jboss.tools.rsp.api.RSPClient;
@@ -196,11 +197,12 @@ public class RSPStartupShutdownTest {
 		initNew(false);
 	}
 	private void initNew(boolean countdown) {
+		int port = new Random().nextInt(1000) + 10000;
 		ShutdownExecutor.getExecutor().setHandler(shutdownHandler);
 		rspInstance = countdown ? countdownLauncher() : defaultLauncher();
 		LauncherSingleton.getDefault().setLauncher(rspInstance);
 		try {
-			rspInstance.launch("27511");
+			rspInstance.launch(""+port);
 		} catch(Exception e) {
 			e.printStackTrace();
 			cleanup(rspInstance, null);
@@ -209,7 +211,7 @@ public class RSPStartupShutdownTest {
 		
 		clientInstance = null;
 		try {
-			clientInstance = new ClientLauncher("localhost", 27511);
+			clientInstance = new ClientLauncher("localhost", port);
 			clientInstance.launch();
 			
 			assertTrue(clientInstance.isConnectionActive());
