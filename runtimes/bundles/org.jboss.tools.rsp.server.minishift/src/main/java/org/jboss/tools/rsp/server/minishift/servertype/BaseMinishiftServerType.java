@@ -52,16 +52,6 @@ public abstract class BaseMinishiftServerType implements IServerType {
 			attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_BINARY, 
 					ServerManagementAPIConstants.ATTR_TYPE_STRING,
 					"A filesystem path pointing to a minishift binary file.", null);
-
-			if( isCDK() ) {
-				attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_REG_USERNAME, 
-						ServerManagementAPIConstants.ATTR_TYPE_STRING,
-						"A registration username.", null);
-	
-				attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_REG_PASSWORD, 
-						ServerManagementAPIConstants.ATTR_TYPE_STRING,
-						"A registration password", null);
-			}
 			required = attrs.toPojo();
 		}
 		return required;
@@ -83,6 +73,10 @@ public abstract class BaseMinishiftServerType implements IServerType {
 			attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_PROFILE, 
 					ServerManagementAPIConstants.ATTR_TYPE_STRING,
 					"A minishift profile. Default value is 'minishift'", "minishift");
+
+			attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_HOME, 
+					ServerManagementAPIConstants.ATTR_TYPE_STRING,
+					"A flag value for the --minishift-home command line launch parameter.", null);
 
 			this.optional = attrs.toPojo();
 		}

@@ -24,6 +24,9 @@ public interface IMinishiftServerAttributes {
 	public static final String MINISHIFT_VM_DRIVER = "minishift.vmdriver";
 
 	public static final String MINISHIFT_PROFILE = "minishift.profile";
+	
+	public static final String MINISHIFT_HOME = "minishift.home";
+	
 	public static final String MINISHIFT_PROFILE_DEFAULT = "minishift";
 
 	

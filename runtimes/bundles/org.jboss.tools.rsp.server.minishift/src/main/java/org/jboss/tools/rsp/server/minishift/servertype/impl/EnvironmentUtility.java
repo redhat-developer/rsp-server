@@ -44,6 +44,11 @@ public class EnvironmentUtility {
 			ret.put("MINISHIFT_USERNAME", user);
 			ret.put("MINISHIFT_PASSWORD", pass);
 		}
+		
+		String msHome = MinishiftPropertyUtility.getMinishiftHome(server);
+		if( msHome != null ) {
+			ret.put("MINISHIFT_HOME", msHome);
+		}
 		return ret;
 	}
 	
