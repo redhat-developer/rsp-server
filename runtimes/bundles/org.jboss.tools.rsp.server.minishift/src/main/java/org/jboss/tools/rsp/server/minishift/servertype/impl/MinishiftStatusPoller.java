@@ -9,6 +9,8 @@
 package org.jboss.tools.rsp.server.minishift.servertype.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
@@ -16,6 +18,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.server.minishift.impl.Activator;
 import org.jboss.tools.rsp.server.minishift.servertype.IMinishiftServerAttributes;
+import org.jboss.tools.rsp.server.minishift.servertype.MinishiftPropertyUtility;
 import org.jboss.tools.rsp.server.spi.launchers.CommandTimeoutException;
 import org.jboss.tools.rsp.server.spi.launchers.ProcessUtility;
 import org.jboss.tools.rsp.server.spi.model.polling.AbstractPoller;
@@ -36,15 +39,18 @@ public class MinishiftStatusPoller extends AbstractPoller implements IServerStat
 	}
 	
 	private String[] callMinishiftStatus(IServer server) throws CommandTimeoutException, IOException {
-		String[] args = new String[] { "status" };
-		// TODO add profile flag
-		//args = CDK32Server.getArgsWithProfile(server, args);
+		List<String> args1 = new ArrayList<>();
+		args1.add("status");
+		String profile = MinishiftPropertyUtility.getMinishiftProfile(server);
+		args1.add("--profile");
+		args1.add(profile);
 		
+		String[] args = (String[]) args1.toArray(new String[args1.size()]);
 		String cmd = getMinishiftCommand(server);
 		ProcessUtility util = new ProcessUtility();
 		String[] lines = util.callMachineReadable(
 				cmd, args, getWorkingDirectory(server), 
-				new EnvironmentUtility(server).getEnvironment(true, false));
+				new EnvironmentUtility(server).getEnvironment(true, true));
 		return lines;
 	}
 	@Override
