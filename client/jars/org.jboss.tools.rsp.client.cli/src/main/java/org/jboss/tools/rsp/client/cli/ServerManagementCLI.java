@@ -16,9 +16,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.jboss.tools.rsp.api.ICapabilityKeys;
 import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
 import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
+import org.jboss.tools.rsp.client.bindings.IClientConnectionClosedListener;
 import org.jboss.tools.rsp.client.bindings.ServerManagementClientLauncher;
 
-public class ServerManagementCLI implements InputProvider {
+public class ServerManagementCLI implements InputProvider, IClientConnectionClosedListener {
 	public static void main(String[] args) {
 		ServerManagementCLI cli = new ServerManagementCLI();
 		try {
@@ -49,7 +50,8 @@ public class ServerManagementCLI implements InputProvider {
 
 		launcher = new ServerManagementClientLauncher(host, Integer.parseInt(port), this);
 		launcher.launch();
-
+		launcher.setListener(this);
+		
 		// possibly unnecessary?
 		ServerCapabilitiesResponse serverCap = launcher.getServerProxy().requestServerCapabilities().get();
 
@@ -96,6 +98,10 @@ public class ServerManagementCLI implements InputProvider {
 				h = q.remove();
 			}
 			if (h != null) {
+				if( !launcher.isConnectionActive()) {
+					initShutdown();
+				}
+				
 				final InputHandler h2 = h;
 				new Thread("Handle input") {
 					public void run() {
@@ -109,5 +115,15 @@ public class ServerManagementCLI implements InputProvider {
 				}.start();
 			}
 		}
+	}
+
+	@Override
+	public void connectionClosed() {
+		initShutdown();
+	}
+	
+	private synchronized void initShutdown() {
+		System.out.println("Connection with remote server has terminated.");
+		System.exit(0);
 	}
 }
