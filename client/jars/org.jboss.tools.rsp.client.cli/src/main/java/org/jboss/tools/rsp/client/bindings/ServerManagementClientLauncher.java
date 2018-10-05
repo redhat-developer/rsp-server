@@ -23,6 +23,7 @@ public class ServerManagementClientLauncher {
 	private int port;
 	private boolean connectionOpen = false;
 	private InputProvider provider;
+	private IClientConnectionClosedListener listener;
 	public ServerManagementClientLauncher(String host, int port, InputProvider provider) {
 		this.host = host;
 		this.port = port;
@@ -52,6 +53,8 @@ public class ServerManagementClientLauncher {
 	private void clientClosed() {
 		this.myClient = null;
 		connectionOpen = false;
+		if( listener != null )
+			listener.connectionClosed();
 	}
 	
 	public void closeConnection() {
@@ -73,5 +76,9 @@ public class ServerManagementClientLauncher {
 			return myClient.getProxy();
 		}
 		return null;
+	}
+	
+	public void setListener(IClientConnectionClosedListener listener) {
+		this.listener = listener;
 	}
 }
