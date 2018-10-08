@@ -13,7 +13,9 @@
 	<packaging>pom</packaging>
 
 	<name>Runtime Server Protocol : Distribution</name>
-
+	<properties>
+		<felix.version>6.0.1</felix.version>
+	</properties>
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -54,7 +56,7 @@
 							<goal>wget</goal>
 						</goals>
 						<configuration>
-							<url>http://download.nextag.com/apache/felix/org.apache.felix.main.distribution-6.0.1.zip</url>
+							<url>http://download.nextag.com/apache/felix/org.apache.felix.main.distribution-${felix.version}.zip</url>
 							<md5>16dc161fe677c3bfca8087df1d72b8da</md5>
 							<unpack>true</unpack>
 						</configuration>
@@ -74,7 +76,7 @@
 						</goals>
 						<configuration>
 							<!-- configure the plugin here -->
-							<outputDirectory>${project.basedir}/target/felix-framework-6.0.1/bundle/</outputDirectory>
+							<outputDirectory>${project.basedir}/target/felix-framework-${felix.version}/bundle/</outputDirectory>
 							<excludeTransitive>true</excludeTransitive>
                                                         <includeScope>runtime</includeScope>
 						</configuration>

@@ -16,7 +16,7 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>${project.basedir}/target/felix-framework-6.0.1</directory>
+			<directory>${project.basedir}/target/felix-framework-${felix.version}</directory>
 			<outputDirectory>/rsp-distribution/</outputDirectory>
 			<fileMode>755</fileMode>
                 	<!--
