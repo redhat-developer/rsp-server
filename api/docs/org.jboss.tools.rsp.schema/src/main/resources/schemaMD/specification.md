@@ -226,46 +226,6 @@ This endpoint returns the following schema as a return value:
 <tr><td><pre>{
   "type" : "object",
   "properties" : {
-    "severity" : {
-      "type" : "integer"
-    },
-    "code" : {
-      "type" : "integer"
-    },
-    "message" : {
-      "type" : "string"
-    },
-    "trace" : {
-      "type" : "string"
-    },
-    "ok" : {
-      "type" : "boolean"
-    },
-    "plugin" : {
-      "type" : "string"
-    }
-  }
-}</pre></td><td><pre>export interface Status {
-    severity: number;
-    code: number;
-    message: string;
-    trace: string;
-    ok: boolean;
-    plugin: string;
-}</pre></td></tr></table>
-
-#### server/requestServerCapabilities
-
- Ask the server what capability keys the server is requesting from the client @return 
-
-This endpoint takes no parameters. 
-
-This endpoint returns the following schema as a return value: 
-
-<table><tr><th>json</th><th>typescript</th></tr>
-<tr><td><pre>{
-  "type" : "object",
-  "properties" : {
     "map" : {
       "type" : "object",
       "additionalProperties" : {
