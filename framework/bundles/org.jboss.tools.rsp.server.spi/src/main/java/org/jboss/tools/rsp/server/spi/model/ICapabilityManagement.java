@@ -8,14 +8,16 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.spi.model;
 
+import java.util.Map;
+
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
-import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
+import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 
 public interface ICapabilityManagement {
 	public void clientAdded(RSPClient client);
 	public void clientRemoved(RSPClient client);
 	public String getCapabilityProperty(RSPClient c, String key);
-	public void registerClientCapabilities(RSPClient c, ClientCapabilitiesRequest response);
-	public ServerCapabilitiesResponse getServerCapabilities();
+	public IStatus registerClientCapabilities(RSPClient c, ClientCapabilitiesRequest response);
+	public Map<String,String> getServerCapabilities();
 }

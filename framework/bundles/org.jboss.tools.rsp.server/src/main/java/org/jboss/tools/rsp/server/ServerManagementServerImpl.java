@@ -454,20 +454,14 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	@Override
-	public CompletableFuture<Status> registerClientCapabilities(ClientCapabilitiesRequest request) {
+	public CompletableFuture<ServerCapabilitiesResponse> registerClientCapabilities(ClientCapabilitiesRequest request) {
 		RSPClient rspc = ClientThreadLocal.getActiveClient();
-		model.getCapabilityManagement().registerClientCapabilities(rspc, request);
-		
-		IStatus s = org.jboss.tools.rsp.eclipse.core.runtime.Status.OK_STATUS;
-		return CompletableFuture.completedFuture(StatusConverter.convert(s));
-	}
-	
-	@Override
-	public CompletableFuture<ServerCapabilitiesResponse> requestServerCapabilities() {
-		ServerCapabilitiesResponse resp = model.getCapabilityManagement().getServerCapabilities();
+		IStatus s = model.getCapabilityManagement().registerClientCapabilities(rspc, request);
+		Status st = StatusConverter.convert(s);
+		Map<String,String> resp2 = model.getCapabilityManagement().getServerCapabilities();
+		ServerCapabilitiesResponse resp = new ServerCapabilitiesResponse(st, resp2);
 		return CompletableFuture.completedFuture(resp);
 	}
-	
 	
 	/*
 	 * Utility methods below

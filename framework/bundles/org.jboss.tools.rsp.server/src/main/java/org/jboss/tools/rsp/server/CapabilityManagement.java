@@ -14,7 +14,8 @@ import java.util.Map;
 import org.jboss.tools.rsp.api.ICapabilityKeys;
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
-import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
+import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
+import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.server.spi.model.ICapabilityManagement;
 
 public class CapabilityManagement implements ICapabilityManagement, ICapabilityKeys {
@@ -44,9 +45,10 @@ public class CapabilityManagement implements ICapabilityManagement, ICapabilityK
 		return null;
 	}
 	
-	public void registerClientCapabilities(RSPClient client, ClientCapabilitiesRequest response) {
+	public IStatus registerClientCapabilities(RSPClient client, ClientCapabilitiesRequest response) {
 		ClientCapabilities cc = new ClientCapabilities(response);
 		this.capabilities.put(client, cc);
+		return Status.OK_STATUS;
 	}
 	
 	private static class Capabilities {
@@ -79,10 +81,10 @@ public class CapabilityManagement implements ICapabilityManagement, ICapabilityK
 	}
 
 	@Override
-	public ServerCapabilitiesResponse getServerCapabilities() {
+	public Map<String,String> getServerCapabilities() {
         Map<String,String> ret = new HashMap<String,String>();
         ret.put(ICapabilityKeys.STRING_PROTOCOL_VERSION, ICapabilityKeys.PROTOCOL_VERSION_CURRENT);
         ret.put(ICapabilityKeys.BOOLEAN_STRING_PROMPT, Boolean.toString(true));
-        return new ServerCapabilitiesResponse(ret);
+        return ret;
 	}
 }

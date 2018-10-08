@@ -39,14 +39,7 @@ public interface RSPServer {
 	 * Register client capabilities so the server knows what this client can support
 	 */
 	@JsonRequest
-	CompletableFuture<Status> registerClientCapabilities(ClientCapabilitiesRequest request);
-
-	/**
-	 * Ask the server what capability keys the server is requesting from the client
-	 * @return
-	 */
-	@JsonRequest
-	CompletableFuture<ServerCapabilitiesResponse> requestServerCapabilities();
+	CompletableFuture<ServerCapabilitiesResponse> registerClientCapabilities(ClientCapabilitiesRequest request);
 	
 	/*
 	 * Discovery

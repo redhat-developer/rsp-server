@@ -52,15 +52,11 @@ public class ServerManagementCLI implements InputProvider, IClientConnectionClos
 		launcher.launch();
 		launcher.setListener(this);
 		
-		// possibly unnecessary?
-		ServerCapabilitiesResponse serverCap = launcher.getServerProxy().requestServerCapabilities().get();
-
 		Map<String, String> clientCap2 = new HashMap<String, String>();
 		clientCap2.put(ICapabilityKeys.STRING_PROTOCOL_VERSION, ICapabilityKeys.PROTOCOL_VERSION_0_10_0);
 		clientCap2.put(ICapabilityKeys.BOOLEAN_STRING_PROMPT, Boolean.toString(true));
 		ClientCapabilitiesRequest clientCap = new ClientCapabilitiesRequest(clientCap2);
-		launcher.getServerProxy().registerClientCapabilities(clientCap);
-
+		ServerCapabilitiesResponse rsp = launcher.getServerProxy().registerClientCapabilities(clientCap).get();
 		defaultHandler = new StandardCommandHandler(launcher, this);
 	}
 
