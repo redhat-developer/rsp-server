@@ -23,7 +23,7 @@ public class CDKServerType extends BaseMinishiftServerType {
 	
 	@Override
 	public Attributes getRequiredAttributes() {
-		if (required == null) {
+		if (this.required == null) {
 			CreateServerAttributesUtility attrs = new CreateServerAttributesUtility();
 			
 			attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_BINARY, 
@@ -37,9 +37,9 @@ public class CDKServerType extends BaseMinishiftServerType {
 			attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_REG_PASSWORD, 
 					ServerManagementAPIConstants.ATTR_TYPE_STRING,
 					"A registration password", null);
-			required = attrs.toPojo();
+			this.required = attrs.toPojo();
 		}
-		return required;
+		return this.required;
 	}
 
 	protected boolean isCDK() {

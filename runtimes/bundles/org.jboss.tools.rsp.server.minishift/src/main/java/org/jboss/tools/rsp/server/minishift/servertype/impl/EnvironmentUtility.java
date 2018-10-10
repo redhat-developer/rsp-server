@@ -16,6 +16,9 @@ import org.jboss.tools.rsp.server.minishift.servertype.MinishiftPropertyUtility;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
 public class EnvironmentUtility {
+	private static final String KEY_USERNAME = "MINISHIFT_USERNAME";
+	private static final String KEY_PASSWORD = "MINISHIFT_PASSWORD";
+	
 	// Isolating duplicated code. Doesn't use IServer yet but will.
 	private IServer server;
 	public EnvironmentUtility(IServer server) {
@@ -41,13 +44,13 @@ public class EnvironmentUtility {
 		String user = MinishiftPropertyUtility.getMinishiftUsername(server);
 		String pass = MinishiftPropertyUtility.getMinishiftPassword(server);
 		if( user != null && pass != null && !user.isEmpty() && !pass.isEmpty()) {
-			ret.put("MINISHIFT_USERNAME", user);
-			ret.put("MINISHIFT_PASSWORD", pass);
+			ret.put(KEY_USERNAME, user);
+			ret.put(KEY_PASSWORD, pass);
 		}
 		
 		String msHome = MinishiftPropertyUtility.getMinishiftHome(server);
 		if( msHome != null ) {
-			ret.put("MINISHIFT_HOME", msHome);
+			ret.put(KEY_USERNAME, msHome);
 		}
 		return ret;
 	}
