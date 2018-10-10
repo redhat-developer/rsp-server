@@ -17,7 +17,4 @@
 	<bundle id="org.jboss.tools.rsp.server"/>
 	<bundle id="org.jboss.tools.rsp.server.wildfly"/>
 	<bundle id="org.jboss.tools.rsp.server.minishift"/>
-	<bundle id="org.jboss.tools.rsp.launching.java.test"/>
-    <bundle id="org.jboss.tools.rsp.server.test"/>
-    <bundle id="org.jboss.tools.rsp.server.wildfly.test"/>
 </site>

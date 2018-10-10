@@ -14,8 +14,10 @@
 	<packaging>eclipse-repository</packaging>
 
     <properties>
-		<felix.version>6.0.1</felix.version>
-	</properties>
+        <felix.version>6.0.1</felix.version>
+        <felix.folder>felix-framework-${felix.version}</felix.folder>
+        <rsp-distribution.folder>rsp-distribution</rsp-distribution.folder>
+    </properties>
 	
     <build>
 		<pluginManagement>
@@ -59,37 +61,39 @@
 						<configuration>
 							<url>http://download.nextag.com/apache/felix/org.apache.felix.main.distribution-${felix.version}.zip</url>
 							<md5>16dc161fe677c3bfca8087df1d72b8da</md5>
-							<unpack>true</unpack>
+                            <unpack>true</unpack>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
+            <!-- copy bundles that are not available from target platform -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>3.1.0</version>
 				<executions>
 					<execution>
-						<id>copy-dependencies</id>
-						<phase>generate-sources</phase>
+						<id>copy-non-tp-dependencies</id>
+						<phase>package</phase>
 						<goals>
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
 							<!-- configure the plugin here -->
-							<outputDirectory>${project.basedir}/target/felix-framework-${felix.version}/bundle/</outputDirectory>
+							<outputDirectory>${project.build.directory}/${felix.folder}/bundle</outputDirectory>
 							<excludeTransitive>true</excludeTransitive>
                             <includeScope>runtime</includeScope>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
+            <!-- build distribution -->
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.5.4</version>
 				<executions>
 					<execution>
-						<id>create-script-zip</id>
+						<id>create-distribution-zip</id>
 						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
@@ -105,4 +109,19 @@
 			</plugin>
 		</plugins>
 	</build>
+
+    <!-- dependencies that are not available from target platform -->
+    <dependencies>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.log</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+		<dependency>
+            <groupId>org.everit.osgi.bundles</groupId>
+			<artifactId>org.everit.osgi.bundles.org.apache.xmlcommons.full</artifactId>
+			<version>1.4.1-20150918</version>
+		</dependency>
+	</dependencies>
+
 </project>
