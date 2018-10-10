@@ -78,10 +78,12 @@ public class ServerModel implements IServerModel {
 		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_MAP);
 	}
 	
+	@Override
 	public ISecureStorageProvider getSecureStorageProvider() {
 		return secureStorageProvider;
 	}
 	
+	@Override
 	public void addServerModelListener(IServerModelListener l) {
 		listeners.add(l);
 	}
@@ -90,22 +92,26 @@ public class ServerModel implements IServerModel {
 		listeners.remove(l);
 	}
 
+	@Override
 	public void addServerType(IServerType type) {
 		if( type != null && type.getId() != null ) {
 			serverTypes.put(type.getId(), type);
 		}
 	}
 	
+	@Override
 	public void removeServerType(IServerType type) {
 		if( type != null && type.getId() != null ) {
 			serverTypes.remove(type.getId());
 		}
 	}
 	
+	@Override
 	public IServer getServer(String id) {
 		return servers.get(id);
 	}
 	
+	@Override
 	public Map<String, IServer> getServers() {
 		return Collections.unmodifiableMap(servers);
 	} 
@@ -123,6 +129,7 @@ public class ServerModel implements IServerModel {
 		File servers = new File(data, "servers");
 		loadServers(servers);
 	}
+
 	public void loadServers(File folder) throws CoreException {
 		if (!folder.exists()) {
 			return;
@@ -169,6 +176,7 @@ public class ServerModel implements IServerModel {
 		LOG.error(e.getMessage(), e);
 	}
 	
+	@Override
 	public IStatus createServer(String serverType, String id, Map<String, Object> attributes) {
 		try {
 			return createServerUnprotected(serverType, id, attributes);
@@ -277,28 +285,35 @@ public class ServerModel implements IServerModel {
 		serverDelegates.put(server.getId(), del);
 		fireServerAdded(server);
 	}
+
 	private void fireServerAdded(IServer server) {
 		for( IServerModelListener l : listeners ) {
 			l.serverAdded(toHandle(server));
 		}
 	}
+
+	@Override
 	public void fireServerProcessTerminated(IServer server, String processId) {
 		for( IServerModelListener l : listeners ) {
 			l.serverProcessTerminated(toHandle(server), processId);
 		}
 	}
+
+	@Override
 	public void fireServerProcessCreated(IServer server, String processId) {
 		for( IServerModelListener l : listeners ) {
 			l.serverProcessCreated(toHandle(server), processId);
 		}
 	}
 
+	@Override
 	public void fireServerStreamAppended(IServer server, String processId, int streamType, String text) {
 		for( IServerModelListener l : listeners ) {
 			l.serverProcessOutputAppended(toHandle(server), processId, streamType, text);
 		}
 	}
 	
+	@Override
 	public void fireServerStateChanged(IServer server, int state) {
 		for( IServerModelListener l : listeners ) {
 			l.serverStateChanged(toHandle(server), state);
@@ -316,6 +331,7 @@ public class ServerModel implements IServerModel {
 		return new ServerHandle(s.getId(), getServerType(typeId));
 	}
 	
+	@Override
 	public boolean removeServer(String serverId) {
 		IServer toRemove = servers.get(serverId);
 		if( toRemove == null ) {
@@ -335,7 +351,7 @@ public class ServerModel implements IServerModel {
 		return true;
 	}
 	
-
+	@Override
 	public ServerHandle[] getServerHandles() {
 		Set<String> s = servers.keySet();
 		ArrayList<ServerHandle> handles = new ArrayList<>();
@@ -360,6 +376,7 @@ public class ServerModel implements IServerModel {
 		return serverTypes.get(typeId);
 	}
 	
+	@Override
 	public ServerType[] getServerTypes() {
 		Set<String> types = serverTypes.keySet();
 		ArrayList<String> types2 = new ArrayList<String>(types);
@@ -372,6 +389,7 @@ public class ServerModel implements IServerModel {
 		return (ServerType[]) ret.toArray(new ServerType[ret.size()]);
 	}
 
+	@Override
 	public ServerType[] getAccessibleServerTypes() {
 		List<ServerType> free = new ArrayList<ServerType>();
 		List<ServerType> all = new ArrayList<ServerType>();
@@ -389,21 +407,22 @@ public class ServerModel implements IServerModel {
 			all.add(st);
 		}
 		
-		if( all.size() > free.size()) {
-			if( !hasPermissions() )
-				return (ServerType[]) free.toArray(new ServerType[free.size()]);
+		if (all.size() > free.size()
+				&& !hasPermissions()) {
+			return free.toArray(new ServerType[free.size()]);
 		}
 		
-		return (ServerType[]) all.toArray(new ServerType[all.size()]);
+		return all.toArray(new ServerType[all.size()]);
 	}
 	
 	private boolean hasPermissions() {
 		return secureStorageProvider.getSecureStorage(true) != null;
 	}
+
 	private boolean hasSecureAttributes(IServerType type) {
 		Attributes a = type.getRequiredAttributes();
 		Attributes b = type.getOptionalAttributes();
-		Set<String> all = new HashSet<String>();
+		Set<String> all = new HashSet<>();
 		all.addAll(a.getAttributes().keySet());
 		all.addAll(b.getAttributes().keySet());
 		for( Iterator<String> i = all.iterator(); i.hasNext(); ) {
@@ -413,30 +432,35 @@ public class ServerModel implements IServerModel {
 		return false;
 	}
 
+	@Override
 	public Attributes getRequiredAttributes(String type) {
 		IServerType t = serverTypes.get(type);
 		Attributes ret = t == null ? null : t.getRequiredAttributes();
 		return validateAttributes(ret, type);
 	}
 	
+	@Override
 	public Attributes getOptionalAttributes(String type) {
 		IServerType t = serverTypes.get(type);
 		Attributes ret = t == null ? null : t.getOptionalAttributes();
 		return validateAttributes(ret, type);
 	}
 
+	@Override
 	public List<ServerLaunchMode> getLaunchModes(String serverType) {
 		IServerType t = serverTypes.get(serverType);
 		ServerLaunchMode[] ret = t == null ? null : t.getLaunchModes();
 		return ret == null ? null : Arrays.asList(ret);
 	}
 	
+	@Override
 	public Attributes getRequiredLaunchAttributes(String type) {
 		IServerType t = serverTypes.get(type);
 		Attributes ret = t == null ? null : t.getRequiredLaunchAttributes();
 		return validateAttributes(ret, type);
 	}
 	
+	@Override
 	public Attributes getOptionalLaunchAttributes(String type) {
 		IServerType t = serverTypes.get(type);
 		Attributes ret = t == null ? null : t.getOptionalLaunchAttributes();
