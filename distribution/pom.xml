@@ -10,13 +10,14 @@
 		<version>0.10.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>org.jboss.tools.rsp.distribution</artifactId>
-	<packaging>pom</packaging>
-
 	<name>Runtime Server Protocol : Distribution</name>
-	<properties>
+	<packaging>eclipse-repository</packaging>
+
+    <properties>
 		<felix.version>6.0.1</felix.version>
 	</properties>
-	<build>
+	
+    <build>
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -78,7 +79,7 @@
 							<!-- configure the plugin here -->
 							<outputDirectory>${project.basedir}/target/felix-framework-${felix.version}/bundle/</outputDirectory>
 							<excludeTransitive>true</excludeTransitive>
-                                                        <includeScope>runtime</includeScope>
+                            <includeScope>runtime</includeScope>
 						</configuration>
 					</execution>
 				</executions>
@@ -104,95 +105,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.log</artifactId>
-			<version>1.0.1</version>
-		</dependency>
-		<dependency>
-		    <groupId>ch.qos.logback</groupId>
-		    <artifactId>logback-classic</artifactId>
-		    <version>1.2.3</version>
-		</dependency>
-		<dependency>
-		    <groupId>ch.qos.logback</groupId>
-		    <artifactId>logback-core</artifactId>
-		    <version>1.2.3</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.slf4j</groupId>
-		    <artifactId>slf4j-api</artifactId>
-		    <version>1.7.25</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.tools.rsp.api.bundles</groupId>
-			<artifactId>org.jboss.tools.rsp.api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.tools.rsp.framework</groupId>
-			<artifactId>org.jboss.tools.rsp.secure</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.tools.rsp.framework</groupId>
-			<artifactId>org.jboss.tools.rsp.logging</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.tools.rsp.framework</groupId>
-			<artifactId>org.jboss.tools.rsp.launching</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.tools.rsp.framework</groupId>
-			<artifactId>org.jboss.tools.rsp.launching.java</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.tools.rsp.framework</groupId>
-			<artifactId>org.jboss.tools.rsp.server.spi</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.tools.rsp.framework</groupId>
-			<artifactId>org.jboss.tools.rsp.server</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.tools.rsp.runtimes.bundles</groupId>
-			<artifactId>org.jboss.tools.rsp.server.wildfly</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.tools.rsp.runtimes.bundles</groupId>
-			<artifactId>org.jboss.tools.rsp.server.minishift</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.everit.osgi.bundles</groupId>
-			<artifactId>org.everit.osgi.bundles.org.apache.xmlcommons.full</artifactId>
-			<version>1.4.1-20150918</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.tools.rsp.framework</groupId>
-			<artifactId>org.jboss.tools.rsp.launching.java.test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.tools.rsp.framework</groupId>
-			<artifactId>org.jboss.tools.rsp.server.test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.tools.rsp.runtimes.tests</groupId>
-			<artifactId>org.jboss.tools.rsp.server.wildfly.test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
 </project>
