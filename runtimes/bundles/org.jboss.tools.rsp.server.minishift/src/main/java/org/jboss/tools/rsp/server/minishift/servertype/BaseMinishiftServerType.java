@@ -13,8 +13,6 @@ import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.launching.java.ILaunchModes;
-import org.jboss.tools.rsp.server.spi.servertype.IServer;
-import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
 
 public abstract class BaseMinishiftServerType implements IServerType {
@@ -45,9 +43,6 @@ public abstract class BaseMinishiftServerType implements IServerType {
 	public String getDescription() {
 		return desc;
 	}
-
-	@Override
-	public abstract IServerDelegate createServerDelegate(IServer server);
 
 	@Override
 	public Attributes getRequiredAttributes() {
@@ -89,7 +84,7 @@ public abstract class BaseMinishiftServerType implements IServerType {
 					ServerManagementAPIConstants.ATTR_TYPE_STRING,
 					"A minishift profile. Default value is 'minishift'", "minishift");
 
-			optional = attrs.toPojo();
+			this.optional = attrs.toPojo();
 		}
 		return optional;
 	}
