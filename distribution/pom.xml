@@ -59,7 +59,7 @@
 							<goal>wget</goal>
 						</goals>
 						<configuration>
-							<url>http://download.nextag.com/apache/felix/org.apache.felix.main.distribution-${felix.version}.zip</url>
+							<url>http://repo1.maven.org/maven2/org/apache/felix/org.apache.felix.main.distribution/6.0.1/org.apache.felix.main.distribution-6.0.1.zip</url>
 							<md5>16dc161fe677c3bfca8087df1d72b8da</md5>
 							<unpack>true</unpack>
 						</configuration>
