@@ -26,7 +26,7 @@ public class WildflyServerMain extends ServerManagementServerLauncher {
 	
 	@Override
 	public void launch(int port) throws Exception {
-		ExtensionHandler.addExtensionsToModel(serverImpl.getModel());
+		ExtensionHandler.addExtensions(serverImpl.getModel());
 		super.launch(port);
 	}
 }

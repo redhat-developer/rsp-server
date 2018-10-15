@@ -13,37 +13,80 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class RSPExtensionBundle implements BundleActivator {
-
-	private BundleListener listener = null;
-	protected abstract void addExtensions();
 	
-	protected void addExtensionsToBundle(BundleContext context, String bundleId) {
-		Bundle b = null;
-		Bundle[] all = context.getBundles();
-		for( int i = 0; i < all.length && b == null; i++ ) {
-			if( all[i].getSymbolicName().equals(bundleId)) {
-				b = all[i];
-			}
+	private static final Logger LOG = LoggerFactory.getLogger(RSPExtensionBundle.class);
+	
+	private BundleListener listener = null;
+
+	protected abstract void addExtensions();
+	protected abstract void removeExtensions();
+
+	protected void addExtensions(final String symbolicName, final BundleContext context) {
+		Bundle bundle = getBundle(symbolicName, context);
+		if (bundle == null) {
+			LOG.debug("No extension added. Bundle {} not found.", symbolicName);
+			return;
 		}
-		if( b.getState() != Bundle.ACTIVE) {
-			listener = new BundleListener() {
-				@Override
-				public void bundleChanged(BundleEvent event) {
-					if( event.getBundle().getSymbolicName().equals(bundleId)) {
-						if( event.getType() == BundleEvent.STARTED ) {
-							addExtensions();
-							context.removeBundleListener(listener);
-							listener = null;
-						}
-					}
-				}
-			};
-			context.addBundleListener(listener);
-		} else {
+
+		if (bundle.getState() == Bundle.ACTIVE) {
+			LOG.debug("Adding extensions. Bundle {} is started.", symbolicName);
 			addExtensions();
+		} else {
+			LOG.debug("Adding extensions once server bundle is started. Registering bundle listener");
+			this.listener = event -> onBundleStarted(event, symbolicName, context);
+			context.addBundleListener(listener);
 		}
 	}
 
+	private void onBundleStarted(BundleEvent event, String symbolicName, BundleContext context) {
+		if (event.getBundle().getSymbolicName().equals(symbolicName) 
+				&& event.getType() == BundleEvent.STARTED) {
+				LOG.debug("Adding extensions. Bundle {} is started.", symbolicName);
+				addExtensions();
+				removeBundleListener(context);
+		}
+	}
+
+	private void removeBundleListener(BundleContext context) {
+		context.removeBundleListener(listener);
+		this.listener = null;
+	}
+
+	protected void removeExtensions(final String symbolicName, final BundleContext context) {
+		Bundle bundle = getBundle(symbolicName, context);
+		if (bundle == null) {
+			LOG.debug("No extension added. Bundle {} not found.", symbolicName);
+			return;
+		}
+
+		if (bundle.getState() == Bundle.ACTIVE) {
+			LOG.debug("Removing extensions from bundle {}.", symbolicName);
+			removeExtensions();
+		}
+	}
+
+	private Bundle getBundle(String symbolicName, BundleContext context) {
+		if (isEmpty(symbolicName)
+				|| context == null) {
+			return null;
+		}
+		Bundle bundle = null;
+		Bundle[] bundles = context.getBundles();
+		for (int i = 0; i < bundles.length && bundle == null; i++) {
+			if (bundles[i].getSymbolicName().equals(symbolicName)) {
+				bundle = bundles[i];
+			}
+		}
+		return bundle;
+	}
+
+	private boolean isEmpty(String string) {
+		return string == null
+				|| string.isEmpty();
+	}
+	
 }

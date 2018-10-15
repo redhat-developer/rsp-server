@@ -43,12 +43,13 @@ public class ExtensionHandler {
 		// inhibit instantiation
 	}
 
-	public static void addExtensionsToModel(IServerManagementModel model) {
+	public static void addExtensions(IServerManagementModel model) {
 		model.getServerBeanTypeManager().addTypeProvider(new JBossServerBeanTypeProvider());
 		model.getServerModel().addServerTypes(TYPES);
 	}
 	
-	public static void removeExtensionsFromModel(IServerManagementModel model) {
+	public static void removeExtensions(IServerManagementModel model) {
+		model.getServerBeanTypeManager().removeTypeProvider(new JBossServerBeanTypeProvider());
 		model.getServerModel().removeServerTypes(TYPES);
 	}
 }

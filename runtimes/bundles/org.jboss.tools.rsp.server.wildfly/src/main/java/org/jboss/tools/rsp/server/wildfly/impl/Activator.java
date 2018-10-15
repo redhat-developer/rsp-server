@@ -16,21 +16,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Activator extends RSPExtensionBundle {
-	private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
+
 	public static final String BUNDLE_ID = "org.jboss.tools.rsp.server.wildfly";
+
+	private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
 	
 	@Override
 	public void start(BundleContext context) throws Exception {
-		LOG.info("Wildfly Server bundle started");
-		addExtensionsToBundle(context, ServerCoreActivator.BUNDLE_ID);
+		LOG.info("Bundle {} starting...", context.getBundle().getSymbolicName());
+
+		addExtensions(ServerCoreActivator.BUNDLE_ID, context);
+	}
+
+	@Override
+	public void stop(BundleContext context) throws Exception {
+		LOG.info("Bundle {} stopping...", context.getBundle().getSymbolicName());
+
+		removeExtensions(ServerCoreActivator.BUNDLE_ID, context);
 	}
 
 	@Override
 	protected void addExtensions() {
-		ExtensionHandler.addExtensionsToModel(LauncherSingleton.getDefault().getLauncher().getModel());
+		ExtensionHandler.addExtensions(LauncherSingleton.getDefault().getLauncher().getModel());
 	}
 	
 	@Override
-	public void stop(BundleContext context) throws Exception {
+	protected void removeExtensions() {
+		ExtensionHandler.removeExtensions(LauncherSingleton.getDefault().getLauncher().getModel());
 	}
 }

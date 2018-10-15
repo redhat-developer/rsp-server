@@ -28,6 +28,10 @@ public class ServerBeanTypeManager implements IServerBeanTypeManager {
 		typeProviders.add(provider);
 	}
 	
+	public void removeTypeProvider(IServerBeanTypeProvider provider) {
+		typeProviders.add(provider);
+	}
+
 	public ServerBeanType[] getAllRegisteredTypes() {
 		return typeProviders.stream()
 			.map(IServerBeanTypeProvider::getServerBeanTypes)
