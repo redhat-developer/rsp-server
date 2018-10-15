@@ -11,13 +11,28 @@ package org.jboss.tools.rsp.server.minishift.impl;
 import org.jboss.tools.rsp.server.minishift.discovery.MinishiftBeanTypeProvider;
 import org.jboss.tools.rsp.server.minishift.servertype.impl.MinishiftServerTypes;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
+import org.jboss.tools.rsp.server.spi.servertype.IServerType;
 
 public class ExtensionHandler {
-	
-	public static void addExtensionsToModel(IServerManagementModel model) {
+
+	private static final IServerType[] TYPES = {
+			MinishiftServerTypes.MINISHIFT_1_12_SERVER_TYPE,
+			MinishiftServerTypes.CDK_3X_SERVER_TYPE
+	};
+
+	private ExtensionHandler() {
+		// inhibit instantionation
+	}
+
+	public static void addExtensions(IServerManagementModel model) {
 		model.getServerBeanTypeManager().addTypeProvider(new MinishiftBeanTypeProvider());
-		model.getServerModel().addServerType(MinishiftServerTypes.MINISHIFT_1_12_SERVER_TYPE);
-		model.getServerModel().addServerType(MinishiftServerTypes.CDK_3X_SERVER_TYPE);
+
+		model.getServerModel().addServerTypes(TYPES);
 	}
 	
+	public static void removeExtensions(IServerManagementModel model) {
+		model.getServerBeanTypeManager().removeTypeProvider(new MinishiftBeanTypeProvider());
+
+		model.getServerModel().removeServerTypes(TYPES);
+	}
 }

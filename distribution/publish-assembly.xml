@@ -9,23 +9,26 @@
 	<fileSets>
 		<fileSet>
 			<directory>${project.basedir}</directory>
-			<outputDirectory>/rsp-distribution/conf/</outputDirectory>
+			<outputDirectory>/${rsp-distribution.folder}/conf/</outputDirectory>
 			<fileMode>755</fileMode>
 			<includes>
 				<include>logback.xml</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>${project.basedir}/target/felix-framework-6.0.1</directory>
-			<outputDirectory>/rsp-distribution/</outputDirectory>
+			<directory>${project.build.directory}/${felix.folder}</directory>
+			<outputDirectory>/${rsp-distribution.folder}/</outputDirectory>
 			<fileMode>755</fileMode>
-                	<!--
-                	Gogo bundles cause issues on windows. Excluding since provides no added value for us.
-                	-->
+            <!--
+            Gogo bundles cause issues on windows. Excluding since provide no added value for us.
+            -->
 			<excludes>
 				<exclude>**/*gogo*</exclude>
 			</excludes>
 		</fileSet>
+        <fileSet>
+			<directory>${project.build.directory}/repository/plugins</directory>
+            <outputDirectory>/${rsp-distribution.folder}/bundle</outputDirectory>
+	  </fileSet>
 	</fileSets>
 </assembly>
-

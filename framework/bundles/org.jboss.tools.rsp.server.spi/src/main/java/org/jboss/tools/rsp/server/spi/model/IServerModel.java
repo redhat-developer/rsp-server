@@ -65,7 +65,10 @@ public interface IServerModel {
 	void addServerModelListener(IServerModelListener listener);
 
 	void addServerType(IServerType serverType);
+	void addServerTypes(IServerType[] serverTypes);
+
 	void removeServerType(IServerType serverType);
+	void removeServerTypes(IServerType[] serverTypes);
 	
 	void loadServers() throws CoreException;
 
