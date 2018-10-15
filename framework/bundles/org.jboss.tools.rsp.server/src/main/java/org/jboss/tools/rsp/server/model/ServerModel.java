@@ -100,12 +100,34 @@ public class ServerModel implements IServerModel {
 	}
 	
 	@Override
+	public void addServerTypes(IServerType[] types) {
+		if (types == null) {
+			return;
+		}
+		
+		for (IServerType type : types) {
+			addServerType(type);
+		}
+	}
+
+	@Override
 	public void removeServerType(IServerType type) {
 		if( type != null && type.getId() != null ) {
 			serverTypes.remove(type.getId());
 		}
 	}
 	
+	@Override
+	public void removeServerTypes(IServerType[] types) {
+		if (types == null) {
+			return;
+		}
+		
+		for (IServerType type : types) {
+			removeServerType(type);
+		}
+	}
+
 	@Override
 	public IServer getServer(String id) {
 		return servers.get(id);
