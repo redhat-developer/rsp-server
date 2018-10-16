@@ -11,16 +11,27 @@ package org.jboss.tools.rsp.api.dao;
 import java.util.Map;
 
 public class ServerCapabilitiesResponse {
-	private Map<String,String> serverCapabilities;
+	private Map<String, String> serverCapabilities;
 	private Status clientRegistrationStatus;
-	public ServerCapabilitiesResponse(Status clientRegistrationStatus, Map<String,String> map) {
+
+	public ServerCapabilitiesResponse(Status clientRegistrationStatus, Map<String, String> map) {
 		this.clientRegistrationStatus = clientRegistrationStatus;
 		this.serverCapabilities = map;
 	}
-	public Map<String,String> getMap() {
-		return serverCapabilities;
-	}
+
 	public Status getClientRegistrationStatus() {
 		return clientRegistrationStatus;
+	}
+
+	public Map<String, String> getServerCapabilities() {
+		return serverCapabilities;
+	}
+
+	public void setServerCapabilities(Map<String, String> serverCapabilities) {
+		this.serverCapabilities = serverCapabilities;
+	}
+
+	public void setClientRegistrationStatus(Status clientRegistrationStatus) {
+		this.clientRegistrationStatus = clientRegistrationStatus;
 	}
 }

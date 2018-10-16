@@ -11,22 +11,28 @@ package org.jboss.tools.rsp.api.dao;
 public class ServerLaunchMode {
 	private String mode;
 	private String desc;
+
 	public ServerLaunchMode() {
-		
+
 	}
+
 	public ServerLaunchMode(String mode, String desc) {
 		this.mode = mode;
 		this.desc = desc;
 	}
+
 	public String getMode() {
 		return mode;
 	}
+
 	public void setMode(String mode) {
 		this.mode = mode;
 	}
+
 	public String getDesc() {
 		return desc;
 	}
+
 	public void setDesc(String desc) {
 		this.desc = desc;
 	}

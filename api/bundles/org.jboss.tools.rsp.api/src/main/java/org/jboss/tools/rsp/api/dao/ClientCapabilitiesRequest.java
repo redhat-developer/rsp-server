@@ -12,20 +12,20 @@ import java.util.Map;
 
 public class ClientCapabilitiesRequest {
 
-	private Map<String,String> map;
+	private Map<String, String> map;
 
 	public ClientCapabilitiesRequest() {
 	}
 
-	public ClientCapabilitiesRequest(Map<String,String> map) {
+	public ClientCapabilitiesRequest(Map<String, String> map) {
 		this.map = map;
 	}
 
-	public Map<String,String> getMap() {
+	public Map<String, String> getMap() {
 		return map;
 	}
 
-	public void setMap(Map<String,String> map) {
+	public void setMap(Map<String, String> map) {
 		this.map = map;
 	}
 }

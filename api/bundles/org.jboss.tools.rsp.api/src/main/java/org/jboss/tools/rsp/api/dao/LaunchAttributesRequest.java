@@ -11,9 +11,11 @@ package org.jboss.tools.rsp.api.dao;
 public class LaunchAttributesRequest {
 	private String serverTypeId;
 	private String mode;
+
 	public LaunchAttributesRequest() {
-		
+
 	}
+
 	public LaunchAttributesRequest(String serverTypeId, String mode) {
 		this.serverTypeId = serverTypeId;
 		this.mode = mode;
@@ -22,12 +24,15 @@ public class LaunchAttributesRequest {
 	public String getServerTypeId() {
 		return serverTypeId;
 	}
+
 	public void setServerTypeId(String serverTypeId) {
 		this.serverTypeId = serverTypeId;
 	}
+
 	public String getMode() {
 		return mode;
 	}
+
 	public void setMode(String mode) {
 		this.mode = mode;
 	}

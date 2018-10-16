@@ -12,20 +12,20 @@ public class ServerBean {
 	public static final String UNKNOWN_STR = "UNKNOWN"; //$NON-NLS-1$
 	public static final String EMPTY = ""; //$NON-NLS-1$
 
-	private String location=EMPTY;
+	private String location = EMPTY;
 	private String typeCategory = UNKNOWN_STR;
 	private String specificType = null;
 	private String name = EMPTY;
 	private String version = EMPTY;
 	private String fullVersion = EMPTY;
 	private String serverAdapterTypeId = EMPTY;
+
 	public ServerBean() {
-		
+
 	}
-	public ServerBean(String location, String name, 
-			String typeCategory, String specificType,
-			String fullVersion, String majorMinor, 
-			String serverAdapterTypeId) {
+
+	public ServerBean(String location, String name, String typeCategory, String specificType, String fullVersion,
+			String majorMinor, String serverAdapterTypeId) {
 		super();
 		this.location = location;
 		this.name = name;
@@ -35,22 +35,21 @@ public class ServerBean {
 		this.version = majorMinor;
 		this.serverAdapterTypeId = serverAdapterTypeId;
 	}
-	
+
 	public ServerBean(ServerBean bean) {
-		this(bean.getLocation(),bean.getName(), 
-				bean.getTypeCategory(), bean.getSpecificType(),
-				bean.getFullVersion(), bean.getVersion(), 
-				bean.getServerAdapterTypeId());
+		this(bean.getLocation(), bean.getName(), bean.getTypeCategory(), bean.getSpecificType(), bean.getFullVersion(),
+				bean.getVersion(), bean.getServerAdapterTypeId());
 	}
 
-	
 	public String toString() {
 		return name + "," + typeCategory + "," + version + "," + location; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
-	
+
 	public boolean equals(Object obj) {
-		if(obj == null) return false;
-		if(this == obj) return true;
+		if (obj == null)
+			return false;
+		if (this == obj)
+			return true;
 		return this.toString().equals(obj.toString());
 	}
 
@@ -88,5 +87,33 @@ public class ServerBean {
 
 	public String getServerAdapterTypeId() {
 		return serverAdapterTypeId;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public void setTypeCategory(String typeCategory) {
+		this.typeCategory = typeCategory;
+	}
+
+	public void setSpecificType(String specificType) {
+		this.specificType = specificType;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+	public void setFullVersion(String fullVersion) {
+		this.fullVersion = fullVersion;
+	}
+
+	public void setServerAdapterTypeId(String serverAdapterTypeId) {
+		this.serverAdapterTypeId = serverAdapterTypeId;
 	}
 }

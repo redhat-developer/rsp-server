@@ -11,9 +11,11 @@ package org.jboss.tools.rsp.api.dao;
 public class LaunchParameters {
 	private String mode;
 	private ServerAttributes params;
+
 	public LaunchParameters() {
-		
+
 	}
+
 	public LaunchParameters(ServerAttributes params, String mode) {
 		this.mode = mode;
 		this.params = params;

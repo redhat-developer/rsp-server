@@ -11,22 +11,28 @@ package org.jboss.tools.rsp.api.dao;
 public class StopServerAttributes {
 	private String id;
 	private boolean force;
+
 	public StopServerAttributes() {
-		
+
 	}
+
 	public StopServerAttributes(String id, boolean force) {
 		this.id = id;
 		this.force = force;
 	}
+
 	public String getId() {
 		return id;
 	}
+
 	public void setId(String id) {
 		this.id = id;
 	}
+
 	public boolean isForce() {
 		return force;
 	}
+
 	public void setForce(boolean force) {
 		this.force = force;
 	}
