@@ -1,6 +1,29 @@
 {
   "type" : "object",
   "properties" : {
+    "clientRegistrationStatus" : {
+      "type" : "object",
+      "properties" : {
+        "severity" : {
+          "type" : "integer"
+        },
+        "code" : {
+          "type" : "integer"
+        },
+        "message" : {
+          "type" : "string"
+        },
+        "trace" : {
+          "type" : "string"
+        },
+        "ok" : {
+          "type" : "boolean"
+        },
+        "plugin" : {
+          "type" : "string"
+        }
+      }
+    },
     "map" : {
       "type" : "object",
       "additionalProperties" : {

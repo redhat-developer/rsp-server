@@ -226,6 +226,29 @@ This endpoint returns the following schema as a return value:
 <tr><td><pre>{
   "type" : "object",
   "properties" : {
+    "clientRegistrationStatus" : {
+      "type" : "object",
+      "properties" : {
+        "severity" : {
+          "type" : "integer"
+        },
+        "code" : {
+          "type" : "integer"
+        },
+        "message" : {
+          "type" : "string"
+        },
+        "trace" : {
+          "type" : "string"
+        },
+        "ok" : {
+          "type" : "boolean"
+        },
+        "plugin" : {
+          "type" : "string"
+        }
+      }
+    },
     "map" : {
       "type" : "object",
       "additionalProperties" : {
@@ -234,7 +257,17 @@ This endpoint returns the following schema as a return value:
     }
   }
 }</pre></td><td><pre>export interface ServerCapabilitiesResponse {
+    clientRegistrationStatus: Status;
     map: { [index: string]: string };
+}
+
+export interface Status {
+    severity: number;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+    plugin: string;
 }</pre></td></tr></table>
 
 #### server/getDiscoveryPaths
