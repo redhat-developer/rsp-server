@@ -32,7 +32,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.launching.utils.IMemento;
-import org.jboss.tools.rsp.launching.utils.XMLMemento;
+import org.jboss.tools.rsp.launching.utils.JSONMemento;
 /**
  * Helper class for storing runtime and server attributes.
  */
@@ -294,7 +294,7 @@ public abstract class Base {
 
 	protected void saveToFile(IProgressMonitor monitor) throws CoreException {
 		try {
-			XMLMemento memento = XMLMemento.createWriteRoot(getXMLRoot());
+			JSONMemento memento = JSONMemento.createWriteRoot();
 			save(memento);
 			
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -421,7 +421,7 @@ public abstract class Base {
 		InputStream in = null;
 		try {
 			String content = new String(Files.readAllBytes(file.toPath()));
-			IMemento memento = XMLMemento.loadMemento(new ByteArrayInputStream(content.getBytes()));
+			IMemento memento = JSONMemento.loadMemento(new ByteArrayInputStream(content.getBytes()));
 			if( memento == null ) {
 				throw new Exception("Error reading server file " + file.getAbsolutePath() + ". Please check logs for more info.");
 			}
@@ -449,7 +449,7 @@ public abstract class Base {
 		InputStream in = null;
 		try {
 			in = new BufferedInputStream(new FileInputStream(path.toFile()));
-			IMemento memento = XMLMemento.loadMemento(in);
+			IMemento memento = JSONMemento.loadMemento(in);
 			load(memento);
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.wst.server.core", 0, NLS.bind("Error loading server from file {0}", path.toString()), e));
