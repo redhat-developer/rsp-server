@@ -13,36 +13,46 @@ public class ServerProcessOutput {
 	private String processId;
 	private int streamType;
 	private String text;
+
 	public ServerProcessOutput() {
-		
+
 	}
+
 	public ServerProcessOutput(ServerHandle handle, String id, int type, String text) {
 		this.server = handle;
 		this.processId = id;
 		this.streamType = type;
 		this.text = text;
 	}
+
 	public ServerHandle getServer() {
 		return server;
 	}
+
 	public void setServer(ServerHandle server) {
 		this.server = server;
 	}
+
 	public String getProcessId() {
 		return processId;
 	}
+
 	public void setProcessId(String processId) {
 		this.processId = processId;
 	}
+
 	public int getStreamType() {
 		return streamType;
 	}
+
 	public void setStreamType(int streamType) {
 		this.streamType = streamType;
 	}
+
 	public String getText() {
 		return text;
 	}
+
 	public void setText(String text) {
 		this.text = text;
 	}

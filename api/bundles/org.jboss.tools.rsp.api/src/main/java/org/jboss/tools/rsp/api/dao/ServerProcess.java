@@ -11,22 +11,28 @@ package org.jboss.tools.rsp.api.dao;
 public class ServerProcess {
 	private ServerHandle server;
 	private String processId;
+
 	public ServerProcess() {
-		
+
 	}
+
 	public ServerProcess(ServerHandle handle, String process) {
 		this.processId = process;
 		this.server = handle;
 	}
+
 	public ServerHandle getServer() {
 		return server;
 	}
+
 	public void setServer(ServerHandle server) {
 		this.server = server;
 	}
+
 	public String getProcessId() {
 		return processId;
 	}
+
 	public void setProcessId(String processId) {
 		this.processId = processId;
 	}

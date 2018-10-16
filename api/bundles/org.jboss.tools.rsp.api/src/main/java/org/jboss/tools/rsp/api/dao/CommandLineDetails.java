@@ -14,15 +14,12 @@ public class CommandLineDetails {
 	private String[] cmdLine;
 	private String workingDir;
 	private String[] envp;
-	private Map<String,String> properties;
-	
+	private Map<String, String> properties;
+
 	public CommandLineDetails() {
-		
 	}
 
-	
-	public CommandLineDetails(String[] cmdLine, String workingDir, String[] envp,
-			Map<String,String> properties) {
+	public CommandLineDetails(String[] cmdLine, String workingDir, String[] envp, Map<String, String> properties) {
 		this.cmdLine = cmdLine;
 		this.workingDir = workingDir;
 		this.envp = envp;
@@ -47,5 +44,17 @@ public class CommandLineDetails {
 
 	public void setProperties(Map<String, String> properties) {
 		this.properties = properties;
+	}
+
+	public void setCmdLine(String[] cmdLine) {
+		this.cmdLine = cmdLine;
+	}
+
+	public void setWorkingDir(String workingDir) {
+		this.workingDir = workingDir;
+	}
+
+	public void setEnvp(String[] envp) {
+		this.envp = envp;
 	}
 }

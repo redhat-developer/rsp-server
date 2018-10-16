@@ -11,7 +11,7 @@ package org.jboss.tools.rsp.api.dao;
 public class StringPrompt {
 	private int code;
 	private String prompt;
-	
+
 	public StringPrompt(int code, String prompt) {
 		this.code = code;
 		this.prompt = prompt;

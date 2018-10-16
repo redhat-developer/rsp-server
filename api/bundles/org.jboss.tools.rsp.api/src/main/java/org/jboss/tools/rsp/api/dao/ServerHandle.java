@@ -11,14 +11,16 @@ package org.jboss.tools.rsp.api.dao;
 public class ServerHandle {
 	private String id;
 	private ServerType type;
+
 	public ServerHandle() {
-		
+
 	}
+
 	public ServerHandle(String id, ServerType type) {
 		this.id = id;
 		this.type = type;
 	}
-	
+
 	public String getId() {
 		return id;
 	}
@@ -26,7 +28,16 @@ public class ServerHandle {
 	public ServerType getType() {
 		return type;
 	}
+
 	public String toString() {
 		return type.toString() + ":" + id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public void setType(ServerType type) {
+		this.type = type;
 	}
 }

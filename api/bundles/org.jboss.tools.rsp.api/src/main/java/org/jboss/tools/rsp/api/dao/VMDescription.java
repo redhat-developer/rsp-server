@@ -12,9 +12,11 @@ public class VMDescription {
 	private String id;
 	private String installLocation;
 	private String version;
+
 	public VMDescription() {
-		
+
 	}
+
 	public VMDescription(String id, String il, String v) {
 		this.id = id;
 		this.installLocation = il;
@@ -31,5 +33,17 @@ public class VMDescription {
 
 	public String getVersion() {
 		return version;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public void setInstallLocation(String installLocation) {
+		this.installLocation = installLocation;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
 	}
 }

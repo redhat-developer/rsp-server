@@ -13,10 +13,11 @@ import java.util.Map;
 
 public class Attributes {
 	private Map<String, Attribute> attributes;
-	
+
 	public Attributes() {
 		attributes = new HashMap<>();
 	}
+
 	public Attributes(Map<String, Attribute> a) {
 		attributes = new HashMap<>(a);
 	}

@@ -11,9 +11,11 @@ package org.jboss.tools.rsp.api.dao;
 public class StartServerResponse {
 	private Status status;
 	private CommandLineDetails details;
+
 	public StartServerResponse() {
-		
+
 	}
+
 	public StartServerResponse(Status status, CommandLineDetails details) {
 		this.status = status;
 		this.details = details;
@@ -32,6 +34,10 @@ public class StartServerResponse {
 	}
 
 	public void setDebugDetails(CommandLineDetails details) {
+		this.details = details;
+	}
+
+	public void setDetails(CommandLineDetails details) {
 		this.details = details;
 	}
 }
