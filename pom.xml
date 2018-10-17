@@ -23,7 +23,6 @@
 		<module>framework</module>
 		<module>runtimes</module>
 		<module>distribution</module>
-                <module>integration-tests</module>
 	</modules>
 
 	<build>
