@@ -1,1 +1,9 @@
-{"rootPropKey":"rootPropValue","childOne":{"childStringKey":"childStringValue"},"childTwo":{"childStringKey":"childStringValue"}}
+{
+  "rootPropKey": "rootPropValue",
+  "childOne": {
+    "childStringKey": "childStringValue"
+  },
+  "childTwo": {
+    "childStringKey": "childStringValue"
+  }
+}
