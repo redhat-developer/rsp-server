@@ -26,6 +26,8 @@ import org.jboss.tools.rsp.launching.utils.XMLMemento;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonSyntaxException;
+
 public class VMInstallRegistry implements IVMInstallRegistry {
 	private static final Logger LOG = LoggerFactory.getLogger(VMInstallRegistry.class);
 
@@ -146,7 +148,13 @@ public class VMInstallRegistry implements IVMInstallRegistry {
 		if (!vmsFile.exists()) {
 			return;
 		}
-		IMemento vmsMemento = JSONMemento.loadMemento(new FileInputStream(vmsFile));
+		IMemento vmsMemento; 
+		try {
+			vmsMemento = JSONMemento.loadMemento(new FileInputStream(vmsFile));
+		} catch (JsonSyntaxException se) {
+			// most probably that it is still in the previous xml format
+			vmsMemento = XMLMemento.loadMemento(new FileInputStream(vmsFile));
+		}
 		for (IMemento vmMemento : vmsMemento.getChildren()) {
 			String id = vmMemento.getString("id");
 			if (findVMInstall(id) != null) {
