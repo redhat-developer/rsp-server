@@ -32,7 +32,10 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.launching.utils.IMemento;
+import org.jboss.tools.rsp.launching.utils.JSONMemento;
 import org.jboss.tools.rsp.launching.utils.XMLMemento;
+
+import com.google.gson.JsonSyntaxException;
 /**
  * Helper class for storing runtime and server attributes.
  */
@@ -294,7 +297,7 @@ public abstract class Base {
 
 	protected void saveToFile(IProgressMonitor monitor) throws CoreException {
 		try {
-			XMLMemento memento = XMLMemento.createWriteRoot(getXMLRoot());
+			JSONMemento memento = JSONMemento.createWriteRoot();
 			save(memento);
 			
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -418,23 +421,21 @@ public abstract class Base {
 	 * 
 	 */
 	protected void loadFromFile(IProgressMonitor monitor) throws CoreException {
-		InputStream in = null;
-		try {
-			String content = new String(Files.readAllBytes(file.toPath()));
-			IMemento memento = XMLMemento.loadMemento(new ByteArrayInputStream(content.getBytes()));
+		try(InputStream in = new ByteArrayInputStream(Files.readAllBytes(file.toPath()))) {
+			IMemento memento; 
+			try {
+				memento = JSONMemento.loadMemento(in);
+			} catch (JsonSyntaxException se) {
+				// most probably that it is still in the previous xml format
+				in.reset();
+				memento = XMLMemento.loadMemento(in);
+			}
 			if( memento == null ) {
 				throw new Exception("Error reading server file " + file.getAbsolutePath() + ". Please check logs for more info.");
 			}
 			load(memento);
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.wst.server.core", 0, NLS.bind("Could not load server from file {0}", file.getAbsolutePath()), e));
-		} finally {
-			try {
-				if (in != null)
-					in.close();
-			} catch (Exception e) {
-				// ignore
-			}
 		}
 	}
 	
@@ -446,20 +447,17 @@ public abstract class Base {
 	 * 
 	 */
 	protected void loadFromPath(IPath path, IProgressMonitor monitor) throws CoreException {
-		InputStream in = null;
-		try {
-			in = new BufferedInputStream(new FileInputStream(path.toFile()));
-			IMemento memento = XMLMemento.loadMemento(in);
+		try(InputStream in = new BufferedInputStream(new FileInputStream(path.toFile()))) {
+			IMemento memento; 
+			try {
+				memento = JSONMemento.loadMemento(in);
+			} catch (JsonSyntaxException se) {
+				// most probably that it is still in the previous xml format
+				memento = XMLMemento.loadMemento(in);
+			}
 			load(memento);
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.wst.server.core", 0, NLS.bind("Error loading server from file {0}", path.toString()), e));
-		} finally {
-			try {
-				if (in != null)
-					in.close();
-			} catch (Exception e) {
-				// ignore
-			}
 		}
 	}
 	

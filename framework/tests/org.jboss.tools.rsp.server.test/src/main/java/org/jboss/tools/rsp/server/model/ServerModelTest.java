@@ -258,15 +258,13 @@ public class ServerModelTest {
 
 	
 	private String getServerString(String name, String type) {
-		String contents = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" + 
-				"<server id=\"" + name + "\" id-set=\"true\" " + 
-				"org.jboss.tools.rsp.server.typeId=\"" + type + "\"/>\n";
+		String contents = "{id:\"" + name + "\", id-set:\"true\", " + 
+				"org.jboss.tools.rsp.server.typeId=\"" + type + "\"}\n";
 		return contents;
 	}
 
 	private String getServerStringNoType(String name) {
-		String contents = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" + 
-				"<server id=\"" + name + "\" id-set=\"true\"/>\n";
+		String contents = "{id:\"" + name + "\", id-set:\"true\"}\n";
 		return contents;
 	}
 	

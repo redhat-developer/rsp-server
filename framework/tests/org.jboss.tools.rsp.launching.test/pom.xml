@@ -6,11 +6,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.jboss.tools.rsp.framework</groupId>
-	  	<artifactId>bundles</artifactId>
+	  	<artifactId>tests</artifactId>
 		<version>0.10.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>org.jboss.tools.rsp.launching</artifactId>
-	<packaging>eclipse-plugin</packaging>
-
-	<name>Runtime Server Protocol : Launching</name>
+	<artifactId>org.jboss.tools.rsp.launching.test</artifactId>
+	<packaging>eclipse-test-plugin</packaging>
 </project>

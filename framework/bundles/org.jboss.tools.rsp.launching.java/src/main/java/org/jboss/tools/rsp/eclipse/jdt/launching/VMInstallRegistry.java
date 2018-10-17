@@ -21,9 +21,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.jboss.tools.rsp.launching.utils.IMemento;
+import org.jboss.tools.rsp.launching.utils.JSONMemento;
 import org.jboss.tools.rsp.launching.utils.XMLMemento;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.JsonSyntaxException;
 
 public class VMInstallRegistry implements IVMInstallRegistry {
 	private static final Logger LOG = LoggerFactory.getLogger(VMInstallRegistry.class);
@@ -128,7 +131,7 @@ public class VMInstallRegistry implements IVMInstallRegistry {
 		if (!vmsFile.exists()) {
 			vmsFile.createNewFile();
 		}
-		XMLMemento memento = XMLMemento.createWriteRoot("vms");
+		JSONMemento memento = JSONMemento.createWriteRoot();
 		for (IVMInstall vmInstall : getVMs()) {
 			IMemento vmMemento = memento.createChild("vm");
 			vmMemento.putString("id", vmInstall.getId());
@@ -145,7 +148,13 @@ public class VMInstallRegistry implements IVMInstallRegistry {
 		if (!vmsFile.exists()) {
 			return;
 		}
-		IMemento vmsMemento = XMLMemento.loadMemento(new FileInputStream(vmsFile));
+		IMemento vmsMemento; 
+		try {
+			vmsMemento = JSONMemento.loadMemento(new FileInputStream(vmsFile));
+		} catch (JsonSyntaxException se) {
+			// most probably that it is still in the previous xml format
+			vmsMemento = XMLMemento.loadMemento(new FileInputStream(vmsFile));
+		}
 		for (IMemento vmMemento : vmsMemento.getChildren()) {
 			String id = vmMemento.getString("id");
 			if (findVMInstall(id) != null) {
