@@ -7,6 +7,9 @@
         "severity" : {
           "type" : "integer"
         },
+        "pluginId" : {
+          "type" : "string"
+        },
         "code" : {
           "type" : "integer"
         },

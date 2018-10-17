@@ -1,11 +1,20 @@
 {
   "type" : "object",
   "properties" : {
+    "serverCapabilities" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "string"
+      }
+    },
     "clientRegistrationStatus" : {
       "type" : "object",
       "properties" : {
         "severity" : {
           "type" : "integer"
+        },
+        "pluginId" : {
+          "type" : "string"
         },
         "code" : {
           "type" : "integer"
@@ -22,12 +31,6 @@
         "plugin" : {
           "type" : "string"
         }
-      }
-    },
-    "map" : {
-      "type" : "object",
-      "additionalProperties" : {
-        "type" : "string"
       }
     }
   }

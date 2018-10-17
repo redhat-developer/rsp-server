@@ -226,11 +226,20 @@ This endpoint returns the following schema as a return value:
 <tr><td><pre>{
   "type" : "object",
   "properties" : {
+    "serverCapabilities" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "string"
+      }
+    },
     "clientRegistrationStatus" : {
       "type" : "object",
       "properties" : {
         "severity" : {
           "type" : "integer"
+        },
+        "pluginId" : {
+          "type" : "string"
         },
         "code" : {
           "type" : "integer"
@@ -248,21 +257,16 @@ This endpoint returns the following schema as a return value:
           "type" : "string"
         }
       }
-    },
-    "map" : {
-      "type" : "object",
-      "additionalProperties" : {
-        "type" : "string"
-      }
     }
   }
 }</pre></td><td><pre>export interface ServerCapabilitiesResponse {
+    serverCapabilities: { [index: string]: string };
     clientRegistrationStatus: Status;
-    map: { [index: string]: string };
 }
 
 export interface Status {
     severity: number;
+    pluginId: string;
     code: number;
     message: string;
     trace: string;
@@ -373,6 +377,9 @@ This endpoint returns the following schema as a return value:
     "severity" : {
       "type" : "integer"
     },
+    "pluginId" : {
+      "type" : "string"
+    },
     "code" : {
       "type" : "integer"
     },
@@ -391,6 +398,7 @@ This endpoint returns the following schema as a return value:
   }
 }</pre></td><td><pre>export interface Status {
     severity: number;
+    pluginId: string;
     code: number;
     message: string;
     trace: string;
@@ -425,6 +433,9 @@ This endpoint returns the following schema as a return value:
     "severity" : {
       "type" : "integer"
     },
+    "pluginId" : {
+      "type" : "string"
+    },
     "code" : {
       "type" : "integer"
     },
@@ -443,6 +454,7 @@ This endpoint returns the following schema as a return value:
   }
 }</pre></td><td><pre>export interface Status {
     severity: number;
+    pluginId: string;
     code: number;
     message: string;
     trace: string;
@@ -567,6 +579,9 @@ This endpoint returns the following schema as a return value:
     "severity" : {
       "type" : "integer"
     },
+    "pluginId" : {
+      "type" : "string"
+    },
     "code" : {
       "type" : "integer"
     },
@@ -585,6 +600,7 @@ This endpoint returns the following schema as a return value:
   }
 }</pre></td><td><pre>export interface Status {
     severity: number;
+    pluginId: string;
     code: number;
     message: string;
     trace: string;
@@ -750,6 +766,9 @@ This endpoint returns the following schema as a return value:
     "severity" : {
       "type" : "integer"
     },
+    "pluginId" : {
+      "type" : "string"
+    },
     "code" : {
       "type" : "integer"
     },
@@ -768,6 +787,7 @@ This endpoint returns the following schema as a return value:
   }
 }</pre></td><td><pre>export interface Status {
     severity: number;
+    pluginId: string;
     code: number;
     message: string;
     trace: string;
@@ -1072,6 +1092,9 @@ This endpoint returns the following schema as a return value:
     "severity" : {
       "type" : "integer"
     },
+    "pluginId" : {
+      "type" : "string"
+    },
     "code" : {
       "type" : "integer"
     },
@@ -1090,6 +1113,7 @@ This endpoint returns the following schema as a return value:
   }
 }</pre></td><td><pre>export interface Status {
     severity: number;
+    pluginId: string;
     code: number;
     message: string;
     trace: string;
@@ -1148,6 +1172,9 @@ This endpoint returns the following schema as a return value:
     "severity" : {
       "type" : "integer"
     },
+    "pluginId" : {
+      "type" : "string"
+    },
     "code" : {
       "type" : "integer"
     },
@@ -1166,6 +1193,7 @@ This endpoint returns the following schema as a return value:
   }
 }</pre></td><td><pre>export interface Status {
     severity: number;
+    pluginId: string;
     code: number;
     message: string;
     trace: string;
@@ -1227,6 +1255,9 @@ This endpoint returns the following schema as a return value:
         "severity" : {
           "type" : "integer"
         },
+        "pluginId" : {
+          "type" : "string"
+        },
         "code" : {
           "type" : "integer"
         },
@@ -1278,6 +1309,7 @@ This endpoint returns the following schema as a return value:
 
 export interface Status {
     severity: number;
+    pluginId: string;
     code: number;
     message: string;
     trace: string;
@@ -1323,6 +1355,9 @@ This endpoint returns the following schema as a return value:
     "severity" : {
       "type" : "integer"
     },
+    "pluginId" : {
+      "type" : "string"
+    },
     "code" : {
       "type" : "integer"
     },
@@ -1341,6 +1376,7 @@ This endpoint returns the following schema as a return value:
   }
 }</pre></td><td><pre>export interface Status {
     severity: number;
+    pluginId: string;
     code: number;
     message: string;
     trace: string;

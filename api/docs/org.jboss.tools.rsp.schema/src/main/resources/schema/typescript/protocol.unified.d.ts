@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2018-10-16 12:38:33.
+// Generated using typescript-generator version 2.2.413 on 2018-10-17 12:52:36.
 
 export interface Attribute {
     type: string;
@@ -9,6 +9,11 @@ export interface Attribute {
 
 export interface Attributes {
     attributes: { [index: string]: Attribute };
+}
+
+export interface ServerCapabilitiesResponse {
+    serverCapabilities: { [index: string]: string };
+    clientRegistrationStatus: Status;
 }
 
 export interface ClientCapabilitiesRequest {
@@ -50,11 +55,6 @@ export interface ServerBean {
     version: string;
     fullVersion: string;
     serverAdapterTypeId: string;
-}
-
-export interface ServerCapabilitiesResponse {
-    clientRegistrationStatus: Status;
-    map: { [index: string]: string };
 }
 
 export interface ServerHandle {
@@ -102,6 +102,7 @@ export interface StartServerResponse {
 
 export interface Status {
     severity: number;
+    pluginId: string;
     code: number;
     message: string;
     trace: string;

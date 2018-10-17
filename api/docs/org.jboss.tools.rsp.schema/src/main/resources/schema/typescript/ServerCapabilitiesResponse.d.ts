@@ -1,10 +1,11 @@
 export interface ServerCapabilitiesResponse {
+    serverCapabilities: { [index: string]: string };
     clientRegistrationStatus: Status;
-    map: { [index: string]: string };
 }
 
 export interface Status {
     severity: number;
+    pluginId: string;
     code: number;
     message: string;
     trace: string;
