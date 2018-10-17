@@ -11,8 +11,10 @@ package org.jboss.tools.rsp.server.model;
 import java.io.File;
 
 import org.jboss.tools.rsp.api.RSPClient;
+import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.eclipse.jdt.launching.VMInstallRegistry;
 import org.jboss.tools.rsp.launching.LaunchingCore;
+import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
 import org.jboss.tools.rsp.server.CapabilityManagement;
 import org.jboss.tools.rsp.server.discovery.DiscoveryPathModel;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanTypeManager;
@@ -29,63 +31,100 @@ public class ServerManagementModel implements IServerManagementModel {
 	private static final Logger LOG = LoggerFactory.getLogger(ServerManagementModel.class);
 
 	private static ServerManagementModel instance;
+
 	public static ServerManagementModel getDefault() {
 		return instance;
 	}
 
-	
-	private SecureStorageGuardian secureStorage;
-	private CapabilityManagement capabilities;
+	private ISecureStorageProvider secureStorage;
+	private ICapabilityManagement capabilities;
 
-	private DiscoveryPathModel rpm;
-	private ServerBeanTypeManager serverBeanTypeManager;
-	private ServerModel serverModel;
-	private VMInstallRegistry vmModel;
-	
+	private IDiscoveryPathModel rpm;
+	private IServerBeanTypeManager serverBeanTypeManager;
+	private IServerModel serverModel;
+	private IVMInstallRegistry vmModel;
+
 	public ServerManagementModel() {
-		this.capabilities = new CapabilityManagement();
-		this.secureStorage = new SecureStorageGuardian(getSecureStorageFile(), capabilities);
-		this.rpm = new DiscoveryPathModel();
-		this.serverBeanTypeManager = new ServerBeanTypeManager();
-		this.serverModel = new ServerModel(secureStorage);
-		this.vmModel = new VMInstallRegistry();
+		this.capabilities = createCapabilityManagement();
+		this.secureStorage = createSecureStorageProvider(capabilities);
+		this.rpm = createDiscoveryPathModel();
+		this.serverBeanTypeManager = createServerBeanTypeManager();
+		this.serverModel = createServerModel(secureStorage);
+		this.vmModel = createVMInstallRegistry();
 		this.vmModel.addActiveVM();
-		
+
 		instance = this;
 	}
 	
+	public ISecureStorageProvider getSecureStorageProvider() {
+		return secureStorage;
+	}
+
 	public IDiscoveryPathModel getDiscoveryPathModel() {
 		return rpm;
 	}
-	
+
 	public IServerBeanTypeManager getServerBeanTypeManager() {
 		return serverBeanTypeManager;
 	}
-	
+
 	public IServerModel getServerModel() {
 		return serverModel;
 	}
 
-	public VMInstallRegistry getVMInstallModel() {
+	public IVMInstallRegistry getVMInstallModel() {
 		return vmModel;
 	}
-	
+
 	public ICapabilityManagement getCapabilityManagement() {
 		return capabilities;
 	}
 
 	public void removeClient(RSPClient client) {
 		capabilities.clientRemoved(client);
+		if( secureStorage instanceof SecureStorageGuardian ) 
+			((SecureStorageGuardian)secureStorage).removeClient(client);
 	}
 
 	public void clientAdded(RSPClient client) {
 		capabilities.clientAdded(client);
 	}
-	
+
 	private File getSecureStorageFile() {
-		File data = LaunchingCore.getDataLocation();
+		File data = getDataLocation();
 		File secure = new File(data, "securestorage");
 		return secure;
 	}
 
+	protected File getDataLocation() {
+		return LaunchingCore.getDataLocation();
+	}
+
+	/*
+	 * Following methods are for tests / subclasses to override. This is not advised
+	 * for clients / extenders, since this class appears to behave as a singleton.
+	 */
+	protected ISecureStorageProvider createSecureStorageProvider(ICapabilityManagement mgmt) {
+		return new SecureStorageGuardian(getSecureStorageFile(), mgmt);
+	}
+
+	protected ICapabilityManagement createCapabilityManagement() {
+		return new CapabilityManagement();
+	}
+
+	protected IDiscoveryPathModel createDiscoveryPathModel() {
+		return new DiscoveryPathModel();
+	}
+
+	protected VMInstallRegistry createVMInstallRegistry() {
+		return new VMInstallRegistry();
+	}
+
+	protected IServerModel createServerModel(ISecureStorageProvider secure) {
+		return new ServerModel(secure);
+	}
+
+	protected IServerBeanTypeManager createServerBeanTypeManager() {
+		return new ServerBeanTypeManager();
+	}
 }

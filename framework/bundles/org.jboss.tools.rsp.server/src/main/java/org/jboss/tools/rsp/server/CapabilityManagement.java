@@ -58,7 +58,7 @@ public class CapabilityManagement implements ICapabilityManagement, ICapabilityK
 		}
 		
 		public String getProperty(String key) {
-			return data.get(key);
+			return data == null ? null : data.get(key);
 		}
 	}
 	
