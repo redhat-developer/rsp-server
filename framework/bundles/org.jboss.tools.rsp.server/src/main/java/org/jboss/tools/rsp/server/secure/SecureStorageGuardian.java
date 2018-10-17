@@ -54,6 +54,7 @@ public class SecureStorageGuardian implements ISecureStorageProvider {
 
 	public void removeClient(RSPClient client) {
 		permissions.remove(client);
+		maxTriesReached.remove(client);
 	}
 
 	private RSPSecureStorage checkKey(byte[] key) throws CryptoException {
@@ -76,7 +77,7 @@ public class SecureStorageGuardian implements ISecureStorageProvider {
 	 * @throws InterruptedException
 	 * @throws ExecutionException
 	 */
-	public void authenticateClient(RSPClient client, int maxTries) throws InterruptedException, ExecutionException {
+	private void authenticateClient(RSPClient client, int maxTries) throws InterruptedException, ExecutionException {
 		if( canPromptClient(client, capabilities)) {
 			String msg = "Please provide a secure-storage password to either create a new, or load an existing, secure storage."; 
 			StringPrompt prompt = new StringPrompt(100, msg);
@@ -98,6 +99,9 @@ public class SecureStorageGuardian implements ISecureStorageProvider {
 	}
 	
 	private boolean canPromptClient(RSPClient client, ICapabilityManagement capabilities) {
+		if( client == null )
+			return false;
+		
 		String prop = capabilities.getCapabilityProperty(client,
 				ICapabilityKeys.STRING_PROTOCOL_VERSION);
 		if( prop != null && !ICapabilityKeys.PROTOCOL_VERSION_0_9_0.equals(prop)) {
