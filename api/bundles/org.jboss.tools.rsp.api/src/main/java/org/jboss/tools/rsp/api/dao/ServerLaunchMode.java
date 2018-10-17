@@ -40,24 +40,23 @@ public class ServerLaunchMode {
 		this.desc = desc;
 	}
 
-        @Override
-        public boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            }
-            if (o == null) {
-                return false;
-            }
-            if (!(o instanceof ServerLaunchMode)) {
-                return false;
-            }
-            ServerLaunchMode temp = (ServerLaunchMode) o;
-            return EqualsUtility.areEqual(this.mode, temp.mode)
-                    && EqualsUtility.areEqual(this.desc, temp.desc);
-        }
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
+		if (o == null) {
+			return false;
+		}
+		if (!(o instanceof ServerLaunchMode)) {
+			return false;
+		}
+		ServerLaunchMode temp = (ServerLaunchMode) o;
+		return EqualsUtility.areEqual(this.mode, temp.mode) && EqualsUtility.areEqual(this.desc, temp.desc);
+	}
 
-        @Override
-        public int hashCode() {
-            return Objects.hash(mode, desc);
-        }
+	@Override
+	public int hashCode() {
+		return Objects.hash(mode, desc);
+	}
 }

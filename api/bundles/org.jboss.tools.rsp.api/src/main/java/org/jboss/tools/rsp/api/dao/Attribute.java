@@ -50,25 +50,25 @@ public class Attribute {
 		this.defaultVal = defaultVal;
 	}
 
-        @Override
-        public boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            }
-            if (o == null) {
-                return false;
-            }
-            if (!(o instanceof Attribute)) {
-                return false;
-            }
-            Attribute temp = (Attribute) o;
-            return EqualsUtility.areEqual(this.type, temp.type) 
-                    && EqualsUtility.areEqual(this.description, temp.description)
-                    && EqualsUtility.areEqual(this.defaultVal, temp.defaultVal);
-        }
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
+		if (o == null) {
+			return false;
+		}
+		if (!(o instanceof Attribute)) {
+			return false;
+		}
+		Attribute temp = (Attribute) o;
+		return EqualsUtility.areEqual(this.type, temp.type)
+				&& EqualsUtility.areEqual(this.description, temp.description)
+				&& EqualsUtility.areEqual(this.defaultVal, temp.defaultVal);
+	}
 
-        @Override
-        public int hashCode() {
-            return Objects.hash(defaultVal, description, type);
-        }
+	@Override
+	public int hashCode() {
+		return Objects.hash(defaultVal, description, type);
+	}
 }

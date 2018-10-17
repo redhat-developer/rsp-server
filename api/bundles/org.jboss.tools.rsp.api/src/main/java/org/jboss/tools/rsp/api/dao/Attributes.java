@@ -31,22 +31,22 @@ public class Attributes {
 		this.attributes = attrs;
 	}
 
-        @Override
-        public boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            }
-            if (o == null) {
-                return false;
-            }
-            if (!(o instanceof Attributes)) {
-                return false;
-            }
-            return EqualsUtility.areEqual(this.attributes, ((Attributes) o).attributes);
-        }
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
+		if (o == null) {
+			return false;
+		}
+		if (!(o instanceof Attributes)) {
+			return false;
+		}
+		return EqualsUtility.areEqual(this.attributes, ((Attributes) o).attributes);
+	}
 
-        @Override
-        public int hashCode() {
-            return attributes.hashCode();
-        }
+	@Override
+	public int hashCode() {
+		return attributes.hashCode();
+	}
 }

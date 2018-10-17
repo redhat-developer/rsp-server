@@ -50,25 +50,24 @@ public class ServerType {
 		this.description = description;
 	}
 
-        @Override
-        public boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            }
-            if (o == null) {
-                return false;
-            }
-            if (!(o instanceof ServerType)) {
-                return false;
-            }
-            ServerType temp = (ServerType) o;
-            return EqualsUtility.areEqual(this.id, temp.id) 
-                    && EqualsUtility.areEqual(this.description, temp.description) 
-                    && EqualsUtility.areEqual(this.visibleName, temp.visibleName);
-        }
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
+		if (o == null) {
+			return false;
+		}
+		if (!(o instanceof ServerType)) {
+			return false;
+		}
+		ServerType temp = (ServerType) o;
+		return EqualsUtility.areEqual(this.id, temp.id) && EqualsUtility.areEqual(this.description, temp.description)
+				&& EqualsUtility.areEqual(this.visibleName, temp.visibleName);
+	}
 
-        @Override
-        public int hashCode() {
-            return Objects.hash(id, description, visibleName);
-        } 
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, description, visibleName);
+	}
 }

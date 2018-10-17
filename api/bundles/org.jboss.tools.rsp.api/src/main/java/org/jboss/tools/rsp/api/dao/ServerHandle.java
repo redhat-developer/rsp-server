@@ -43,25 +43,24 @@ public class ServerHandle {
 	public void setType(ServerType type) {
 		this.type = type;
 	}
-        
-        @Override
-        public boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            }
-            if (o == null) {
-                return false;
-            }
-            if (!(o instanceof ServerHandle)) {
-                return false;
-            }
-            ServerHandle temp = (ServerHandle) o;
-            return EqualsUtility.areEqual(this.id, temp.id)
-                    && EqualsUtility.areEqual(this.type, temp.type);
-        }
 
-        @Override
-        public int hashCode() {
-            return Objects.hash(id, type);
-        }
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
+		if (o == null) {
+			return false;
+		}
+		if (!(o instanceof ServerHandle)) {
+			return false;
+		}
+		ServerHandle temp = (ServerHandle) o;
+		return EqualsUtility.areEqual(this.id, temp.id) && EqualsUtility.areEqual(this.type, temp.type);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, type);
+	}
 }
