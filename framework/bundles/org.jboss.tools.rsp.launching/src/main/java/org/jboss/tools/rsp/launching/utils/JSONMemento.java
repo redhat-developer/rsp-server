@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -130,16 +131,11 @@ public class JSONMemento implements IMemento {
 	 * @exception java.io.IOException
 	 */
 	public void saveToFile(String filename) throws IOException {
-		Gson gson = new Gson();
-		try(BufferedWriter w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename)))) {
-			JsonElement jsonElement = gson.fromJson(this.jsonObject, JsonElement.class);
-			gson.toJson(jsonElement, w);
-			w.flush();
-		}
+		save(new FileOutputStream(filename));
 	}
 	
 	public void save(OutputStream os) throws IOException {
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		JsonElement jsonElement = gson.fromJson(this.jsonObject, JsonElement.class);
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
 		gson.toJson(jsonElement, bw);

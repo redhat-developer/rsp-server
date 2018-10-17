@@ -1,6 +1,5 @@
 package org.jboss.tools.rsp.launching.utils;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -67,7 +66,12 @@ public class JSONMementoTest {
 		
 		memento.saveToFile(TEST_JSON_COPY_PATH);
 		
-		assertArrayEquals(Files.readAllBytes(Paths.get(TEST_JSON_PATH)), Files.readAllBytes(Paths.get(TEST_JSON_COPY_PATH)));
+		String original = new String(Files.readAllBytes(Paths.get(TEST_JSON_PATH)));
+		String o2 = original.replaceAll("\\s","");
+		String actual = new String(Files.readAllBytes(Paths.get(TEST_JSON_COPY_PATH)));
+		String a2 = actual.replaceAll("\\s","");
+		
+		assertEquals(o2, a2);
 	}
 
 }

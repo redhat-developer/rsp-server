@@ -6,8 +6,7 @@ Automatic-Module-Name: org.jboss.tools.rsp.launching
 Bundle-Version: 0.10.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Activator: org.jboss.tools.rsp.launching.internal.LaunchingActivator
-Bundle-ClassPath: .,
- lib/gson-2.8.2.jar
+Bundle-ClassPath: .
 Import-Package: com.google.gson,
  javax.xml.parsers,
  javax.xml.transform,
@@ -29,5 +28,3 @@ Export-Package: org.jboss.tools.rsp.eclipse.core.runtime,
  org.jboss.tools.rsp.launching,
  org.jboss.tools.rsp.launching.utils,
  org.jboss.tools.rsp.launching.internal;x-friends:="org.jboss.tools.rsp.server.test"
-Require-Bundle: org.jboss.tools.rsp.api;bundle-version="0.0.9",
- com.google.gson;bundle-version="2.8.2"
