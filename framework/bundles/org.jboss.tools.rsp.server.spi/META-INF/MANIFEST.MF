@@ -8,6 +8,7 @@ Bundle-Version: 0.10.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: org.jboss.tools.rsp.api,
  org.jboss.tools.rsp.api.dao,
+ org.jboss.tools.rsp.api.dao.util,
  org.jboss.tools.rsp.eclipse.core.runtime,
  org.jboss.tools.rsp.eclipse.debug.core,
  org.jboss.tools.rsp.eclipse.debug.core.model,

@@ -51,7 +51,10 @@ public class JSONMemento implements IMemento {
 
 	@Override
 	public JSONMemento getChild(String childName) {
-		return new JSONMemento(this.jsonObject.getAsJsonObject(childName), childName);
+		JsonObject obj = this.jsonObject.getAsJsonObject(childName);
+		if( obj == null )
+			return null;
+		return new JSONMemento(obj, childName);
 	}
 
 	@Override
@@ -101,7 +104,13 @@ public class JSONMemento implements IMemento {
 
 	@Override
 	public List<String> getNames() {
-		return new ArrayList<String>(this.jsonObject.keySet());
+		List<String> ret = new ArrayList<>();
+		for (String key: this.jsonObject.keySet()) {
+			if (!this.jsonObject.get(key).isJsonObject()) {
+				ret.add(key);
+			}
+		}
+		return ret;
 	}
 
 	@Override

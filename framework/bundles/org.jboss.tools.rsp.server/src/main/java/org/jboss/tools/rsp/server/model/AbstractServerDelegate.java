@@ -15,15 +15,29 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableState;
+import org.jboss.tools.rsp.api.dao.LaunchParameters;
+import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
+import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
+import org.jboss.tools.rsp.api.dao.ServerState;
+import org.jboss.tools.rsp.api.dao.ServerType;
+import org.jboss.tools.rsp.api.dao.StartServerResponse;
+import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
+import org.jboss.tools.rsp.eclipse.core.runtime.MultiStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.debug.core.DebugEvent;
 import org.jboss.tools.rsp.eclipse.debug.core.IDebugEventSetListener;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.IStreamListener;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
+import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.launching.RuntimeProcessEventManager;
+import org.jboss.tools.rsp.launching.utils.StatusConverter;
+import org.jboss.tools.rsp.server.ServerCoreActivator;
+import org.jboss.tools.rsp.server.model.internal.ServerPublishStateModel;
 import org.jboss.tools.rsp.server.model.internal.ServerStreamListener;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.model.polling.IPollResultListener;
@@ -31,6 +45,8 @@ import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller;
 import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
+import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
+import org.jboss.tools.rsp.server.spi.servertype.IServerType;
 
 public abstract class AbstractServerDelegate implements IServerDelegate, IDebugEventSetListener {
 
@@ -42,7 +58,9 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	protected HashMap<String, Object> sharedData = new HashMap<>();
 	private IServer server;
 	
-	protected AbstractServerDelegate(IServer server) {
+	private ServerPublishStateModel publishModel = new ServerPublishStateModel();
+	
+	public AbstractServerDelegate(IServer server) {
 		this.server = server;
 		if( registerAsProcessListener())
 			RuntimeProcessEventManager.getDefault().addListener(this);
@@ -85,6 +103,11 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		return new CreateServerValidation(errorStatus(msg, bundle),Collections.emptyList());
 	}
 
+	@Override
+	public CreateServerValidation validate() {
+		return new CreateServerValidation(Status.OK_STATUS, new ArrayList<String>());
+	}
+
 	/**
 	 * Returns the current state of this server.
 	 * <p>
@@ -97,10 +120,28 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	 * constants declared on {@link IServer}
 	 */
 	@Override
-	public int getServerState() {
+	public int getServerRunState() {
 		return serverState;
 	}
-
+	
+	protected ServerHandle getServerHandle() {
+		IServerType ist = getServer().getServerType();
+		ServerType st = new ServerType(ist.getId(), ist.getName(), ist.getDescription());
+		ServerHandle sh = new ServerHandle(getServer().getId(), st);
+		return sh;
+	}
+	
+	
+	@Override
+	public ServerState getServerState() {
+		ServerHandle handle = getServerHandle();
+		ServerState state = new ServerState();
+		state.setServer(handle);
+		state.setState(getServerRunState());
+		state.setModuleState(getServerPublishModel().getDeployables());
+		return state;
+	}
+	
 	protected void setServerState(int state) {
 		setServerState(state, true);
 	}
@@ -109,11 +150,11 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		if( state != this.serverState) {
 			this.serverState = state;
 			if( fire ) 
-				fireStateChanged(state);
+				fireStateChanged(getServerState());
 		}
 	}
 	
-	protected void fireStateChanged(int state) {
+	protected void fireStateChanged(ServerState state) {
 		getServerModel().fireServerStateChanged(server, state);
 	}
 
@@ -236,6 +277,11 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 				mode -> needle.equals(mode.getMode()));
 	}
 	
+	public StartServerResponse start(String mode) {
+		IStatus s = new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server Start not implemented");
+		return new StartServerResponse(StatusConverter.convert(s), null);
+	}
+
 	public void handleDebugEvents(DebugEvent[] events) {
 		ArrayList<ILaunch> launchList = new ArrayList<>(this.launches);
 		for( int i = 0; i < events.length; i++ ) {
@@ -323,5 +369,96 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 
 	public ILaunch[] getLaunches() {
 		return launches.toArray(new ILaunch[launches.size()]);
+	}
+
+	@Override
+	public IStatus canAddDeployable(DeployableReference reference) {
+		return Status.OK_STATUS;
+	}
+	
+	@Override
+	public IStatus canRemoveDeployable(DeployableReference reference) {
+		return Status.OK_STATUS;
+	}
+	
+	@Override
+	public IServerPublishModel getServerPublishModel() {
+		return publishModel;
+	}
+	
+	@Override
+	public IStatus publish(int publishType) {
+		MultiStatus ms = new MultiStatus(ServerCoreActivator.BUNDLE_ID, 0, "Publishing server " + getServer().getName(), null);
+		try {
+			publishStart(publishType);
+			List<DeployableState> list = getServerPublishModel().getDeployables();
+			for( DeployableState state : list ) {
+				try {
+					int iState = state.getPublishState();
+					publishModule(state.getReference(), publishType, iState);
+				} catch(CoreException ce) {
+					String mod = state.getReference().getId();
+					String server = getServer().getName();
+					ms.add(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+							NLS.bind("Error while publishing module {0} to server {1}", mod, server), ce)); 
+				}
+			}
+		} catch(CoreException ce) {
+			ms.add(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+					NLS.bind("Error publishing to server {0}", getServer().getName()), ce));
+		} finally {
+			try {
+				publishFinish(publishType);
+			} catch(CoreException ce) {
+				ms.add(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+						NLS.bind("Error completing publishing to server {0}", getServer().getName()), ce));
+			}
+		}
+		
+		return ms;
+	}
+
+	protected void publishStart(int publishType) throws CoreException {
+		// Clients override
+	}
+
+	protected void publishFinish(int publishType) throws CoreException {
+		// Clients override
+	}
+
+	protected void publishModule(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
+		// Clients should override this default implementation
+		setModulePublishState(reference, ServerManagementAPIConstants.PUBLISH_STATE_NONE);
+		setModuleState(reference, ServerManagementAPIConstants.STATE_STARTED);
+	}
+
+	protected void setModulePublishState(DeployableReference reference, int publishState) {
+		getServerPublishModel().setModulePublishState(reference, publishState);
+	}
+
+	protected void setModuleState(DeployableReference reference, int runState) {
+		getServerPublishModel().setModuleState(reference, runState);
+	}
+	
+	public IStatus canPublish() {
+		return Status.OK_STATUS;
+	}
+
+	@Override
+	public IStatus clientSetServerStarting(ServerStartingAttributes attr) {
+		setServerState(STATE_STARTING, true);
+		return Status.OK_STATUS;
+	}
+
+	@Override
+	public IStatus clientSetServerStarted(LaunchParameters attr) {
+		setServerState(STATE_STARTED, true);
+		return Status.OK_STATUS;
+	}
+
+	@Override
+	public IStatus stop(boolean force) {
+		setServerState(STATE_STOPPED, true);
+		return Status.OK_STATUS;
 	}
 }

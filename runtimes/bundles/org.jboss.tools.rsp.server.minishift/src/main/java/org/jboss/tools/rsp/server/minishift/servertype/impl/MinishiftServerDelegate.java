@@ -82,14 +82,14 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 			return new Status(IStatus.ERROR, Activator.BUNDLE_ID,
 					"Server may not be launched in mode " + launchMode);
 		}
-		if( getServerState() == IServerDelegate.STATE_STOPPED ) {
+		if( getServerRunState() == IServerDelegate.STATE_STOPPED ) {
 			IStatus v = validate().getStatus();
 			if( !v.isOK() )
 				return v;
 			return Status.OK_STATUS;
 		} else {
 			String stateString = null;
-			switch(getServerState()) {
+			switch(getServerRunState()) {
 			case IServerDelegate.STATE_STARTED:
 				stateString = "started";break;
 			case IServerDelegate.STATE_STARTING:

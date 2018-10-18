@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2018-10-17 12:52:36.
+// Generated using typescript-generator version 2.2.413 on 2018-10-18 18:43:06.
 
 export interface Attribute {
     type: string;
@@ -39,6 +39,13 @@ export interface LaunchAttributesRequest {
 export interface LaunchParameters {
     mode: string;
     params: ServerAttributes;
+}
+
+export interface ModuleState {
+    id: string;
+    path: string;
+    state: number;
+    publishState: number;
 }
 
 export interface ServerAttributes {
@@ -84,9 +91,11 @@ export interface ServerStartingAttributes {
     request: LaunchParameters;
 }
 
-export interface ServerStateChange {
+export interface ServerState {
     server: ServerHandle;
     state: number;
+    publishState: number;
+    moduleState: ModuleState[];
 }
 
 export interface ServerType {

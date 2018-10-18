@@ -69,22 +69,22 @@ public class ServerTypeTest {
 		IServerType testType = new TestType();
 		sm.addServerType(testType);
 
-		Attributes attrs = sm.getRequiredAttributes(testType.getId());
+		Attributes attrs = sm.getRequiredAttributes(testType);
 		assertNotNull(attrs);
 		assertEquals(attrs.getAttributes().size(), 1);
 		assertEquals(attrs.getAttributes().keySet().iterator().next(), "flag.1");
 
-		attrs = sm.getOptionalAttributes(testType.getId());
+		attrs = sm.getOptionalAttributes(testType);
 		assertNotNull(attrs);
 		assertEquals(attrs.getAttributes().size(), 1);
 		assertEquals(attrs.getAttributes().keySet().iterator().next(), "flag.2");
 
-		attrs = sm.getRequiredLaunchAttributes(testType.getId());
+		attrs = sm.getRequiredLaunchAttributes(testType);
 		assertNotNull(attrs);
 		assertEquals(attrs.getAttributes().size(), 1);
 		assertEquals(attrs.getAttributes().keySet().iterator().next(), "flag.3");
 
-		attrs = sm.getOptionalLaunchAttributes(testType.getId());
+		attrs = sm.getOptionalLaunchAttributes(testType);
 		assertNotNull(attrs);
 		assertEquals(attrs.getAttributes().size(), 1);
 		assertEquals(attrs.getAttributes().keySet().iterator().next(), "flag.4");
@@ -116,19 +116,19 @@ public class ServerTypeTest {
 		};
 		sm.addServerType(testType);
 
-		Attributes ret = sm.getRequiredAttributes(testType.getId());
+		Attributes ret = sm.getRequiredAttributes(testType);
 		assertNotNull(ret);
 		assertEquals(0, ret.getAttributes().size());
 
-		ret = sm.getOptionalAttributes(testType.getId());
+		ret = sm.getOptionalAttributes(testType);
 		assertNotNull(ret);
 		assertEquals(0, ret.getAttributes().size());
 
-		ret = sm.getRequiredLaunchAttributes(testType.getId());
+		ret = sm.getRequiredLaunchAttributes(testType);
 		assertNotNull(ret);
 		assertEquals(0, ret.getAttributes().size());
 
-		ret = sm.getOptionalLaunchAttributes(testType.getId());
+		ret = sm.getOptionalLaunchAttributes(testType);
 		assertNotNull(ret);
 		assertEquals(0, ret.getAttributes().size());
 	}

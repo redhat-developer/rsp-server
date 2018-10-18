@@ -77,7 +77,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 			return new Status(IStatus.ERROR, Activator.BUNDLE_ID,
 					"Server may not be launched in mode " + launchMode);
 		}
-		if( getServerState() == IServerDelegate.STATE_STOPPED ) {
+		if( getServerRunState() == IServerDelegate.STATE_STOPPED ) {
 			IStatus v = validate().getStatus();
 			if( !v.isOK() )
 				return v;

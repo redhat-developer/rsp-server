@@ -13,8 +13,11 @@ import java.util.Map;
 
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
+import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
+import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
@@ -31,7 +34,6 @@ public interface IServerModel {
 	ServerType[] getServerTypes();
 	
 	ServerType[] getAccessibleServerTypes();
-	
 
 	IServer getServer(String id);
 	
@@ -41,21 +43,21 @@ public interface IServerModel {
 
 	ServerHandle[] getServerHandles();
 
-	Attributes getRequiredAttributes(String id);
+	Attributes getRequiredAttributes(IServerType serverType);
 
-	Attributes getOptionalAttributes(String id);
+	Attributes getOptionalAttributes(IServerType serverType);
 
-	List<ServerLaunchMode> getLaunchModes(String serverType);
+	List<ServerLaunchMode> getLaunchModes(IServerType serverType);
 	
-	Attributes getRequiredLaunchAttributes(String id);
+	Attributes getRequiredLaunchAttributes(IServerType serverType);
 
-	Attributes getOptionalLaunchAttributes(String id);
+	Attributes getOptionalLaunchAttributes(IServerType serverType);
 
 	CreateServerResponse createServer(String serverType, String id, Map<String, Object> attributes);
 
-	boolean removeServer(String id);
+	boolean removeServer(IServer server);
 
-	void fireServerStateChanged(IServer server, int state);
+	void fireServerStateChanged(IServer server, ServerState state);
 
 	void fireServerProcessTerminated(IServer server, String processId);
 
@@ -75,5 +77,10 @@ public interface IServerModel {
 
 	void saveServers() throws CoreException;
 	
+	List<DeployableState> getDeployables(IServer server);
+	
+	IStatus addDeployable(IServer server, DeployableReference reference);
+	IStatus removeDeployable(IServer server, DeployableReference reference);
 
+	IStatus publish(IServer server, int kind) throws CoreException;
 }

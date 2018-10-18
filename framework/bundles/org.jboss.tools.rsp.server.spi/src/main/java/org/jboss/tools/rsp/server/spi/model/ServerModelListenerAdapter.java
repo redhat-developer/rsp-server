@@ -1,6 +1,7 @@
 package org.jboss.tools.rsp.server.spi.model;
 
 import org.jboss.tools.rsp.api.dao.ServerHandle;
+import org.jboss.tools.rsp.api.dao.ServerState;
 
 public class ServerModelListenerAdapter implements IServerModelListener {
 
@@ -23,7 +24,7 @@ public class ServerModelListenerAdapter implements IServerModelListener {
 	}
 
 	@Override
-	public void serverStateChanged(ServerHandle server, int state) {
+	public void serverStateChanged(ServerHandle server, ServerState state) {
 		// TODO Auto-generated method stub
 		
 	}

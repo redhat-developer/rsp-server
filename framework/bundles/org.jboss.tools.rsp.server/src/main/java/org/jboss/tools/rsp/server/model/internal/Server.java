@@ -9,10 +9,14 @@
 package org.jboss.tools.rsp.server.model.internal;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.launching.utils.IMemento;
@@ -21,6 +25,7 @@ import org.jboss.tools.rsp.server.core.internal.SecuredBase;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
+import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
 
 public class Server extends SecuredBase implements IServer {
@@ -30,6 +35,8 @@ public class Server extends SecuredBase implements IServer {
 	private IServerDelegate delegate;
 	private IServerType serverType;
 	private IServerManagementModel managementModel;
+	
+	private List<DeployableReference> moduleInitialization;
 	
 	public Server(File file, ISecureStorageProvider storage) {
 		super(file, storage);
@@ -59,13 +66,39 @@ public class Server extends SecuredBase implements IServer {
 	@Override
 	protected void saveState(IMemento memento) {
 		if( this.delegate != null ) {
-			memento.putString("mode", this.delegate.getMode());
-			memento.putInteger("state", this.delegate.getServerState());
+			// Do not persist 'state' information for server or module;
+			// just the existence of that module itself. 
+			List<DeployableState> modState = null;
+			IServerPublishModel pubMod = delegate.getServerPublishModel();
+			modState = pubMod == null ? new ArrayList<>() : pubMod.getDeployables();
+			if( modState != null && modState.size() > 0 ) {
+				IMemento modules = memento.createChild("modules");
+				Iterator<DeployableState> dsIt = modState.iterator();
+				while(dsIt.hasNext()) {
+					IMemento oneModule = modules.createChild("module");
+					DeployableState oneState = dsIt.next();
+					oneModule.putString("id", oneState.getReference().getId());
+					oneModule.putString("path", oneState.getReference().getPath());
+				}
+			}
 		}
 	}
 	
 	@Override
 	protected void loadState(IMemento memento) {
+		List<DeployableReference> references = new ArrayList<>();
+		IMemento modules = memento.getChild("modules");
+		if( modules != null ) {
+			IMemento[] deployableArray = modules.getChildren("module");
+			if( deployableArray != null) {
+				for( int i = 0; i < deployableArray.length; i++ ) {
+					String path = deployableArray[i].getString("path");
+					String id = deployableArray[i].getString("id");
+					references.add(new DeployableReference(id, path));
+				}
+			}
+		}
+		moduleInitialization = references;
 	}
 	
 	@Override
@@ -86,6 +119,8 @@ public class Server extends SecuredBase implements IServer {
 
 	public void setDelegate(IServerDelegate del) {
 		delegate = del;
+		if( delegate != null && delegate.getServerPublishModel() != null )
+			delegate.getServerPublishModel().initialize(moduleInitialization);
 	}
 
 	@Override

@@ -17,7 +17,7 @@ import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerProcess;
 import org.jboss.tools.rsp.api.dao.ServerProcessOutput;
-import org.jboss.tools.rsp.api.dao.ServerStateChange;
+import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.StringPrompt;
 
 @JsonSegment("client")
@@ -97,7 +97,7 @@ public interface RSPClient {
 	 * 
 	 */
 	@JsonNotification
-	void serverStateChanged(ServerStateChange stateChange);
+	void serverStateChanged(ServerState state);
 
 	/**
 	 * The `client/serverProcessCreated` notification is sent 

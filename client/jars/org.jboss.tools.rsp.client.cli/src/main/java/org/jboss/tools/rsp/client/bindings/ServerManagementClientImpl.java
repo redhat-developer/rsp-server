@@ -17,7 +17,7 @@ import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerProcess;
 import org.jboss.tools.rsp.api.dao.ServerProcessOutput;
-import org.jboss.tools.rsp.api.dao.ServerStateChange;
+import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.StringPrompt;
 import org.jboss.tools.rsp.client.cli.InputHandler;
 import org.jboss.tools.rsp.client.cli.InputProvider;
@@ -66,7 +66,7 @@ public class ServerManagementClientImpl implements RSPClient {
 	}
 
 	@Override
-	public void serverStateChanged(ServerStateChange state) {
+	public void serverStateChanged(ServerState state) {
 		String stateString = null;
 		switch(state.getState()) {
 		case ServerManagementAPIConstants.STATE_STARTED:
@@ -110,6 +110,7 @@ public class ServerManagementClientImpl implements RSPClient {
 
 	@Override
 	public CompletableFuture<String> promptString(StringPrompt prompt) {
+		@SuppressWarnings("unchecked")
 		final CompletableFuture<String>[] ret = new CompletableFuture[1];
 		ret[0] = null;
 		

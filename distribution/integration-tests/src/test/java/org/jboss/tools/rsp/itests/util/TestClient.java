@@ -9,7 +9,7 @@
 package org.jboss.tools.rsp.itests.util;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
-import org.jboss.tools.rsp.api.dao.ServerStateChange;
+import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.client.bindings.ServerManagementClientImpl;
 
 /**
@@ -21,7 +21,7 @@ public class TestClient extends ServerManagementClientImpl {
     private String stateString;
 
     @Override
-    public void serverStateChanged(ServerStateChange state) {
+    public void serverStateChanged(ServerState state) {
         switch (state.getState()) {
             case ServerManagementAPIConstants.STATE_STARTED:
                 stateString = "started";

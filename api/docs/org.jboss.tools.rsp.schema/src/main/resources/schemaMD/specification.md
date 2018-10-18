@@ -1201,6 +1201,125 @@ This endpoint returns the following schema as a return value:
     plugin: string;
 }</pre></td></tr></table>
 
+#### server/getServerState
+
+ Get the state of the current server 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "type" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "visibleName" : {
+          "type" : "string"
+        },
+        "description" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface ServerHandle {
+    id: string;
+    type: ServerType;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
+    description: string;
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "server" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "visibleName" : {
+              "type" : "string"
+            },
+            "description" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    },
+    "state" : {
+      "type" : "integer"
+    },
+    "publishState" : {
+      "type" : "integer"
+    },
+    "moduleState" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "path" : {
+            "type" : "string"
+          },
+          "state" : {
+            "type" : "integer"
+          },
+          "publishState" : {
+            "type" : "integer"
+          }
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface ServerState {
+    server: ServerHandle;
+    state: number;
+    publishState: number;
+    moduleState: ModuleState[];
+}
+
+export interface ServerHandle {
+    id: string;
+    type: ServerType;
+}
+
+export interface ModuleState {
+    id: string;
+    path: string;
+    state: number;
+    publishState: number;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
+    description: string;
+}</pre></td></tr></table>
+
 #### server/startServerAsync
 
  The `server/startServerAsync` request is sent by the client to the server to start an existing server in the model. This request will cause the server to launch the server and keep organized the spawned processes, their I/O streams, and any events that must be propagated to the client. 
@@ -1608,16 +1727,48 @@ This endpoint takes the following json schemas as parameters:
     },
     "state" : {
       "type" : "integer"
+    },
+    "publishState" : {
+      "type" : "integer"
+    },
+    "moduleState" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "path" : {
+            "type" : "string"
+          },
+          "state" : {
+            "type" : "integer"
+          },
+          "publishState" : {
+            "type" : "integer"
+          }
+        }
+      }
     }
   }
-}</pre></td><td><pre>export interface ServerStateChange {
+}</pre></td><td><pre>export interface ServerState {
     server: ServerHandle;
     state: number;
+    publishState: number;
+    moduleState: ModuleState[];
 }
 
 export interface ServerHandle {
     id: string;
     type: ServerType;
+}
+
+export interface ModuleState {
+    id: string;
+    path: string;
+    state: number;
+    publishState: number;
 }
 
 export interface ServerType {

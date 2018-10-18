@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.server.spi.model;
 
 import org.jboss.tools.rsp.api.dao.ServerHandle;
+import org.jboss.tools.rsp.api.dao.ServerState;
 
 public interface IServerModelListener {
 	void serverAdded(ServerHandle server);
@@ -17,7 +18,7 @@ public interface IServerModelListener {
 	
 	void serverAttributesChanged(ServerHandle server);
 	
-	void serverStateChanged(ServerHandle server, int state);
+	void serverStateChanged(ServerHandle server, ServerState state);
 	
 	void serverProcessCreated(ServerHandle server, String processId);
 	

@@ -74,6 +74,18 @@ public interface ServerManagementAPIConstants {
 	 * full publish is required.
 	 */
 	public static final int PUBLISH_STATE_FULL = 3;
+	
+	/**
+	 * Publish state constant (value 4) indicating that the
+	 * deployable has yet to be added / deployed, and should be.
+	 */
+	public static final int PUBLISH_STATE_ADD = 4;
+
+	/**
+	 * Publish state constant (value 5) indicating that a
+	 * removal of the deployable is required
+	 */
+	public static final int PUBLISH_STATE_REMOVE = 5;
 
 	/**
 	 * Publish kind constant (value 1) indicating an incremental publish request.

@@ -25,6 +25,29 @@
     },
     "state" : {
       "type" : "integer"
+    },
+    "publishState" : {
+      "type" : "integer"
+    },
+    "moduleState" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "path" : {
+            "type" : "string"
+          },
+          "state" : {
+            "type" : "integer"
+          },
+          "publishState" : {
+            "type" : "integer"
+          }
+        }
+      }
     }
   }
 }

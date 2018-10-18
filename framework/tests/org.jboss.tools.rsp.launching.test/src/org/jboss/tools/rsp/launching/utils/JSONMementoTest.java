@@ -50,8 +50,8 @@ public class JSONMementoTest {
 		assertEquals(2, memento.getChildren().length);
 		assertEquals(1, memento.getChildren("childOne").length);
 		assertEquals("childStringValue", memento.getChildren("childOne")[0].getString("childStringKey"));
-		assertEquals(3, memento.getNames().size());
-		assertTrue(memento.getNames().containsAll(Arrays.asList("rootPropKey", "childOne", "childTwo")));
+		assertEquals(1, memento.getNames().size());
+		assertTrue(memento.getNames().containsAll(Arrays.asList("rootPropKey")));
 	}
 	
 	@Test
@@ -61,8 +61,8 @@ public class JSONMementoTest {
 		assertEquals(2, memento.getChildren().length);
 		assertEquals(1, memento.getChildren("childOne").length);
 		assertEquals("childStringValue", memento.getChildren("childOne")[0].getString("childStringKey"));
-		assertEquals(3, memento.getNames().size());
-		assertTrue(memento.getNames().containsAll(Arrays.asList("rootPropKey", "childOne", "childTwo")));
+		assertEquals(1, memento.getNames().size());
+		assertTrue(memento.getNames().containsAll(Arrays.asList("rootPropKey")));
 		
 		memento.saveToFile(TEST_JSON_COPY_PATH);
 		
