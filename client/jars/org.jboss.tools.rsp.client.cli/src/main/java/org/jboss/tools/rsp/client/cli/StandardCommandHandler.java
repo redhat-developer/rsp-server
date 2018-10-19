@@ -157,7 +157,7 @@ public class StandardCommandHandler implements InputHandler {
 			List<ServerHandle> handles = launcher.getServerProxy().getServerHandles().get();
 			System.out.println(handles.size() + " servers found:");
 			for( ServerHandle sh : handles ) {
-				System.out.println("   " + sh.getType() + ":" + sh.getId());
+				System.out.println("   " + sh.getType().getId() + ":" + sh.getId());
 			}
 		} else if( s.trim().startsWith(REMOVE_SERVER)) {
 			String suffix = s.substring(REMOVE_SERVER.length());
