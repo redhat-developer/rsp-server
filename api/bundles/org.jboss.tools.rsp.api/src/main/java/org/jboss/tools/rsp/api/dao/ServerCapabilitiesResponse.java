@@ -14,6 +14,10 @@ public class ServerCapabilitiesResponse {
 	private Map<String, String> serverCapabilities;
 	private Status clientRegistrationStatus;
 
+	public ServerCapabilitiesResponse() {
+		
+	}
+	
 	public ServerCapabilitiesResponse(Status clientRegistrationStatus, Map<String, String> map) {
 		this.clientRegistrationStatus = clientRegistrationStatus;
 		this.serverCapabilities = map;
