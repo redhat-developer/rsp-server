@@ -24,10 +24,12 @@
     </location>
 
     <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
-        <repository location="http://repository.jboss.org/nexus/content/unzip/unzip/org/jboss/tools/locus/jbosstools-locus/1.7.0/jbosstools-locus-1.7.0-updatesite.zip-unzip/"/>
+        <repository location="http://repository.jboss.org/nexus/content/unzip/unzip/org/jboss/tools/locus/jbosstools-locus/1.8.0-SNAPSHOT/jbosstools-locus-1.8.0-SNAPSHOT-updatesite.zip-unzip"/>
         <!-- Test dependencies -->
         <unit id="org.jboss.tools.locus.mockito" version="1.9.5.v20131024-0922"/>
         <unit id="org.assertj.core" version="2.1.0"/>
+		<unit id="org.apache.felix.log" version="1.2.0"/>
+		<unit id="org.everit.osgi.bundles.org.apache.xmlcommons.full" version="1.4.1.20150918"/>
     </location>
 
     <!-- SimRel -->
