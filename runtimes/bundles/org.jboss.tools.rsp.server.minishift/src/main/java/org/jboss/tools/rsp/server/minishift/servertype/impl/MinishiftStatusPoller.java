@@ -96,22 +96,21 @@ public class MinishiftStatusPoller extends AbstractPoller implements IServerStat
 		for (int i = 0; i < lines.length; i++) {
 			if( "Does Not Exist".equals(lines[i])) {
 					return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
-							"minishift profile does not exist.");
+							"Minishift profile does not exist.");
 			}
-			if (lines[i] != null && lines[i].startsWith("OpenShift:")) {
-				String stat = lines[i].substring("OpenShift:".length()).trim();
+			if (lines[i] != null && lines[i].startsWith("Minishift:")) {
+				String stat = lines[i].substring("Minishift:".length()).trim();
 				if (stat.trim().startsWith("Running")){
-					// throws OpenShiftNotReadyPollingException on failure
 					return Status.OK_STATUS;
 				}
 				if ("Stopped".equals(stat)) {
 					return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
-							"OpenShift is stopped.");
+							"Minishift is stopped.");
 				}
 			}
 		}
 		return new Status(IStatus.INFO, Activator.BUNDLE_ID, 
-				"minishift status indicates the CDK is starting.");
+				"Minishift status indicates the CDK is starting.");
 	}
 	
 	/*
