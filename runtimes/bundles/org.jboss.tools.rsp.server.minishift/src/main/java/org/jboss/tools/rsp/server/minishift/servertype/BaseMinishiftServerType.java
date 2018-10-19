@@ -76,7 +76,7 @@ public abstract class BaseMinishiftServerType implements IServerType {
 
 			attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_HOME, 
 					ServerManagementAPIConstants.ATTR_TYPE_STRING,
-					"A flag value for the --minishift-home command line launch parameter.", null);
+					"A attribute to set the MINISHIFT_HOME environment variable when interacting with the server. The MINISHIFT_HOME environment variable allows you to choose a different home directory for Minishift", null);
 
 			this.optional = attrs.toPojo();
 		}
