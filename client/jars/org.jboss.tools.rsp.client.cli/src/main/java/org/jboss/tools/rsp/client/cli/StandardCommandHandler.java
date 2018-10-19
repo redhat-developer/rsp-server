@@ -120,9 +120,19 @@ public class StandardCommandHandler implements InputHandler {
 			runLocalLaunchScenario();
 		} else if (s.startsWith(STOP_SERVER)) {
 			String suffix = s.substring(STOP_SERVER.length()).trim();
-			StopServerAttributes ssa = new StopServerAttributes(suffix, false);
-			Status stat = launcher.getServerProxy().stopServerAsync(ssa).get();
-			System.out.println(stat.toString());
+			String trimmed = suffix.trim();
+			if( trimmed.length() == 0 ) {
+				System.out.println("Syntax: stop server servername [boolean:force]");
+			} else {
+				String[] split = trimmed.split(" ");
+				boolean force = false;
+				if( split.length == 2 ) {
+					force = Boolean.parseBoolean(split[1]);
+				}
+				StopServerAttributes ssa = new StopServerAttributes(split[0], force);
+				Status stat = launcher.getServerProxy().stopServerAsync(ssa).get();
+				System.out.println(stat.toString());
+			}
 		} else if (s.startsWith(ADD_PATH)) {
 			String suffix = s.substring(ADD_PATH.length());
 			DiscoveryPath dp = new DiscoveryPath(suffix.trim());
