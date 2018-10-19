@@ -109,19 +109,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<!-- dependencies that are not available from target platform -->
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.log</artifactId>
-			<version>1.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.everit.osgi.bundles</groupId>
-			<artifactId>org.everit.osgi.bundles.org.apache.xmlcommons.full</artifactId>
-			<version>1.4.1-20150918</version>
-		</dependency>
-	</dependencies>
-
 </project>
