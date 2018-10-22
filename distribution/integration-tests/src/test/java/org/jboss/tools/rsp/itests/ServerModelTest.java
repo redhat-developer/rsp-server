@@ -140,7 +140,7 @@ public class ServerModelTest extends RSPTestCase {
     @Test
     public void testCreateServerInvalid() throws Exception {
         ServerAttributes attr = new ServerAttributes("UNKNOWN", "fly", null);
-        Status status = serverProxy.createServer(attr).get();
+        Status status = serverProxy.createServer(attr).get().getStatus();
         
         assertEquals(Status.ERROR, status.getSeverity());
         assertEquals("Server Type UNKNOWN not found", status.getMessage());
@@ -148,7 +148,7 @@ public class ServerModelTest extends RSPTestCase {
     
     @Test
     public void testCreateServerNull() throws Exception {
-        Status status = serverProxy.createServer(null).get();
+        Status status = serverProxy.createServer(null).get().getStatus();
         
         assertEquals(Status.ERROR, status.getSeverity());
         assertEquals(INVALID_PARAM, status.getMessage());

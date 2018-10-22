@@ -31,6 +31,7 @@ import org.jboss.tools.rsp.server.spi.model.polling.IPollResultListener;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller;
 import org.jboss.tools.rsp.server.spi.model.polling.PollThreadUtils;
 import org.jboss.tools.rsp.server.spi.model.polling.WebPortPoller;
+import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.wildfly.impl.Activator;
@@ -54,22 +55,22 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	protected abstract String getPollURL(IServer server);
 	
 	@Override
-	public IStatus validate() {
+	public CreateServerValidation validate() {
 		String home = getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
 		
 		if( null == home ) {
-			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, "Server home must not be null");
+			return validationErrorResponse("Server home must not be null", IJBossServerAttributes.SERVER_HOME, Activator.BUNDLE_ID);
 		}
 		if(!(new File(home).exists())) {
-			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, "Server home must exist");
+			return validationErrorResponse("Server home must exist", IJBossServerAttributes.SERVER_HOME, Activator.BUNDLE_ID);
 		}
 		
 		IVMInstall vmi = new JBossVMRegistryDiscovery().findVMInstall(this);
 		if( vmi == null ) {
-			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
-					"Server " + getServer().getId() + " can not find a valid virtual machine to use.");
+			String msg = "Server " + getServer().getId() + " can not find a valid virtual machine to use.";
+			return validationErrorResponse(msg, null, Activator.BUNDLE_ID);
 		}
-		return Status.OK_STATUS;
+		return new CreateServerValidation(Status.OK_STATUS, null);
 	}
 
 	public IStatus canStart(String launchMode) {
@@ -78,7 +79,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 					"Server may not be launched in mode " + launchMode);
 		}
 		if( getServerState() == IServerDelegate.STATE_STOPPED ) {
-			IStatus v = validate();
+			IStatus v = validate().getStatus();
 			if( !v.isOK() )
 				return v;
 			return Status.OK_STATUS;

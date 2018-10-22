@@ -33,6 +33,7 @@ import org.jboss.tools.rsp.server.spi.model.polling.IPollResultListener;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller.SERVER_STATE;
 import org.jboss.tools.rsp.server.spi.model.polling.PollThreadUtils;
+import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.slf4j.Logger;
@@ -55,16 +56,16 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 	}
 	
 	@Override
-	public IStatus validate() {
+	public CreateServerValidation validate() {
 		String bin = getServer().getAttribute(IMinishiftServerAttributes.MINISHIFT_BINARY, (String)null);
 		
 		if( null == bin ) {
-			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, "Minishift binary location must not be null");
+			return validationErrorResponse("Minishift binary location must not be null", IMinishiftServerAttributes.MINISHIFT_BINARY, Activator.BUNDLE_ID);
 		}
 		if(!(new File(bin).exists())) {
-			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, "Minishift binary location must exist");
+			return validationErrorResponse("Minishift binary location must exist", IMinishiftServerAttributes.MINISHIFT_BINARY, Activator.BUNDLE_ID);
 		}
-		return Status.OK_STATUS;
+		return new CreateServerValidation(Status.OK_STATUS, null);
 	}
 
 	public IStatus canStart(String launchMode) {
@@ -73,7 +74,7 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 					"Server may not be launched in mode " + launchMode);
 		}
 		if( getServerState() == IServerDelegate.STATE_STOPPED ) {
-			IStatus v = validate();
+			IStatus v = validate().getStatus();
 			if( !v.isOK() )
 				return v;
 			return Status.OK_STATUS;

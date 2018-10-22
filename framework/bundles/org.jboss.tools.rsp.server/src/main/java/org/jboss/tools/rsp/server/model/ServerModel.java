@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
+import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerType;
@@ -30,6 +31,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.launching.LaunchingCore;
+import org.jboss.tools.rsp.launching.utils.StatusConverter;
 import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
 import org.jboss.tools.rsp.secure.model.NullSecureStorageProvider;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
@@ -37,6 +39,7 @@ import org.jboss.tools.rsp.server.model.internal.DaoUtilities;
 import org.jboss.tools.rsp.server.model.internal.Server;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModelListener;
+import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
@@ -199,38 +202,48 @@ public class ServerModel implements IServerModel {
 	}
 	
 	@Override
-	public IStatus createServer(String serverType, String id, Map<String, Object> attributes) {
+	public CreateServerResponse createServer(String serverType, String id, Map<String, Object> attributes) {
 		try {
 			return createServerUnprotected(serverType, id, attributes);
 		} catch(Exception e) {
-			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+			Status s = new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
 					"An unexpected error occurred", e);
+			return new CreateServerResponse(StatusConverter.convert(s), null);
 		}
 	}
 	
-	private IStatus createServerUnprotected(String serverType, String id, Map<String, Object> attributes) throws CoreException {
+	private CreateServerResponse createServerUnprotected(String serverType, String id, Map<String, Object> attributes) throws CoreException {
+		IStatus s = null;
+		IServerType fact = null;
 		if( servers.get(id) != null ) {
-			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server with id " + id + " already exists.");
+			s = new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server with id " + id + " already exists.");
+		} else {
+			fact = serverTypes.get(serverType);
+			if( fact == null ) {
+				s = new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server Type " + serverType + " not found");
+			} else {
+				IStatus valid = validateAttributes(fact, attributes);
+				if( !valid.isOK()) {
+					s = valid;
+				}
+			}
 		}
-		IServerType fact = serverTypes.get(serverType);
-		if( fact == null ) {
-			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server Type " + serverType + " not found");
+		
+		if( s != null ) {
+			return new CreateServerResponse(StatusConverter.convert(s), null);
 		}
-		IStatus valid = validateAttributes(fact, attributes);
-		if( !valid.isOK()) {
-			return valid;
-		}
+		
 		Server server = createServer2(fact, id, attributes);
 		IServerDelegate del = fact.createServerDelegate(server);
 		server.setDelegate(del);
 		
-		valid = del.validate();
-		if( !valid.isOK()) {
-			return valid;
+		CreateServerValidation valid = del.validate();
+		if( !valid.getStatus().isOK()) {
+			return valid.toDao();
 		}
 		addServer(server, del);
 		server.save(new NullProgressMonitor());
-		return Status.OK_STATUS;
+		return valid.toDao();
 	}
 	
 	private IStatus validateAttributes(IServerType type, Map<String, Object> map) {
