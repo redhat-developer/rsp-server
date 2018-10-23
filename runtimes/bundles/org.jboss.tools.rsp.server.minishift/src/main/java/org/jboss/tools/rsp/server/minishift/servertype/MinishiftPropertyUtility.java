@@ -24,6 +24,10 @@ public class MinishiftPropertyUtility {
 				IMinishiftServerAttributes.MINISHIFT_PROFILE_DEFAULT);
 	}
 
+	public static String getMinishiftHome(IServer server) {
+		return server.getAttribute(IMinishiftServerAttributes.MINISHIFT_HOME, (String)null);
+	}
+
 	public static String getMinishiftUsername(IServer server) {
 		return server.getAttribute(IMinishiftServerAttributes.MINISHIFT_REG_USERNAME, (String) null);
 	}
