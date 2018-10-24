@@ -216,6 +216,10 @@ public class ServerModel implements IServerModel {
 	
 	private CreateServerResponse createServerUnprotected(String serverType, String id, Map<String, Object> attributes) throws CoreException {
 		IServerType type = getServerType(serverType, id, attributes);
+		IStatus validAttributes = validateAttributes(type, attributes);
+		if( !validAttributes.isOK()) {
+			throw new CoreException(validAttributes);
+		}
 		
 		Server server = createServer2(type, id, attributes);
 		IServerDelegate del = type.createServerDelegate(server);
@@ -238,11 +242,6 @@ public class ServerModel implements IServerModel {
 			type = serverTypes.get(serverType);
 			if( type == null ) {
 				throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server Type " + serverType + " not found"));
-			} else {
-				IStatus valid = validateAttributes(type, attributes);
-				if( !valid.isOK()) {
-					throw new CoreException(valid);
-				}
 			}
 		}
 		return type;
