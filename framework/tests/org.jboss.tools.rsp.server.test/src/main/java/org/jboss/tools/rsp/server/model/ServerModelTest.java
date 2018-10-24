@@ -26,7 +26,6 @@ import java.nio.file.Path;
 
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerType;
-import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.server.spi.model.ServerModelListenerAdapter;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
@@ -70,7 +69,7 @@ public class ServerModelTest {
 			Files.write(s1, contents.getBytes());
 			sm.loadServers(dir.toFile());
 			assertEquals(sm.getServers().size(), 0);
-		} catch(IOException | CoreException e) {
+		} catch(IOException e) {
 			if( s1 != null && s1.toFile().exists()) {
 				s1.toFile().delete();
 				s1.toFile().getParentFile().delete();
@@ -91,7 +90,7 @@ public class ServerModelTest {
 			Files.write(s1, contents.getBytes());
 			sm.loadServers(dir.toFile());
 			assertEquals(sm.getServers().size(), 0);
-		} catch(IOException | CoreException e) {
+		} catch(IOException e) {
 			if( s1 != null && s1.toFile().exists()) {
 				s1.toFile().delete();
 				s1.toFile().getParentFile().delete();
@@ -112,7 +111,7 @@ public class ServerModelTest {
 			Files.write(s1, contents.getBytes());
 			sm.loadServers(dir.toFile());
 			assertEquals(sm.getServers().size(), 0);
-		} catch(IOException | CoreException e) {
+		} catch(IOException e) {
 			if( s1 != null && s1.toFile().exists()) {
 				s1.toFile().delete();
 				s1.toFile().getParentFile().delete();
@@ -136,7 +135,7 @@ public class ServerModelTest {
 			Files.write(s1, contents.getBytes());
 			sm.loadServers(dir.toFile());
 			assertEquals(sm.getServers().size(), 1);
-		} catch(IOException | CoreException e) {
+		} catch(IOException e) {
 			if( s1 != null && s1.toFile().exists()) {
 				s1.toFile().delete();
 				s1.toFile().getParentFile().delete();
@@ -168,7 +167,7 @@ public class ServerModelTest {
 			assertNotNull(sh.getType());
 			ServerType st = sh.getType();
 			assertEquals(st.getId(), "wonka5");
-		} catch(IOException | CoreException e) {
+		} catch(IOException e) {
 			if( s1 != null && s1.toFile().exists()) {
 				s1.toFile().delete();
 				s1.toFile().getParentFile().delete();
@@ -247,7 +246,7 @@ public class ServerModelTest {
 			assertNull(sm.getServer("abc123"));
 			assertFalse(removed[0].booleanValue());
 			assertFalse(s1.toFile().exists());
-		} catch(IOException | CoreException e) {
+		} catch(IOException e) {
 			if( s1 != null && s1.toFile().exists()) {
 				s1.toFile().delete();
 				s1.toFile().getParentFile().delete();
