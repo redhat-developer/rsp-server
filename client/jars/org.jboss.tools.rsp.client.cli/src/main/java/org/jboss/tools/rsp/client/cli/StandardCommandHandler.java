@@ -402,6 +402,9 @@ public class StandardCommandHandler implements InputHandler {
 		String attrType = attrsUtil.getAttributeType(k);
 		Class c = getAttributeTypeAsClass(attrType);
 		String reqType = c.getName();
+		if (c == null) {
+			System.out.println("unknown attribute type " + attrType + ". Aborting.");
+		}
 		String reqDesc = attrsUtil.getAttributeDescription(k);
 		Object defVal = attrsUtil.getAttributeDefaultValue(k);
 		
@@ -421,43 +424,50 @@ public class StandardCommandHandler implements InputHandler {
 			}
 		}
 		
-		String msg = null;
+        Object value = null;
 		if (Integer.class.equals(c) || Boolean.class.equals(c) || String.class.equals(c)) {
-			msg = "Please enter a value: ";
+			value = promptPrimitiveValue(attrsUtil.getAttributeType(k));
 		} else if (List.class.equals(c)) {
-			msg = "Please enter a list value. Send a blank line to end the list.";
+			value = promptListValue();
 		} else if (Map.class.equals(c)) {
-			msg = "Please enter a map value. Each line should read some.key=some.val.\nSend a blank line to end the map.";
+			value = promptMapValue();
 		}
-		System.out.println(msg);
-		
-		if (Integer.class.equals(c) || Boolean.class.equals(c) || String.class.equals(c)) {
-			String val = nextLine();
-			toSend.put(k, convertType(val, attrsUtil.getAttributeType(k)));
-		} else if (List.class.equals(c)) {
-			List<String> arr = new ArrayList<String>();
-			String tmp = nextLine();
-			while (!tmp.trim().isEmpty()) {
-				arr.add(tmp);
-				tmp = nextLine();
+		toSend.put(k, value);
+	}
+
+	private Map<String, String> promptMapValue() {
+		System.out.println("Please enter a map value. Each line should read some.key=some.val.\nSend a blank line to end the map.");
+		Map<String, String> map = new HashMap<>();
+		String tmp = nextLine();
+		while (!tmp.trim().isEmpty()) {
+			int ind = tmp.indexOf("=");
+			if (ind == -1) {
+				System.out.println("Invalid map entry. Please try again");
+			} else {
+				String k1 = tmp.substring(0,  ind);
+				String v1 = tmp.substring(ind+1);
+				map.put(k1,v1);
 			}
-			toSend.put(k, arr);
-		} else if (Map.class.equals(c)) {
-			Map<String, String> map = new HashMap<>();
-			String tmp = nextLine();
-			while (!tmp.trim().isEmpty()) {
-				int ind = tmp.indexOf("=");
-				if (ind == -1) {
-					System.out.println("Invalid map entry. Please try again");
-				} else {
-					String k1 = tmp.substring(0,  ind);
-					String v1 = tmp.substring(ind+1);
-					map.put(k1,v1);
-				}
-				tmp = nextLine();
-			}
-			toSend.put(k, map);
+			tmp = nextLine();
 		}
+		return map;
+	}
+
+	private List<String> promptListValue() {
+		System.out.println("Please enter a list value. Send a blank line to end the list.");
+		List<String> arr = new ArrayList<String>();
+		String tmp = nextLine();
+		while (!tmp.trim().isEmpty()) {
+			arr.add(tmp);
+			tmp = nextLine();
+		}
+		return arr;
+	}
+
+	private Object promptPrimitiveValue(String type) {
+		System.out.println("Please enter a value: ");
+		String val = nextLine();
+		return convertType(val, type);
 	}
 
 	private Object workaroundDoubles(Object defaultVal, String attrType) {
