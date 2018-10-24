@@ -338,7 +338,7 @@ public class StandardCommandHandler implements InputHandler {
 				while(updateInvalidAttributes(result, required2, optional2, store)) {
 					System.out.println("Adding Server...");
 					csa = new ServerAttributes(selected.getId(), name, store);
-					CreateServerResponse r6 = launcher.getServerProxy().createServer(csa).get();
+					result = launcher.getServerProxy().createServer(csa).get();
 					if (result.getStatus().isOK()) {
 						System.out.println("Server Added");
 						return;
@@ -359,16 +359,26 @@ public class StandardCommandHandler implements InputHandler {
 			System.out.println("   " + list.get(i));
 		}
 		
-		System.out.println("Would you like to correct the invalid fields and try again? y/n");
-		String tryAgain = nextLine();
-		if( tryAgain.equalsIgnoreCase("y") || tryAgain.equalsIgnoreCase("yes")) {
-			List<String> invalid = result.getInvalidKeys();
-			promptForInvalidAttributes(invalid, required2, store, true);
-			promptForInvalidAttributes(invalid, optional2, store, false);
-			return true;
+		boolean tryAgain = promptBoolean("Would you like to correct the invalid fields and try again? y/n");
+		if (!tryAgain) {
+			return false;
 		}
-		return false;
+
+		List<String> invalid = result.getInvalidKeys();
+		promptForInvalidAttributes(invalid, required2, store, true);
+		promptForInvalidAttributes(invalid, optional2, store, false);
+		return true;
 	}
+	
+	private boolean promptBoolean(String msg) {
+		System.out.println(msg);
+		String tryAgain = nextLine();
+		if (tryAgain == null || tryAgain.isEmpty() || tryAgain.toLowerCase().equals("n")) {
+			return false;
+		}
+		return true;
+	}
+		
 	
 	private void promptForAttributes(Attributes attr, HashMap<String, Object> store, boolean required2) {
 		if (attr == null)
@@ -416,9 +426,7 @@ public class StandardCommandHandler implements InputHandler {
 		}
 		System.out.println(toPrint);
 		if (!required2) {
-			System.out.println("Would you like to set this value? [y/n]");
-			String val = nextLine();
-			if (val == null || val.isEmpty() || val.toLowerCase().equals("n")) {
+			if( !promptBoolean("Would you like to set this value? [y/n]") ) {
 				System.out.println("Skipping");
 				return;
 			}
