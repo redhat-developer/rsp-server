@@ -205,6 +205,8 @@ public class ServerModel implements IServerModel {
 	public CreateServerResponse createServer(String serverType, String id, Map<String, Object> attributes) {
 		try {
 			return createServerUnprotected(serverType, id, attributes);
+		} catch(CoreException e) {
+			return new CreateServerResponse(StatusConverter.convert(e.getStatus()), null);
 		} catch(Exception e) {
 			Status s = new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
 					"An unexpected error occurred", e);
@@ -213,28 +215,10 @@ public class ServerModel implements IServerModel {
 	}
 	
 	private CreateServerResponse createServerUnprotected(String serverType, String id, Map<String, Object> attributes) throws CoreException {
-		IStatus s = null;
-		IServerType fact = null;
-		if( servers.get(id) != null ) {
-			s = new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server with id " + id + " already exists.");
-		} else {
-			fact = serverTypes.get(serverType);
-			if( fact == null ) {
-				s = new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server Type " + serverType + " not found");
-			} else {
-				IStatus valid = validateAttributes(fact, attributes);
-				if( !valid.isOK()) {
-					s = valid;
-				}
-			}
-		}
+		IServerType type = getServerType(serverType, id, attributes);
 		
-		if( s != null ) {
-			return new CreateServerResponse(StatusConverter.convert(s), null);
-		}
-		
-		Server server = createServer2(fact, id, attributes);
-		IServerDelegate del = fact.createServerDelegate(server);
+		Server server = createServer2(type, id, attributes);
+		IServerDelegate del = type.createServerDelegate(server);
 		server.setDelegate(del);
 		
 		CreateServerValidation valid = del.validate();
@@ -244,6 +228,24 @@ public class ServerModel implements IServerModel {
 		addServer(server, del);
 		server.save(new NullProgressMonitor());
 		return valid.toDao();
+	}
+
+	private IServerType getServerType(String serverType, String id, Map<String, Object> attributes) throws CoreException {
+		IServerType type = null;
+		if( servers.get(id) != null ) {
+			throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server with id " + id + " already exists."));
+		} else {
+			type = serverTypes.get(serverType);
+			if( type == null ) {
+				throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server Type " + serverType + " not found"));
+			} else {
+				IStatus valid = validateAttributes(type, attributes);
+				if( !valid.isOK()) {
+					throw new CoreException(valid);
+				}
+			}
+		}
+		return type;
 	}
 	
 	private IStatus validateAttributes(IServerType type, Map<String, Object> map) {
