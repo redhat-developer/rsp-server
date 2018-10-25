@@ -9,6 +9,9 @@
 package org.jboss.tools.rsp.server.model.internal;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
@@ -20,7 +23,9 @@ import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
 
 public class Server extends SecuredBase implements IServer {
+
 	public static final String TYPE_ID = "org.jboss.tools.rsp.server.typeId";
+
 	private IServerDelegate delegate;
 	private IServerType serverType;
 	
@@ -28,13 +33,14 @@ public class Server extends SecuredBase implements IServer {
 		super(file, storage);
 	}
 	
-	public Server(File file, IServerType type, ISecureStorageProvider storage) {
-		super(file, type.getId(), storage);
+	public Server(File file, IServerType type, String id, Map<String, Object> attributes, ISecureStorageProvider storage) {
+		super(file, id, storage);
 		this.serverType = type;
 		if( this.serverType != null ) {
 			setAttribute(TYPE_ID, type.getId());
 			this.delegate = this.serverType.createServerDelegate(this);
 		}
+		setAttributes(attributes);
 	}
 
 	@Override
@@ -89,6 +95,27 @@ public class Server extends SecuredBase implements IServer {
 	
 	public void load(IProgressMonitor monitor) throws CoreException {
 		super.loadFromFile(monitor);
+	}
+
+	private void setAttributes(Map<String, Object> attributes) {
+		Set<String> keys = attributes.keySet();
+		for( String k : keys) {
+			setAttribute(k, attributes.get(k));
+		}
+	}
+
+	protected void setAttribute(String k, Object val) {
+		if( val instanceof Integer) {
+			setAttribute(k, ((Integer)val).intValue());
+		} else if( val instanceof Boolean) {
+			setAttribute(k, ((Boolean)val).booleanValue());
+		} else if( val instanceof String ) {
+			setAttribute(k, (String)val);
+		} else if( val instanceof List) {
+			setAttribute(k, (List<?>)val);
+		} else if( val instanceof Map) {
+			setAttribute(k, (Map<?,?>)val);
+		}
 	}
 
 }
