@@ -399,11 +399,11 @@ public class StandardCommandHandler implements InputHandler {
 			return;
 		
 		CreateServerAttributesUtility attrsUtil = new CreateServerAttributesUtility(attr);
-		HashMap<String, Object> toSend = store;
 		if (attrsUtil != null) {
 			Set<String> keys = attrsUtil.listAttributes();
 			for (String k : keys) {
-				promptForAttributeSingleKey(attrsUtil, k, required2, toSend);
+				if( invalid.contains(k))
+					promptForAttributeSingleKey(attrsUtil, k, required2, store);
 			}
 		}
 	}
