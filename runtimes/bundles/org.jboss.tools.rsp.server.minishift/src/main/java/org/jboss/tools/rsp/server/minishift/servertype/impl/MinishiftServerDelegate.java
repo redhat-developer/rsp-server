@@ -24,6 +24,7 @@ import org.jboss.tools.rsp.eclipse.debug.core.DebugException;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.rsp.launching.utils.StatusConverter;
+import org.jboss.tools.rsp.server.minishift.discovery.MinishiftDiscovery;
 import org.jboss.tools.rsp.server.minishift.impl.Activator;
 import org.jboss.tools.rsp.server.minishift.servertype.IMinishiftServerAttributes;
 import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
@@ -62,8 +63,16 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 		if( null == bin ) {
 			return validationErrorResponse("Minishift binary location must not be null", IMinishiftServerAttributes.MINISHIFT_BINARY, Activator.BUNDLE_ID);
 		}
-		if(!(new File(bin).exists())) {
+		File fBin = new File(bin);
+		if(!fBin.exists())
 			return validationErrorResponse("Minishift binary location must exist", IMinishiftServerAttributes.MINISHIFT_BINARY, Activator.BUNDLE_ID);
+
+		if(!fBin.isFile())
+			return validationErrorResponse("Minishift binary location must not be a directory.", IMinishiftServerAttributes.MINISHIFT_BINARY, Activator.BUNDLE_ID);
+
+		MinishiftDiscovery discovery = new MinishiftDiscovery();
+		if( !discovery.isMinishiftBinaryFile(fBin)) {
+			return validationErrorResponse("Provided path is not a Minishift binary file: " + bin, IMinishiftServerAttributes.MINISHIFT_BINARY, Activator.BUNDLE_ID);
 		}
 		return new CreateServerValidation(Status.OK_STATUS, null);
 	}
