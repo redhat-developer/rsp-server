@@ -290,29 +290,7 @@ public class ServerModel implements IServerModel {
 		}
 		// TODO check for duplicates
 		File serverFile = new File(serversDirectory, id);
-		Server s = new Server(serverFile, serverType, secureStorageProvider);
-		s.setAttribute("id", id);
-
-		Set<String> keys = attributes.keySet();
-		for( String k : keys) {
-			setAttribute(s, k, attributes.get(k));
-		}
-		
-		return s;
-	}
-	
-	private void setAttribute(Server s, String k, Object val) {
-		if( val instanceof Integer) {
-			s.setAttribute(k, ((Integer)val).intValue());
-		} else if( val instanceof Boolean) {
-			s.setAttribute(k, ((Boolean)val).booleanValue());
-		} else if( val instanceof String ) {
-			s.setAttribute(k, (String)val);
-		} else if( val instanceof List) {
-			s.setAttribute(k, (List)val);
-		} else if( val instanceof Map) {
-			s.setAttribute(k, (Map)val);
-		}
+		return new Server(serverFile, serverType, id, attributes, secureStorageProvider);
 	}
 	
 	private void addServer(IServer server, IServerDelegate del) {
