@@ -42,7 +42,6 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.launching.utils.StatusConverter;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.rsp.server.model.RemoteEventManager;
-import org.jboss.tools.rsp.server.model.ServerManagementModel;
 import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
@@ -53,13 +52,13 @@ public class ServerManagementServerImpl implements RSPServer {
 	private final List<RSPClient> clients = new CopyOnWriteArrayList<>();
 	private final List<SocketLauncher<RSPClient>> launchers = new CopyOnWriteArrayList<>();
 	
-	private final ServerManagementModel model;
+	private final IServerManagementModel managementModel;
 	private final RemoteEventManager remoteEventManager;
 	private ServerManagementServerLauncher launcher;
 	
-	public ServerManagementServerImpl(ServerManagementServerLauncher launcher) {
+	public ServerManagementServerImpl(ServerManagementServerLauncher launcher, IServerManagementModel managementModel) {
 		this.launcher = launcher;
-		this.model = new ServerManagementModel();
+		this.managementModel = managementModel;
 		this.remoteEventManager = new RemoteEventManager(this);
 	}
 	
@@ -83,12 +82,12 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	public void clientAdded(SocketLauncher<RSPClient> launcher) {
-		this.model.clientAdded(launcher.getRemoteProxy());
+		managementModel.clientAdded(launcher.getRemoteProxy());
 	}
 	
 	protected void removeClient(SocketLauncher<RSPClient> launcher) {
 		this.launchers.remove(launcher);
-		this.model.removeClient(launcher.getRemoteProxy());
+		managementModel.clientRemoved(launcher.getRemoteProxy());
 		this.clients.remove(launcher.getRemoteProxy());
 	}
 	
@@ -97,7 +96,7 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 	
 	public IServerManagementModel getModel() {
-		return model;
+		return managementModel;
 	}
 
 	/**
@@ -105,7 +104,7 @@ public class ServerManagementServerImpl implements RSPServer {
 	 */
 	@Override
 	public CompletableFuture<List<DiscoveryPath>> getDiscoveryPaths() {
-		return CompletableFuture.completedFuture(model.getDiscoveryPathModel().getPaths());
+		return CompletableFuture.completedFuture(managementModel.getDiscoveryPathModel().getPaths());
 	}
 
 	private boolean isEmptyDiscoveryPath(DiscoveryPath path) {
@@ -131,7 +130,7 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( !ipath.isAbsolute()) {
 			return invalidParameterStatus();
 		}
-		boolean ret = model.getDiscoveryPathModel().addPath(path);
+		boolean ret = managementModel.getDiscoveryPathModel().addPath(path);
 		return booleanToStatus(ret, "Discovery path not added: " + path.getFilepath());
 	}
 
@@ -149,7 +148,7 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( !ipath.isAbsolute()) {
 			return invalidParameterStatus();
 		}
-		boolean ret = model.getDiscoveryPathModel().removePath(path);
+		boolean ret = managementModel.getDiscoveryPathModel().removePath(path);
 		return booleanToStatus(ret, "Discovery path not removed: " + path.getFilepath());
 	}
 
@@ -170,7 +169,7 @@ public class ServerManagementServerImpl implements RSPServer {
 			return ret;
 		}
 
-		ServerBeanLoader loader = new ServerBeanLoader(new File(path.getFilepath()));
+		ServerBeanLoader loader = new ServerBeanLoader(new File(path.getFilepath()), managementModel);
 		ServerBean bean = loader.getServerBean();
 		if( bean != null )
 			ret.add(bean);
@@ -188,7 +187,7 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 	
 	private List<ServerHandle> getServerHandlesSync() {
-		ServerHandle[] all = model.getServerModel().getServerHandles();
+		ServerHandle[] all = managementModel.getServerModel().getServerHandles();
 		return Arrays.asList(all);
 	}
 
@@ -202,7 +201,7 @@ public class ServerManagementServerImpl implements RSPServer {
 			return invalidParameterStatus();
 		}
 		
-		boolean b = model.getServerModel().removeServer(handle.getId());
+		boolean b = managementModel.getServerModel().removeServer(handle.getId());
 		return booleanToStatus(b, "Server not removed: " + handle.getId());
 	}
 
@@ -215,7 +214,7 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( type == null || isEmpty(type.getId())) {
 			return null;
 		}
-		Attributes rspa = model.getServerModel().getRequiredAttributes(type.getId());
+		Attributes rspa = managementModel.getServerModel().getRequiredAttributes(type.getId());
 		return rspa;
 	}
 
@@ -227,7 +226,7 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( type == null || isEmpty(type.getId())) {
 			return null;
 		}
-		return model.getServerModel().getOptionalAttributes(type.getId());
+		return managementModel.getServerModel().getOptionalAttributes(type.getId());
 	}
 	
 	@Override
@@ -238,7 +237,7 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( type == null || isEmpty(type.getId()) ) {
 			return null;
 		}
-		List<ServerLaunchMode> l = model.getServerModel()
+		List<ServerLaunchMode> l = managementModel.getServerModel()
 				.getLaunchModes(type.getId());
 		return l;
 	}
@@ -251,7 +250,7 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( req == null || isEmpty(req.getServerTypeId()) || isEmpty(req.getMode())) {
 			return null;
 		}
-		Attributes rspa = model.getServerModel().getRequiredLaunchAttributes(req.getServerTypeId());
+		Attributes rspa = managementModel.getServerModel().getRequiredLaunchAttributes(req.getServerTypeId());
 		return rspa;
 	}
 
@@ -263,7 +262,7 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( req == null || isEmpty(req.getServerTypeId()) || isEmpty(req.getMode())) {
 			return null;
 		}
-		Attributes rspa = model.getServerModel().getOptionalLaunchAttributes(req.getServerTypeId());
+		Attributes rspa = managementModel.getServerModel().getOptionalLaunchAttributes(req.getServerTypeId());
 		return rspa;
 	}
 
@@ -282,7 +281,7 @@ public class ServerManagementServerImpl implements RSPServer {
 		String id = attr.getId();
 		Map<String, Object> attributes = attr.getAttributes();
 		
-		CreateServerResponse ret = model.getServerModel().createServer(serverType, id, attributes);
+		CreateServerResponse ret = managementModel.getServerModel().createServer(serverType, id, attributes);
 		return ret;
 	}
 
@@ -291,7 +290,7 @@ public class ServerManagementServerImpl implements RSPServer {
 		return teeFuture(() -> getServerTypesSync());
 	}
 	private List<ServerType> getServerTypesSync() {
-		ServerType[] types = model.getServerModel().getAccessibleServerTypes();
+		ServerType[] types = managementModel.getServerModel().getAccessibleServerTypes();
 		return Arrays.asList(types);
 	}
 
@@ -307,7 +306,7 @@ public class ServerManagementServerImpl implements RSPServer {
 		}
 
 		String id = attr.getParams().getId();
-		IServer server = model.getServerModel().getServer(id);
+		IServer server = managementModel.getServerModel().getServer(id);
 		if( server == null ) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server " + id + " does not exist");
 			return (new StartServerResponse(StatusConverter.convert(is), null));
@@ -339,7 +338,7 @@ public class ServerManagementServerImpl implements RSPServer {
 			return invalidParameterStatus();
 		}
 
-		IServer server = model.getServerModel().getServer(attr.getId());
+		IServer server = managementModel.getServerModel().getServer(attr.getId());
 		if( server == null ) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server " + attr.getId() + " does not exist");
 			return (StatusConverter.convert(is));
@@ -376,7 +375,7 @@ public class ServerManagementServerImpl implements RSPServer {
 			return null;
 		}
 		String id = req.getParams().getId();
-		IServer server = model.getServerModel().getServer(id);
+		IServer server = managementModel.getServerModel().getServer(id);
 		if( server == null ) {
 			return null;
 		}
@@ -403,7 +402,7 @@ public class ServerManagementServerImpl implements RSPServer {
 			return invalidParameterStatus();
 		}
 		String id = attr.getRequest().getParams().getId();
-		IServer server = model.getServerModel().getServer(id);
+		IServer server = managementModel.getServerModel().getServer(id);
 		if( server == null ) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server " + id + " does not exist");
 			return StatusConverter.convert(is);
@@ -433,7 +432,7 @@ public class ServerManagementServerImpl implements RSPServer {
 		}
 
 		String id = attr.getParams().getId();
-		IServer server = model.getServerModel().getServer(id);
+		IServer server = managementModel.getServerModel().getServer(id);
 		if( server == null ) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server " + id + " does not exist");
 			return StatusConverter.convert(is);
@@ -458,9 +457,9 @@ public class ServerManagementServerImpl implements RSPServer {
 	@Override
 	public CompletableFuture<ServerCapabilitiesResponse> registerClientCapabilities(ClientCapabilitiesRequest request) {
 		RSPClient rspc = ClientThreadLocal.getActiveClient();
-		IStatus s = model.getCapabilityManagement().registerClientCapabilities(rspc, request);
+		IStatus s = managementModel.getCapabilityManagement().registerClientCapabilities(rspc, request);
 		Status st = StatusConverter.convert(s);
-		Map<String,String> resp2 = model.getCapabilityManagement().getServerCapabilities();
+		Map<String,String> resp2 = managementModel.getCapabilityManagement().getServerCapabilities();
 		ServerCapabilitiesResponse resp = new ServerCapabilitiesResponse(st, resp2);
 		return CompletableFuture.completedFuture(resp);
 	}

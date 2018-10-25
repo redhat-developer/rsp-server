@@ -37,7 +37,7 @@ public class JBossAS710ExtendedProperties extends JBossAS7ExtendedProperties { /
 	}
 	public IDefaultLaunchArguments getDefaultLaunchArguments() {
 		if( server != null) {
-			ServerBeanLoader l = new ServerBeanLoader(getServerHomeFile());
+			ServerBeanLoader l = new ServerBeanLoader(getServerHomeFile(), server.getServerManagementModel());
 			if( l.getServerBeanType().getName().equals(ServerBeanTypeAS7GateIn.NAME_GATEIN)) {
 				String version = l.getServerBean().getVersion();
 				if( "3.3".equals(version) 

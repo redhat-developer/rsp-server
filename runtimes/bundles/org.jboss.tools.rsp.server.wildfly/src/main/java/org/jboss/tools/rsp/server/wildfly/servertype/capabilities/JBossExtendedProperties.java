@@ -48,7 +48,7 @@ public class JBossExtendedProperties extends ServerExtendedProperties {
 	}
 
 	protected ServerBeanLoader getServerBeanLoader() {
-		return new ServerBeanLoader(getServerHomeFile());
+		return new ServerBeanLoader(getServerHomeFile(), server.getServerManagementModel());
 	}
 	
 	protected String getServerHome() {

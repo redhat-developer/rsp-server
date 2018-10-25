@@ -12,9 +12,9 @@ package org.jboss.tools.rsp.server.discovery.serverbeans;
 import java.io.File;
 
 import org.jboss.tools.rsp.api.dao.ServerBean;
-import org.jboss.tools.rsp.server.model.ServerManagementModel;
 import org.jboss.tools.rsp.server.spi.discovery.IServerBeanTypeManager;
 import org.jboss.tools.rsp.server.spi.discovery.ServerBeanType;
+import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 
 
 /**
@@ -24,10 +24,12 @@ import org.jboss.tools.rsp.server.spi.discovery.ServerBeanType;
 public class ServerBeanLoader {
 	private ServerBean bean = null;
 	private ServerBeanType type = null;
-	private File rootLocation = null;
+	private final File rootLocation;
+	private final IServerManagementModel managementModel;
 
-	public ServerBeanLoader(File location) {
-		rootLocation = location;
+	public ServerBeanLoader(File location, IServerManagementModel managementModel) {
+		this.rootLocation = location;
+		this.managementModel = managementModel;
 	}
 	
 	public ServerBean getServerBean() {
@@ -58,7 +60,7 @@ public class ServerBeanLoader {
 	}
 	
 	protected IServerBeanTypeManager getServerBeanTypeManager() {
-		return ServerManagementModel.getDefault().getServerBeanTypeManager();
+		return managementModel.getServerBeanTypeManager();
 	}
 
 	public String getFullServerVersion() {

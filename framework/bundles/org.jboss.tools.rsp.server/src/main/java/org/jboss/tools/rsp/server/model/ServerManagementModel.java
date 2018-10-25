@@ -30,11 +30,7 @@ import org.slf4j.LoggerFactory;
 public class ServerManagementModel implements IServerManagementModel {
 	private static final Logger LOG = LoggerFactory.getLogger(ServerManagementModel.class);
 
-	private static ServerManagementModel instance;
-
-	public static ServerManagementModel getDefault() {
-		return instance;
-	}
+	private static final String SECURESTORAGE_DIRECTORY = "securestorage";
 
 	private ISecureStorageProvider secureStorage;
 	private ICapabilityManagement capabilities;
@@ -45,15 +41,18 @@ public class ServerManagementModel implements IServerManagementModel {
 	private IVMInstallRegistry vmModel;
 
 	public ServerManagementModel() {
+		this(LaunchingCore.getDataLocation());
+	}
+	
+	/** protected for testing purposes **/
+	public ServerManagementModel(File dataLocation) {
 		this.capabilities = createCapabilityManagement();
-		this.secureStorage = createSecureStorageProvider(capabilities);
+		this.secureStorage = createSecureStorageProvider(getSecureStorageFile(dataLocation), capabilities);
 		this.rpm = createDiscoveryPathModel();
 		this.serverBeanTypeManager = createServerBeanTypeManager();
 		this.serverModel = createServerModel(secureStorage);
 		this.vmModel = createVMInstallRegistry();
 		this.vmModel.addActiveVM();
-
-		instance = this;
 	}
 	
 	public ISecureStorageProvider getSecureStorageProvider() {
@@ -80,7 +79,7 @@ public class ServerManagementModel implements IServerManagementModel {
 		return capabilities;
 	}
 
-	public void removeClient(RSPClient client) {
+	public void clientRemoved(RSPClient client) {
 		capabilities.clientRemoved(client);
 		if( secureStorage instanceof SecureStorageGuardian ) 
 			((SecureStorageGuardian)secureStorage).removeClient(client);
@@ -90,22 +89,17 @@ public class ServerManagementModel implements IServerManagementModel {
 		capabilities.clientAdded(client);
 	}
 
-	private File getSecureStorageFile() {
-		File data = getDataLocation();
-		File secure = new File(data, "securestorage");
+	private File getSecureStorageFile(File dataLocation) {
+		File secure = new File(dataLocation, SECURESTORAGE_DIRECTORY);
 		return secure;
-	}
-
-	protected File getDataLocation() {
-		return LaunchingCore.getDataLocation();
 	}
 
 	/*
 	 * Following methods are for tests / subclasses to override. This is not advised
 	 * for clients / extenders, since this class appears to behave as a singleton.
 	 */
-	protected ISecureStorageProvider createSecureStorageProvider(ICapabilityManagement mgmt) {
-		return new SecureStorageGuardian(getSecureStorageFile(), mgmt);
+	protected ISecureStorageProvider createSecureStorageProvider(File file, ICapabilityManagement mgmt) {
+		return new SecureStorageGuardian(file, mgmt);
 	}
 
 	protected ICapabilityManagement createCapabilityManagement() {
@@ -121,7 +115,7 @@ public class ServerManagementModel implements IServerManagementModel {
 	}
 
 	protected IServerModel createServerModel(ISecureStorageProvider secure) {
-		return new ServerModel(secure);
+		return new ServerModel(this);
 	}
 
 	protected IServerBeanTypeManager createServerBeanTypeManager() {

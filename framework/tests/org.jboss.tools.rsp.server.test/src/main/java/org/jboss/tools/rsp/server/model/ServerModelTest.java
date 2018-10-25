@@ -27,11 +27,13 @@ import java.nio.file.Path;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.launching.LaunchingCore;
+import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.ServerModelListenerAdapter;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -56,10 +58,16 @@ public class ServerModelTest {
 		else
 			System.setProperty(LaunchingCore.SYSPROP_DATA_LOCATION, ORIGINAL_DATA_LOC);
 	}
+
+	private ServerModel sm;
+
+	@Before
+	public void before() {
+		this.sm = new ServerModel(mock(IServerManagementModel.class));
+	}
 	
 	@Test
 	public void testGibberishFile() {
-		ServerModel sm = new ServerModel();
 		Path dir = null;
 		Path s1 = null;
 		try {
@@ -80,7 +88,6 @@ public class ServerModelTest {
 
 	@Test
 	public void testMissingServerTypeInFile() {
-		ServerModel sm = new ServerModel();
 		Path dir = null;
 		Path s1 = null;
 		try {
@@ -101,7 +108,6 @@ public class ServerModelTest {
 
 	@Test
 	public void testMissingServerTypeInModel() {
-		ServerModel sm = new ServerModel();
 		Path dir = null;
 		Path s1 = null;
 		try {
@@ -124,7 +130,6 @@ public class ServerModelTest {
 
 	@Test
 	public void testLoadServer() {
-		ServerModel sm = new ServerModel();
 		sm.addServerType(mockServerType("wonka5"));
 		Path dir = null;
 		Path s1 = null;
@@ -147,7 +152,6 @@ public class ServerModelTest {
 
 	@Test
 	public void testLoadServerHandles() {
-		ServerModel sm = new ServerModel();
 		sm.addServerType(mockServerType("wonka5"));
 		Path dir = null;
 		Path s1 = null;
@@ -178,7 +182,6 @@ public class ServerModelTest {
 	
 	@Test
 	public void testAddAndRemoveServerType() {
-		ServerModel sm = new ServerModel();
 		assertNotNull(sm.getServerTypes());
 		assertEquals(0, sm.getServerTypes().length);
 		assertNull(sm.getIServerType("wonka5"));
@@ -197,7 +200,6 @@ public class ServerModelTest {
 	
 	@Test
 	public void testLoadAndRemoveServerWithListener() {
-		ServerModel sm = new ServerModel();
 		final Boolean[] added = new Boolean[] {new Boolean(false)};
 		final Boolean[] removed = new Boolean[] {new Boolean(false)};
 		ServerModelListenerAdapter smla = new ServerModelListenerAdapter() {

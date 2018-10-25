@@ -24,12 +24,13 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.launching.internal.LaunchingActivator;
 import org.jboss.tools.rsp.launching.java.ILaunchModes;
-import org.jboss.tools.rsp.launching.utils.StatusConverter;
+import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -55,10 +56,16 @@ public class ServerTypeTest {
 			System.setProperty(LaunchingCore.SYSPROP_DATA_LOCATION, ORIGINAL_DATA_LOC);
 	}
 
+	private ServerModel sm;
+
+	@Before
+	public void before() {
+		this.sm = new ServerModel(mock(IServerManagementModel.class));
+
+	}
 	
 	@Test
 	public void testServerTypeAttributes() {
-		ServerModel sm = new ServerModel();
 		IServerType testType = new TestType();
 		sm.addServerType(testType);
 
@@ -86,7 +93,6 @@ public class ServerTypeTest {
 
 	@Test
 	public void testInvalidAttributeType() {
-		ServerModel sm = new ServerModel();
 		IServerType testType = new TestType() {
 			@Override
 			public Attributes getRequiredAttributes() {
@@ -129,7 +135,6 @@ public class ServerTypeTest {
 
 	@Test
 	public void createServerMissingAttribute() {
-		ServerModel sm = new ServerModel();
 		IServerType testType = new TestType();
 		sm.addServerType(testType);
 		CreateServerResponse stat = sm.createServer(testType.getId(), "test.name1", new HashMap<String, Object>());
@@ -139,7 +144,6 @@ public class ServerTypeTest {
 
 	@Test
 	public void createServerMissingType() {
-		ServerModel sm = new ServerModel();
 		CreateServerResponse stat = sm.createServer("test1", "test.name1", new HashMap<String, Object>());
 		assertNotNull(stat);
 		assertFalse(stat.getStatus().isOK());
@@ -147,7 +151,6 @@ public class ServerTypeTest {
 
 	@Test
 	public void testAttributeWrongType() {
-		ServerModel sm = new ServerModel();
 		IServerType testType = new TestType() {
 			@Override
 			public Attributes getRequiredAttributes() {
@@ -194,7 +197,6 @@ public class ServerTypeTest {
 	}
 	@Test
 	public void testValidationError() {
-		ServerModel sm = new ServerModel();
 		IServerType testType = new TestType() {
 			@Override
 			public Attributes getRequiredAttributes() {

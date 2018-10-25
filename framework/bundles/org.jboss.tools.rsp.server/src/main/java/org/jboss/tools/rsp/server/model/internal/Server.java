@@ -18,6 +18,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.launching.utils.IMemento;
 import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
 import org.jboss.tools.rsp.server.core.internal.SecuredBase;
+import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
@@ -28,14 +29,16 @@ public class Server extends SecuredBase implements IServer {
 
 	private IServerDelegate delegate;
 	private IServerType serverType;
+	private IServerManagementModel managementModel;
 	
 	public Server(File file, ISecureStorageProvider storage) {
 		super(file, storage);
 	}
 	
-	public Server(File file, IServerType type, String id, Map<String, Object> attributes, ISecureStorageProvider storage) {
-		super(file, id, storage);
+	public Server(File file, IServerType type, String id, Map<String, Object> attributes, IServerManagementModel managementModel) {
+		super(file, id, managementModel.getSecureStorageProvider());
 		this.serverType = type;
+		this.managementModel = managementModel;
 		if( this.serverType != null ) {
 			setAttribute(TYPE_ID, type.getId());
 			this.delegate = this.serverType.createServerDelegate(this);
@@ -87,6 +90,10 @@ public class Server extends SecuredBase implements IServer {
 	@Override
 	public IServerDelegate getDelegate() {
 		return delegate;
+	}
+
+	public IServerManagementModel getServerManagementModel() {
+		return managementModel;
 	}
 	
 	public void save(IProgressMonitor monitor) throws CoreException {

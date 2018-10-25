@@ -13,7 +13,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import org.jboss.tools.rsp.server.model.ServerManagementModel;
+import java.util.Collections;
+
+import org.jboss.tools.rsp.server.spi.discovery.IServerBeanTypeManager;
+import org.jboss.tools.rsp.server.spi.discovery.ServerBeanType;
+import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
@@ -27,7 +31,6 @@ public class ExtendedPropertiesTest {
 
 	@Test
 	public void testServerTypes() {
-		new ServerManagementModel();
 		String[] toTest = IServerConstants.ALL_JBOSS_SERVERS;
 		ExtendedServerPropertiesAdapterFactory fact = new ExtendedServerPropertiesAdapterFactory();
 		for( int i = 0; i < toTest.length; i++ ) {
@@ -47,7 +50,24 @@ public class ExtendedPropertiesTest {
 		doReturn(st).when(s).getServerType();
 		doReturn(type).when(st).getId();
 		doReturn(".").when(s).getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
+
+		IServerManagementModel managementModel = mockServerManagementModel();
+		doReturn(managementModel).when(s).getServerManagementModel();
+	
 		return s;
+	}
+
+	private IServerManagementModel mockServerManagementModel() {
+		IServerManagementModel managementModel = mock(IServerManagementModel.class);		
+		IServerBeanTypeManager beanTypeManager = mockServerBeanTypeManager();
+		doReturn(beanTypeManager).when(managementModel).getServerBeanTypeManager();
+		return managementModel;
+	}
+
+	private IServerBeanTypeManager mockServerBeanTypeManager() {
+		IServerBeanTypeManager beanTypeManager = mock(IServerBeanTypeManager.class);
+		doReturn(new ServerBeanType[] {}).when(beanTypeManager).getAllRegisteredTypes();
+		return beanTypeManager;
 	}
 
 }
