@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.rsp.secure.test.model;
 
 import static org.junit.Assert.assertEquals;
@@ -14,6 +22,7 @@ import org.jboss.tools.rsp.secure.model.RSPSecureStorage;
 import org.junit.Test;
 
 public class RSPSecureStorageTest {
+
 	@Test
 	public void testNonExistentProperties() throws IOException, CryptoException {
 		File tmp = File.createTempFile("RSPSecureStorageTest", "1" + System.currentTimeMillis());
@@ -35,7 +44,7 @@ public class RSPSecureStorageTest {
 		assertEquals("test2", inner.getStringProperty("dne", "test2"));
 	}
 
-
+	@Test
 	public void testAddProperties() throws IOException, CryptoException {
 		File tmp = File.createTempFile("RSPSecureStorageTest", "2" + System.currentTimeMillis());
 		tmp.delete();
@@ -62,9 +71,8 @@ public class RSPSecureStorageTest {
 		assertEquals("persist-me", inner.getStringProperty("key", "test"));
 		assertEquals("persist-me", inner.getStringProperty("key", "test2"));
 	}
-	
-	
 
+	@Test
 	public void testSaveProperties() throws IOException, CryptoException {
 		File tmp = File.createTempFile("RSPSecureStorageTest", "2" + System.currentTimeMillis());
 		tmp.delete();
@@ -106,7 +114,6 @@ public class RSPSecureStorageTest {
 		assertEquals("persist-me", inner2.getStringProperty("keyS", "wrong"));
 
 	}
-	
 
 	@Test
 	public void testBadKey() throws IOException, CryptoException {
