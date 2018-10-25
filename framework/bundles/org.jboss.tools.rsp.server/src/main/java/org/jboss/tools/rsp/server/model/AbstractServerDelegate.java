@@ -26,6 +26,7 @@ import org.jboss.tools.rsp.eclipse.debug.core.IStreamListener;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.rsp.launching.RuntimeProcessEventManager;
 import org.jboss.tools.rsp.server.model.internal.ServerStreamListener;
+import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.model.polling.IPollResultListener;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller;
 import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
@@ -42,7 +43,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	protected HashMap<String, Object> sharedData = new HashMap<>();
 	private IServer server;
 	
-	public AbstractServerDelegate(IServer server) {
+	protected AbstractServerDelegate(IServer server) {
 		this.server = server;
 		if( registerAsProcessListener())
 			RuntimeProcessEventManager.getDefault().addListener(this);
@@ -119,15 +120,19 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	}
 	
 	protected void fireStateChanged(int state) {
-		ServerManagementModel.getDefault().getServerModel().fireServerStateChanged(server, state);
+		getServerModel().fireServerStateChanged(server, state);
 	}
 
 	protected void fireServerProcessTerminated(String processId) {
-		ServerManagementModel.getDefault().getServerModel().fireServerProcessTerminated(server, processId);
+		getServerModel().fireServerProcessTerminated(server, processId);
 	}
 	
 	protected void fireServerProcessCreated(String processId) {
-		ServerManagementModel.getDefault().getServerModel().fireServerProcessCreated(server, processId);
+		getServerModel().fireServerProcessCreated(server, processId);
+	}
+
+	protected IServerModel getServerModel() {
+		return server.getServerManagementModel().getServerModel();
 	}
 
 	/**

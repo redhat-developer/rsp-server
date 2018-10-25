@@ -14,13 +14,21 @@ import static org.mockito.Mockito.mock;
 
 import org.jboss.tools.rsp.api.ICapabilityKeys;
 import org.jboss.tools.rsp.api.RSPClient;
+import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
+import org.junit.Before;
 import org.junit.Test;
 
 public class ServerManagementModelTest {
 
+	private IServerManagementModel model;
+
+	@Before
+	public void before() {
+		this.model = new ServerManagementModel();
+	}
+	
 	@Test
 	public void testDependentModelsNotNull() {
-		ServerManagementModel model = new ServerManagementModel();
 		assertNotNull(model);
 		assertNotNull(model.getCapabilityManagement());
 		assertNotNull(model.getDiscoveryPathModel());
@@ -32,7 +40,6 @@ public class ServerManagementModelTest {
 
 	@Test
 	public void testClientAdded() {
-		ServerManagementModel model = new ServerManagementModel();
 		RSPClient client = mock(RSPClient.class);
 		model.clientAdded(client);
 

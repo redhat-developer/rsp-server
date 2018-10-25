@@ -15,6 +15,7 @@ import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
 public class JBoss6xDefaultLaunchArguments extends JBoss5xDefaultLaunchArguments {
+
 	public JBoss6xDefaultLaunchArguments(IServer server) {
 		super(server);
 	}
@@ -34,7 +35,7 @@ public class JBoss6xDefaultLaunchArguments extends JBoss5xDefaultLaunchArguments
 		// EXPECT the local dev copy is the same distribution. 
 		IPath home = getServerHome();
 		/// use the local version to know what version, since we can't actually look at the remote
-		String version = new ServerBeanLoader(getServerHome().toFile()).getFullServerVersion();
+		String version = new ServerBeanLoader(getServerHome().toFile(), server.getServerManagementModel()).getFullServerVersion();
 		if( version.startsWith("6.1")) {
 			// Only relevent for as6.1
 			ret += SYSPROP + LOGGING_CONFIG_PROP + EQ + QUOTE + FILE_COLON + 

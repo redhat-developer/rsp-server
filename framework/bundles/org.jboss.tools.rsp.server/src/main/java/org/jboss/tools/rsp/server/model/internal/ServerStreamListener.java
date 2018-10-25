@@ -10,7 +10,7 @@ package org.jboss.tools.rsp.server.model.internal;
 
 import org.jboss.tools.rsp.eclipse.debug.core.IStreamListener;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IStreamMonitor;
-import org.jboss.tools.rsp.server.model.ServerManagementModel;
+import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
 public class ServerStreamListener implements IStreamListener {
@@ -31,10 +31,9 @@ public class ServerStreamListener implements IStreamListener {
 	}
 
 	private void fireStreamAppended(IServer server2, int streamType, String text) {
-		ServerManagementModel.getDefault().getServerModel()
-			.fireServerStreamAppended(server2, processId, streamType, text);
-		ServerManagementModel.getDefault().getServerModel().fireServerStreamAppended(
-				server2, processId, streamType, text);
+		IServerModel serverModel = server.getServerManagementModel().getServerModel();
+		serverModel.fireServerStreamAppended(server2, processId, streamType, text);
+		serverModel.fireServerStreamAppended(server2, processId, streamType, text);
 	}
 	
 }

@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.SocketLauncher;
+import org.jboss.tools.rsp.server.model.ServerManagementModel;
 import org.jboss.tools.rsp.server.model.ServerPersistenceManager;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.slf4j.Logger;
@@ -50,7 +51,7 @@ public class ServerManagementServerLauncher {
 	}
 	
 	protected ServerManagementServerImpl createImpl() {
-		return new ServerManagementServerImpl(this);
+		return new ServerManagementServerImpl(this, new ServerManagementModel());
 	}
 	
 	public IServerManagementModel getModel() {

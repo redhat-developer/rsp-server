@@ -32,27 +32,17 @@ public class SecureStorageGuardianTest {
 
 	@Test
 	public void testSecureStorageGuardian() throws IOException {
-		File location = Files.createTempDirectory("ServerManagementModelTest").toFile();
 		RSPClient client = mock(RSPClient.class);
 		when(client.promptString(any())).thenReturn(CompletableFuture.completedFuture("abcde"));
-		ServerManagementModel model = new ServerManagementModel() {
-			protected File getDataLocation() {
-				return location;
-			}
-		};
+		ServerManagementModel model = createServerManagementModel();
 		testPromptableGuardian(model, client, true);
 	}
 
 	@Test
 	public void testGuardianSecondClientWrongPassword() throws IOException {
-		File location = Files.createTempDirectory("ServerManagementModelTest").toFile();
 		RSPClient client = mock(RSPClient.class);
 		when(client.promptString(any())).thenReturn(CompletableFuture.completedFuture("abcde"));
-		ServerManagementModel model = new ServerManagementModel() {
-			protected File getDataLocation() {
-				return location;
-			}
-		};
+		ServerManagementModel model = createServerManagementModel();
 		testPromptableGuardian(model, client, true);
 
 		// Now test a second client with the wrong password
@@ -75,10 +65,10 @@ public class SecureStorageGuardianTest {
 		assertNull(provider.getSecureStorage(true));
 		
 		// simulate a reconnect
-		model.removeClient(client);
+		model.clientRemoved(client);
 		model.clientAdded(client);
 
-		// Register the client with the abilityt to be prompted... but...
+		// Register the client with the ability to be prompted... but...
 		// getSecureStorage will still fail since it won't prompt the user with this api
 		Map<String, String> promptable = new HashMap<String, String>();
 		promptable.put(ICapabilityKeys.STRING_PROTOCOL_VERSION, ICapabilityKeys.PROTOCOL_VERSION_0_10_0);
@@ -98,6 +88,11 @@ public class SecureStorageGuardianTest {
 			assertNull(provider.getSecureStorage(true));
 			assertNull(provider.getSecureStorage());
 		}
+	}
+
+	private ServerManagementModel createServerManagementModel() throws IOException {
+		File location = Files.createTempDirectory("ServerManagementModelTest").toFile();
+		return new ServerManagementModel(location) {};
 	}
 
 }

@@ -25,6 +25,7 @@ import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.SocketLauncher;
 import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.server.ShutdownExecutor.IShutdownHandler;
+import org.jboss.tools.rsp.server.model.ServerManagementModel;
 import org.jboss.tools.rsp.server.util.ClientLauncher;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -168,7 +169,7 @@ public class RSPStartupShutdownTest {
 	protected ServerManagementServerLauncher countdownLauncher() {
 		return new ServerManagementServerLauncher() {
 			protected ServerManagementServerImpl createImpl() {
-				return new ServerManagementServerImpl(this) {
+				return new ServerManagementServerImpl(this, new ServerManagementModel()) {
 					@Override
 					protected void removeClient(SocketLauncher<RSPClient> launcher) {
 						try {

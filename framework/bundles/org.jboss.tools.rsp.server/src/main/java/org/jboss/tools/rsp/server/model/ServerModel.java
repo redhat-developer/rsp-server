@@ -33,10 +33,10 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.launching.utils.StatusConverter;
 import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
-import org.jboss.tools.rsp.secure.model.NullSecureStorageProvider;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
 import org.jboss.tools.rsp.server.model.internal.DaoUtilities;
 import org.jboss.tools.rsp.server.model.internal.Server;
+import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModelListener;
 import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
@@ -51,28 +51,17 @@ public class ServerModel implements IServerModel {
 
 	private static final String SERVERS_DIRECTORY = "servers";
 
-	private HashMap<String, IServerType> serverTypes;
-	private HashMap<String, IServer> servers;
-	private HashMap<String, IServerDelegate> serverDelegates;
-	private List<IServerModelListener> listeners;
-	
-	private Set<String> approvedAttributeTypes;
-	private ISecureStorageProvider secureStorageProvider;
+	private final HashMap<String, IServerType> serverTypes = new HashMap<>();
+	private final HashMap<String, IServer> servers = new HashMap<>();
+	private final HashMap<String, IServerDelegate> serverDelegates = new HashMap<>();
+	private final List<IServerModelListener> listeners = new ArrayList<>();
+	private final Set<String> approvedAttributeTypes = new HashSet<>();
+	private final IServerManagementModel managementModel;
 
-	
-	public ServerModel() {
-		this(new NullSecureStorageProvider());
-	}
-	
-	public ServerModel(ISecureStorageProvider provider) {
-		this.secureStorageProvider = provider;
-		this.serverTypes = new HashMap<>();
-		this.servers = new HashMap<>();
-		this.serverDelegates = new HashMap<>();
-		this.listeners = new ArrayList<>();
+	public ServerModel(IServerManagementModel managementModel) {
+		this.managementModel = managementModel;
 		
 		// Server attributes must be one of the following types
-		this.approvedAttributeTypes = new HashSet<>();
 		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_INT);
 		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_BOOL);
 		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_STRING);
@@ -84,7 +73,7 @@ public class ServerModel implements IServerModel {
 	
 	@Override
 	public ISecureStorageProvider getSecureStorageProvider() {
-		return secureStorageProvider;
+		return managementModel.getSecureStorageProvider();
 	}
 	
 	@Override
@@ -167,9 +156,9 @@ public class ServerModel implements IServerModel {
 
 		}
 	}
-	
+
 	private Server loadServer(File serverFile) {
-		Server server = new Server(serverFile, secureStorageProvider);
+		Server server = new Server(serverFile, managementModel.getSecureStorageProvider());
 		try {
 			server.load(new NullProgressMonitor());
 			String tid = server.getTypeId();
@@ -282,7 +271,7 @@ public class ServerModel implements IServerModel {
 		return null;
 	}
 
-	private Server createServer2(IServerType serverType, String id, Map<String, Object> attributes) {
+	private Server createServer2(IServerType serverType, String id, Map<String, Object> attributes) throws CoreException {
 		File data = LaunchingCore.getDataLocation();
 		File serversDirectory = new File(data, SERVERS_DIRECTORY);
 		if( !serversDirectory.exists()) {
@@ -290,7 +279,7 @@ public class ServerModel implements IServerModel {
 		}
 		// TODO check for duplicates
 		File serverFile = new File(serversDirectory, id);
-		return new Server(serverFile, serverType, id, attributes, secureStorageProvider);
+		return new Server(serverFile, serverType, id, attributes, managementModel);
 	}
 	
 	private void addServer(IServer server, IServerDelegate del) {
@@ -429,7 +418,7 @@ public class ServerModel implements IServerModel {
 	}
 	
 	private boolean hasPermissions() {
-		return secureStorageProvider.getSecureStorage(true) != null;
+		return managementModel.getSecureStorageProvider().getSecureStorage(true) != null;
 	}
 
 	private boolean hasSecureAttributes(IServerType type) {
