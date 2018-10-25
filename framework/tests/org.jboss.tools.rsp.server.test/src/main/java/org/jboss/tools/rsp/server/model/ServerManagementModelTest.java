@@ -20,7 +20,7 @@ public class ServerManagementModelTest {
 
 	@Test
 	public void testDependentModelsNotNull() {
-		ServerManagementModel model = new ServerManagementModel();
+		ServerManagementModel model = ServerManagementModel.getDefault();
 		assertNotNull(model);
 		assertNotNull(model.getCapabilityManagement());
 		assertNotNull(model.getDiscoveryPathModel());
@@ -32,7 +32,7 @@ public class ServerManagementModelTest {
 
 	@Test
 	public void testClientAdded() {
-		ServerManagementModel model = new ServerManagementModel();
+		ServerManagementModel model = ServerManagementModel.getDefault();
 		RSPClient client = mock(RSPClient.class);
 		model.clientAdded(client);
 

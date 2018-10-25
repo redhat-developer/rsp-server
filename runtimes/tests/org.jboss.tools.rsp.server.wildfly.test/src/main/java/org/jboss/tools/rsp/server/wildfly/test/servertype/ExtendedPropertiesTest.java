@@ -27,7 +27,7 @@ public class ExtendedPropertiesTest {
 
 	@Test
 	public void testServerTypes() {
-		new ServerManagementModel();
+		ServerManagementModel.getDefault();
 		String[] toTest = IServerConstants.ALL_JBOSS_SERVERS;
 		ExtendedServerPropertiesAdapterFactory fact = new ExtendedServerPropertiesAdapterFactory();
 		for( int i = 0; i < toTest.length; i++ ) {

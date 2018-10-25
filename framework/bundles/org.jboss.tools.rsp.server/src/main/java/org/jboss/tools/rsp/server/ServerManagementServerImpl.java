@@ -58,7 +58,7 @@ public class ServerManagementServerImpl implements RSPServer {
 	
 	public ServerManagementServerImpl(ServerManagementServerLauncher launcher) {
 		this.launcher = launcher;
-		this.model = new ServerManagementModel();
+		this.model = ServerManagementModel.getDefault();
 		this.remoteEventManager = new RemoteEventManager(this);
 	}
 	
