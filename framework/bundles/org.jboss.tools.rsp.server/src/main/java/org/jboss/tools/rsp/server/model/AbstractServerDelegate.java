@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
-import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.debug.core.DebugEvent;
@@ -34,8 +33,8 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	
 	private int serverState = STATE_UNKNOWN;
 	private String currentMode = null;
-	private List<ILaunch> launches = new ArrayList<ILaunch>();
-	protected HashMap<String, Object> sharedData = new HashMap<String, Object>();
+	private List<ILaunch> launches = new ArrayList<>();
+	protected HashMap<String, Object> sharedData = new HashMap<>();
 	private IServer server;
 	
 	public AbstractServerDelegate(IServer server) {
@@ -44,32 +43,30 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 			RuntimeProcessEventManager.getDefault().addListener(this);
 	}
 	
+	@Override
 	public synchronized Object getSharedData(String key) {
 		return sharedData.get(key);
 	}
 	
+	@Override
 	public synchronized void putSharedData(String key, Object o) {
 		sharedData.put(key, o);
 	}
 	
+	@Override
 	public void dispose() {
 		if( registerAsProcessListener())
 			RuntimeProcessEventManager.getDefault().removeListener(this);
 	}
 	
-	
-	
 	protected boolean registerAsProcessListener() {
 		return true;
 	}
 	
-	
+	@Override
 	public IServer getServer() {
 		return server;
 	}
-
-	@Override
-	public abstract IStatus validate();
 
 	/**
 	 * Returns the current state of this server.
@@ -82,6 +79,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	 * @return one of the server state (<code>STATE_XXX</code>)
 	 * constants declared on {@link IServer}
 	 */
+	@Override
 	public int getServerState() {
 		return serverState;
 	}
@@ -89,6 +87,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	protected void setServerState(int state) {
 		setServerState(state, true);
 	}
+
 	protected void setServerState(int state, boolean fire) {
 		if( state != this.serverState) {
 			this.serverState = state;
@@ -109,7 +108,6 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		ServerManagementModel.getDefault().getServerModel().fireServerProcessCreated(server, processId);
 	}
 
-
 	/**
 	 * Returns the ILaunchManager mode that the server is in. This method will
 	 * return null if the server is not running.
@@ -118,6 +116,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	 *    defined by {@link org.eclipse.debug.core.ILaunchManager}, or
 	 *    <code>null</code> if the server is stopped.
 	 */
+	@Override
 	public String getMode() {
 		return currentMode;
 	}
@@ -125,8 +124,6 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	public void setMode(String mode) {
 		this.currentMode = mode;
 	}
-	
-	
 
 	/**
 	 * Returns whether this server is in a state that it can
@@ -177,7 +174,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	 *    {@link org.eclipse.debug.core.ILaunchManager}
 	 * @return a status object with code <code>IStatus.OK</code> if the server can
 	 *    be restarted, otherwise a status object indicating why it can't
-    * @since 1.1
+	 * @since 1.1
 	 */
 	public IStatus canRestart(String mode) {
 		return Status.OK_STATUS;
@@ -203,16 +200,15 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	 * 
 	 * @return a status object with code <code>IStatus.OK</code> if the server can
 	 *   be stopped, otherwise a status object indicating why it can't
-    * @since 1.1
+	 * @since 1.1
 	 */
 	public IStatus canStop() {
 		return Status.OK_STATUS;
 	}
-	
-	public abstract StartServerResponse start(String mode);
-	
+
+	@Override
 	public void handleDebugEvents(DebugEvent[] events) {
-		ArrayList<ILaunch> launchList = new ArrayList<ILaunch>(this.launches);
+		ArrayList<ILaunch> launchList = new ArrayList<>(this.launches);
 		for( int i = 0; i < events.length; i++ ) {
 			Object o = events[i].getSource();
 			if( o instanceof IProcess && events[i].getKind() == DebugEvent.TERMINATE) {
@@ -230,8 +226,6 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	protected void processTerminated(IProcess p, ILaunch l) {
 		this.fireServerProcessTerminated(getProcessId(p));	
 	}
-	
-	
 
 	protected void registerLaunch(ILaunch launch2) {
 		launches.add(launch2);
@@ -242,10 +236,10 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 					+ ":" + ctime + ":p" + i;
 			all[i].setAttribute(PROCESS_ID_KEY, pName);
 			IStreamListener out = new ServerStreamListener(
-					getServer(), all[i], getProcessId(all[i]), 
+					getServer(), getProcessId(all[i]), 
 					ServerManagementAPIConstants.STREAM_TYPE_SYSOUT);
 			IStreamListener err = new ServerStreamListener(
-					getServer(), all[i], getProcessId(all[i]), 
+					getServer(), getProcessId(all[i]), 
 					ServerManagementAPIConstants.STREAM_TYPE_SYSERR);
 			all[i].getStreamsProxy().getOutputStreamMonitor().addListener(out);
 			all[i].getStreamsProxy().getErrorStreamMonitor().addListener(err);
@@ -297,6 +291,8 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 			}
 		};
 	}
-	
-	
+
+	public ILaunch[] getLaunches() {
+		return launches.toArray(new ILaunch[launches.size()]);
+	}
 }
