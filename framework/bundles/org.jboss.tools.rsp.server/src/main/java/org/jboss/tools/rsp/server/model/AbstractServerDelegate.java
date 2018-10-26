@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
@@ -209,6 +210,15 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		return Status.OK_STATUS;
 	}
 	
+	protected boolean modesContains(String needle) {
+		if (needle == null) {
+			return false;
+		}
+		ServerLaunchMode[] modes = getServer().getServerType().getLaunchModes();
+		return Arrays.stream(modes).anyMatch(
+				mode -> needle.equals(mode.getMode()));
+	}
+
 	public abstract StartServerResponse start(String mode);
 	
 	public void handleDebugEvents(DebugEvent[] events) {
