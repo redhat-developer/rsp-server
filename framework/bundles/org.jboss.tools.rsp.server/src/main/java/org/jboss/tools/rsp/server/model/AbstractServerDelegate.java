@@ -15,6 +15,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+<<<<<<< 5cd643c665dd5e53e6afe3f8343fa65e9a52e9ac
+=======
+import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
+import org.jboss.tools.rsp.api.dao.StartServerResponse;
+>>>>>>> removed duplicate modesContains
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.debug.core.DebugEvent;
@@ -165,7 +170,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	 *    {@link org.eclipse.debug.core.ILaunchManager}
 	 * @return a status object with code <code>IStatus.OK</code> if the server can
 	 *    be started, otherwise a status object indicating why it can't
-    * @since 1.1
+	 * @since 1.1
 	 */
 	public IStatus canStart(String launchMode) {
 		return Status.OK_STATUS;
@@ -224,8 +229,18 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	public IStatus canStop() {
 		return Status.OK_STATUS;
 	}
+	
+	protected boolean modesContains(String needle) {
+		if (needle == null) {
+			return false;
+		}
+		ServerLaunchMode[] modes = getServer().getServerType().getLaunchModes();
+		return Arrays.stream(modes).anyMatch(
+				mode -> needle.equals(mode.getMode()));
+	}
 
-	@Override
+	public abstract StartServerResponse start(String mode);
+	
 	public void handleDebugEvents(DebugEvent[] events) {
 		ArrayList<ILaunch> launchList = new ArrayList<>(this.launches);
 		for( int i = 0; i < events.length; i++ ) {

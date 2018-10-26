@@ -104,16 +104,6 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 		}
 	}
 	
-	private boolean modesContains(String needle) {
-		ServerLaunchMode[] modes = getServer().getServerType().getLaunchModes();
-		for( int i = 0; i < modes.length; i++ ) {
-			if( modes[i].getMode().equals(needle)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
 	@Override
 	public StartServerResponse start(String mode) {
 		IStatus stat = canStart(mode);
