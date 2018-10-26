@@ -33,6 +33,8 @@ public class ServerStreamListener implements IStreamListener {
 	private void fireStreamAppended(IServer server2, int streamType, String text) {
 		ServerManagementModel.getDefault().getServerModel()
 			.fireServerStreamAppended(server2, processId, streamType, text);
+		ServerManagementModel.getDefault().getServerModel().fireServerStreamAppended(
+				server2, processId, streamType, text);
 	}
 	
 }
