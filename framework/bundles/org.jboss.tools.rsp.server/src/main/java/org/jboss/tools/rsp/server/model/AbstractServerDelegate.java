@@ -15,11 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
-<<<<<<< 5cd643c665dd5e53e6afe3f8343fa65e9a52e9ac
-=======
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
->>>>>>> removed duplicate modesContains
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.debug.core.DebugEvent;
@@ -79,6 +76,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	protected IStatus errorStatus(String err, String bundle) {
 		return new Status(IStatus.ERROR, bundle, err);
 	}
+
 	protected CreateServerValidation validationErrorResponse(String msg, String key, String bundle) {
 		if( key != null ) {
 			return new CreateServerValidation(errorStatus(msg, bundle),
