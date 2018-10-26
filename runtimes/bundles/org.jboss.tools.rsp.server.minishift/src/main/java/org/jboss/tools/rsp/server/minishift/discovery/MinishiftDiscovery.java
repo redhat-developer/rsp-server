@@ -9,22 +9,37 @@
 package org.jboss.tools.rsp.server.minishift.discovery;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class MinishiftDiscovery {
+
+	private static final Logger LOG = LoggerFactory.getLogger(MinishiftDiscovery.class);
+
 	private static final Pattern WHITELIST_PATTERN = Pattern.compile("cdk-[0-9][.][0-9].*-minishift-(linux|darwin|windows)-amd64(.exe)?");
 
 	private static final String MINISHIFT = "minishift";
 	private static final String MINISHIFT_EXE = "minishift.exe";
 
 	public boolean isMinishiftBinaryFile(File file) {
-		String name = file.getName();
-		if( file.isFile() && file.exists() && file.canExecute()) {
-			if( name.equals(MINISHIFT) || name.equals( MINISHIFT_EXE))
-				return true;
-			if( whitelistMatchesName(name))
-				return true;
+		try {
+			Path path = file.toPath();
+			File resolvedFile = path.toRealPath().toFile();
+			if (resolvedFile.exists() 
+					&& resolvedFile.isFile() 
+					&& resolvedFile.canExecute()) {
+				String name = resolvedFile.getName();
+				return name.equals(MINISHIFT) 
+						|| name.equals(MINISHIFT_EXE) 
+						|| whitelistMatchesName(name);
+			}
+		} catch (IOException e) {
+			LOG.error("Could not determine if {} is a minishift binary.", file.getAbsolutePath());
 		}
 		return false;
 	}
@@ -58,7 +73,7 @@ public class MinishiftDiscovery {
 	}
 	
 	private boolean whitelistMatchesName(String name) {
-	     Matcher m = WHITELIST_PATTERN.matcher(name);
-	     return m.matches();
+		Matcher m = WHITELIST_PATTERN.matcher(name);
+		return m.matches();
 	}
 }
