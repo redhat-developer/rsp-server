@@ -21,6 +21,7 @@ import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attribute;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
+import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
@@ -330,17 +331,54 @@ public class StandardCommandHandler implements InputHandler {
 			
 			System.out.println("Adding Server...");
 			ServerAttributes csa = new ServerAttributes(selected.getId(), name, store);
-			Status result = launcher.getServerProxy().createServer(csa).get();
-			if (result.isOK()) {
+			CreateServerResponse result = launcher.getServerProxy().createServer(csa).get();
+			if (result.getStatus().isOK()) {
 				System.out.println("Server Added");
 			} else {
-				System.out.println("Error adding server: " + result.getMessage());
+				while(updateInvalidAttributes(result, required2, optional2, store)) {
+					System.out.println("Adding Server...");
+					csa = new ServerAttributes(selected.getId(), name, store);
+					result = launcher.getServerProxy().createServer(csa).get();
+					if (result.getStatus().isOK()) {
+						System.out.println("Server Added");
+						return;
+					}
+				}
 			}
 		} catch(InterruptedException | ExecutionException ioe) {
 			ioe.printStackTrace();
 		}
 	}
 	
+	
+	private boolean updateInvalidAttributes(CreateServerResponse result, Attributes required2, Attributes optional2, HashMap<String, Object> store ) {
+		System.out.println("Error adding server: " + result.getStatus().getMessage());
+		List<String> list = result.getInvalidKeys();
+		System.out.println("Invalid attributes: ");
+		for( int i = 0; i < list.size(); i++ ) {
+			System.out.println("   " + list.get(i));
+		}
+		
+		boolean tryAgain = promptBoolean("Would you like to correct the invalid fields and try again? y/n");
+		if (!tryAgain) {
+			return false;
+		}
+
+		List<String> invalid = result.getInvalidKeys();
+		promptForInvalidAttributes(invalid, required2, store, true);
+		promptForInvalidAttributes(invalid, optional2, store, false);
+		return true;
+	}
+	
+	private boolean promptBoolean(String msg) {
+		System.out.println(msg);
+		String tryAgain = nextLine();
+		if (tryAgain == null || tryAgain.isEmpty() || tryAgain.toLowerCase().equals("n")) {
+			return false;
+		}
+		return true;
+	}
+		
 	
 	private void promptForAttributes(Attributes attr, HashMap<String, Object> store, boolean required2) {
 		if (attr == null)
@@ -351,69 +389,95 @@ public class StandardCommandHandler implements InputHandler {
 		if (attrsUtil != null) {
 			Set<String> keys = attrsUtil.listAttributes();
 			for (String k : keys) {
-				String attrType = attrsUtil.getAttributeType(k);
-				Class c = getAttributeTypeAsClass(attrType);
-				String reqType = c.getName();
-				String reqDesc = attrsUtil.getAttributeDescription(k);
-				Object defVal = attrsUtil.getAttributeDefaultValue(k);
-				
-				// Workaround to sending integers over json
-				defVal = workaroundDoubles(defVal, attrType);
-				String toPrint = "Key: " + k + "\nType: " + reqType + "\nDescription: " + reqDesc;
-				if (defVal != null) {
-					toPrint += "\nDefault Value: " + defVal.toString();
-				}
-				System.out.println(toPrint);
-				if (!required2) {
-					System.out.println("Would you like to set this value? [y/n]");
-					String val = nextLine();
-					if (val == null || val.isEmpty() || val.toLowerCase().equals("n")) {
-						System.out.println("Skipping");
-						continue;
-					}
-				}
-				
-				String msg = null;
-				if (Integer.class.equals(c) || Boolean.class.equals(c) || String.class.equals(c)) {
-					msg = "Please enter a value: ";
-				} else if (List.class.equals(c)) {
-					msg = "Please enter a list value. Send a blank line to end the list.";
-				} else if (Map.class.equals(c)) {
-					msg = "Please enter a map value. Each line should read some.key=some.val.\nSend a blank line to end the map.";
-				}
-				System.out.println(msg);
-				
-				if (Integer.class.equals(c) || Boolean.class.equals(c) || String.class.equals(c)) {
-					String val = nextLine();
-					toSend.put(k, convertType(val, attrsUtil.getAttributeType(k)));
-				} else if (List.class.equals(c)) {
-					List<String> arr = new ArrayList<String>();
-					String tmp = nextLine();
-					while (!tmp.trim().isEmpty()) {
-						arr.add(tmp);
-						tmp = nextLine();
-					}
-					toSend.put(k, arr);
-				} else if (Map.class.equals(c)) {
-					Map<String, String> map = new HashMap<>();
-					String tmp = nextLine();
-					while (!tmp.trim().isEmpty()) {
-						int ind = tmp.indexOf("=");
-						if (ind == -1) {
-							System.out.println("Invalid map entry. Please try again");
-						} else {
-							String k1 = tmp.substring(0,  ind);
-							String v1 = tmp.substring(ind+1);
-							map.put(k1,v1);
-						}
-						tmp = nextLine();
-					}
-					toSend.put(k, map);
-				}
+				promptForAttributeSingleKey(attrsUtil, k, required2, toSend);
 			}
 		}
 	}
 	
+	private void promptForInvalidAttributes(List<String> invalid, Attributes attr, HashMap<String, Object> store, boolean required2) {
+		if (attr == null)
+			return;
+		
+		CreateServerAttributesUtility attrsUtil = new CreateServerAttributesUtility(attr);
+		if (attrsUtil != null) {
+			Set<String> keys = attrsUtil.listAttributes();
+			for (String k : keys) {
+				if( invalid.contains(k))
+					promptForAttributeSingleKey(attrsUtil, k, required2, store);
+			}
+		}
+	}
+	
+	private void promptForAttributeSingleKey(CreateServerAttributesUtility attrsUtil, String k, boolean required2, HashMap<String, Object> toSend) {
+		String attrType = attrsUtil.getAttributeType(k);
+		Class c = getAttributeTypeAsClass(attrType);
+		String reqType = c.getName();
+		if (c == null) {
+			System.out.println("unknown attribute type " + attrType + ". Aborting.");
+		}
+		String reqDesc = attrsUtil.getAttributeDescription(k);
+		Object defVal = attrsUtil.getAttributeDefaultValue(k);
+		
+		// Workaround to sending integers over json
+		defVal = workaroundDoubles(defVal, attrType);
+		String toPrint = "Key: " + k + "\nType: " + reqType + "\nDescription: " + reqDesc;
+		if (defVal != null) {
+			toPrint += "\nDefault Value: " + defVal.toString();
+		}
+		System.out.println(toPrint);
+		if (!required2) {
+			if( !promptBoolean("Would you like to set this value? [y/n]") ) {
+				System.out.println("Skipping");
+				return;
+			}
+		}
+		
+        Object value = null;
+		if (Integer.class.equals(c) || Boolean.class.equals(c) || String.class.equals(c)) {
+			value = promptPrimitiveValue(attrsUtil.getAttributeType(k));
+		} else if (List.class.equals(c)) {
+			value = promptListValue();
+		} else if (Map.class.equals(c)) {
+			value = promptMapValue();
+		}
+		toSend.put(k, value);
+	}
+
+	private Map<String, String> promptMapValue() {
+		System.out.println("Please enter a map value. Each line should read some.key=some.val.\nSend a blank line to end the map.");
+		Map<String, String> map = new HashMap<>();
+		String tmp = nextLine();
+		while (!tmp.trim().isEmpty()) {
+			int ind = tmp.indexOf("=");
+			if (ind == -1) {
+				System.out.println("Invalid map entry. Please try again");
+			} else {
+				String k1 = tmp.substring(0,  ind);
+				String v1 = tmp.substring(ind+1);
+				map.put(k1,v1);
+			}
+			tmp = nextLine();
+		}
+		return map;
+	}
+
+	private List<String> promptListValue() {
+		System.out.println("Please enter a list value. Send a blank line to end the list.");
+		List<String> arr = new ArrayList<String>();
+		String tmp = nextLine();
+		while (!tmp.trim().isEmpty()) {
+			arr.add(tmp);
+			tmp = nextLine();
+		}
+		return arr;
+	}
+
+	private Object promptPrimitiveValue(String type) {
+		System.out.println("Please enter a value: ");
+		String val = nextLine();
+		return convertType(val, type);
+	}
+
 	private Object workaroundDoubles(Object defaultVal, String attrType) {
 
 		// Workaround for the problems with json transfer

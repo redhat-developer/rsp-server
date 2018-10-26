@@ -10,6 +10,7 @@ package org.jboss.tools.rsp.server.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import org.jboss.tools.rsp.launching.RuntimeProcessEventManager;
 import org.jboss.tools.rsp.server.model.internal.ServerStreamListener;
 import org.jboss.tools.rsp.server.spi.model.polling.IPollResultListener;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller;
+import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
@@ -68,8 +70,21 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		return server;
 	}
 
+	protected IStatus errorStatus(String err, String bundle) {
+		return new Status(IStatus.ERROR, bundle, err);
+	}
+	protected CreateServerValidation validationErrorResponse(String msg, String key, String bundle) {
+		if( key != null ) {
+			return new CreateServerValidation(errorStatus(msg, bundle),
+					Arrays.asList(new String[] {key}));
+		}
+		return new CreateServerValidation(errorStatus(msg, bundle),Collections.EMPTY_LIST);
+	}
+	
+
+	
 	@Override
-	public abstract IStatus validate();
+	public abstract CreateServerValidation validate();
 
 	/**
 	 * Returns the current state of this server.

@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
+import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerType;
@@ -30,6 +31,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.launching.LaunchingCore;
+import org.jboss.tools.rsp.launching.utils.StatusConverter;
 import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
 import org.jboss.tools.rsp.secure.model.NullSecureStorageProvider;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
@@ -37,6 +39,7 @@ import org.jboss.tools.rsp.server.model.internal.DaoUtilities;
 import org.jboss.tools.rsp.server.model.internal.Server;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModelListener;
+import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
@@ -46,6 +49,7 @@ import org.slf4j.LoggerFactory;
 public class ServerModel implements IServerModel {
 	private static final Logger LOG = LoggerFactory.getLogger(ServerModel.class);
 
+	private static final String SERVERS_DIRECTORY = "servers";
 
 	private HashMap<String, IServerType> serverTypes;
 	private HashMap<String, IServer> servers;
@@ -68,7 +72,7 @@ public class ServerModel implements IServerModel {
 		this.listeners = new ArrayList<>();
 		
 		// Server attributes must be one of the following types
-		this.approvedAttributeTypes = new HashSet<String>();
+		this.approvedAttributeTypes = new HashSet<>();
 		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_INT);
 		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_BOOL);
 		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_STRING);
@@ -148,11 +152,11 @@ public class ServerModel implements IServerModel {
 	@Override
 	public void loadServers() throws CoreException {
 		File data = LaunchingCore.getDataLocation();
-		File servers = new File(data, "servers");
+		File servers = new File(data, SERVERS_DIRECTORY);
 		loadServers(servers);
 	}
 
-	public void loadServers(File folder) throws CoreException {
+	public void loadServers(File folder) {
 		if (!folder.exists()) {
 			return;
 		}
@@ -199,38 +203,48 @@ public class ServerModel implements IServerModel {
 	}
 	
 	@Override
-	public IStatus createServer(String serverType, String id, Map<String, Object> attributes) {
+	public CreateServerResponse createServer(String serverType, String id, Map<String, Object> attributes) {
 		try {
 			return createServerUnprotected(serverType, id, attributes);
+		} catch(CoreException e) {
+			return new CreateServerResponse(StatusConverter.convert(e.getStatus()), null);
 		} catch(Exception e) {
-			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+			Status s = new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
 					"An unexpected error occurred", e);
+			return new CreateServerResponse(StatusConverter.convert(s), null);
 		}
 	}
 	
-	private IStatus createServerUnprotected(String serverType, String id, Map<String, Object> attributes) throws CoreException {
-		if( servers.get(id) != null ) {
-			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server with id " + id + " already exists.");
+	private CreateServerResponse createServerUnprotected(String serverType, String id, Map<String, Object> attributes) throws CoreException {
+		IServerType type = getServerType(serverType, id);
+		IStatus validAttributes = validateAttributes(type, attributes);
+		if( !validAttributes.isOK()) {
+			throw new CoreException(validAttributes);
 		}
-		IServerType fact = serverTypes.get(serverType);
-		if( fact == null ) {
-			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server Type " + serverType + " not found");
-		}
-		IStatus valid = validateAttributes(fact, attributes);
-		if( !valid.isOK()) {
-			return valid;
-		}
-		Server server = createServer2(fact, id, attributes);
-		IServerDelegate del = fact.createServerDelegate(server);
-		server.setDelegate(del);
 		
-		valid = del.validate();
-		if( !valid.isOK()) {
-			return valid;
+		Server server = createServer2(type, id, attributes);
+		IServerDelegate del = server.getDelegate();
+
+		CreateServerValidation valid = del.validate();
+		if( !valid.getStatus().isOK()) {
+			return valid.toDao();
 		}
 		addServer(server, del);
 		server.save(new NullProgressMonitor());
-		return Status.OK_STATUS;
+		return valid.toDao();
+	}
+
+	private IServerType getServerType(String serverType, String id) throws CoreException {
+		IServerType type = null;
+		if( servers.get(id) != null ) {
+			throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server with id " + id + " already exists."));
+		} else {
+			type = serverTypes.get(serverType);
+			if( type == null ) {
+				throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server Type " + serverType + " not found"));
+			}
+		}
+		return type;
 	}
 	
 	private IStatus validateAttributes(IServerType type, Map<String, Object> map) {
@@ -259,36 +273,35 @@ public class ServerModel implements IServerModel {
 		}
 		return Status.OK_STATUS;
 	}
-	
-	
+
 	private Object convertJSonTransfer(Object value, Class expected) {
 		// TODO check more things here for errors in the transfer
 		if( Integer.class.equals(expected) && Double.class.equals(value.getClass())) {
-			return new Integer(((Double)value).intValue());
+			return Integer.valueOf(((Double)value).intValue());
 		}
 		return null;
 	}
-	
-	private Server createServer2(IServerType serverType, String id, 
-			Map<String, Object> attributes) throws CoreException {
+
+	private Server createServer2(IServerType serverType, String id, Map<String, Object> attributes) {
 		File data = LaunchingCore.getDataLocation();
-		File servers = new File(data, "servers");
-		if( !servers.exists()) {
-			servers.mkdirs();
+		File serversDirectory = new File(data, SERVERS_DIRECTORY);
+		if( !serversDirectory.exists()) {
+			serversDirectory.mkdirs();
 		}
 		// TODO check for duplicates
-		File thisServer = new File(servers, id);
-		Server s = new Server(thisServer, serverType, secureStorageProvider);
+		File serverFile = new File(serversDirectory, id);
+		Server s = new Server(serverFile, serverType, secureStorageProvider);
 		s.setAttribute("id", id);
-		
+
 		Set<String> keys = attributes.keySet();
 		for( String k : keys) {
-			store(s, k, attributes.get(k));
+			setAttribute(s, k, attributes.get(k));
 		}
+		
 		return s;
 	}
 	
-	private void store(Server s, String k, Object val) {
+	private void setAttribute(Server s, String k, Object val) {
 		if( val instanceof Integer) {
 			s.setAttribute(k, ((Integer)val).intValue());
 		} else if( val instanceof Boolean) {
@@ -375,14 +388,14 @@ public class ServerModel implements IServerModel {
 	
 	@Override
 	public ServerHandle[] getServerHandles() {
-		Set<String> s = servers.keySet();
+		Set<String> serverKeys = servers.keySet();
 		ArrayList<ServerHandle> handles = new ArrayList<>();
-		for( String s1 : s ) {
-			String id = s1;
+		for( String serverKey : serverKeys ) {
+			String id = serverKey;
 			String type = servers.get(id).getTypeId();
 			handles.add(new ServerHandle(id,  getServerType(type)));
 		}
-		return (ServerHandle[]) handles.toArray(new ServerHandle[handles.size()]);
+		return handles.toArray(new ServerHandle[handles.size()]);
 	}
 	
 	private ServerType getServerType(String typeId) {
@@ -401,23 +414,23 @@ public class ServerModel implements IServerModel {
 	@Override
 	public ServerType[] getServerTypes() {
 		Set<String> types = serverTypes.keySet();
-		ArrayList<String> types2 = new ArrayList<String>(types);
+		ArrayList<String> types2 = new ArrayList<>(types);
 		Collections.sort(types2);
-		ArrayList<ServerType> ret = new ArrayList<ServerType>();
+		ArrayList<ServerType> ret = new ArrayList<>();
 		for( String t : types2 ) {
 			IServerType type = serverTypes.get(t);
 			ret.add(new ServerType(t, type.getName(), type.getDescription()));
 		}
-		return (ServerType[]) ret.toArray(new ServerType[ret.size()]);
+		return ret.toArray(new ServerType[ret.size()]);
 	}
 
 	@Override
 	public ServerType[] getAccessibleServerTypes() {
-		List<ServerType> free = new ArrayList<ServerType>();
-		List<ServerType> all = new ArrayList<ServerType>();
+		List<ServerType> free = new ArrayList<>();
+		List<ServerType> all = new ArrayList<>();
 		
 		Set<String> types = serverTypes.keySet();
-		ArrayList<String> types2 = new ArrayList<String>(types);
+		ArrayList<String> types2 = new ArrayList<>(types);
 		Collections.sort(types2);
 		for( String t : types2 ) {
 			// Always add to 'all',   add to 'free' if type does not require secure storage
@@ -496,7 +509,7 @@ public class ServerModel implements IServerModel {
 			for( String all1 : all ) {
 				String attrType = util.getAttributeType(all1);
 				if( !approvedAttributeTypes.contains(attrType)) {
-					LOG.error("Extension for servertype " + serverType + " is invalid and requires an attribute of an invalid type.");
+					LOG.error("Extension for servertype {} is invalid and requires an attribute of an invalid type.", serverType);
 					util.removeAttribute(all1);
 				}
 			}

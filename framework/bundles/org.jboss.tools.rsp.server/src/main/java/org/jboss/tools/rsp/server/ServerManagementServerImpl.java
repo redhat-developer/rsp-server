@@ -22,6 +22,7 @@ import org.jboss.tools.rsp.api.SocketLauncher;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
+import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
@@ -268,20 +269,21 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	
 	@Override
-	public CompletableFuture<Status> createServer(ServerAttributes attr) {
+	public CompletableFuture<CreateServerResponse> createServer(ServerAttributes attr) {
 		return teeFuture(() -> createServerSync(attr));
 	}
-	private Status createServerSync(ServerAttributes attr) {
+	private CreateServerResponse createServerSync(ServerAttributes attr) {
 		if( attr == null || isEmpty(attr.getId()) || isEmpty(attr.getServerType())) {
-			return invalidParameterStatus();
+			Status s = invalidParameterStatus();
+			return new CreateServerResponse(s, null);
 		}
 		
 		String serverType = attr.getServerType();
 		String id = attr.getId();
 		Map<String, Object> attributes = attr.getAttributes();
 		
-		IStatus ret = model.getServerModel().createServer(serverType, id, attributes);
-		return StatusConverter.convert(ret);
+		CreateServerResponse ret = model.getServerModel().createServer(serverType, id, attributes);
+		return ret;
 	}
 
 	@Override

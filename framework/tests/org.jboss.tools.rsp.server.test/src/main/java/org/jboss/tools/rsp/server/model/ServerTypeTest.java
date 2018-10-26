@@ -10,11 +10,13 @@ import static org.mockito.Mockito.mock;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
+import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
@@ -22,6 +24,8 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.launching.internal.LaunchingActivator;
 import org.jboss.tools.rsp.launching.java.ILaunchModes;
+import org.jboss.tools.rsp.launching.utils.StatusConverter;
+import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
@@ -128,17 +132,17 @@ public class ServerTypeTest {
 		ServerModel sm = new ServerModel();
 		IServerType testType = new TestType();
 		sm.addServerType(testType);
-		IStatus stat = sm.createServer(testType.getId(), "test.name1", new HashMap<String, Object>());
+		CreateServerResponse stat = sm.createServer(testType.getId(), "test.name1", new HashMap<String, Object>());
 		assertNotNull(stat);
-		assertFalse(stat.isOK());
+		assertFalse(stat.getStatus().isOK());
 	}
 
 	@Test
 	public void createServerMissingType() {
 		ServerModel sm = new ServerModel();
-		IStatus stat = sm.createServer("test1", "test.name1", new HashMap<String, Object>());
+		CreateServerResponse stat = sm.createServer("test1", "test.name1", new HashMap<String, Object>());
 		assertNotNull(stat);
-		assertFalse(stat.isOK());
+		assertFalse(stat.getStatus().isOK());
 	}
 
 	@Test
@@ -159,34 +163,34 @@ public class ServerTypeTest {
 		
 		HashMap<String, Object> attr = new HashMap<String, Object>();
 		attr.put("flag.1", new Integer(5));
-		IStatus stat = sm.createServer(testType.getId(), "test.name1", attr);
+		CreateServerResponse stat = sm.createServer(testType.getId(), "test.name1", attr);
 		assertNotNull(stat);
-		assertFalse(stat.isOK());
+		assertFalse(stat.getStatus().isOK());
 		
 		
 		attr = new HashMap<String, Object>();
 		attr.put("flag.1", "value");
 		stat = sm.createServer(testType.getId(), "test.name1", attr);
 		assertNotNull(stat);
-		assertFalse(stat.isOK());
+		assertFalse(stat.getStatus().isOK());
 
 		attr = new HashMap<String, Object>();
 		attr.put("flag.1", Arrays.asList(new String[] {"test1","test2"}));
 		stat = sm.createServer(testType.getId(), "test.name1", attr);
 		assertNotNull(stat);
-		assertFalse(stat.isOK());
+		assertFalse(stat.getStatus().isOK());
 
 		attr = new HashMap<String, Object>();
 		attr.put("flag.1", Arrays.asList(new HashMap<String, Object>(){{ put("One", "1"); put("Two", "2");}}));
 		stat = sm.createServer(testType.getId(), "test.name1", attr);
 		assertNotNull(stat);
-		assertFalse(stat.isOK());
+		assertFalse(stat.getStatus().isOK());
 
 		attr = new HashMap<String, Object>();
 		attr.put("flag.1", true);
 		stat = sm.createServer(testType.getId(), "test.name1", attr);
 		assertNotNull(stat);
-		assertTrue(stat.isOK());
+		assertTrue(stat.getStatus().isOK());
 	}
 	@Test
 	public void testValidationError() {
@@ -208,9 +212,9 @@ public class ServerTypeTest {
 		sm.addServerType(testType);
 		HashMap<String, Object> attr = new HashMap<String, Object>();
 		attr.put("flag.1", true);
-		IStatus stat = sm.createServer(testType.getId(), "test.name1", attr);
+		CreateServerResponse stat = sm.createServer(testType.getId(), "test.name1", attr);
 		assertNotNull(stat);
-		assertFalse(stat.isOK());
+		assertFalse(stat.getStatus().isOK());
 
 	}
 
@@ -283,13 +287,16 @@ public class ServerTypeTest {
 		public IServerDelegate errorMock(IServer server) {
 			IStatus error = new Status(IStatus.ERROR, LaunchingActivator.BUNDLE_ID, "Some param is invalid");
 			IServerDelegate del = mock(IServerDelegate.class);
-			doReturn(error).when(del).validate();
+			CreateServerValidation ret = new CreateServerValidation(error, new ArrayList<String>());
+			doReturn(ret).when(del).validate();
 			return del;			
 		}
 
 		public IServerDelegate okMock(IServer server) {
 			IServerDelegate del = mock(IServerDelegate.class);
-			doReturn(Status.OK_STATUS).when(del).validate();
+			IStatus error2 = Status.OK_STATUS;
+			CreateServerValidation ret = new CreateServerValidation(error2, new ArrayList<String>());
+			doReturn(ret).when(del).validate();
 			return del;
 		}
 

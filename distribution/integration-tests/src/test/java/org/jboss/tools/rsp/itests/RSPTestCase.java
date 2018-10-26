@@ -58,6 +58,6 @@ public class RSPTestCase {
         Map<String, Object> attr = new HashMap<>();
         attr.put("server.home.dir", bean.getLocation());
         ServerAttributes serverAttr = new ServerAttributes(bean.getServerAdapterTypeId(), id, attr);
-        return serverProxy.createServer(serverAttr).get();
+        return serverProxy.createServer(serverAttr).get().getStatus();
     }
 }

@@ -12,6 +12,14 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class StatusConverter {
+	public static org.jboss.tools.rsp.eclipse.core.runtime.IStatus convert(
+			org.jboss.tools.rsp.api.dao.Status status) {
+		int sev = status.getSeverity();
+		String plugin = status.getPlugin();
+		String msg = status.getMessage();
+		return new org.jboss.tools.rsp.eclipse.core.runtime.Status(sev, plugin, msg);
+	}
+	
 	public static org.jboss.tools.rsp.api.dao.Status convert(
 			org.jboss.tools.rsp.eclipse.core.runtime.IStatus status) {
 		int sev = status.getSeverity();

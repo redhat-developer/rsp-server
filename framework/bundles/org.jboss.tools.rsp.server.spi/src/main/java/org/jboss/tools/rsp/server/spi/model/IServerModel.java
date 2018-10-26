@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jboss.tools.rsp.api.dao.Attributes;
+import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerType;
@@ -50,7 +51,7 @@ public interface IServerModel {
 
 	Attributes getOptionalLaunchAttributes(String id);
 
-	IStatus createServer(String serverType, String id, Map<String, Object> attributes);
+	CreateServerResponse createServer(String serverType, String id, Map<String, Object> attributes);
 
 	boolean removeServer(String id);
 
