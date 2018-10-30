@@ -186,7 +186,7 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 	}
 
 	@Override
-	protected void processTerminated(IProcess p, ILaunch l) {
+	protected void processTerminated(IProcess p) {
 		// The launch command will terminate but that just means startup has completed.
 		// Not that the runtime has shutdown.
 		fireServerProcessTerminated(getProcessId(p));
