@@ -13,7 +13,6 @@ import java.io.File;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
-import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
@@ -173,7 +172,8 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	}
 
 	@Override
-	protected void processTerminated(IProcess p, ILaunch l) {
+	protected void processTerminated(IProcess p) {
+		ILaunch l = p.getLaunch();
 		if( l == startLaunch ) {
 			IProcess[] all = l.getProcesses();
 			boolean allTerminated = true;
