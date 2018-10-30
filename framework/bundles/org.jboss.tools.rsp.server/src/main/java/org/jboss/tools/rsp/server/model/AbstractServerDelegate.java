@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
-import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.debug.core.DebugEvent;
@@ -81,15 +80,10 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	protected CreateServerValidation validationErrorResponse(String msg, String key, String bundle) {
 		if( key != null ) {
 			return new CreateServerValidation(errorStatus(msg, bundle),
-					Arrays.asList(new String[] {key}));
+					Arrays.asList(key));
 		}
-		return new CreateServerValidation(errorStatus(msg, bundle),Collections.EMPTY_LIST);
+		return new CreateServerValidation(errorStatus(msg, bundle),Collections.emptyList());
 	}
-	
-
-	
-	@Override
-	public abstract CreateServerValidation validate();
 
 	/**
 	 * Returns the current state of this server.
@@ -241,8 +235,6 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		return Arrays.stream(modes).anyMatch(
 				mode -> needle.equals(mode.getMode()));
 	}
-
-	public abstract StartServerResponse start(String mode);
 	
 	public void handleDebugEvents(DebugEvent[] events) {
 		ArrayList<ILaunch> launchList = new ArrayList<>(this.launches);
@@ -253,14 +245,14 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 				for( ILaunch l : launchList ) {
 					List<IProcess> processes = Arrays.asList(l.getProcesses());
 					if( processes.contains(o)) {
-						processTerminated((IProcess)o, l);
+						processTerminated((IProcess)o);
 					}
 				}
 			}
 		}
 	}
 	
-	protected void processTerminated(IProcess p, ILaunch l) {
+	protected void processTerminated(IProcess p) {
 		this.fireServerProcessTerminated(getProcessId(p));	
 	}
 
