@@ -1,13 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2011 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - Initial API and implementation
- *******************************************************************************/
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc. IBM Corporation - Initial API and implementation
+ ******************************************************************************/
 package org.jboss.tools.rsp.server.core.internal;
 
 import java.beans.PropertyChangeEvent;
@@ -17,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -34,8 +33,10 @@ import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.launching.utils.IMemento;
 import org.jboss.tools.rsp.launching.utils.JSONMemento;
 import org.jboss.tools.rsp.launching.utils.XMLMemento;
+import org.jboss.tools.rsp.server.ServerCoreActivator;
 
 import com.google.gson.JsonSyntaxException;
+
 /**
  * Helper class for storing runtime and server attributes.
  */
@@ -47,7 +48,7 @@ public abstract class Base {
 	protected static final String PROP_ID_SET = "id-set";
 	protected static final String PROP_TIMESTAMP = "timestamp";
 
-	protected Map<String, Object> map = new HashMap<String, Object>();
+	protected Map<String, Object> map = new HashMap<>();
 	protected File file;
 	private transient List<PropertyChangeListener> propertyListeners;
 	/**
@@ -133,7 +134,7 @@ public abstract class Base {
 			Object obj = map.get(attributeName);
 			if (obj == null)
 				return defaultValue;
-			return Boolean.valueOf((String) obj).booleanValue();
+			return Boolean.parseBoolean((String) obj);
 		} catch (Exception e) {
 			// ignore
 		}
@@ -172,7 +173,7 @@ public abstract class Base {
 		if (isAttributeSet(attributeName) && current == value)
 			return;
 		map.put(attributeName, Integer.toString(value));
-		firePropertyChangeEvent(attributeName, new Integer(current), new Integer(value));
+		firePropertyChangeEvent(attributeName, Integer.valueOf(current), Integer.valueOf(value));
 	}
 
 	public void setAttribute(String attributeName, boolean value) {
@@ -180,7 +181,7 @@ public abstract class Base {
 		if (isAttributeSet(attributeName) && current == value)
 			return;
 		map.put(attributeName, Boolean.toString(value));
-		firePropertyChangeEvent(attributeName, new Boolean(current), new Boolean(value));
+		firePropertyChangeEvent(attributeName, Boolean.valueOf(current), Boolean.valueOf(value));
 	}
 
 	public void setAttribute(String attributeName, String value) {
@@ -196,7 +197,7 @@ public abstract class Base {
 	}
 
 	public void setAttribute(String attributeName, List<String> value) {
-		List current = getAttribute(attributeName, (List<String>)null);
+		List<?> current = getAttribute(attributeName, (List<String>)null);
 		if (isAttributeSet(attributeName) && current != null && current.equals(value))
 			return;
 		if (value == null)
@@ -206,8 +207,8 @@ public abstract class Base {
 		firePropertyChangeEvent(attributeName, current, value);
 	}
 
-	public void setAttribute(String attributeName, Map value) {
-		Map current = getAttribute(attributeName, (Map)null);
+	public void setAttribute(String attributeName, Map<?,?> value) {
+		Map<?,?> current = getAttribute(attributeName, (Map<?, ?>)null);
 		if (isAttributeSet(attributeName) && current != null && current.equals(value))
 			return;
 		if (value == null)
@@ -249,7 +250,6 @@ public abstract class Base {
 	protected abstract String getXMLRoot();
 	
 	protected void save(IMemento memento) {
-		//IMemento child = memento.createChild("properties");
 		IMemento child = memento;
 		Iterator iterator = map.keySet().iterator();
 		while (iterator.hasNext()) {
@@ -274,6 +274,7 @@ public abstract class Base {
 		}
 		saveState(child);
 	}
+
 	protected void saveMap(IMemento memento, String key, Map map2) {
 		IMemento child = memento.createChild("map");
 		child.putString("key", key);
@@ -304,7 +305,7 @@ public abstract class Base {
 			memento.save(out);
 			byte[] bytes = out.toByteArray();
 			if (file.exists()) {
-				file.delete();
+				Files.delete(file.toPath());
 			}
 			Files.write(file.toPath(), bytes);
 		} catch (Exception e) {
@@ -322,7 +323,7 @@ public abstract class Base {
 	protected abstract void saveState(IMemento memento);
 
 	protected void load(IMemento memento) {
-		map = new HashMap<String, Object>();
+		map = new HashMap<>();
 		
 		Iterator<String> iterator = memento.getNames().iterator();
 		while (iterator.hasNext()) {
@@ -348,7 +349,7 @@ public abstract class Base {
 	}
 	
 	protected Map getMapFromMemento(IMemento memento) {
-		Map<String, String> vMap = new HashMap<String, String>();
+		Map<String, String> vMap = new HashMap<>();
 		Iterator<String> iterator = memento.getNames().iterator();
 		while(iterator.hasNext()) {
 			String s = iterator.next();
@@ -363,7 +364,7 @@ public abstract class Base {
 	}
 	
 	protected List getListFromMemento(IMemento memento) {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		int i = 0;
 		String key2 = memento.getString("value" + (i++));
 		while (key2 != null) {
@@ -391,7 +392,12 @@ public abstract class Base {
 	}
 
 	protected void deleteFromFile() throws CoreException {
-		file.delete();
+		try {
+			Files.delete(file.toPath());
+		} catch(IOException e) {
+			IStatus status = new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Could not delete file " + file.getAbsolutePath());
+			throw new CoreException(status);
+		}
 	}
 
 	protected void deleteFromMetadata() {
@@ -422,17 +428,7 @@ public abstract class Base {
 	 */
 	protected void loadFromFile(IProgressMonitor monitor) throws CoreException {
 		try(InputStream in = new ByteArrayInputStream(Files.readAllBytes(file.toPath()))) {
-			IMemento memento; 
-			try {
-				memento = JSONMemento.loadMemento(in);
-			} catch (JsonSyntaxException se) {
-				// most probably that it is still in the previous xml format
-				in.reset();
-				memento = XMLMemento.loadMemento(in);
-			}
-			if( memento == null ) {
-				throw new Exception("Error reading server file " + file.getAbsolutePath() + ". Please check logs for more info.");
-			}
+			IMemento memento = loadMemento(in); 
 			load(memento);
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.wst.server.core", 0, NLS.bind("Could not load server from file {0}", file.getAbsolutePath()), e));
@@ -443,25 +439,26 @@ public abstract class Base {
 		load(memento);
 	}
 	
-	/**
-	 * 
-	 */
 	protected void loadFromPath(IPath path, IProgressMonitor monitor) throws CoreException {
 		try(InputStream in = new BufferedInputStream(new FileInputStream(path.toFile()))) {
-			IMemento memento; 
-			try {
-				memento = JSONMemento.loadMemento(in);
-			} catch (JsonSyntaxException se) {
-				// most probably that it is still in the previous xml format
-				memento = XMLMemento.loadMemento(in);
-			}
+			IMemento memento = loadMemento(in);
 			load(memento);
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.wst.server.core", 0, NLS.bind("Error loading server from file {0}", path.toString()), e));
 		}
 	}
-	
-	
+
+	private IMemento loadMemento(InputStream in) throws IOException {
+		IMemento memento;
+		try {
+			memento = JSONMemento.loadMemento(in);
+		} catch (JsonSyntaxException se) {
+			// most probably that it is still in the previous xml format
+			in.reset();
+			memento = XMLMemento.loadMemento(in);
+		}
+		return memento;
+	}
 
 	/**
 	 * Fire a property change event.
