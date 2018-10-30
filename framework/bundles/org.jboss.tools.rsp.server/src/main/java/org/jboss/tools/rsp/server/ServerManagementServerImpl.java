@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Supplier;
 
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.RSPServer;
@@ -63,7 +64,7 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 	
 	public List<RSPClient> getClients() {
-		return new ArrayList<RSPClient>(clients);
+		return new ArrayList<>(clients);
 	}
 	
 	/**
@@ -92,7 +93,7 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 	
 	public List<SocketLauncher<RSPClient>> getActiveLaunchers() {
-		return new ArrayList<SocketLauncher<RSPClient>>(launchers);
+		return new ArrayList<>(launchers);
 	}
 	
 	public IServerManagementModel getModel() {
@@ -100,26 +101,19 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	/**
-	 * Return existing messages.
+	 * Returns existing discovery paths.
 	 */
 	@Override
 	public CompletableFuture<List<DiscoveryPath>> getDiscoveryPaths() {
 		return CompletableFuture.completedFuture(managementModel.getDiscoveryPathModel().getPaths());
 	}
 
-	private boolean isEmptyDiscoveryPath(DiscoveryPath path) {
-		if( path == null || isEmpty(path.getFilepath())) {
-			return true;
-		}
-		return false;
-	}
-
 	/**
-	 * Add a path to our list of discovery paths
+	 * Adds a path to our list of discovery paths
 	 */
 	@Override
 	public CompletableFuture<Status> addDiscoveryPath(DiscoveryPath path) {
-		return teeFuture(() -> addDiscoveryPathSync(path));
+		return createCompletableFuture(() -> addDiscoveryPathSync(path));
 	}
 	
 	private Status addDiscoveryPathSync(DiscoveryPath path) {
@@ -134,10 +128,9 @@ public class ServerManagementServerImpl implements RSPServer {
 		return booleanToStatus(ret, "Discovery path not added: " + path.getFilepath());
 	}
 
-
 	@Override
 	public CompletableFuture<Status> removeDiscoveryPath(DiscoveryPath path) {
-		return teeFuture(() -> removeDiscoveryPathSync(path));
+		return createCompletableFuture(() -> removeDiscoveryPathSync(path));
 	}
 	
 	public Status removeDiscoveryPathSync(DiscoveryPath path) {
@@ -152,11 +145,15 @@ public class ServerManagementServerImpl implements RSPServer {
 		return booleanToStatus(ret, "Discovery path not removed: " + path.getFilepath());
 	}
 
-	
+	private boolean isEmptyDiscoveryPath(DiscoveryPath path) {
+		return path == null || isEmpty(path.getFilepath());
+	}
+
 	@Override
 	public CompletableFuture<List<ServerBean>> findServerBeans(DiscoveryPath path) {
-		return teeFuture(() -> findServerBeansSync(path));
+		return createCompletableFuture(() -> findServerBeansSync(path));
 	}
+
 	private List<ServerBean> findServerBeansSync(DiscoveryPath path) {
 		List<ServerBean> ret = new ArrayList<>();
 		if( path == null || isEmpty(path.getFilepath())) {
@@ -183,7 +180,7 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public CompletableFuture<List<ServerHandle>> getServerHandles() {
-		return teeFuture(() -> getServerHandlesSync());
+		return createCompletableFuture(() -> getServerHandlesSync());
 	}
 	
 	private List<ServerHandle> getServerHandlesSync() {
@@ -193,7 +190,7 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public CompletableFuture<Status> deleteServer(ServerHandle handle) {
-		return teeFuture(() -> deleteServerSync(handle));
+		return createCompletableFuture(() -> deleteServerSync(handle));
 	}
 	
 	private Status deleteServerSync(ServerHandle handle) {
@@ -207,7 +204,7 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public CompletableFuture<Attributes> getRequiredAttributes(ServerType type) {
-		return teeFuture(() -> getRequiredAttributesSync(type));
+		return createCompletableFuture(() -> getRequiredAttributesSync(type));
 	}
 	
 	private Attributes getRequiredAttributesSync(ServerType type) {
@@ -220,8 +217,9 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public CompletableFuture<Attributes> getOptionalAttributes(ServerType type) {
-		return teeFuture(() -> getOptionalAttributesSync(type));
+		return createCompletableFuture(() -> getOptionalAttributesSync(type));
 	}
+
 	private Attributes getOptionalAttributesSync(ServerType type) {
 		if( type == null || isEmpty(type.getId())) {
 			return null;
@@ -231,8 +229,9 @@ public class ServerManagementServerImpl implements RSPServer {
 	
 	@Override
 	public CompletableFuture<List<ServerLaunchMode>> getLaunchModes(ServerType type) {
-		return teeFuture(() -> getLaunchModesSync(type));
+		return createCompletableFuture(() -> getLaunchModesSync(type));
 	}
+
 	private List<ServerLaunchMode> getLaunchModesSync(ServerType type) {
 		if( type == null || isEmpty(type.getId()) ) {
 			return null;
@@ -244,7 +243,7 @@ public class ServerManagementServerImpl implements RSPServer {
 	
 	@Override
 	public CompletableFuture<Attributes> getRequiredLaunchAttributes(LaunchAttributesRequest req) {
-		return teeFuture(() -> getRequiredLaunchAttributesSync(req));
+		return createCompletableFuture(() -> getRequiredLaunchAttributesSync(req));
 	}
 	private Attributes getRequiredLaunchAttributesSync(LaunchAttributesRequest req) {
 		if( req == null || isEmpty(req.getServerTypeId()) || isEmpty(req.getMode())) {
@@ -256,8 +255,9 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public CompletableFuture<Attributes> getOptionalLaunchAttributes(LaunchAttributesRequest req) {
-		return teeFuture(() -> getOptionalLaunchAttributesSync(req));
+		return createCompletableFuture(() -> getOptionalLaunchAttributesSync(req));
 	}
+
 	private Attributes getOptionalLaunchAttributesSync(LaunchAttributesRequest req) {
 		if( req == null || isEmpty(req.getServerTypeId()) || isEmpty(req.getMode())) {
 			return null;
@@ -265,12 +265,12 @@ public class ServerManagementServerImpl implements RSPServer {
 		Attributes rspa = managementModel.getServerModel().getOptionalLaunchAttributes(req.getServerTypeId());
 		return rspa;
 	}
-
 	
 	@Override
 	public CompletableFuture<CreateServerResponse> createServer(ServerAttributes attr) {
-		return teeFuture(() -> createServerSync(attr));
+		return createCompletableFuture(() -> createServerSync(attr));
 	}
+
 	private CreateServerResponse createServerSync(ServerAttributes attr) {
 		if( attr == null || isEmpty(attr.getId()) || isEmpty(attr.getServerType())) {
 			Status s = invalidParameterStatus();
@@ -287,8 +287,9 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public CompletableFuture<List<ServerType>> getServerTypes() {
-		return teeFuture(() -> getServerTypesSync());
+		return createCompletableFuture(() -> getServerTypesSync());
 	}
+
 	private List<ServerType> getServerTypesSync() {
 		ServerType[] types = managementModel.getServerModel().getAccessibleServerTypes();
 		return Arrays.asList(types);
@@ -296,8 +297,9 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public CompletableFuture<StartServerResponse> startServerAsync(LaunchParameters attr) {
-		return teeFuture(() -> startServerImpl(attr));
+		return createCompletableFuture(() -> startServerImpl(attr));
 	}
+
 	private StartServerResponse startServerImpl(LaunchParameters attr) {
 		if( attr == null || isEmpty(attr.getMode()) || isEmpty(attr.getParams().getId())) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
@@ -327,12 +329,12 @@ public class ServerManagementServerImpl implements RSPServer {
 			return (new StartServerResponse(StatusConverter.convert(is), null));
 		}
 	}
-
 	
 	@Override
 	public CompletableFuture<Status> stopServerAsync(StopServerAttributes attr) {
-		return teeFuture(() -> stopServerImpl(attr));
+		return createCompletableFuture(() -> stopServerImpl(attr));
 	}
+
 	private Status stopServerImpl(StopServerAttributes attr) {
 		if( attr == null || isEmpty(attr.getId())) {
 			return invalidParameterStatus();
@@ -368,8 +370,9 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public CompletableFuture<CommandLineDetails> getLaunchCommand(LaunchParameters req) {
-		return teeFuture(() -> getLaunchCommandSync(req));
+		return createCompletableFuture(() -> getLaunchCommandSync(req));
 	}
+
 	private CommandLineDetails getLaunchCommandSync(LaunchParameters req) {
 		if( req == null || isEmpty(req.getMode()) || isEmpty(req.getParams().getId())) {
 			return null;
@@ -393,7 +396,7 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public CompletableFuture<Status> serverStartingByClient(ServerStartingAttributes attr) {
-		return teeFuture(() -> serverStartingByClientSync(attr));
+		return createCompletableFuture(() -> serverStartingByClientSync(attr));
 	}
 
 	private Status serverStartingByClientSync(ServerStartingAttributes attr) {
@@ -424,8 +427,9 @@ public class ServerManagementServerImpl implements RSPServer {
 	
 	@Override
 	public CompletableFuture<Status> serverStartedByClient(LaunchParameters attr) {
-		return teeFuture(() -> serverStartedByClientSync(attr));
+		return createCompletableFuture(() -> serverStartedByClientSync(attr));
 	}
+
 	private Status serverStartedByClientSync(LaunchParameters attr) {
 		if( attr == null || attr.getParams() == null || isEmpty(attr.getParams().getId())) {
 			return invalidParameterStatus();
@@ -451,7 +455,6 @@ public class ServerManagementServerImpl implements RSPServer {
 					ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred.", e);
 			return StatusConverter.convert(is);
 		}
-
 	}
 
 	@Override
@@ -488,24 +491,14 @@ public class ServerManagementServerImpl implements RSPServer {
 		return StatusConverter.convert(s);
 	}
 
-	private static interface IMethodProvider<T> {
-		public T method();
-	}
-	
-	private static class RSPCompletableFuture<T> {
-		public CompletableFuture<T> method(IMethodProvider<T> provider) {
-			final RSPClient rspc = ClientThreadLocal.getActiveClient();
-			CompletableFuture<T> completableFuture = new CompletableFuture<>();
-			CompletableFuture.runAsync(() -> {
-				ClientThreadLocal.setActiveClient(rspc);
-				completableFuture.complete(provider.method());
-				ClientThreadLocal.setActiveClient(null);
-			});
-			return completableFuture;
-		}
-	}
-
-	<T> CompletableFuture<T> teeFuture(IMethodProvider<T> provider) {
-		return new RSPCompletableFuture<T>().method(provider);
+	private static <T> CompletableFuture<T> createCompletableFuture(Supplier<T> supplier) {
+		final RSPClient rspc = ClientThreadLocal.getActiveClient();
+		CompletableFuture<T> completableFuture = new CompletableFuture<>();
+		CompletableFuture.runAsync(() -> {
+			ClientThreadLocal.setActiveClient(rspc);
+			completableFuture.complete(supplier.get());
+			ClientThreadLocal.setActiveClient(null);
+		});
+		return completableFuture;
 	}
 }
