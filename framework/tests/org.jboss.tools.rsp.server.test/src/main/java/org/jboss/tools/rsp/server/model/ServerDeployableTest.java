@@ -31,7 +31,6 @@ import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
-import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.launching.utils.IMemento;
 import org.jboss.tools.rsp.launching.utils.JSONMemento;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
@@ -39,6 +38,7 @@ import org.jboss.tools.rsp.server.spi.servertype.AbstractServerType;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
+import org.jboss.tools.rsp.server.util.DataLocationSysProp;
 import org.jboss.tools.rsp.server.util.generation.DeploymentGeneration;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -46,25 +46,17 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ServerDeployableTest {
-	private static String ORIGINAL_DATA_LOC = null;
+
+	private static final DataLocationSysProp dataLocation = new DataLocationSysProp();
 
 	@BeforeClass
 	public static void beforeClass() {
-		ORIGINAL_DATA_LOC = System.getProperty(LaunchingCore.SYSPROP_DATA_LOCATION);
-		try {
-			File tmp = Files.createTempDirectory("ServerDeployableTest").toFile();
-			System.setProperty(LaunchingCore.SYSPROP_DATA_LOCATION, tmp.getAbsolutePath());
-		} catch (IOException ioe) {
-			throw new RuntimeException(ioe);
-		}
+		dataLocation.backup().set("ServerDeployableTest");
 	}
 
 	@AfterClass
 	public static void afterClass() {
-		if (ORIGINAL_DATA_LOC == null)
-			System.clearProperty(LaunchingCore.SYSPROP_DATA_LOCATION);
-		else
-			System.setProperty(LaunchingCore.SYSPROP_DATA_LOCATION, ORIGINAL_DATA_LOC);
+		dataLocation.restore();
 	}
 
 	private ServerModel sm;
@@ -121,7 +113,7 @@ public class ServerDeployableTest {
 		IServer server = sm.getServer(handle.getId());
 		List<DeployableState> deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
-		assertTrue(deployables.size() == 0);
+		assertTrue(deployables.isEmpty());
 
 		DeployableReference reference = new DeployableReference("some.name", war.getAbsolutePath());
 		IStatus added = sm.addDeployable(server, reference);
@@ -138,7 +130,7 @@ public class ServerDeployableTest {
 
 		deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
-		assertTrue(deployables.size() == 0);
+		assertTrue(deployables.isEmpty());
 
 	}
 	
@@ -151,7 +143,7 @@ public class ServerDeployableTest {
 
 		List<DeployableState> deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
-		assertTrue(deployables.size() == 0);
+		assertTrue(deployables.isEmpty());
 
 		DeployableReference reference = new DeployableReference("some.name", war.getAbsolutePath());
 		IStatus added = sm.addDeployable(server, reference);
@@ -186,7 +178,7 @@ public class ServerDeployableTest {
 
 		deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
-		assertTrue(deployables.size() == 0);
+		assertTrue(deployables.isEmpty());
 		
 
 		try {

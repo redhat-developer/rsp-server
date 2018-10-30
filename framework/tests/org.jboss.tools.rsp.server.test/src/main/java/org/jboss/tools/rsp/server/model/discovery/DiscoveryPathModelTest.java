@@ -19,35 +19,26 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
-import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.server.discovery.DiscoveryPathModel;
 import org.jboss.tools.rsp.server.spi.discovery.IDiscoveryPathListener;
+import org.jboss.tools.rsp.server.util.DataLocationSysProp;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class DiscoveryPathModelTest {
-	private static String ORIGINAL_DATA_LOC = null;
+
+	private static final DataLocationSysProp dataLocation = new DataLocationSysProp();
 	
-	@BeforeClass 
+	@BeforeClass
 	public static void beforeClass() {
-		ORIGINAL_DATA_LOC = System.getProperty(LaunchingCore.SYSPROP_DATA_LOCATION);
-		try {
-			File tmp = Files.createTempDirectory("RSPStartupShutdownTest").toFile();
-			System.setProperty(LaunchingCore.SYSPROP_DATA_LOCATION, tmp.getAbsolutePath());
-		} catch(IOException ioe) {
-			throw new RuntimeException(ioe);
-		}
-	}
-	
-	@AfterClass
-	public static void afterClass() {
-		if( ORIGINAL_DATA_LOC == null )
-			System.clearProperty(LaunchingCore.SYSPROP_DATA_LOCATION);
-		else
-			System.setProperty(LaunchingCore.SYSPROP_DATA_LOCATION, ORIGINAL_DATA_LOC);
+		dataLocation.backup().set("RSPStartupShutdownTest");
 	}
 
+	@AfterClass
+	public static void afterClass() {
+		dataLocation.restore();
+	}
 	
 	@Test
 	public void testBasicFunctionality() {
