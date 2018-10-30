@@ -1,6 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.rsp.server;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -27,7 +34,6 @@ class RSPServerSocketLauncher<T> extends ServerSocketLauncher<T> {
 		super(localService, remoteInterface, socket, tracing);
 	}
 
-	
 	/**
 	 * Start a thread that listens for messages in the message producer and forwards them to the message consumer.
 	 * 
@@ -66,12 +72,8 @@ class RSPServerSocketLauncher<T> extends ServerSocketLauncher<T> {
 
 			@Override
 			public boolean cancel(boolean mayInterruptIfRunning) {
-				if (mayInterruptIfRunning && messageProducer instanceof Closeable) {
-					try {
-						((Closeable) messageProducer).close();
-					} catch (IOException e) {
-						throw new RuntimeException(e);
-					}
+				if (mayInterruptIfRunning) {
+					messageProducer.close();
 				}
 				return result.cancel(mayInterruptIfRunning);
 			}
@@ -82,7 +84,6 @@ class RSPServerSocketLauncher<T> extends ServerSocketLauncher<T> {
 			}
 		};
 	}
-	
 	
 	public static class CustomMessageProcessor implements Runnable {
 		private static final Logger LOG = Logger.getLogger(ConcurrentMessageProcessor.class.getName());
