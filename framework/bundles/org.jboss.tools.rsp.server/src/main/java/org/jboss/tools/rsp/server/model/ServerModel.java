@@ -176,7 +176,7 @@ public class ServerModel implements IServerModel {
 				if( typeId == null ) {
 					log(new Exception(
 							"Unable to load server from file " + serverFile.getAbsolutePath() + "; server type is missing or null."));
-				} else if( getServerType(typeId) == null ) {
+				} else if( createServerTypeDAO(typeId) == null ) {
 					log(new Exception(
 							"Unable to load server from file " + serverFile.getAbsolutePath() + "; server type " + typeId + " is not found in model."));
 				}
@@ -207,8 +207,16 @@ public class ServerModel implements IServerModel {
 		}
 	}
 	
-	private CreateServerResponse createServerUnprotected(String serverType, String id, Map<String, Object> attributes) throws CoreException {
-		IServerType type = getServerType(serverType, id);
+	private CreateServerResponse createServerUnprotected(String serverType, String id, Map<String, Object> attributes) 
+			throws CoreException {
+		if( servers.get(id) != null ) {
+			throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+					"Server with id " + id + " already exists."));
+		}
+		IServerType type = serverTypes.get(serverType);
+		if( type == null ) {
+			throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server Type " + serverType + " not found"));
+		}
 		IStatus validAttributes = validateAttributes(type, attributes);
 		if( !validAttributes.isOK()) {
 			throw new CoreException(validAttributes);
@@ -224,19 +232,6 @@ public class ServerModel implements IServerModel {
 		addServer(server, del);
 		server.save(new NullProgressMonitor());
 		return valid.toDao();
-	}
-
-	private IServerType getServerType(String serverType, String id) throws CoreException {
-		IServerType type = null;
-		if( servers.get(id) != null ) {
-			throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server with id " + id + " already exists."));
-		} else {
-			type = serverTypes.get(serverType);
-			if( type == null ) {
-				throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server Type " + serverType + " not found"));
-			}
-		}
-		return type;
 	}
 	
 	private IStatus validateAttributes(IServerType type, Map<String, Object> map) {
@@ -333,7 +328,7 @@ public class ServerModel implements IServerModel {
 	
 	private ServerHandle toHandle(IServer s) {
 		String typeId = s.getTypeId();
-		return new ServerHandle(s.getId(), getServerType(typeId));
+		return new ServerHandle(s.getId(), createServerTypeDAO(typeId));
 	}
 	
 	@Override
@@ -363,17 +358,16 @@ public class ServerModel implements IServerModel {
 		for( String serverKey : serverKeys ) {
 			String id = serverKey;
 			String type = servers.get(id).getTypeId();
-			handles.add(new ServerHandle(id,  getServerType(type)));
+			handles.add(new ServerHandle(id,  createServerTypeDAO(type)));
 		}
 		return handles.toArray(new ServerHandle[handles.size()]);
 	}
 	
-	private ServerType getServerType(String typeId) {
+	private ServerType createServerTypeDAO(String typeId) {
 		IServerType st = serverTypes.get(typeId);
 		if( st == null )
 			return null;
 		return new ServerType(typeId, st.getName(), st.getDescription());
-		
 	}
 	
 	@Override
