@@ -46,11 +46,11 @@ public class Server extends SecuredBase implements IServer {
 		super(file, id, managementModel.getSecureStorageProvider());
 		this.serverType = type;
 		this.managementModel = managementModel;
+		setAttributes(attributes);
 		if( this.serverType != null ) {
 			setAttribute(TYPE_ID, type.getId());
 			this.delegate = this.serverType.createServerDelegate(this);
 		}
-		setAttributes(attributes);
 	}
 
 	@Override

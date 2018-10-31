@@ -62,4 +62,11 @@ public interface IServerPublishModel {
 	 * @param runState
 	 */
 	public void setModuleState(DeployableReference reference, int runState);
+
+	/**
+	 * Get the current state for the deployment
+	 * @param reference
+	 * @return
+	 */
+	public DeployableState getDeployableState(DeployableReference reference);
 }

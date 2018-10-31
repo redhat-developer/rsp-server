@@ -10,7 +10,9 @@ package org.jboss.tools.rsp.server.wildfly.servertype;
 
 import java.io.File;
 
+import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
+import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
@@ -34,6 +36,7 @@ import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.wildfly.impl.Activator;
+import org.jboss.tools.rsp.server.wildfly.servertype.publishing.IJBossPublishController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +70,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		IVMInstall vmi = new JBossVMRegistryDiscovery().findVMInstall(this);
 		if( vmi == null ) {
 			String msg = "Server " + getServer().getId() + " can not find a valid virtual machine to use.";
-			return validationErrorResponse(msg, null, Activator.BUNDLE_ID);
+			return validationErrorResponse(msg, IJBossServerAttributes.VM_INSTALL_PATH, Activator.BUNDLE_ID);
 		}
 		return new CreateServerValidation(Status.OK_STATUS, null);
 	}
@@ -211,5 +214,47 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	public IStatus clientSetServerStarted(LaunchParameters attr) {
 		setServerState(STATE_STARTED, true);
 		return Status.OK_STATUS;
+	}
+	
+	private IJBossPublishController publishController;
+	protected IJBossPublishController getOrCreatePublishController() {
+		if( publishController == null ) {
+			publishController = createPublishController();
+		}
+		return publishController;
+	}
+	
+	protected abstract IJBossPublishController createPublishController();
+	
+	@Override
+	public IStatus canAddDeployable(DeployableReference reference) {
+		return getOrCreatePublishController().canAddDeployable(reference);
+	}
+	
+	@Override
+	public IStatus canRemoveDeployable(DeployableReference reference) {
+		return getOrCreatePublishController().canRemoveDeployable(reference);
+	}
+	
+	
+	public IStatus canPublish() {
+		return getOrCreatePublishController().canPublish();
+	}
+	
+
+	protected void publishStart(int publishType) throws CoreException {
+		getOrCreatePublishController().publishStart(publishType);
+	}
+
+	protected void publishFinish(int publishType) throws CoreException {
+		getOrCreatePublishController().publishFinish(publishType);
+	}
+
+	protected void publishModule(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
+		int syncState = getOrCreatePublishController().publishModule(reference, publishType, modulePublishType);
+		setModulePublishState(reference, syncState);
+		
+		// TODO launch a module poller?!
+		setModuleState(reference, ServerManagementAPIConstants.STATE_STARTED);
 	}
 }

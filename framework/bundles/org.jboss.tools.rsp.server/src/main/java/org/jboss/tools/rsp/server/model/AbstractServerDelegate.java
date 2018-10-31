@@ -440,6 +440,10 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		getServerPublishModel().setModuleState(reference, runState);
 	}
 	
+	protected DeployableState getDeployableState(DeployableReference reference) {
+		return getServerPublishModel().getDeployableState(reference);
+	}
+	
 	public IStatus canPublish() {
 		return Status.OK_STATUS;
 	}

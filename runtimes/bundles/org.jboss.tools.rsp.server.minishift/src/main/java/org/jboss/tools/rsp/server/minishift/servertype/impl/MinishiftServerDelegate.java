@@ -12,6 +12,7 @@ import java.io.File;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
+import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
@@ -224,6 +225,21 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 	public IStatus clientSetServerStarted(LaunchParameters attr) {
 		setServerState(STATE_STARTED, true);
 		return Status.OK_STATUS;
+	}
+	
+	
+	/**
+	 * This server type can't publish nothin yet!
+	 */
+	
+	@Override
+	public IStatus canAddDeployable(DeployableReference reference) {
+		return Status.CANCEL_STATUS;
+	}
+	
+	@Override
+	public IStatus canRemoveDeployable(DeployableReference reference) {
+		return Status.CANCEL_STATUS;
 	}
 
 }

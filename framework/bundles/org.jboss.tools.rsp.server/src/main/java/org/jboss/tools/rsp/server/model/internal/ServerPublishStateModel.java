@@ -62,6 +62,16 @@ public class ServerPublishStateModel implements IServerPublishModel {
 			state.put(reference.getId(), sActual);
 		}
 	}
+	
+	@Override
+	public DeployableState getDeployableState(DeployableReference reference) {
+		DeployableState ds = state.get(reference.getId());
+		DeployableState ret = new DeployableState();
+		ret.setPublishState(ds.getPublishState());
+		ret.setState(ds.getState());
+		ret.setReference(reference);
+		return ret;
+	}
 
 	@Override
 	public void setModulePublishState(DeployableReference reference, int publishState) {

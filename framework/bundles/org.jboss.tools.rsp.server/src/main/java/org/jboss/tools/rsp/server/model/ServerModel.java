@@ -451,8 +451,7 @@ public class ServerModel implements IServerModel {
 
 	@Override
 	public List<ServerLaunchMode> getLaunchModes(IServerType serverType) {
-		IServerType t = serverTypes.get(serverType);
-		ServerLaunchMode[] ret = t == null ? null : t.getLaunchModes();
+		ServerLaunchMode[] ret = serverType == null ? null : serverType.getLaunchModes();
 		return ret == null ? null : Arrays.asList(ret);
 	}
 	
