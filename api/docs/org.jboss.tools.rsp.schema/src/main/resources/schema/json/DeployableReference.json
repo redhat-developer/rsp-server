@@ -6,12 +6,6 @@
     },
     "path" : {
       "type" : "string"
-    },
-    "state" : {
-      "type" : "integer"
-    },
-    "publishState" : {
-      "type" : "integer"
     }
   }
 }

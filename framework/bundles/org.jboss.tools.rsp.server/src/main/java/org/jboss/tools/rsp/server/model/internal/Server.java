@@ -38,8 +38,9 @@ public class Server extends SecuredBase implements IServer {
 	
 	private List<DeployableReference> moduleInitialization;
 	
-	public Server(File file, ISecureStorageProvider storage) {
-		super(file, storage);
+	public Server(File file, IServerManagementModel managementModel) {
+		super(file, managementModel.getSecureStorageProvider());
+		this.managementModel = managementModel;
 	}
 	
 	public Server(File file, IServerType type, String id, Map<String, Object> attributes, IServerManagementModel managementModel) {

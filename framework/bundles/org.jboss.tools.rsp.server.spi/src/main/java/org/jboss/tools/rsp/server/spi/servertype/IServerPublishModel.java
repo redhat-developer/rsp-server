@@ -69,4 +69,10 @@ public interface IServerPublishModel {
 	 * @return
 	 */
 	public DeployableState getDeployableState(DeployableReference reference);
+
+	/**
+	 * Force the model to remove the given deployable from its stores entirely.
+	 * @param reference
+	 */
+	public void deployableRemoved(DeployableReference reference);
 }

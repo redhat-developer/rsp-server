@@ -98,16 +98,14 @@ public interface ServerManagementAPIConstants {
 	public static final int PUBLISH_FULL = 2;
 
 	/**
-	 * Publish kind constant (value 3) indicating an automatic publish request.
+	 * Publish kind constant (value 3) indicating a publish clean request
 	 */
-	public static final int PUBLISH_AUTO = 3;
-
+	public static final int PUBLISH_CLEAN = 3;
+	
 	/**
-	 * Publish kind constant (value 4) indicating a publish clean request
+	 * Publish kind constant (value 4) indicating an automatic publish request.
 	 */
-	public static final int PUBLISH_CLEAN = 4;
-	
-	
+	public static final int PUBLISH_AUTO = 4;
 	
 	/*
 	 * Debugging details: keys

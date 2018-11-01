@@ -396,6 +396,15 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 				try {
 					int iState = state.getPublishState();
 					publishModule(state.getReference(), publishType, iState);
+					DeployableState postState = getServerPublishModel().getDeployableState(state.getReference());
+					
+					// If module was to be removed, and it was successfully removed, 
+					// clean it from the publish model cache entirely. 
+					if( iState == ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) {
+						if( postState != null && postState.getPublishState() == ServerManagementAPIConstants.PUBLISH_STATE_NONE) {
+							getServerPublishModel().deployableRemoved(state.getReference());
+						}
+					}
 				} catch(CoreException ce) {
 					String mod = state.getReference().getId();
 					String server = getServer().getName();

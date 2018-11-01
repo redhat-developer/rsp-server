@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2018-10-18 18:43:06.
+// Generated using typescript-generator version 2.2.413 on 2018-11-01 15:29:00.
 
 export interface Attribute {
     type: string;
@@ -11,11 +11,6 @@ export interface Attributes {
     attributes: { [index: string]: Attribute };
 }
 
-export interface ServerCapabilitiesResponse {
-    serverCapabilities: { [index: string]: string };
-    clientRegistrationStatus: Status;
-}
-
 export interface ClientCapabilitiesRequest {
     map: { [index: string]: string };
 }
@@ -25,6 +20,22 @@ export interface CommandLineDetails {
     workingDir: string;
     envp: string[];
     properties: { [index: string]: string };
+}
+
+export interface CreateServerResponse {
+    status: Status;
+    invalidKeys: string[];
+}
+
+export interface DeployableReference {
+    id: string;
+    path: string;
+}
+
+export interface DeployableState {
+    reference: DeployableReference;
+    state: number;
+    publishState: number;
 }
 
 export interface DiscoveryPath {
@@ -41,11 +52,14 @@ export interface LaunchParameters {
     params: ServerAttributes;
 }
 
-export interface ModuleState {
-    id: string;
-    path: string;
-    state: number;
-    publishState: number;
+export interface ModifyDeployableRequest {
+    server: ServerHandle;
+    deployable: DeployableReference;
+}
+
+export interface PublishServerRequest {
+    server: ServerHandle;
+    kind: number;
 }
 
 export interface ServerAttributes {
@@ -62,6 +76,11 @@ export interface ServerBean {
     version: string;
     fullVersion: string;
     serverAdapterTypeId: string;
+}
+
+export interface ServerCapabilitiesResponse {
+    serverCapabilities: { [index: string]: string };
+    clientRegistrationStatus: Status;
 }
 
 export interface ServerHandle {
@@ -95,7 +114,7 @@ export interface ServerState {
     server: ServerHandle;
     state: number;
     publishState: number;
-    moduleState: ModuleState[];
+    moduleState: DeployableState[];
 }
 
 export interface ServerType {

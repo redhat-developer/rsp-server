@@ -161,7 +161,7 @@ public class ServerModel implements IServerModel {
 	}
 
 	private Server loadServer(File serverFile) {
-		Server server = new Server(serverFile, managementModel.getSecureStorageProvider());
+		Server server = new Server(serverFile, managementModel);
 		try {
 			server.load(new NullProgressMonitor());
 			String tid = server.getTypeId();

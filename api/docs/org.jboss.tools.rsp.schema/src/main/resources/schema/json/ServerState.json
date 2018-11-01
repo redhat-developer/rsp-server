@@ -34,11 +34,16 @@
       "items" : {
         "type" : "object",
         "properties" : {
-          "id" : {
-            "type" : "string"
-          },
-          "path" : {
-            "type" : "string"
+          "reference" : {
+            "type" : "object",
+            "properties" : {
+              "id" : {
+                "type" : "string"
+              },
+              "path" : {
+                "type" : "string"
+              }
+            }
           },
           "state" : {
             "type" : "integer"

@@ -26,6 +26,7 @@ public class ServerPublishStateModel implements IServerPublishModel {
 		state = new HashMap<>();
 	}
 	
+	@Override
 	public void addDeployable(DeployableReference reference) {
 		DeployableState sActual = new DeployableState();
 		sActual.setReference(reference);
@@ -34,6 +35,7 @@ public class ServerPublishStateModel implements IServerPublishModel {
 		state.put(reference.getId(), sActual);
 	}
 
+	@Override
 	public void removeDeployable(DeployableReference reference) {
 		DeployableState ds = state.get(reference.getId());
 		if( ds.getPublishState() == ServerManagementAPIConstants.PUBLISH_STATE_ADD) { 
@@ -43,6 +45,7 @@ public class ServerPublishStateModel implements IServerPublishModel {
 		ds.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_REMOVE);
 	}
 
+	@Override
 	public void deployableRemoved(DeployableReference reference) {
 		state.remove(reference.getId());
 	}

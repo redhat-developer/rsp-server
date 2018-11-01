@@ -763,29 +763,45 @@ This endpoint returns the following schema as a return value:
 <tr><td><pre>{
   "type" : "object",
   "properties" : {
-    "severity" : {
-      "type" : "integer"
+    "status" : {
+      "type" : "object",
+      "properties" : {
+        "severity" : {
+          "type" : "integer"
+        },
+        "pluginId" : {
+          "type" : "string"
+        },
+        "code" : {
+          "type" : "integer"
+        },
+        "message" : {
+          "type" : "string"
+        },
+        "trace" : {
+          "type" : "string"
+        },
+        "ok" : {
+          "type" : "boolean"
+        },
+        "plugin" : {
+          "type" : "string"
+        }
+      }
     },
-    "pluginId" : {
-      "type" : "string"
-    },
-    "code" : {
-      "type" : "integer"
-    },
-    "message" : {
-      "type" : "string"
-    },
-    "trace" : {
-      "type" : "string"
-    },
-    "ok" : {
-      "type" : "boolean"
-    },
-    "plugin" : {
-      "type" : "string"
+    "invalidKeys" : {
+      "type" : "array",
+      "items" : {
+        "type" : "string"
+      }
     }
   }
-}</pre></td><td><pre>export interface Status {
+}</pre></td><td><pre>export interface CreateServerResponse {
+    status: Status;
+    invalidKeys: string[];
+}
+
+export interface Status {
     severity: number;
     pluginId: string;
     code: number;
@@ -1279,11 +1295,16 @@ This endpoint returns the following schema as a return value:
       "items" : {
         "type" : "object",
         "properties" : {
-          "id" : {
-            "type" : "string"
-          },
-          "path" : {
-            "type" : "string"
+          "reference" : {
+            "type" : "object",
+            "properties" : {
+              "id" : {
+                "type" : "string"
+              },
+              "path" : {
+                "type" : "string"
+              }
+            }
           },
           "state" : {
             "type" : "integer"
@@ -1299,7 +1320,7 @@ This endpoint returns the following schema as a return value:
     server: ServerHandle;
     state: number;
     publishState: number;
-    moduleState: ModuleState[];
+    moduleState: DeployableState[];
 }
 
 export interface ServerHandle {
@@ -1307,9 +1328,8 @@ export interface ServerHandle {
     type: ServerType;
 }
 
-export interface ModuleState {
-    id: string;
-    path: string;
+export interface DeployableState {
+    reference: DeployableReference;
     state: number;
     publishState: number;
 }
@@ -1318,6 +1338,11 @@ export interface ServerType {
     id: string;
     visibleName: string;
     description: string;
+}
+
+export interface DeployableReference {
+    id: string;
+    path: string;
 }</pre></td></tr></table>
 
 #### server/startServerAsync
@@ -1463,6 +1488,376 @@ This endpoint takes the following json schemas as parameters:
 }</pre></td><td><pre>export interface StopServerAttributes {
     id: string;
     force: boolean;
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "severity" : {
+      "type" : "integer"
+    },
+    "pluginId" : {
+      "type" : "string"
+    },
+    "code" : {
+      "type" : "integer"
+    },
+    "message" : {
+      "type" : "string"
+    },
+    "trace" : {
+      "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
+    },
+    "plugin" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface Status {
+    severity: number;
+    pluginId: string;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+    plugin: string;
+}</pre></td></tr></table>
+
+#### server/getDeployables
+
+ The `server/getDeployables` request is sent by the client to the server to get a list of all deployables 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "type" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "visibleName" : {
+          "type" : "string"
+        },
+        "description" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface ServerHandle {
+    id: string;
+    type: ServerType;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
+    description: string;
+}</pre></td></tr></table>
+
+This endpoint returns a list of the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "reference" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "path" : {
+          "type" : "string"
+        }
+      }
+    },
+    "state" : {
+      "type" : "integer"
+    },
+    "publishState" : {
+      "type" : "integer"
+    }
+  }
+}</pre></td><td><pre>export interface DeployableState {
+    reference: DeployableReference;
+    state: number;
+    publishState: number;
+}
+
+export interface DeployableReference {
+    id: string;
+    path: string;
+}</pre></td></tr></table>
+
+#### server/addDeployable
+
+ The `server/addDeployable` request is sent by the client to the server to add a deployable reference to a server's list of deployable items so that it can be published thereafter. @param handle @param reference @return 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "server" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "visibleName" : {
+              "type" : "string"
+            },
+            "description" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    },
+    "deployable" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "path" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface ModifyDeployableRequest {
+    server: ServerHandle;
+    deployable: DeployableReference;
+}
+
+export interface ServerHandle {
+    id: string;
+    type: ServerType;
+}
+
+export interface DeployableReference {
+    id: string;
+    path: string;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
+    description: string;
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "severity" : {
+      "type" : "integer"
+    },
+    "pluginId" : {
+      "type" : "string"
+    },
+    "code" : {
+      "type" : "integer"
+    },
+    "message" : {
+      "type" : "string"
+    },
+    "trace" : {
+      "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
+    },
+    "plugin" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface Status {
+    severity: number;
+    pluginId: string;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+    plugin: string;
+}</pre></td></tr></table>
+
+#### server/removeDeployable
+
+ The `server/removeDeployable` request is sent by the client to the server to remove a deployable reference from a server's list of deployable items so that it can be unpublished thereafter. @param handle @param reference @return 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "server" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "visibleName" : {
+              "type" : "string"
+            },
+            "description" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    },
+    "deployable" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "path" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface ModifyDeployableRequest {
+    server: ServerHandle;
+    deployable: DeployableReference;
+}
+
+export interface ServerHandle {
+    id: string;
+    type: ServerType;
+}
+
+export interface DeployableReference {
+    id: string;
+    path: string;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
+    description: string;
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "severity" : {
+      "type" : "integer"
+    },
+    "pluginId" : {
+      "type" : "string"
+    },
+    "code" : {
+      "type" : "integer"
+    },
+    "message" : {
+      "type" : "string"
+    },
+    "trace" : {
+      "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
+    },
+    "plugin" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface Status {
+    severity: number;
+    pluginId: string;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+    plugin: string;
+}</pre></td></tr></table>
+
+#### server/publish
+
+ The `server/publish` request is sent by the client to the server to instruct the server adapter to publish any changes to the backing runtime. @param request @return 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "server" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "visibleName" : {
+              "type" : "string"
+            },
+            "description" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    },
+    "kind" : {
+      "type" : "integer"
+    }
+  }
+}</pre></td><td><pre>export interface PublishServerRequest {
+    server: ServerHandle;
+    kind: number;
+}
+
+export interface ServerHandle {
+    id: string;
+    type: ServerType;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
+    description: string;
 }</pre></td></tr></table>
 
 This endpoint returns the following schema as a return value: 
@@ -1736,11 +2131,16 @@ This endpoint takes the following json schemas as parameters:
       "items" : {
         "type" : "object",
         "properties" : {
-          "id" : {
-            "type" : "string"
-          },
-          "path" : {
-            "type" : "string"
+          "reference" : {
+            "type" : "object",
+            "properties" : {
+              "id" : {
+                "type" : "string"
+              },
+              "path" : {
+                "type" : "string"
+              }
+            }
           },
           "state" : {
             "type" : "integer"
@@ -1756,7 +2156,7 @@ This endpoint takes the following json schemas as parameters:
     server: ServerHandle;
     state: number;
     publishState: number;
-    moduleState: ModuleState[];
+    moduleState: DeployableState[];
 }
 
 export interface ServerHandle {
@@ -1764,9 +2164,8 @@ export interface ServerHandle {
     type: ServerType;
 }
 
-export interface ModuleState {
-    id: string;
-    path: string;
+export interface DeployableState {
+    reference: DeployableReference;
     state: number;
     publishState: number;
 }
@@ -1775,6 +2174,11 @@ export interface ServerType {
     id: string;
     visibleName: string;
     description: string;
+}
+
+export interface DeployableReference {
+    id: string;
+    path: string;
 }</pre></td></tr></table>
 
 This endpoint returns no value#### client/serverProcessCreated

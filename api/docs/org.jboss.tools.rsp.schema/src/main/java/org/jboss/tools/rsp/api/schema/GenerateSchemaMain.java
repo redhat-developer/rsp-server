@@ -13,10 +13,14 @@ import org.jboss.tools.rsp.api.dao.Attribute;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
+import org.jboss.tools.rsp.api.dao.CreateServerResponse;
+import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
-import org.jboss.tools.rsp.api.dao.DeployableState;
+import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
+import org.jboss.tools.rsp.api.dao.PublishServerRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerBean;
 import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
@@ -56,15 +60,19 @@ public class GenerateSchemaMain {
 		Class[] daoClasses = new Class[] {
 				Attribute.class,
 				Attributes.class,
-				ServerCapabilitiesResponse.class,
 				ClientCapabilitiesRequest.class,
 				CommandLineDetails.class,
+				CreateServerResponse.class,
+				DeployableReference.class,
+				DeployableState.class,
 				DiscoveryPath.class,
 				LaunchAttributesRequest.class,
 				LaunchParameters.class,
-				DeployableState.class,
+				ModifyDeployableRequest.class,
+				PublishServerRequest.class,
 				ServerAttributes.class,
 				ServerBean.class,
+				ServerCapabilitiesResponse.class,
 				ServerHandle.class,
 				ServerLaunchMode.class,
 				ServerProcess.class,

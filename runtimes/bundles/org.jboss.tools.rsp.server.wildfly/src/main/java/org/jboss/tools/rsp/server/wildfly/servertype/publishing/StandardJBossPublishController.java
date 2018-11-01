@@ -139,10 +139,10 @@ public class StandardJBossPublishController implements IJBossPublishController {
 	protected int removeModule(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
 		File dest = getDestinationPath(reference).toFile();
 		if( dest != null && dest.exists()) {
-			if( dest.delete() )
-				return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
+			if( !dest.delete() )
+				return delegate.getServerPublishModel().getDeployableState(reference).getPublishState();
 		}
-		return delegate.getServerPublishModel().getDeployableState(reference).getPublishState();
+		return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 	}
 	
 }
