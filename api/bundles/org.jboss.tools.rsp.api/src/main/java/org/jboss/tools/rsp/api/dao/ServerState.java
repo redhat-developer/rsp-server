@@ -11,35 +11,44 @@ package org.jboss.tools.rsp.api.dao;
 import java.util.List;
 
 public class ServerState {
+
 	private ServerHandle server;
 	private int state;
 	private int publishState;
-	private List<DeployableState> moduleState;
+	private List<DeployableState> deployableStates;
+
 	public ServerState() {
-		
 	}
+
 	public ServerHandle getServer() {
 		return server;
 	}
+
 	public void setServer(ServerHandle server) {
 		this.server = server;
 	}
+
 	public int getState() {
 		return state;
 	}
+
 	public void setState(int state) {
 		this.state = state;
 	}
+
 	public int getPublishState() {
 		return publishState;
 	}
+
 	public void setPublishState(int publishState) {
 		this.publishState = publishState;
 	}
-	public List<DeployableState> getModuleState() {
-		return moduleState;
+
+	public List<DeployableState> getDeployableStates() {
+		return deployableStates;
 	}
-	public void setModuleState(List<DeployableState> moduleState) {
-		this.moduleState = moduleState;
+
+	public void setDeployableStates(List<DeployableState> deployStates) {
+		this.deployableStates = deployStates;
 	}
 }

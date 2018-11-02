@@ -12,66 +12,85 @@ import java.util.List;
 
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
+import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 
 public interface IServerPublishModel {
 	
 	
 	/**
-	 * Add a deployable to the list of objects we want published to the server. 
+	 * Adds a deployable to the list of objects we want published to the server. 
 	 * On the next publish request, a publish of this deployable will be attempted. 
 	 *  
 	 * @param reference
+	 * @return IStatus#OK if the deployable was added. IStatus.ERROR otherwise.
 	 */
-	public void addDeployable(DeployableReference reference);
+	public IStatus addDeployable(DeployableReference reference);
 
 	/**
-	 * Remove a deployable from the list of objects we want published to the server. 
+	 * Returns {@code true} if the given reference can be added to this model. This
+	 * is the case if this model does not contain a DeployableReference with the
+	 * same id.
+	 * 
+	 * @param reference
+	 * @return true if the given reference can be added
+	 * 
+	 * @see DeployableReference#getId
+	 */
+	public boolean contains(DeployableReference reference);
+
+	/**
+	 * Removes a deployable from the list of objects we want published to the server. 
 	 * On the next publish request, a removal of this deployable will be attempted. 
 	 *  
 	 * @param reference
+	 * @return IStatus#OK if the deployable was removed. IStatus.ERROR otherwise.
+	 * 
+	 * @see #removeDeployable
 	 */
-	public void removeDeployable(DeployableReference reference);
-	
-	/**
-	 * Get a list of the deployables for this server and their current states
-	 * @return
-	 */
-	public List<DeployableState> getDeployables();
+	public IStatus removeDeployable(DeployableReference reference);
 
 	/**
-	 * Allow the framework to initialize the model from a data store
+	 * Returns a list of the deployables for this server and their current states
+	 * @return
+	 */
+	public List<DeployableState> getDeployableStates();
+	
+	/**
+	 * Allows the framework to initialize the model from a data store
 	 * @param references
 	 */
 	public void initialize(List<DeployableReference> references);
 
 	/**
-	 * Set the publish state for a module. 
+	 * Sets the publish state for a deployable. 
 	 * Clients should call this method after publishing to update
 	 * the model with what the current state is.
 	 * @param reference
 	 * @param publishState
 	 */
-	public void setModulePublishState(DeployableReference reference, int publishState);
+	public void setDeployablePublishState(DeployableReference reference, int publishState);
 
 	/**
-	 * Set the run state (starting, started, etc) for a deployment.
+	 * Sets the run state (starting, started, etc) for a deployment.
 	 * Clients should call this method after publishing, 
 	 * stopping, starting, etc a given deployment. 
 	 * 
 	 * @param reference
 	 * @param runState
 	 */
-	public void setModuleState(DeployableReference reference, int runState);
+	public void setDeployableState(DeployableReference reference, int runState);
 
 	/**
-	 * Get the current state for the deployment
+	 * Returns the current state for the given deployment. Return {@code null} if
+	 * the deployment doesn't exist yet.
+	 * 
 	 * @param reference
 	 * @return
 	 */
 	public DeployableState getDeployableState(DeployableReference reference);
 
 	/**
-	 * Force the model to remove the given deployable from its stores entirely.
+	 * Forces the model to remove the given deployable from its stores entirely.
 	 * @param reference
 	 */
 	public void deployableRemoved(DeployableReference reference);

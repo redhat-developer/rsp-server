@@ -9,7 +9,7 @@ export interface ServerHandle {
 }
 
 export interface DeployableReference {
-    id: string;
+    label: string;
     path: string;
 }
 

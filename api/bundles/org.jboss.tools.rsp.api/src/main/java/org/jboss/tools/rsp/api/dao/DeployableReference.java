@@ -11,24 +11,24 @@ package org.jboss.tools.rsp.api.dao;
 import org.jboss.tools.rsp.api.dao.util.EqualsUtility;
 
 public class DeployableReference {
-	private String id;
+
+	private String label;
 	private String path;
 	
 	public DeployableReference() {
-		this(null,null);
 	}
 
-	public DeployableReference(String id, String path) {
-		this.id = id;
+	public DeployableReference(String label, String path) {
+		this.label = label;
 		this.path = path;
 	}
 
-	public String getId() {
-		return id;
+	public String getLabel() {
+		return label;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 	public String getPath() {
@@ -40,16 +40,24 @@ public class DeployableReference {
 	}
 	
 	@Override
-	public boolean equals(Object other2) {
-		if( !(other2 instanceof DeployableReference)) 
-			return false;
-		DeployableReference other = (DeployableReference)other2;
-		return EqualsUtility.areEqual(getPath(), other.getPath()) && 
-				EqualsUtility.areEqual(getId(), other.getId());
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((label == null) ? 0 : label.hashCode());
+		result = prime * result + ((path == null) ? 0 : path.hashCode());
+		return result;
 	}
 
 	@Override
-	public int hashCode() {
-		return (getId() + "::" + getPath()).hashCode();
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DeployableReference other = (DeployableReference) obj;
+		return EqualsUtility.areEqual(label, other.label)
+				&& EqualsUtility.areEqual(path, other.path);
 	}
 }

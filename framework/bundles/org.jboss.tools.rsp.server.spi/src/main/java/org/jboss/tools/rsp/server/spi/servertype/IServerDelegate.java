@@ -10,8 +10,8 @@ package org.jboss.tools.rsp.server.spi.servertype;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
-import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
@@ -28,7 +28,8 @@ public interface IServerDelegate {
 	 * server is in an unknown state.
 	 * 
 	 * @see #getServerRunState()
-	 * @see #getModuleState(IModule[])
+	 * @see IServerPublishModel#getDeployableState(DeployableReference)
+	 * @see DeployableState#getState()
 	 */
 	public static final int STATE_UNKNOWN = ServerManagementAPIConstants.STATE_UNKNOWN;
 
@@ -37,7 +38,8 @@ public interface IServerDelegate {
 	 * server is starting, but not yet ready to serve content.
 	 * 
 	 * @see #getServerRunState()
-	 * @see #getModuleState(IModule[])
+	 * @see IServerPublishModel#getDeployableState(DeployableReference)
+	 * @see DeployableState#getState()
 	 */
 	public static final int STATE_STARTING = ServerManagementAPIConstants.STATE_STARTING;
 
@@ -46,7 +48,8 @@ public interface IServerDelegate {
 	 * server is ready to serve content.
 	 * 
 	 * @see #getServerRunState()
-	 * @see #getModuleState(IModule[])
+	 * @see IServerPublishModel#getDeployableState(DeployableReference)
+	 * @see DeployableState#getState()
 	 */
 	public static final int STATE_STARTED = ServerManagementAPIConstants.STATE_STARTED;
 
@@ -55,7 +58,8 @@ public interface IServerDelegate {
 	 * server is shutting down.
 	 * 
 	 * @see #getServerRunState()
-	 * @see #getModuleState(IModule[])
+	 * @see IServerPublishModel#getDeployableState(DeployableReference)
+	 * @see DeployableState#getState()
 	 */
 	public static final int STATE_STOPPING = ServerManagementAPIConstants.STATE_STOPPING;
 
@@ -64,7 +68,8 @@ public interface IServerDelegate {
 	 * server is stopped.
 	 * 
 	 * @see #getServerRunState()
-	 * @see #getModuleState(IModule[])
+	 * @see IServerPublishModel#getDeployableState(DeployableReference)
+	 * @see DeployableState#getState()
 	 */
 	public static final int STATE_STOPPED = ServerManagementAPIConstants.STATE_STOPPED;
 
@@ -72,8 +77,9 @@ public interface IServerDelegate {
 	 * Publish state constant (value 0) indicating that it's
 	 * in an unknown state.
 	 * 
-	 * @see #getServerPublishState()
-	 * @see #getModulePublishState(IModule[])
+	 * @see #getServerRunState()
+	 * @see IServerPublishModel#getDeployableState(DeployableReference)
+	 * @see DeployableState#getPublishState()
 	 */
 	public static final int PUBLISH_STATE_UNKNOWN = ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN;
 
@@ -81,8 +87,9 @@ public interface IServerDelegate {
 	 * Publish state constant (value 1) indicating that there
 	 * is no publish required.
 	 * 
-	 * @see #getServerPublishState()
-	 * @see #getModulePublishState(IModule[])
+	 * @see #getServerRunState()
+	 * @see IServerPublishModel#getDeployableState(DeployableReference)
+	 * @see DeployableState#getPublishState()
 	 */
 	public static final int PUBLISH_STATE_NONE = ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 
@@ -90,8 +97,9 @@ public interface IServerDelegate {
 	 * Publish state constant (value 2) indicating that an
 	 * incremental publish is required.
 	 * 
-	 * @see #getServerPublishState()
-	 * @see #getModulePublishState(IModule[])
+	 * @see #getServerRunState()
+	 * @see IServerPublishModel#getDeployableState(DeployableReference)
+	 * @see DeployableState#getPublishState()
 	 */
 	public static final int PUBLISH_STATE_INCREMENTAL = ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL;
 
@@ -99,8 +107,9 @@ public interface IServerDelegate {
 	 * Publish state constant (value 3) indicating that a
 	 * full publish is required.
 	 * 
-	 * @see #getServerPublishState()
-	 * @see #getModulePublishState(IModule[])
+	 * @see #getServerRunState()
+	 * @see IServerPublishModel#getDeployableState(DeployableReference)
+	 * @see DeployableState#getPublishState()
 	 */
 	public static final int PUBLISH_STATE_FULL = ServerManagementAPIConstants.PUBLISH_STATE_FULL;
 

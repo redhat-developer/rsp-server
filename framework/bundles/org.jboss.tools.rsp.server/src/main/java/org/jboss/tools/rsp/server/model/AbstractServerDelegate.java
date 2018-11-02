@@ -54,11 +54,11 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	
 	private int serverState = STATE_UNKNOWN;
 	private String currentMode = null;
-	private List<ILaunch> launches = new ArrayList<>();
-	protected HashMap<String, Object> sharedData = new HashMap<>();
-	private IServer server;
+	private final List<ILaunch> launches = new ArrayList<>();
+	protected final HashMap<String, Object> sharedData = new HashMap<>();
+	private final IServer server;
 	
-	private ServerPublishStateModel publishModel = new ServerPublishStateModel();
+	private final ServerPublishStateModel publishModel = new ServerPublishStateModel();
 	
 	public AbstractServerDelegate(IServer server) {
 		this.server = server;
@@ -138,7 +138,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		ServerState state = new ServerState();
 		state.setServer(handle);
 		state.setState(getServerRunState());
-		state.setModuleState(getServerPublishModel().getDeployables());
+		state.setDeployableStates(getServerPublishModel().getDeployables());
 		return state;
 	}
 	
@@ -277,11 +277,13 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 				mode -> needle.equals(mode.getMode()));
 	}
 	
+	@Override
 	public StartServerResponse start(String mode) {
 		IStatus s = new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server Start not implemented");
 		return new StartServerResponse(StatusConverter.convert(s), null);
 	}
 
+	@Override
 	public void handleDebugEvents(DebugEvent[] events) {
 		ArrayList<ILaunch> launchList = new ArrayList<>(this.launches);
 		for( int i = 0; i < events.length; i++ ) {
@@ -325,7 +327,6 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	protected String getProcessId(IProcess p) {
 		return p.getAttribute(PROCESS_ID_KEY);
 	}
-	
 	
 	/*
 	 * Polling utility methods
@@ -391,14 +392,14 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		MultiStatus ms = new MultiStatus(ServerCoreActivator.BUNDLE_ID, 0, "Publishing server " + getServer().getName(), null);
 		try {
 			publishStart(publishType);
-			List<DeployableState> list = getServerPublishModel().getDeployables();
+			List<DeployableState> list = getServerPublishModel().getDeployableStates();
 			for( DeployableState state : list ) {
 				try {
 					int iState = state.getPublishState();
-					publishModule(state.getReference(), publishType, iState);
+					publishDeployable(state.getReference(), publishType, iState);
 					DeployableState postState = getServerPublishModel().getDeployableState(state.getReference());
 					
-					// If module was to be removed, and it was successfully removed, 
+					// If deployable was to be removed, and it was successfully removed, 
 					// clean it from the publish model cache entirely. 
 					if( iState == ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) {
 						if( postState != null && postState.getPublishState() == ServerManagementAPIConstants.PUBLISH_STATE_NONE) {
@@ -406,10 +407,10 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 						}
 					}
 				} catch(CoreException ce) {
-					String mod = state.getReference().getId();
+					String mod = state.getReference().getLabel();
 					String server = getServer().getName();
 					ms.add(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
-							NLS.bind("Error while publishing module {0} to server {1}", mod, server), ce)); 
+							NLS.bind("Error while publishing deployable {0} to server {1}", mod, server), ce)); 
 				}
 			}
 		} catch(CoreException ce) {
@@ -435,24 +436,25 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		// Clients override
 	}
 
-	protected void publishModule(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
+	protected void publishDeployable(DeployableReference reference, int publishType, int deployablemodulePublishType) throws CoreException {
 		// Clients should override this default implementation
-		setModulePublishState(reference, ServerManagementAPIConstants.PUBLISH_STATE_NONE);
-		setModuleState(reference, ServerManagementAPIConstants.STATE_STARTED);
+		setDeployablePublishState(reference, ServerManagementAPIConstants.PUBLISH_STATE_NONE);
+		setDeployableState(reference, ServerManagementAPIConstants.STATE_STARTED);
 	}
 
-	protected void setModulePublishState(DeployableReference reference, int publishState) {
-		getServerPublishModel().setModulePublishState(reference, publishState);
+	protected void setDeployablePublishState(DeployableReference reference, int publishState) {
+		getServerPublishModel().setDeployablePublishState(reference, publishState);
 	}
 
-	protected void setModuleState(DeployableReference reference, int runState) {
-		getServerPublishModel().setModuleState(reference, runState);
+	protected void setDeployableState(DeployableReference reference, int runState) {
+		getServerPublishModel().setDeployableState(reference, runState);
 	}
 	
 	protected DeployableState getDeployableState(DeployableReference reference) {
 		return getServerPublishModel().getDeployableState(reference);
 	}
 	
+	@Override
 	public IStatus canPublish() {
 		return Status.OK_STATUS;
 	}

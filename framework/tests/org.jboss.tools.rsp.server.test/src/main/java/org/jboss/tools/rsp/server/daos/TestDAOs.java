@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.rsp.server.daos;
 
 import java.io.File;
@@ -24,7 +32,6 @@ import junit.framework.TestCase;
  * and a proper getter / setter for each and every
  * non-static field. 
  */
-
 @RunWith(value = Parameterized.class)
 public class TestDAOs extends TestCase {
 	@Parameters(name = "{0}")
@@ -42,12 +49,12 @@ public class TestDAOs extends TestCase {
 		assert classLoader != null;
 		String path = packageName.replace('.', '/');
 		Enumeration<URL> resources = classLoader.getResources(path);
-		List<File> dirs = new ArrayList<File>();
+		List<File> dirs = new ArrayList<>();
 		while (resources.hasMoreElements()) {
 			URL resource = resources.nextElement();
 			dirs.add(new File(resource.getFile()));
 		}
-		ArrayList<Class> classes = new ArrayList<Class>();
+		ArrayList<Class> classes = new ArrayList<>();
 		for (File directory : dirs) {
 			classes.addAll(findClasses(directory, packageName));
 		}
@@ -55,7 +62,7 @@ public class TestDAOs extends TestCase {
 	}
 
 	private static List<Class> findClasses(File directory, String packageName) throws ClassNotFoundException {
-		List<Class> classes = new ArrayList<Class>();
+		List<Class> classes = new ArrayList<>();
 		if (!directory.exists()) {
 			return classes;
 		}
@@ -71,9 +78,9 @@ public class TestDAOs extends TestCase {
 		}
 		return classes;
 	}
-	
-	
+
 	protected Class dao;
+
 	public TestDAOs(Class dao) {
 		this.dao = dao;
 	}
@@ -134,11 +141,10 @@ public class TestDAOs extends TestCase {
 	private Method findSetter(String name, Field f) {
 		Method[] all = dao.getMethods();
 		for( int i = 0; i < all.length; i++ ) {
-			if( all[i].getName().equalsIgnoreCase(name)) {
-				if( all[i].getParameterTypes().length == 1) {
-					if( all[i].getParameterTypes()[0].equals(f.getType()))
-						return all[i];
-				}
+			if (all[i].getName().equalsIgnoreCase(name) 
+					&& all[i].getParameterTypes().length == 1
+					&& all[i].getParameterTypes()[0].equals(f.getType())) {
+				return all[i];
 			}
 		}
 		return null;
@@ -147,11 +153,10 @@ public class TestDAOs extends TestCase {
 	private Method findGetter(String name, Field f) {
 		Method[] all = dao.getMethods();
 		for( int i = 0; i < all.length; i++ ) {
-			if( all[i].getName().equalsIgnoreCase(name)) {
-				if( all[i].getParameterTypes().length == 0) {
-					if( all[i].getReturnType().equals(f.getType()))
-						return all[i];
-				}
+			if (all[i].getName().equalsIgnoreCase(name) 
+					&& all[i].getParameterTypes().length == 0
+					&& all[i].getReturnType().equals(f.getType())) {
+				return all[i];
 			}
 		}
 		return null;

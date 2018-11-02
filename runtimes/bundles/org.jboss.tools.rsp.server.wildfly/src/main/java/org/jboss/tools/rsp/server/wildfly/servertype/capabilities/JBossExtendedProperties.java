@@ -89,7 +89,7 @@ public class JBossExtendedProperties extends ServerExtendedProperties {
 	}
 
 	@Override
-	public boolean canVerifyRemoteModuleState() {
+	public boolean canVerifyRemoteDeploymentState() {
 		return true;
 	}
 	
@@ -164,12 +164,12 @@ public class JBossExtendedProperties extends ServerExtendedProperties {
 	 * For JBoss servers allow only for servers which are know to support this according to AS7-4704.
 	 */
 	@Override
-	public boolean allowExplodedModulesInWarLibs() {
+	public boolean allowExplodedDeploymentsInWarLibs() {
 		return false;
 	}
 
 	@Override
-	public boolean allowExplodedModulesInEars() {
+	public boolean allowExplodedDeploymentsInEars() {
 		return false;
 	}
 

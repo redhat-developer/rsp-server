@@ -20,7 +20,6 @@ import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.launching.utils.IMemento;
-import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
 import org.jboss.tools.rsp.server.core.internal.SecuredBase;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
@@ -32,11 +31,16 @@ public class Server extends SecuredBase implements IServer {
 
 	public static final String TYPE_ID = "org.jboss.tools.rsp.server.typeId";
 
+	private static final String MEMENTO_DEPLOYABLES = "deployables";
+	private static final String MEMENTO_DEPLOYABLE = "deployable";
+	private static final String MEMENTO_DEPLOYABLE_LABEL = "label";
+	private static final String MEMENTO_DEPLOYABLE_PATH = "path";
+
 	private IServerDelegate delegate;
 	private IServerType serverType;
 	private IServerManagementModel managementModel;
 	
-	private List<DeployableReference> moduleInitialization;
+	private List<DeployableReference> deployableInitialization;
 	
 	public Server(File file, IServerManagementModel managementModel) {
 		super(file, managementModel.getSecureStorageProvider());
@@ -67,20 +71,21 @@ public class Server extends SecuredBase implements IServer {
 	@Override
 	protected void saveState(IMemento memento) {
 		if( this.delegate != null ) {
-			// Do not persist 'state' information for server or module;
-			// just the existence of that module itself. 
-			List<DeployableState> modState = null;
+			// Do not persist 'state' information for server or deployable;
+			// just the existence of that deployable itself. 
+			List<DeployableState> deployableState = null;
 			IServerPublishModel pubMod = delegate.getServerPublishModel();
-			modState = pubMod == null ? new ArrayList<>() : pubMod.getDeployables();
-			if( modState != null && modState.size() > 0 ) {
-				IMemento modules = memento.createChild("modules");
-				Iterator<DeployableState> dsIt = modState.iterator();
-				while(dsIt.hasNext()) {
-					IMemento oneModule = modules.createChild("module");
-					DeployableState oneState = dsIt.next();
-					oneModule.putString("id", oneState.getReference().getId());
-					oneModule.putString("path", oneState.getReference().getPath());
-				}
+			deployableState = pubMod == null ? new ArrayList<>() : pubMod.getDeployableStates();
+			if( deployableState == null || deployableState.isEmpty() ) {
+				return;
+			}
+			IMemento deployables = memento.createChild(MEMENTO_DEPLOYABLES);
+			Iterator<DeployableState> dsIt = deployableState.iterator();
+			while(dsIt.hasNext()) {
+				IMemento deployable = deployables.createChild(MEMENTO_DEPLOYABLE);
+				DeployableState oneState = dsIt.next();
+				deployable.putString(MEMENTO_DEPLOYABLE_LABEL, oneState.getReference().getLabel());
+				deployable.putString(MEMENTO_DEPLOYABLE_PATH, oneState.getReference().getPath());
 			}
 		}
 	}
@@ -88,18 +93,18 @@ public class Server extends SecuredBase implements IServer {
 	@Override
 	protected void loadState(IMemento memento) {
 		List<DeployableReference> references = new ArrayList<>();
-		IMemento modules = memento.getChild("modules");
-		if( modules != null ) {
-			IMemento[] deployableArray = modules.getChildren("module");
+		IMemento deployables = memento.getChild(MEMENTO_DEPLOYABLES);
+		if( deployables != null ) {
+			IMemento[] deployableArray = deployables.getChildren(MEMENTO_DEPLOYABLE);
 			if( deployableArray != null) {
 				for( int i = 0; i < deployableArray.length; i++ ) {
-					String path = deployableArray[i].getString("path");
-					String id = deployableArray[i].getString("id");
-					references.add(new DeployableReference(id, path));
+					String path = deployableArray[i].getString(MEMENTO_DEPLOYABLE_PATH);
+					String label = deployableArray[i].getString(MEMENTO_DEPLOYABLE_LABEL);
+					references.add(new DeployableReference(label, path));
 				}
 			}
 		}
-		moduleInitialization = references;
+		deployableInitialization = references;
 	}
 	
 	@Override
@@ -121,7 +126,7 @@ public class Server extends SecuredBase implements IServer {
 	public void setDelegate(IServerDelegate del) {
 		delegate = del;
 		if( delegate != null && delegate.getServerPublishModel() != null )
-			delegate.getServerPublishModel().initialize(moduleInitialization);
+			delegate.getServerPublishModel().initialize(deployableInitialization);
 	}
 
 	@Override

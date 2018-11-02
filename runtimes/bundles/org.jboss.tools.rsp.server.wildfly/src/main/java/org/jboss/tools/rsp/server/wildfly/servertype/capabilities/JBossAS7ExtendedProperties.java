@@ -40,7 +40,7 @@ public class JBossAS7ExtendedProperties extends JBossExtendedProperties { //impl
 		return DEPLOYMENT_SCANNER_AS7_MANAGEMENT_SUPPORT;
 	}
 
-	public boolean canVerifyRemoteModuleState() {
+	public boolean canVerifyRemoteDeploymentState() {
 		return true;
 	}
 

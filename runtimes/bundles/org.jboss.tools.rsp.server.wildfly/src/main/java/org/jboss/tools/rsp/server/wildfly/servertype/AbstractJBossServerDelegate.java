@@ -250,11 +250,11 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		getOrCreatePublishController().publishFinish(publishType);
 	}
 
-	protected void publishModule(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
+	protected void publishDeployable(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
 		int syncState = getOrCreatePublishController().publishModule(reference, publishType, modulePublishType);
-		setModulePublishState(reference, syncState);
+		setDeployablePublishState(reference, syncState);
 		
 		// TODO launch a module poller?!
-		setModuleState(reference, ServerManagementAPIConstants.STATE_STARTED);
+		setDeployableState(reference, ServerManagementAPIConstants.STATE_STARTED);
 	}
 }

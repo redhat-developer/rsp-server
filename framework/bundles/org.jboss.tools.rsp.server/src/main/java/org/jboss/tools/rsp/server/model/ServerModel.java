@@ -476,41 +476,40 @@ public class ServerModel implements IServerModel {
 		}
 		return null;
 	}
-	
+
+	@Override
 	public IStatus addDeployable(IServer server, DeployableReference reference) {
 		IServerDelegate s = serverDelegates.get(server.getId());
-		if( s != null ) {
-			IStatus canAdd = s.canAddDeployable(reference);
-			if( canAdd.isOK()) {
-				s.getServerPublishModel().addDeployable(reference);
-				return Status.OK_STATUS;
-			} else {
-				return canAdd;
-			}
+		if( s == null ) {
+			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+					"Server " + server.getId() + " not found.");
 		}
-		return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
-				"Server " + server.getId() + " not found.");
+		IStatus canAdd = s.canAddDeployable(reference);
+		if(!canAdd.isOK()) {
+			return canAdd;
+		}
+		return s.getServerPublishModel().addDeployable(reference);
 	}
 
+	@Override
 	public IStatus removeDeployable(IServer server, DeployableReference reference) {
 		IServerDelegate s = serverDelegates.get(server.getId());
-		if( s != null ) {
-			IStatus canRemove = s.canRemoveDeployable(reference);
-			if( canRemove.isOK()) {
-				s.getServerPublishModel().removeDeployable(reference);
-				return Status.OK_STATUS;
-			} else {
-				return canRemove;
-			}
+		if( s == null ) {
+			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+					"Server " + server.getId() + " not found.");
 		}
-		return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
-				"Server " + server.getId() + " not found.");
+		IStatus canRemove = s.canRemoveDeployable(reference);
+		if (!canRemove.isOK()) {
+			return canRemove;
+		}
+		return s.getServerPublishModel().removeDeployable(reference);
 	}
 
+	@Override
 	public List<DeployableState> getDeployables(IServer server) {
 		IServerDelegate s = serverDelegates.get(server.getId());
 		if( s != null ) {
-			return s.getServerPublishModel().getDeployables();
+			return s.getServerPublishModel().getDeployableStates();
 		}
 		return new ArrayList<DeployableState>();
 	}

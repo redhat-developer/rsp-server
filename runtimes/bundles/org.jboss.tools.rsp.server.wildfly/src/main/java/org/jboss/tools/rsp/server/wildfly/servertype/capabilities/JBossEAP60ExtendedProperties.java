@@ -34,12 +34,12 @@ public class JBossEAP60ExtendedProperties extends JBossAS710ExtendedProperties {
 		return true;
 	}
 	
-	public boolean allowExplodedModulesInEars() {
-		return allowExplodedModulesInWarLibs();
+	public boolean allowExplodedDeploymentsInEars() {
+		return allowExplodedDeploymentsInWarLibs();
 	}
 
 	@Override
-	public boolean allowExplodedModulesInWarLibs() {
+	public boolean allowExplodedDeploymentsInWarLibs() {
 		String version = getServerBeanLoader().getFullServerVersion();
 		if (version == null)
 			return false;

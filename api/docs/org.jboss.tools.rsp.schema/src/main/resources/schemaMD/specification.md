@@ -1290,7 +1290,7 @@ This endpoint returns the following schema as a return value:
     "publishState" : {
       "type" : "integer"
     },
-    "moduleState" : {
+    "deployableStates" : {
       "type" : "array",
       "items" : {
         "type" : "object",
@@ -1298,7 +1298,7 @@ This endpoint returns the following schema as a return value:
           "reference" : {
             "type" : "object",
             "properties" : {
-              "id" : {
+              "label" : {
                 "type" : "string"
               },
               "path" : {
@@ -1320,7 +1320,7 @@ This endpoint returns the following schema as a return value:
     server: ServerHandle;
     state: number;
     publishState: number;
-    moduleState: DeployableState[];
+    deployableStates: DeployableState[];
 }
 
 export interface ServerHandle {
@@ -1341,7 +1341,7 @@ export interface ServerType {
 }
 
 export interface DeployableReference {
-    id: string;
+    label: string;
     path: string;
 }</pre></td></tr></table>
 
@@ -1576,7 +1576,7 @@ This endpoint returns a list of the following schema as a return value:
     "reference" : {
       "type" : "object",
       "properties" : {
-        "id" : {
+        "label" : {
           "type" : "string"
         },
         "path" : {
@@ -1598,7 +1598,7 @@ This endpoint returns a list of the following schema as a return value:
 }
 
 export interface DeployableReference {
-    id: string;
+    label: string;
     path: string;
 }</pre></td></tr></table>
 
@@ -1637,7 +1637,7 @@ This endpoint takes the following json schemas as parameters:
     "deployable" : {
       "type" : "object",
       "properties" : {
-        "id" : {
+        "label" : {
           "type" : "string"
         },
         "path" : {
@@ -1657,7 +1657,7 @@ export interface ServerHandle {
 }
 
 export interface DeployableReference {
-    id: string;
+    label: string;
     path: string;
 }
 
@@ -1740,7 +1740,7 @@ This endpoint takes the following json schemas as parameters:
     "deployable" : {
       "type" : "object",
       "properties" : {
-        "id" : {
+        "label" : {
           "type" : "string"
         },
         "path" : {
@@ -1760,7 +1760,7 @@ export interface ServerHandle {
 }
 
 export interface DeployableReference {
-    id: string;
+    label: string;
     path: string;
 }
 
@@ -2126,7 +2126,7 @@ This endpoint takes the following json schemas as parameters:
     "publishState" : {
       "type" : "integer"
     },
-    "moduleState" : {
+    "deployableStates" : {
       "type" : "array",
       "items" : {
         "type" : "object",
@@ -2134,7 +2134,7 @@ This endpoint takes the following json schemas as parameters:
           "reference" : {
             "type" : "object",
             "properties" : {
-              "id" : {
+              "label" : {
                 "type" : "string"
               },
               "path" : {
@@ -2156,7 +2156,7 @@ This endpoint takes the following json schemas as parameters:
     server: ServerHandle;
     state: number;
     publishState: number;
-    moduleState: DeployableState[];
+    deployableStates: DeployableState[];
 }
 
 export interface ServerHandle {
@@ -2177,7 +2177,7 @@ export interface ServerType {
 }
 
 export interface DeployableReference {
-    id: string;
+    label: string;
     path: string;
 }</pre></td></tr></table>
 

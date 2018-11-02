@@ -13,10 +13,16 @@ public class DeployableState {
 	private int state;
 	private int publishState;
 	
+	/* required for gson reflective instantiation */
 	public DeployableState() {
-		
 	}
 
+	public DeployableState(DeployableReference reference, int state, int publishState) {
+		this.reference = reference;
+		this.state = state;
+		this.publishState = publishState;
+	}
+	
 	public int getState() {
 		return state;
 	}
@@ -39,5 +45,36 @@ public class DeployableState {
 
 	public void setReference(DeployableReference reference) {
 		this.reference = reference;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + publishState;
+		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
+		result = prime * result + state;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DeployableState other = (DeployableState) obj;
+		if (publishState != other.publishState)
+			return false;
+		if (reference == null) {
+			if (other.reference != null)
+				return false;
+		} else if (!reference.equals(other.reference))
+			return false;
+		if (state != other.state)
+			return false;
+		return true;
 	}
 }

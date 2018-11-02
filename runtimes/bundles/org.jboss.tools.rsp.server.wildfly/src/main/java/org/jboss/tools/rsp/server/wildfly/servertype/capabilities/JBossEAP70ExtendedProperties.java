@@ -45,12 +45,12 @@ public class JBossEAP70ExtendedProperties extends JBossAS710ExtendedProperties {
 	}
 
 	@Override
-	public boolean allowExplodedModulesInWarLibs() {
+	public boolean allowExplodedDeploymentsInWarLibs() {
 		return true;
 	}
 	
 	@Override
-	public boolean allowExplodedModulesInEars() {
+	public boolean allowExplodedDeploymentsInEars() {
 		return true;
 	}
 }

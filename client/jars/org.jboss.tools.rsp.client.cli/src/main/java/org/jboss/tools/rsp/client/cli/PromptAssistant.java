@@ -75,7 +75,7 @@ public class PromptAssistant {
 		List<DeployableState> deployables = launcher.getServerProxy().getDeployables(handle).get();
 		List<String> collectorCollection = deployables.stream()
 				.map(DeployableState::getReference)
-				.map(DeployableReference::getId)
+				.map(DeployableReference::getLabel)
 				.collect(Collectors.toList());
 		String ret = promptUser(collectorCollection, "Please select a deployment:");
 		if( ret != null && collectorCollection.contains(ret)) {

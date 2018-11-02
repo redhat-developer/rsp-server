@@ -48,7 +48,6 @@ import org.jboss.tools.rsp.server.util.generation.DeploymentGeneration;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ServerDeployableTest {
@@ -58,10 +57,16 @@ public class ServerDeployableTest {
 	private static final String SERVER_ID = "abc123";
 	private static final String SERVER_TYPE = "wonka6";
 	private static final String DEPLOYMENTS_DIR = SERVERS_DIR + "_deployments";
-	private static final String DEPLOYABLE_NAME = "some.name";
+	private static final String DEPLOYABLE_LABEL = "some.name";
 	private static final String WAR_FILENAME = "hello-world-war-1.0.0.war";
 
 	private static final DataLocationSysProp dataLocation = new DataLocationSysProp();
+
+	/* TODO: remove duplication from Server */
+	private static final String MEMENTO_DEPLOYABLES = "deployables";
+	private static final String MEMENTO_DEPLOYABLE = "deployable";
+	private static final String MEMENTO_DEPLOYABLE_LABEL = "label";
+	private static final String MEMENTO_DEPLOYABLE_PATH = "path";
 
 	@BeforeClass
 	public static void beforeClass() {
@@ -102,7 +107,7 @@ public class ServerDeployableTest {
 
 		IServer server = sm.getServer(SERVER_ID);
 		assertTrue(sm.getDeployables(server).isEmpty());
-		DeployableReference reference = new DeployableReference(DEPLOYABLE_NAME, war.getAbsolutePath());
+		DeployableReference reference = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
 		IStatus added = sm.addDeployable(server, reference);
 		assertNotNull(added);
 		assertFalse(added.isOK());
@@ -121,7 +126,7 @@ public class ServerDeployableTest {
 
 		IServer server = sm.getServer(SERVER_ID);
 		assertTrue(sm.getDeployables(server).isEmpty());
-		DeployableReference reference = new DeployableReference(DEPLOYABLE_NAME, war.getAbsolutePath());
+		DeployableReference reference = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
 		IStatus added = sm.addDeployable(server, reference);
 		assertNotNull(added);
 		assertTrue(added.isOK());
@@ -136,32 +141,61 @@ public class ServerDeployableTest {
 	@Test
 	public void testCanAddMultipleDeployables() {
 		assertTrue(sm.getDeployables(server).isEmpty());
-		DeployableReference reference = new DeployableReference(DEPLOYABLE_NAME, war.getAbsolutePath());
+		DeployableReference reference = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
 		IStatus added = sm.addDeployable(server, reference);
 		assertNotNull(added);
 		assertTrue(added.isOK());
 		assertNotNull(sm.getDeployables(server));
 		assertEquals(1, sm.getDeployables(server).size());
 
-		DeployableReference reference2 = new DeployableReference(DEPLOYABLE_NAME + "2", war.getAbsolutePath());
+		DeployableReference reference2 = new DeployableReference(DEPLOYABLE_LABEL, "/smurfette/in/da/woods");
 		added = sm.addDeployable(server, reference2);
 		assertNotNull(added);
 		assertTrue(added.isOK());
 		assertEquals(2, sm.getDeployables(server).size());
 	}
 
-	@Ignore("Doesn't work, currently I can remove a deploybale that I didn't add")
 	@Test
-	public void testCannotRemoveInexistantDeployable() {
+	public void testCanNotAddSamePath() {
 		assertTrue(sm.getDeployables(server).isEmpty());
-		DeployableReference reference = new DeployableReference(DEPLOYABLE_NAME, war.getAbsolutePath());
+		DeployableReference reference = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
 		IStatus added = sm.addDeployable(server, reference);
 		assertNotNull(added);
 		assertTrue(added.isOK());
+		assertNotNull(sm.getDeployables(server));
 		assertEquals(1, sm.getDeployables(server).size());
 
-		DeployableReference reference2 = new DeployableReference(DEPLOYABLE_NAME, war.getAbsolutePath());
+		DeployableReference reference2 = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
+		added = sm.addDeployable(server, reference2);
+		assertNotNull(added);
+		assertFalse(added.isOK());
+		assertEquals(1, sm.getDeployables(server).size());
+
+		reference2 = new DeployableReference("papa-smurf", war.getAbsolutePath());
+		added = sm.addDeployable(server, reference2);
+		assertNotNull(added);
+		assertFalse(added.isOK());
+		assertEquals(1, sm.getDeployables(server).size());
+	}
+
+	@Test
+	public void testCannotRemoveInexistantPath() {		
+		assertTrue(sm.getDeployables(server).isEmpty());
+		DeployableReference reference = new DeployableReference(DEPLOYABLE_LABEL, "/gargamel/in/da/castle");
+		IStatus added = sm.addDeployable(server, reference);
+		assertNotNull(added);
+		assertTrue(added.isOK());
+		assertNotNull(sm.getDeployables(server));
+		assertEquals(1, sm.getDeployables(server).size());
+
+		DeployableReference reference2 = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
 		IStatus removed = sm.removeDeployable(server, reference2);
+		assertNotNull(removed);
+		assertFalse(removed.isOK());
+		assertEquals(1, sm.getDeployables(server).size());
+
+		reference2 = new DeployableReference("papa-smurf", war.getAbsolutePath());
+		removed = sm.removeDeployable(server, reference2);
 		assertNotNull(removed);
 		assertFalse(removed.isOK());
 		assertEquals(1, sm.getDeployables(server).size());
@@ -174,14 +208,14 @@ public class ServerDeployableTest {
 		assertNotNull(deployables);
 		assertTrue(deployables.isEmpty());
 
-		DeployableReference reference = new DeployableReference(DEPLOYABLE_NAME, war.getAbsolutePath());
+		DeployableReference reference = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
 		IStatus added = sm.addDeployable(server, reference);
 		assertNotNull(added);
 		assertTrue(added.isOK());
 
 		deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
-		assertTrue(deployables.size() == 1);
+		assertEquals(1, deployables.size());
 
 		IStatus removed = sm.removeDeployable(server, reference);
 		assertNotNull(removed);
@@ -200,26 +234,26 @@ public class ServerDeployableTest {
 		assertNotNull(deployables);
 		assertTrue(deployables.isEmpty());
 
-		DeployableReference reference = new DeployableReference(DEPLOYABLE_NAME, war.getAbsolutePath());
+		DeployableReference reference = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
 		IStatus added = sm.addDeployable(server, reference);
 		assertNotNull(added);
 		assertTrue(added.isOK());
 
 		deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
-		assertTrue(deployables.size() == 1);
+		assertEquals(1, deployables.size());
 
 		try {
 			sm.saveServers();
 			JSONMemento memento = JSONMemento.loadMemento(new FileInputStream(serverFile));
-			IMemento[] modules = memento.getChildren("modules");
-			assertNotNull(modules);
-			assertEquals(1, modules.length);
-			IMemento[] module = modules[0].getChildren("module");
-			assertNotNull(module);
-			assertEquals(1, module.length);
-			assertEquals(DEPLOYABLE_NAME, module[0].getString("id"));
-			assertEquals(war.getAbsolutePath(), module[0].getString("path"));
+			IMemento[] deployablesMemento = memento.getChildren(MEMENTO_DEPLOYABLES);
+			assertNotNull(deployablesMemento);
+			assertEquals(1, deployablesMemento.length);
+			IMemento[] deployableMemento = deployablesMemento[0].getChildren(MEMENTO_DEPLOYABLE);
+			assertNotNull(deployableMemento);
+			assertEquals(1, deployableMemento.length);
+			assertEquals(DEPLOYABLE_LABEL, deployableMemento[0].getString(MEMENTO_DEPLOYABLE_LABEL));
+			assertEquals(war.getAbsolutePath(), deployableMemento[0].getString(MEMENTO_DEPLOYABLE_PATH));
 		} catch(IOException | CoreException ioe) {
 			ioe.printStackTrace();
 			fail();
@@ -237,8 +271,8 @@ public class ServerDeployableTest {
 		try {
 			sm.saveServers();
 			JSONMemento memento = JSONMemento.loadMemento(new FileInputStream(serverFile));
-			IMemento[] modules = memento.getChildren("modules");
-			boolean dne = (modules == null || modules.length == 0);
+			IMemento[] deployablesMemento = memento.getChildren(MEMENTO_DEPLOYABLES);
+			boolean dne = (deployablesMemento == null || deployablesMemento.length == 0);
 			assertTrue(dne);
 		} catch(IOException | CoreException ioe) {
 			ioe.printStackTrace();
@@ -253,30 +287,30 @@ public class ServerDeployableTest {
 		
 		List<DeployableState> deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
-		assertTrue(deployables.size() == 1);
+		assertEquals(1, deployables.size());
 
 		DeployableState ds1 = deployables.get(0);
 		assertNotNull(ds1);
 		assertEquals(ServerManagementAPIConstants.STATE_UNKNOWN, ds1.getState());
 		assertEquals(ServerManagementAPIConstants.PUBLISH_STATE_FULL, ds1.getPublishState());
-		assertEquals(DEPLOYABLE_NAME, ds1.getReference().getId());
+		assertEquals(DEPLOYABLE_LABEL, ds1.getReference().getLabel());
 	}
 
 	@Test
 	public void testDefaultPublishImplementation() {
 		IServer server = sm.getServer(SERVER_ID);
 
-		DeployableReference reference = new DeployableReference(DEPLOYABLE_NAME, war.getAbsolutePath());
+		DeployableReference reference = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
 		IStatus added = sm.addDeployable(server, reference);
 		assertNotNull(added);
 		assertTrue(added.isOK());
 
 		List<DeployableState> deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
-		assertTrue(deployables.size() == 1);
+		assertEquals(1, deployables.size());
 		
 		ServerState ss = server.getDelegate().getServerState();
-		List<DeployableState> dState = ss.getModuleState();
+		List<DeployableState> dState = ss.getDeployableStates();
 		assertNotNull(dState);
 		assertEquals(1, dState.size());
 		DeployableState oneState = dState.get(0);
@@ -293,7 +327,7 @@ public class ServerDeployableTest {
 		
 		// Verify module is set to no publish required and module is started
 		ss = server.getDelegate().getServerState();
-		dState = ss.getModuleState();
+		dState = ss.getDeployableStates();
 		assertNotNull(dState);
 		assertEquals(1, dState.size());
 		oneState = dState.get(0);
@@ -309,20 +343,20 @@ public class ServerDeployableTest {
 
 	@Test
 	public void testDefaultPublishImplementationWithDelay() {
-		ServerModel sm = createServerModel(TestServerDelegateWithDelay::new, getServerWithDeployablesString(SERVER_ID, SERVER_TYPE));
+		ServerModel sm = createServerModel(TestServerDelegateWithDelay::new, getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE));
 		IServer server = sm.getServer(SERVER_ID);
 
-		DeployableReference reference = new DeployableReference(DEPLOYABLE_NAME, war.getAbsolutePath());
+		DeployableReference reference = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
 		IStatus added = sm.addDeployable(server, reference);
 		assertNotNull(added);
 		assertTrue(added.isOK());
 
 		List<DeployableState> deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
-		assertTrue(deployables.size() == 1);
+		assertEquals(1, deployables.size());
 		
 		ServerState ss = server.getDelegate().getServerState();
-		List<DeployableState> dState = ss.getModuleState();
+		List<DeployableState> dState = ss.getDeployableStates();
 		assertNotNull(dState);
 		assertEquals(1, dState.size());
 		DeployableState oneState = dState.get(0);
@@ -344,7 +378,7 @@ public class ServerDeployableTest {
 		
 		// Verify module is set to no publish required and module is started
 		ss = server.getDelegate().getServerState();
-		dState = ss.getModuleState();
+		dState = ss.getDeployableStates();
 		assertNotNull(dState);
 		assertEquals(1, dState.size());
 		oneState = dState.get(0);
@@ -359,7 +393,7 @@ public class ServerDeployableTest {
 		} catch(InterruptedException ie) {}
 		
 		ss = server.getDelegate().getServerState();
-		dState = ss.getModuleState();
+		dState = ss.getDeployableStates();
 		assertNotNull(dState);
 		assertEquals(1, dState.size());
 		oneState = dState.get(0);
@@ -374,7 +408,7 @@ public class ServerDeployableTest {
 		} catch(InterruptedException ie) {}
 		
 		ss = server.getDelegate().getServerState();
-		dState = ss.getModuleState();
+		dState = ss.getDeployableStates();
 		assertNotNull(dState);
 		assertEquals(1, dState.size());
 		oneState = dState.get(0);
@@ -382,9 +416,6 @@ public class ServerDeployableTest {
 		assertEquals(ServerManagementAPIConstants.PUBLISH_STATE_NONE, oneState.getPublishState());
 		assertEquals(ServerManagementAPIConstants.STATE_STARTED, oneState.getState());
 	}
-	
-//	String original = new String(Files.readAllBytes(Paths.get(TEST_JSON_PATH)));
-//	String o2 = original.replaceAll("\\s","");
 
 	private IServerType mockServerType(String typeId, Function<IServer, IServerDelegate> delegateProvider) {
 		return new TestServerType(typeId, typeId + ".name", typeId + ".desc", delegateProvider);
@@ -398,34 +429,34 @@ public class ServerDeployableTest {
 		public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params) {
 			return null;
 		}
-		protected void publishModule(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
+		protected void publishDeployable(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
 			new Thread("Test publish") {
 				public void run() {
 					try {
 						startSignal1.await();
 					} catch(InterruptedException ie) {}
-					setModulePublishState2(reference, ServerManagementAPIConstants.PUBLISH_STATE_NONE);
+					setDeployablePublishState2(reference, ServerManagementAPIConstants.PUBLISH_STATE_NONE);
 					doneSignal1.countDown();
 					
 					try {
 						startSignal2.await();
 					} catch(InterruptedException ie) {}
-					setModuleState2(reference, ServerManagementAPIConstants.STATE_STARTED);
+					setDeployableState2(reference, ServerManagementAPIConstants.STATE_STARTED);
 					doneSignal2.countDown();
 				}
 			}.start();
 		}
 		
-		protected void setModulePublishState2(DeployableReference reference, int publishState) {
-			setModulePublishState(reference, publishState);
+		protected void setDeployablePublishState2(DeployableReference reference, int publishState) {
+			setDeployablePublishState(reference, publishState);
 		}
 
-		protected void setModuleState2(DeployableReference reference, int runState) {
-			setModuleState(reference, runState);
+		protected void setDeployableState2(DeployableReference reference, int runState) {
+			setDeployableState(reference, runState);
 		}
 	}
 
-	private class TestServerDelegate extends AbstractServerDelegate {
+	public class TestServerDelegate extends AbstractServerDelegate {
 
 		public TestServerDelegate(IServer server) {
 			super(server);
@@ -437,7 +468,7 @@ public class ServerDeployableTest {
 		}
 	}
 	
-	private class TestServerType extends AbstractServerType {
+	public class TestServerType extends AbstractServerType {
 
 		private Function<IServer, IServerDelegate> delegateProvider;
 
@@ -500,9 +531,9 @@ public class ServerDeployableTest {
 				"  \"id-set\": \"true\",\n" + 
 				"  \"org.jboss.tools.rsp.server.typeId\": \"" + type  + "\",\n" + 
 				"  \"id\": \"" + name + "\",\n" + 
-				"  \"modules\": {\n" + 
-				"    \"module\": {\n" + 
-				"      \"id\": \"some.name\",\n" + 
+				"  \"deployables\": {\n" + 
+				"    \"deployable\": {\n" + 
+				"      \"label\": \"some.name\",\n" + 
 				"      \"path\": \"/tmp/serverdeployabletest_deployments1557855048044620815/hello-world-war-1.0.0.war\"\n" + 
 				"    }\n" + 
 				"  }\n" + 

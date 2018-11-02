@@ -2,7 +2,7 @@ export interface ServerState {
     server: ServerHandle;
     state: number;
     publishState: number;
-    moduleState: DeployableState[];
+    deployableStates: DeployableState[];
 }
 
 export interface ServerHandle {
@@ -23,6 +23,6 @@ export interface ServerType {
 }
 
 export interface DeployableReference {
-    id: string;
+    label: string;
     path: string;
 }

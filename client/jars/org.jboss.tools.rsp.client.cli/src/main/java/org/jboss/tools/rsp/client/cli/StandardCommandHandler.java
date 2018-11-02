@@ -289,7 +289,7 @@ public class StandardCommandHandler implements InputHandler {
 					else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_NONE) pubStateString = "[none]";
 					else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) pubStateString = "[remove]";
 					else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN) pubStateString = "[unknown]";
-					System.out.println(c++ + ") " + ds.getReference().getId() + " " + pubStateString); // TODO add run state?
+					System.out.println(c++ + ") " + ds.getReference().getLabel() + " " + pubStateString); // TODO add run state?
 				}
 			}
 		} catch(InterruptedException | ExecutionException ioe) {
