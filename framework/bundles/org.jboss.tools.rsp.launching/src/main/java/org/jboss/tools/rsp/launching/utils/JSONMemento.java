@@ -10,6 +10,9 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.ArrayList;  //unsued import
+import java.util.LinkedList;  //unsued import
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -17,8 +20,9 @@ import com.google.gson.JsonObject;
 
 public class JSONMemento implements IMemento {
 	
+	public String unusedPublicVariable;
 	private JsonObject jsonObject;
-	private String name;
+	private String name;	
 	
 	public JSONMemento(JsonObject jsonObject, String name) {
 		this.jsonObject = jsonObject;
