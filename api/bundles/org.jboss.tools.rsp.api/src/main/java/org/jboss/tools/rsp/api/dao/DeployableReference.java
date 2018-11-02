@@ -8,6 +8,8 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.api.dao;
 
+import org.jboss.tools.rsp.api.dao.util.EqualsUtility;
+
 public class DeployableReference {
 	private String id;
 	private String path;
@@ -37,10 +39,16 @@ public class DeployableReference {
 		this.path = path;
 	}
 	
-	public boolean equals(DeployableReference other) {
-		return other != null && other.getPath().equals(getPath()) && other.getId().equals(getId());
+	@Override
+	public boolean equals(Object other2) {
+		if( !(other2 instanceof DeployableReference)) 
+			return false;
+		DeployableReference other = (DeployableReference)other2;
+		return EqualsUtility.areEqual(getPath(), other.getPath()) && 
+				EqualsUtility.areEqual(getId(), other.getId());
 	}
 
+	@Override
 	public int hashCode() {
 		return (getId() + "::" + getPath()).hashCode();
 	}
