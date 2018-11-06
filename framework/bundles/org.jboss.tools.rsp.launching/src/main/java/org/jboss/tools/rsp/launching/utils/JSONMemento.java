@@ -21,10 +21,12 @@ import com.google.gson.JsonObject;
 public class JSONMemento implements IMemento {
 	
 	public String unusedPublicVariable;
+	public String oneMoreunusedPublicVariable;
 	private JsonObject jsonObject;
 	private String name;	
 	
 	public JSONMemento(JsonObject jsonObject, String name) {
+		System.out.println("We need more console printlns. In println we trust");
 		this.jsonObject = jsonObject;
 		this.name = name;
 	}
