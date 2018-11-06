@@ -73,16 +73,17 @@ public class Server extends SecuredBase implements IServer {
 		return getAttribute(TYPE_ID, (String)null);
 	}
 
+	@Override
 	public IServerType getServerType() {
 		return serverType;
 	}
-	
+
 	public void setServerType(IServerType type) {
 		this.serverType = type;
 		if( type != null ) 
 			setAttribute(TYPE_ID, type.getId());
 	}
-	
+
 	public void setDelegate(IServerDelegate del) {
 		delegate = del;
 	}
@@ -92,14 +93,17 @@ public class Server extends SecuredBase implements IServer {
 		return delegate;
 	}
 
+	@Override
 	public IServerManagementModel getServerManagementModel() {
 		return managementModel;
 	}
-	
+
+	@Override
 	public void save(IProgressMonitor monitor) throws CoreException {
 		super.saveToFile(monitor);
 	}
-	
+
+	@Override
 	public void load(IProgressMonitor monitor) throws CoreException {
 		super.loadFromFile(monitor);
 	}
