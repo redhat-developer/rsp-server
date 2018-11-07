@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -101,11 +102,7 @@ public final class XMLMemento implements IMemento {
 				return new XMLMemento(document, (Element) node);
 			
 			// ignore
-		} catch (ParserConfigurationException e) {
-			logError(e);
-		} catch (SAXException e) {
-			logError(e);
-		} catch (IOException e) {
+		} catch (ParserConfigurationException | SAXException | IOException e) {
 			logError(e);
 		} finally {
 			try {
@@ -175,7 +172,7 @@ public final class XMLMemento implements IMemento {
 			return new IMemento[0];
 
 		// Extract each node with given type.
-		List<Element> list = new ArrayList<Element>(size);
+		List<Element> list = new ArrayList<>(size);
 		for (int nX = 0; nX < size; nX ++) {
 			Node node = nodes.item(nX);
 			if (node instanceof Element) {
@@ -232,7 +229,7 @@ public final class XMLMemento implements IMemento {
 			return new String[0];
 
 		// Extract each node with given type.
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		for (int nX = 0; nX < size; nX ++) {
 			Node node = nodes.item(nX);
 			if (node instanceof Element) {
@@ -241,7 +238,7 @@ public final class XMLMemento implements IMemento {
 					list.add(element2.getNodeName());
 			}
 		}
-		return (String[]) list.toArray(new String[list.size()]);
+		return list.toArray(new String[list.size()]);
 	}
 
 	public String getNodeName() {
@@ -315,7 +312,7 @@ public final class XMLMemento implements IMemento {
 	public List<String> getNames() {
 		NamedNodeMap map = element.getAttributes();
 		int size = map.getLength();
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		for (int i = 0; i < size; i++) {
 			Node node = map.item(i);
 			String name = node.getNodeName();
@@ -342,17 +339,8 @@ public final class XMLMemento implements IMemento {
 	 * @exception java.io.IOException
 	 */
 	public static IMemento loadMemento(String filename) throws IOException {
-		InputStream in = null;
-		try {
-			in = new BufferedInputStream(new FileInputStream(filename));
+		try(InputStream in = new BufferedInputStream(new FileInputStream(filename))) {
 			return XMLMemento.createReadRoot(in);
-		} finally {
-			try {
-				if (in != null)
-					in.close();
-			} catch (IOException e) {
-				// ignore
-			}
 		}
 	}
 
@@ -381,15 +369,15 @@ public final class XMLMemento implements IMemento {
 		Result result = new StreamResult(os);
 		Source source = new DOMSource(factory);
 		try {
-			Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			TransformerFactory factory = TransformerFactory.newInstance();
+			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+			Transformer transformer = factory.newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml"); //$NON-NLS-1$
 			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8"); //$NON-NLS-1$
 			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2"); //$NON-NLS-1$ //$NON-NLS-2$
 			transformer.transform(source, result);
-		} catch (TransformerFactoryConfigurationError e) {
-			throw new IOException(e);		
-		} catch (TransformerException e) {
+		} catch (TransformerFactoryConfigurationError | TransformerException e) {
 			throw new IOException(e);		
 		}
 	}
@@ -401,19 +389,12 @@ public final class XMLMemento implements IMemento {
 	 * @exception java.io.IOException
 	 */
 	public void saveToFile(String filename) throws IOException {
-		BufferedOutputStream w = null;
-		try {
-			w = new BufferedOutputStream(new FileOutputStream(filename));
+		try (BufferedOutputStream w = new BufferedOutputStream(new FileOutputStream(filename))) {
 			save(w);
-		} finally {
-			if (w != null) {
-				try {
-					w.close();
-				} catch (IOException e) {
-					// ignore
-				}
-			}
+		} catch (IOException e) {
+			// ignore
 		}
+
 	}
 
 	public String saveToString() throws IOException {
@@ -437,7 +418,7 @@ public final class XMLMemento implements IMemento {
 	 * @see IMemento#putBoolean(String, boolean)
 	 */
 	public void putBoolean(String key, boolean value) {
-		element.setAttribute(key, Boolean.toString(value).toString());
+		element.setAttribute(key, Boolean.toString(value));
 	}
 
 	/**

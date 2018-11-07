@@ -85,6 +85,7 @@ public class ServerManagementCLI implements InputProvider, IClientConnectionClos
 				}
 				
 				new Thread("Handle input") {
+					@Override
 					public void run() {
 						try {
 							handler.handleInput(content);

@@ -45,10 +45,8 @@ public class DeploymentGeneration {
 				"Build-Jdk: 1.8.0_151\n" + 
 				"\n";
 		
-		try {
-			
-			ZipOutputStream out = new ZipOutputStream(new FileOutputStream(destination));
-			
+		try(ZipOutputStream out = new ZipOutputStream(new FileOutputStream(destination))) {
+		
 			ZipEntry e = new ZipEntry("index.jsp");
 			out.putNextEntry(e);
 			byte[] data = indexjsp.getBytes();
@@ -66,8 +64,6 @@ public class DeploymentGeneration {
 			byte[] data3 = webxml.getBytes();
 			out.write(data3, 0, data3.length);
 			out.closeEntry();
-
-			out.close();
 			return true;
 		} catch(IOException ioe) {
 			ioe.printStackTrace();

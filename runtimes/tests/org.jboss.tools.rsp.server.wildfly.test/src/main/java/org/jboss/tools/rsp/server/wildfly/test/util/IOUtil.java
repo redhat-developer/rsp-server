@@ -27,9 +27,14 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class IOUtil {
+	
+	private IOUtil() {
+		
+	}
+	
 	public static byte[] getBytesFromInputStream(InputStream is) {
 		if( is == null )
-			return null;
+			return new byte[0];
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		try {
 			int nRead;
@@ -42,7 +47,7 @@ public class IOUtil {
 			buffer.flush();
 			return buffer.toByteArray();
 		} catch(IOException ioe) {
-			return null;
+			return new byte[0];
 		}
     }      
 
@@ -50,17 +55,11 @@ public class IOUtil {
 	public static void setContents(File file, String contents) throws IOException {
 		byte[] buffer = new byte[65536];
 		InputStream in = new ByteArrayInputStream(contents.getBytes());
-		OutputStream out = null;
-		try {
-			out = new BufferedOutputStream(new FileOutputStream(file));
+		try(OutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {
 			int avail = in.read(buffer);
 			while (avail > 0) {
 				out.write(buffer, 0, avail);
 				avail = in.read(buffer);
-			}
-		} finally {
-			if (out != null) {
-				out.close();
 			}
 		}
 	}
@@ -70,16 +69,16 @@ public class IOUtil {
 	}
 
 	public static byte[] getBytesFromFile(File file) throws IOException {
-        InputStream is = new FileInputStream(file);
-        byte[] bytes = new byte[(int)file.length()];
-        int offset = 0;
-        int numRead = 0;
-        while (offset < bytes.length
-               && (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
-            offset += numRead;
+        try (InputStream is = new FileInputStream(file)) {
+	        byte[] bytes = new byte[(int)file.length()];
+	        int offset = 0;
+	        int numRead = 0;
+	        while (offset < bytes.length
+	               && (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
+	            offset += numRead;
+	        }
+	        return bytes;
         }
-        is.close();
-        return bytes;
     }
 	
 	public static int countFiles(File root) {
@@ -104,10 +103,8 @@ public class IOUtil {
 	public static void unzipFile(File zipped, File toLoc) {
 		toLoc.mkdirs();
 		final int BUFFER = 2048;
-		try {
-			  BufferedOutputStream dest = null;
-		      FileInputStream fis = new FileInputStream(zipped);
-			  ZipInputStream zis = new ZipInputStream(new BufferedInputStream(fis));
+		try (FileInputStream fis = new FileInputStream(zipped);
+				ZipInputStream zis = new ZipInputStream(new BufferedInputStream(fis))) {
 	          ZipEntry entry;
 	          while((entry = zis.getNextEntry()) != null) {
 	             int count;
@@ -122,14 +119,13 @@ public class IOUtil {
 		             f.getParentFile().mkdirs();
 		             if( !f.exists()) {
 		            	 String out = f.getAbsolutePath();
-			             FileOutputStream fos = new FileOutputStream(out);
-			             dest = new BufferedOutputStream(fos, BUFFER);
-			             while ((count = zis.read(data, 0, BUFFER)) != -1) {
-			                dest.write(data, 0, count);
-			             }
-			             dest.flush();
-			             dest.close();
-		             }
+						try (BufferedOutputStream dest = new BufferedOutputStream(new FileOutputStream(out), BUFFER)) {
+							while ((count = zis.read(data, 0, BUFFER)) != -1) {
+								dest.write(data, 0, count);
+							}
+							dest.flush();
+						}
+					}
 	             }
 	          }
 	          zis.close();
@@ -149,10 +145,8 @@ public class IOUtil {
 	      if(file.length() < 4) {
 	          return false;
 	      }
-	      try {
-		      DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+	      try (DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {
 		      int test = in.readInt();
-		      in.close();
 		      return test == 0x504b0304;
 	      }catch( IOException ioe) {
 	    	  return false;
@@ -171,7 +165,7 @@ public class IOUtil {
 			}
 
 			//list all the directory contents
-			String files[] = src.list();
+			String[] files = src.list();
 
 			for (String file : files) {
 				//construct the src and dest file structure
@@ -181,22 +175,19 @@ public class IOUtil {
 				copyFolder(srcFile,destFile);
 			}
 
-		}else{
+		} else {
 			//if file, then copy it
 			//Use bytes stream to support all file types
-			InputStream in = new FileInputStream(src);
-			OutputStream out = new FileOutputStream(dest); 
+			try (InputStream in = new FileInputStream(src); OutputStream out = new FileOutputStream(dest)) {
 
-			byte[] buffer = new byte[1024];
+				byte[] buffer = new byte[1024];
 
-			int length;
-			//copy the file content in bytes 
-			while ((length = in.read(buffer)) > 0){
-				out.write(buffer, 0, length);
+				int length;
+				// copy the file content in bytes
+				while ((length = in.read(buffer)) > 0) {
+					out.write(buffer, 0, length);
+				}
 			}
-
-			in.close();
-			out.close();
 		}
 	}
 	
@@ -213,32 +204,32 @@ public class IOUtil {
 	public static void safeDelete(File file) {
 		safeDelete(file, null);
 	}
+	
 	public static void safeDelete(File file, IFileUtilListener listener) {
-		if( file.isDirectory() ) {
+		if (file.isDirectory()) {
 			File[] children = file.listFiles();
-			if( children != null ) {
-				for( int i = 0; i < children.length; i++ ) {
+			if (children != null) {
+				for (int i = 0; i < children.length; i++) {
 					safeDelete(children[i], listener);
 				}
 			}
-			
-			if( file.exists()) {
-				try {
-					boolean tmp = file.delete();
-					if( listener != null ) listener.folderDeleted(file, tmp, null);
-				} catch( SecurityException sex) {
-					if( listener != null ) listener.folderDeleted(file, false, sex);
-				}
-			}
+
+			safeDeleteFile(file, listener);
 		}
-		
+
 		// files only
-		if( file.exists() ) {
+		safeDeleteFile(file, listener);
+	}
+	
+	private static void safeDeleteFile(File file, IFileUtilListener listener) {
+		if (file.exists()) {
 			try {
 				boolean tmp = file.delete();
-				if( listener != null ) listener.fileDeleted(file, tmp, null);
-			} catch( SecurityException sex) {
-				if( listener != null ) listener.fileDeleted(file, false, sex);
+				if (listener != null)
+					listener.fileDeleted(file, tmp, null);
+			} catch (SecurityException sex) {
+				if (listener != null)
+					listener.fileDeleted(file, false, sex);
 			}
 		}
 	}
@@ -284,20 +275,18 @@ public class IOUtil {
 			}
 			return copied;
 		} else {
-			try {
-			    FileInputStream fis  = new FileInputStream(src);
-			    FileOutputStream fos = new FileOutputStream(dest);
-			    byte[] buf = new byte[1024];
-			    int i = 0;
-			    while((i=fis.read(buf))!=-1) {
-			      fos.write(buf, 0, i);
-			      }
-			    fis.close();
-			    fos.close();
-			    if( listener != null ) listener.fileCopied(src, dest, true, null);
+			try (FileInputStream fis = new FileInputStream(src); FileOutputStream fos = new FileOutputStream(dest)) {
+				byte[] buf = new byte[1024];
+				int i = 0;
+				while ((i = fis.read(buf)) != -1) {
+					fos.write(buf, 0, i);
+				}
+				if (listener != null)
+					listener.fileCopied(src, dest, true, null);
 				return true;
-			} catch( Exception e ) {
-			    if( listener != null ) listener.fileCopied(src, dest, false, e);
+			} catch (Exception e) {
+				if (listener != null)
+					listener.fileCopied(src, dest, false, e);
 				return false;
 			}
 		}
@@ -337,18 +326,20 @@ public class IOUtil {
     }
 
     public static void copyDir(File from, File to, boolean includeSubdirs, boolean mkdirs, boolean overwriteOnlyOlderFiles, FileFilter filter) {
-        if(filter != null && !filter.accept(from)) return;
+        if (filter != null && !filter.accept(from) || 
+        	from == null || !from.isDirectory() || !to.isDirectory()) {
+        	return;
+        }
         if (mkdirs) to.mkdirs();
-        if(from == null || !from.isDirectory() || !to.isDirectory()) return;
         File[] fs = from.listFiles();
-        if(fs == null) return;
+        if (fs == null) return;
         for (int i = 0; i < fs.length; i++) {
             String n = fs[i].getName();
             File c = new File(to, n);
             if (fs[i].isDirectory() && !includeSubdirs) continue;
-        	if(filter != null && !filter.accept(new File(from, n))) continue;
+        	if (filter != null && !filter.accept(new File(from, n))) continue;
 
-            if(fs[i].isDirectory()) {
+            if (fs[i].isDirectory()) {
                 c.mkdirs();
                 copyDir(fs[i], c, includeSubdirs, mkdirs, overwriteOnlyOlderFiles, filter);
             } else if (overwriteOnlyOlderFiles && fs[i].isFile() && c.isFile()) {
@@ -368,36 +359,23 @@ public class IOUtil {
 
     public static boolean copyFile(File source, File dest, boolean mkdirs, boolean overwrite) {
         if (mkdirs) dest.getParentFile().mkdirs();
-        if(!source.isFile()) return false;
-        if(dest.isFile() && !isSameFile(dest)) dest.delete();
-        if(dest.isFile() && !overwrite) return false;
-        if(!dest.exists())
+        if (!source.isFile()) return false;
+        if (dest.isFile() && !isSameFile(dest)) dest.delete();
+        if (dest.isFile() && !overwrite) return false;
+        if (!dest.exists()) {
 			try {
 				dest.createNewFile();
 			} catch (IOException e1) {
 				log(e1); 
 			}
-        InputStream is = null;
-        OutputStream os = null;
-        try {
-            is = new BufferedInputStream(new FileInputStream(source), 16 * 1024);
-            os = new BufferedOutputStream(new FileOutputStream(dest), 16 * 1024);
+        }
+        try (InputStream is = new BufferedInputStream(new FileInputStream(source), 16 * 1024);
+            OutputStream os = new BufferedOutputStream(new FileOutputStream(dest), 16 * 1024)) {
             copyStream(is, os);
             return true;
         } catch (IOException e) {
         	log(e);
             return false;
-        } finally {
-            try {
-                if (is != null) is.close();
-            } catch (IOException e) {
-            	log(e);
-            }
-            try {
-                if (os != null) os.close();
-            } catch (IOException e) {
-            	log(e);
-            }
         }
     }
     
@@ -435,14 +413,8 @@ public class IOUtil {
 	}
 
 	public static void writeTo(InputStream in, File file) throws IOException {
-		OutputStream out = null;
-		try {
-			out = new BufferedOutputStream(new FileOutputStream(file));
+		try (OutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {
 			writeTo(in, out);
-		} finally {
-			if (out != null) {
-				out.close();
-			}
 		}
 	}
 
