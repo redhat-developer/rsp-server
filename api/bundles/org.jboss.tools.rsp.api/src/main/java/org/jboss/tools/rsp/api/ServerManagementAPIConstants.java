@@ -51,11 +51,6 @@ public interface ServerManagementAPIConstants {
 	 */
 	public static final int STATE_STOPPED = 4;
 
-	/**
-	 * Publish state constant (value 0) indicating that it's
-	 * in an unknown state.
-	 */
-	public static final int PUBLISH_STATE_UNKNOWN = 0;
 
 	/**
 	 * Publish state constant (value 1) indicating that there
@@ -86,6 +81,12 @@ public interface ServerManagementAPIConstants {
 	 * removal of the deployable is required
 	 */
 	public static final int PUBLISH_STATE_REMOVE = 5;
+	
+	/**
+	 * Publish state constant (value 6) indicating that it's
+	 * in an unknown state.
+	 */
+	public static final int PUBLISH_STATE_UNKNOWN = 6;
 
 	/**
 	 * Publish kind constant (value 1) indicating an incremental publish request.

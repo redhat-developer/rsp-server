@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
@@ -127,7 +128,7 @@ public class StandardJBossPublishController implements IJBossPublishController {
 	protected int copyModule(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
 		File dest = getDestinationPath(reference).toFile();
 		try {
-			Files.copy(new File(reference.getPath()).toPath(), dest.toPath());
+			Files.copy(new File(reference.getPath()).toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 		} catch(IOException ioe) {
 			LOG.error("Error publishing module {0} to server {1}", ioe);

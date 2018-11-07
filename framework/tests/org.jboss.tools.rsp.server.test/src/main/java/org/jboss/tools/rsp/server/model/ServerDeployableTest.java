@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
@@ -34,6 +35,7 @@ import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
+import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
@@ -42,6 +44,8 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.launching.utils.IMemento;
 import org.jboss.tools.rsp.launching.utils.JSONMemento;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
+import org.jboss.tools.rsp.server.spi.model.IServerModelListener;
+import org.jboss.tools.rsp.server.spi.model.ServerModelListenerAdapter;
 import org.jboss.tools.rsp.server.spi.servertype.AbstractServerType;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
@@ -262,6 +266,11 @@ public class ServerDeployableTest {
 					protected void publishFinish(int publishType) throws CoreException {
 						startFinishInvocation.add("finish");
 					}
+					
+					@Override
+					protected void fireStateChanged(ServerState state) {
+						// Do nothing
+					}
 				},
 				getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE));
 		IStatus added = sm.addDeployable(server, deployable);
@@ -290,6 +299,7 @@ public class ServerDeployableTest {
 							throw new CoreException(Status.CANCEL_STATUS);
 						}
 					}
+					
 				},
 				getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE));
 		sm.addDeployable(server, deployable);
@@ -425,14 +435,18 @@ public class ServerDeployableTest {
 		assertEquals(ServerManagementAPIConstants.STATE_STARTED, oneState.getState());
 	}
 	
-	private CountDownLatch startSignal1;
-	private CountDownLatch doneSignal1;
-	private CountDownLatch startSignal2;
-	private CountDownLatch doneSignal2;
+	private CountDownLatch[] startSignal1 = new CountDownLatch[1];
+	private CountDownLatch[] doneSignal1 = new CountDownLatch[1];
+	private CountDownLatch[] startSignal2 = new CountDownLatch[1];
+	private CountDownLatch[] doneSignal2 = new CountDownLatch[1];
 
 	@Test
 	public void testDefaultPublishImplementationWithDelay() {
 		ServerModel sm = createServerModel(TestServerDelegateWithDelay::new, getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE));
+		defaultPublishImplementationWithDelayInternal(sm);
+	}
+	
+	public void defaultPublishImplementationWithDelayInternal(ServerModel sm) {
 		IServer server = sm.getServer(SERVER_ID);
 
 		DeployableReference reference = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
@@ -454,10 +468,10 @@ public class ServerDeployableTest {
 		assertEquals(ServerManagementAPIConstants.STATE_UNKNOWN, oneState.getState());
 
 		// Now do the publish
-		startSignal1 = new CountDownLatch(1);
-		doneSignal1 = new CountDownLatch(1);
-		startSignal2 = new CountDownLatch(1);
-		doneSignal2 = new CountDownLatch(1);
+		startSignal1[0] = new CountDownLatch(1);
+		doneSignal1[0] = new CountDownLatch(1);
+		startSignal2[0] = new CountDownLatch(1);
+		doneSignal2[0] = new CountDownLatch(1);
 
 		try {
 			sm.publish(server, ServerManagementAPIConstants.PUBLISH_FULL);
@@ -476,9 +490,9 @@ public class ServerDeployableTest {
 		assertEquals(ServerManagementAPIConstants.STATE_UNKNOWN, oneState.getState());
 		
 		// countdown once
-		startSignal1.countDown();
+		startSignal1[0].countDown();
 		try {
-			doneSignal1.await();
+			doneSignal1[0].await();
 		} catch(InterruptedException ie) {}
 		
 		ss = server.getDelegate().getServerState();
@@ -491,9 +505,9 @@ public class ServerDeployableTest {
 		assertEquals(ServerManagementAPIConstants.STATE_UNKNOWN, oneState.getState());
 		
 		// countdown once
-		startSignal2.countDown();
+		startSignal2[0].countDown();
 		try {
-			doneSignal2.await();
+			doneSignal2[0].await();
 		} catch(InterruptedException ie) {}
 		
 		ss = server.getDelegate().getServerState();
@@ -505,6 +519,55 @@ public class ServerDeployableTest {
 		assertEquals(ServerManagementAPIConstants.PUBLISH_STATE_NONE, oneState.getPublishState());
 		assertEquals(ServerManagementAPIConstants.STATE_STARTED, oneState.getState());
 	}
+	
+// This test requires a file watcher service on the rsp-server
+//	@Test
+//	public void testPublishModifyFile() {
+//		ArrayList<ServerState> states = new ArrayList<>();
+//		final Boolean[] beginTest = new Boolean[1];
+//		beginTest[0] = Boolean.valueOf(false);
+//		IServerModelListener l = new ServerModelListenerAdapter() {
+//			@Override
+//			public void serverStateChanged(ServerHandle server, ServerState state) {
+//				if( beginTest[0]) {
+//					try {
+//						startSignal1[0].await();
+//					} catch(InterruptedException ie) {}
+//
+//					states.add(state);
+//					doneSignal1[0].countDown();
+//				}
+//			}
+//		};
+//		
+//		ServerModel sm = createServerModel(TestServerDelegateWithDelay::new, getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE), l);
+//		defaultPublishImplementationWithDelayInternal(sm);
+//		
+//		states.clear();
+//
+//		startSignal1[0] = new CountDownLatch(1);
+//		doneSignal1[0] = new CountDownLatch(1);
+//
+//		long timestamp = System.currentTimeMillis();
+//		beginTest[0] = true;
+//		war.setLastModified(timestamp);
+//		// countdown once
+//		assertTrue(states.size() == 0);
+//		startSignal1[0].countDown();
+//		boolean waitingSucceeds = false;
+//		try {
+//			waitingSucceeds = doneSignal1[0].await(10, TimeUnit.SECONDS);
+//		} catch(InterruptedException ie) {}
+//		assertTrue(waitingSucceeds);
+//		assertTrue(states.size() == 1);
+//		ServerState state1 = states.get(states.size()-1);
+//		assertNotNull(state1);
+//		List<DeployableState> ds = state1.getDeployableStates();
+//		assertNotNull(ds);
+//		assertEquals(ds.size(), 1);
+//		DeployableState dds = ds.get(0);
+//		assertEquals(dds.getPublishState(), ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL);
+//	}
 
 	private IServerType mockServerType(String typeId, Function<IServer, IServerDelegate> delegateProvider) {
 		return new TestServerType(typeId, typeId + ".name", typeId + ".desc", delegateProvider);
@@ -522,20 +585,23 @@ public class ServerDeployableTest {
 			new Thread("Test publish") {
 				public void run() {
 					try {
-						startSignal1.await();
+						startSignal1[0].await();
 					} catch(InterruptedException ie) {}
 					setDeployablePublishState2(reference, ServerManagementAPIConstants.PUBLISH_STATE_NONE);
-					doneSignal1.countDown();
+					doneSignal1[0].countDown();
 					
 					try {
-						startSignal2.await();
+						startSignal2[0].await();
 					} catch(InterruptedException ie) {}
 					setDeployableState2(reference, ServerManagementAPIConstants.STATE_STARTED);
-					doneSignal2.countDown();
+					doneSignal2[0].countDown();
 				}
 			}.start();
 		}
-		
+		@Override
+		protected void fireStateChanged(ServerState state) {
+			// Do nothing
+		}
 		protected void setDeployablePublishState2(DeployableReference reference, int publishState) {
 			setDeployablePublishState(reference, publishState);
 		}
@@ -554,6 +620,10 @@ public class ServerDeployableTest {
 		@Override
 		public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params) {
 			return null;
+		}
+		@Override
+		protected void fireStateChanged(ServerState state) {
+			// Do nothing
 		}
 	}
 	
@@ -601,13 +671,19 @@ public class ServerDeployableTest {
 	}
 
 	private ServerModel createServerModel(Function<IServer, IServerDelegate> serverDelegateProvider, String serverString) {
+		return createServerModel(serverDelegateProvider, serverString, null);
+	}
+	private ServerModel createServerModel(Function<IServer, IServerDelegate> serverDelegateProvider, String serverString, IServerModelListener listener) {
 		ServerModel sm = new ServerModel(mock(IServerManagementModel.class));
+		if( listener != null)
+			sm.addServerModelListener(listener);
 		sm.addServerType(mockServerType(SERVER_TYPE, serverDelegateProvider));
 		createServerFile(SERVER_FILENAME, serverString);
 		sm.loadServers(serversDir.toFile());
 		return sm;
 	}
 
+	
 	private String getServerWithoutDeployablesString(String name, String type) {
 		String contents = "{id:\"" + name + "\", id-set:\"true\", " 
 				+ "org.jboss.tools.rsp.server.typeId=\"" + type

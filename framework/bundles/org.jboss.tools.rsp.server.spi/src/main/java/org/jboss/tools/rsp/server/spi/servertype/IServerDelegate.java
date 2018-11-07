@@ -286,6 +286,8 @@ public interface IServerDelegate {
 	 * @return
 	 */
 	public IStatus canPublish();
+
+	int getServerPublishState();
 	
 
 }

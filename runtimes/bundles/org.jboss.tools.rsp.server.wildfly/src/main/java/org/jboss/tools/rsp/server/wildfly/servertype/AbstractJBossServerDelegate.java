@@ -248,6 +248,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 
 	protected void publishFinish(int publishType) throws CoreException {
 		getOrCreatePublishController().publishFinish(publishType);
+		super.publishFinish(publishType);
 	}
 
 	protected void publishDeployable(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {

@@ -53,6 +53,9 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	private static final String PROCESS_ID_KEY = "process.id.key";
 	
 	private int serverState = STATE_UNKNOWN;
+	private int publishState = STATE_UNKNOWN;
+	
+	
 	private String currentMode = null;
 	private final List<ILaunch> launches = new ArrayList<>();
 	protected final HashMap<String, Object> sharedData = new HashMap<>();
@@ -123,7 +126,12 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	public int getServerRunState() {
 		return serverState;
 	}
-	
+
+	@Override
+	public int getServerPublishState() {
+		return publishState;
+	}
+
 	protected ServerHandle getServerHandle() {
 		IServerType ist = getServer().getServerType();
 		ServerType st = new ServerType(ist.getId(), ist.getName(), ist.getDescription());
@@ -137,11 +145,12 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		ServerHandle handle = getServerHandle();
 		ServerState state = new ServerState();
 		state.setServer(handle);
+		state.setPublishState(getServerPublishState());
 		state.setState(getServerRunState());
 		state.setDeployableStates(getServerPublishModel().getDeployableStates());
 		return state;
 	}
-	
+
 	protected void setServerState(int state) {
 		setServerState(state, true);
 	}
@@ -149,6 +158,18 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	protected void setServerState(int state, boolean fire) {
 		if( state != this.serverState) {
 			this.serverState = state;
+			if( fire ) 
+				fireStateChanged(getServerState());
+		}
+	}
+
+	protected void setServerPublishState(int state) {
+		setServerPublishState(state, true);
+	}
+
+	protected void setServerPublishState(int state, boolean fire) {
+		if( state != this.publishState) {
+			this.publishState = state;
 			if( fire ) 
 				fireStateChanged(getServerState());
 		}
@@ -414,7 +435,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 						NLS.bind("Error completing publishing to server {0}", getServer().getName()), ce));
 			}
 		}
-		
+		fireStateChanged(getServerState());
 		return ms;
 	}
 
@@ -437,7 +458,20 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	}
 
 	protected void publishFinish(int publishType) throws CoreException {
+		// Clients override or customize
+		updatePublishStateFromModules();
+	}
+	
+	protected void updatePublishStateFromModules() throws CoreException {
 		// Clients override
+		int maxState = 0;
+		List<DeployableState> states = getServerPublishModel().getDeployableStates();
+		for( DeployableState s : states ) {
+			maxState = (s.getPublishState() > maxState ? s.getPublishState() : maxState);
+		}
+		if( maxState > ServerManagementAPIConstants.PUBLISH_STATE_FULL)
+			maxState = ServerManagementAPIConstants.PUBLISH_STATE_FULL;
+		setServerPublishState(maxState);
 	}
 
 	protected void publishDeployable(DeployableReference reference, int publishType, int deployablemodulePublishType) throws CoreException {
