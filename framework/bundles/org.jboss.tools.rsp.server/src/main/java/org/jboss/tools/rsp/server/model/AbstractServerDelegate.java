@@ -395,17 +395,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 			List<DeployableState> list = getServerPublishModel().getDeployableStates();
 			for( DeployableState state : list ) {
 				try {
-					int iState = state.getPublishState();
-					publishDeployable(state.getReference(), publishType, iState);
-					DeployableState postState = getServerPublishModel().getDeployableState(state.getReference());
-					
-					// If deployable was to be removed, and it was successfully removed, 
-					// clean it from the publish model cache entirely. 
-					if( iState == ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) {
-						if( postState != null && postState.getPublishState() == ServerManagementAPIConstants.PUBLISH_STATE_NONE) {
-							getServerPublishModel().deployableRemoved(state.getReference());
-						}
-					}
+					publish(publishType, state);
 				} catch(CoreException ce) {
 					String mod = state.getReference().getLabel();
 					String server = getServer().getName();
@@ -426,6 +416,20 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		}
 		
 		return ms;
+	}
+
+	protected void publish(int publishType, DeployableState state) throws CoreException {
+		int publishState = state.getPublishState();
+		publishDeployable(state.getReference(), publishType, publishState);
+		DeployableState postState = getServerPublishModel().getDeployableState(state.getReference());
+		
+		// If deployable was to be removed, and it was successfully removed, 
+		// clean it from the publish model cache entirely. 
+		if( publishState == ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) {
+			if( postState != null && postState.getPublishState() == ServerManagementAPIConstants.PUBLISH_STATE_NONE) {
+				getServerPublishModel().deployableRemoved(state.getReference());
+			}
+		}
 	}
 
 	protected void publishStart(int publishType) throws CoreException {

@@ -511,7 +511,7 @@ public class ServerModel implements IServerModel {
 		if( s != null ) {
 			return s.getServerPublishModel().getDeployableStates();
 		}
-		return new ArrayList<DeployableState>();
+		return new ArrayList<>();
 	}
 
 	@Override
