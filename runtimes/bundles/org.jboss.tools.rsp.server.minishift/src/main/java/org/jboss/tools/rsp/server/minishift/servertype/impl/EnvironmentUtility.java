@@ -34,13 +34,13 @@ public class EnvironmentUtility {
 		if( appendCredentials ) 
 			configEnv = getEnvironmentFromServer();
 		else 
-			configEnv = new HashMap<String,String>();
+			configEnv = new HashMap<>();
 		
 		return NativeEnvironmentUtils.getDefault().getEnvironment(configEnv, appendNativeEnv);
 	}
 
 	protected Map<String, String> getEnvironmentFromServer() {
-		HashMap<String,String> ret = new HashMap<String, String>();
+		HashMap<String,String> ret = new HashMap<>();
 		String user = MinishiftPropertyUtility.getMinishiftUsername(server);
 		String pass = MinishiftPropertyUtility.getMinishiftPassword(server);
 		if( user != null && pass != null && !user.isEmpty() && !pass.isEmpty()) {
