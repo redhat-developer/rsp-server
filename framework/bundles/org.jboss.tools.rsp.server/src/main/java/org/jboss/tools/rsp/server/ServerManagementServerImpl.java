@@ -488,7 +488,7 @@ public class ServerManagementServerImpl implements RSPServer {
 		ServerCapabilitiesResponse resp = new ServerCapabilitiesResponse(st, resp2);
 		return CompletableFuture.completedFuture(resp);
 	}
-	
+
 	/*
 	 * Utility methods below
 	 */	
@@ -502,7 +502,7 @@ public class ServerManagementServerImpl implements RSPServer {
 		}
 		return StatusConverter.convert(s);
 	}
-	
+
 	private boolean isEmpty(String s) {
 		return s == null || s.isEmpty();
 	}
@@ -512,8 +512,6 @@ public class ServerManagementServerImpl implements RSPServer {
 				IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Parameter is invalid. It may be null, missing required fields, or unacceptable values.");
 		return StatusConverter.convert(s);
 	}
-	
-
 
 	@Override
 	public CompletableFuture<List<DeployableState>> getDeployables(ServerHandle handle) {
@@ -524,11 +522,11 @@ public class ServerManagementServerImpl implements RSPServer {
 		IServer server = managementModel.getServerModel().getServer(handle.getId());
 		 return managementModel.getServerModel().getDeployables(server);
 	}
-
 	
 	public CompletableFuture<Status> addDeployable(ModifyDeployableRequest request) {
 		return createCompletableFuture(() -> addDeployableSync(request.getServer(), request.getDeployable()));
 	}
+
 	public Status addDeployableSync(ServerHandle handle, DeployableReference reference) {
 		IServer server = managementModel.getServerModel().getServer(handle.getId());
 		IStatus stat = managementModel.getServerModel().addDeployable(server, reference);
@@ -538,6 +536,7 @@ public class ServerManagementServerImpl implements RSPServer {
 	public CompletableFuture<Status> removeDeployable(ModifyDeployableRequest request) {
 		return createCompletableFuture(() -> removeDeployableSync(request.getServer(), request.getDeployable()));
 	}
+
 	public Status removeDeployableSync(ServerHandle handle, DeployableReference reference) {
 		IServer server = managementModel.getServerModel().getServer(handle.getId());
 		IStatus stat = managementModel.getServerModel().removeDeployable(server, reference);
@@ -548,8 +547,8 @@ public class ServerManagementServerImpl implements RSPServer {
 	public CompletableFuture<Status> publish(PublishServerRequest request) {
 		return createCompletableFuture(() -> publishSync(request));
 	}
-	
-	public Status publishSync(PublishServerRequest request) {
+
+	private Status publishSync(PublishServerRequest request) {
 		try {
 			IServer server = managementModel.getServerModel().getServer(request.getServer().getId());
 			IStatus stat = managementModel.getServerModel().publish(server, request.getKind());
