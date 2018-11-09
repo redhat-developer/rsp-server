@@ -15,24 +15,31 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.launching.utils.StatusConverter;
 
 public class CreateServerValidation {
+
 	private IStatus status;
 	private List<String> failedKeys;
+
 	public CreateServerValidation() {
 	}
+
 	public CreateServerValidation(IStatus status, List<String> failedKeys) {
 		this.status = status;
 		this.failedKeys = failedKeys;
 		
 	}
+
 	public IStatus getStatus() {
 		return status;
 	}
+
 	public void setStatus(IStatus status) {
 		this.status = status;
 	}
+
 	public List<String> getFailedKeys() {
 		return failedKeys;
 	}
+
 	public void setFailedKeys(List<String> failedKeys) {
 		this.failedKeys = failedKeys;
 	}
