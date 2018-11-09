@@ -14,6 +14,8 @@ import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller.SERVER_ST
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller.TIMEOUT_BEHAVIOR;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -21,6 +23,8 @@ import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
  */
 public class PollThread extends Thread {
 
+	private static final Logger LOG = LoggerFactory.getLogger(PollThread.class);
+	
 	private boolean abort, stateStartedOrStopped;
 	private SERVER_STATE expectedState;
 	private IServerStatePoller poller;
@@ -29,7 +33,7 @@ public class PollThread extends Thread {
 	private int timeout;
 
 	public PollThread(SERVER_STATE expectedState, IServerStatePoller poller, IPollResultListener listener, IServer server, int timeout) {
-		super(getThreadName(server));
+		super(NLS.bind("{0} - Server Poller", server.getName()));
 		this.expectedState = expectedState;
 		this.poller = poller;
 		this.server = server;
@@ -38,17 +42,8 @@ public class PollThread extends Thread {
 		this.timeout = timeout;
 	}
 
-	private static String getThreadName(IServer server) {
-		return NLS.bind("{0} - Server Poller", server.getName());
-	}
-
 	public void cancel() {
-		cancel(null);
-	}
-
-	public void cancel(String message) {
 		abort = true;
-		//abortMessage = message;
 		poller.cancel(IServerStatePoller.CANCELATION_CAUSE.CANCEL);
 	}
 
@@ -66,9 +61,11 @@ public class PollThread extends Thread {
 		return timeout;
 	}
 
+	@Override
 	public void run() {
 		// Poller not found. Abort
 		if (poller == null) {
+			LOG.error("No poller defined, aborting polling.");
 			alertListener(oppositeState(expectedState));
 			return;
 		}
@@ -97,6 +94,7 @@ public class PollThread extends Thread {
 					// abort and put the message in event log
 					poller.cancel(CANCELATION_CAUSE.CANCEL);
 					poller.cleanup();
+					LOG.error("Error occurred while polling, aborting.");
 					alertListener(oppositeState(expectedState));
 					return;
 				} catch (RequiresInfoException rie) {
@@ -122,7 +120,7 @@ public class PollThread extends Thread {
 				handleTimeoutTermination();
 			}
 		} catch(Exception e) {
-			e.printStackTrace();
+			LOG.error("Error occurred while polling, aborting.", e);
 			handleExceptionTermination();
 		}
 
@@ -138,21 +136,23 @@ public class PollThread extends Thread {
 			poller.cancel(CANCELATION_CAUSE.CANCEL);
 			poller.cleanup();
 			alertListener(oppositeState(expectedState));
-			return;
 		} catch (RequiresInfoException rie) {
 			// You don't have an answer... liar!
 		}
 	}
+
 	private void handleExceptionTermination() {
 		cancel();
 		poller.cleanup();
 		handleTimeoutBehavior();
 	}
+
 	private void handleTimeoutTermination() {
 		poller.cancel(CANCELATION_CAUSE.TIMEOUT_REACHED);
 		poller.cleanup();
 		handleTimeoutBehavior();
 	}
+
 	private void handleTimeoutBehavior() {
 		TIMEOUT_BEHAVIOR behavior = poller.getTimeoutBehavior();
 		// xnor;
