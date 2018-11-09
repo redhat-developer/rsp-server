@@ -37,5 +37,6 @@ Import-Package: org.eclipse.lsp4j.jsonrpc,
 Export-Package: org.jboss.tools.rsp.server,
  org.jboss.tools.rsp.server.discovery,
  org.jboss.tools.rsp.server.discovery.serverbeans,
+ org.jboss.tools.rsp.server.filewatcher,
  org.jboss.tools.rsp.server.model
 Require-Bundle: org.jboss.tools.rsp.api

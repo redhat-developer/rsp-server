@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.rsp.server.model.internal;
+package org.jboss.tools.rsp.server.model.internal.publishing;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
