@@ -36,11 +36,7 @@ public class PollThreadUtils {
 	 */
 	public static void cancelPolling(String message, PollThread pollThread) {
 		if (pollThread != null) {
-			if (message != null) {
-				pollThread.cancel(message);
-			} else {
-				pollThread.cancel();
-			}
+			pollThread.cancel();
 		}
 	}
 
