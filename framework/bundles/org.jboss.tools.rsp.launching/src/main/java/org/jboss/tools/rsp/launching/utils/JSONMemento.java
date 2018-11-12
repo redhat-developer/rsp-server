@@ -33,7 +33,7 @@ public class JSONMemento implements IMemento {
 	public static JSONMemento createReadRoot(InputStream in) {
 		Gson gson = new Gson();
 		try (Reader reader = new InputStreamReader(in)) {
-			JsonElement rootElement = gson.fromJson(new InputStreamReader(in), JsonElement.class);
+			JsonElement rootElement = gson.fromJson(reader, JsonElement.class);
 			return new JSONMemento(rootElement.getAsJsonObject(), "");
 		} catch (IOException e) {
 			return null;
