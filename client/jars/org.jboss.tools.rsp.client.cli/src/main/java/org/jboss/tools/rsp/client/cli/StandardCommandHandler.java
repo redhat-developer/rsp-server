@@ -140,7 +140,7 @@ public class StandardCommandHandler implements InputHandler {
 				printLocalLaunchCommandDetails(getLaunchReq);
 		} else if (s.equals(LAUNCH_LOCAL)) {
 			runLocalLaunchScenario();
-		} else if (s.startsWith(STOP_SERVER)) {
+		} else if (s.startsWith(STOP_SERVER) || s.trim().equals(STOP_SERVER.trim())) {
 			runStopServer(s);
 		} else if (s.trim().equals(LIST_SERVER_TYPES)) {
 			List<ServerType> handles = launcher.getServerProxy().getServerTypes().get();
@@ -193,20 +193,26 @@ public class StandardCommandHandler implements InputHandler {
 	}
 
 	private void runStopServer(String s) throws Exception {
-		String suffix = s.substring(STOP_SERVER.length()).trim();
+		String suffix = s.trim().substring(STOP_SERVER.trim().length());
 		String trimmed = suffix.trim();
+		
 		if( trimmed.length() == 0 ) {
-			System.out.println("Syntax: stop server servername [boolean:force]");
-		} else {
-			String[] split = trimmed.split(" ");
-			boolean force = false;
-			if( split.length == 2 ) {
-				force = Boolean.parseBoolean(split[1]);
+			ServerHandle selected = assistant.selectServer();
+			if( selected != null ) {
+				trimmed = selected.getId();
+			} else {
+				System.out.println("Syntax: stop server servername [boolean:force]");
+				return;
 			}
-			StopServerAttributes ssa = new StopServerAttributes(split[0], force);
-			Status stat = launcher.getServerProxy().stopServerAsync(ssa).get();
-			System.out.println(stat.toString());
 		}
+		String[] split = trimmed.split(" ");
+		boolean force = false;
+		if( split.length == 2 ) {
+			force = Boolean.parseBoolean(split[1]);
+		}
+		StopServerAttributes ssa = new StopServerAttributes(split[0], force);
+		Status stat = launcher.getServerProxy().stopServerAsync(ssa).get();
+		System.out.println(stat.toString());
 	}
 	
 	private void runStartServer(String s) throws Exception {
