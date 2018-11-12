@@ -1,0 +1,58 @@
+{
+  "type" : "object",
+  "properties" : {
+    "server" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "visibleName" : {
+              "type" : "string"
+            },
+            "description" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    },
+    "state" : {
+      "type" : "integer"
+    },
+    "publishState" : {
+      "type" : "integer"
+    },
+    "deployableStates" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "reference" : {
+            "type" : "object",
+            "properties" : {
+              "label" : {
+                "type" : "string"
+              },
+              "path" : {
+                "type" : "string"
+              }
+            }
+          },
+          "state" : {
+            "type" : "integer"
+          },
+          "publishState" : {
+            "type" : "integer"
+          }
+        }
+      }
+    }
+  }
+}

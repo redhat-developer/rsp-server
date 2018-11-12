@@ -19,44 +19,34 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerType;
-import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.ServerModelListenerAdapter;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
+import org.jboss.tools.rsp.server.util.DataLocationSysProp;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ServerModelTest {
-	private static String ORIGINAL_DATA_LOC = null;
-	
-	@BeforeClass 
+	private static final DataLocationSysProp dataLocation = new DataLocationSysProp();
+
+	@BeforeClass
 	public static void beforeClass() {
-		ORIGINAL_DATA_LOC = System.getProperty(LaunchingCore.SYSPROP_DATA_LOCATION);
-		try {
-			File tmp = Files.createTempDirectory("RSPStartupShutdownTest").toFile();
-			System.setProperty(LaunchingCore.SYSPROP_DATA_LOCATION, tmp.getAbsolutePath());
-		} catch(IOException ioe) {
-			throw new RuntimeException(ioe);
-		}
+		dataLocation.backup().set("ServerModelTest");
 	}
-	
+
 	@AfterClass
 	public static void afterClass() {
-		if( ORIGINAL_DATA_LOC == null )
-			System.clearProperty(LaunchingCore.SYSPROP_DATA_LOCATION);
-		else
-			System.setProperty(LaunchingCore.SYSPROP_DATA_LOCATION, ORIGINAL_DATA_LOC);
+		dataLocation.restore();
 	}
 
 	private ServerModel sm;
@@ -78,10 +68,7 @@ public class ServerModelTest {
 			sm.loadServers(dir.toFile());
 			assertEquals(sm.getServers().size(), 0);
 		} catch(IOException e) {
-			if( s1 != null && s1.toFile().exists()) {
-				s1.toFile().delete();
-				s1.toFile().getParentFile().delete();
-			}
+			removeFile(s1);
 			fail();
 		}
 	}
@@ -98,10 +85,7 @@ public class ServerModelTest {
 			sm.loadServers(dir.toFile());
 			assertEquals(sm.getServers().size(), 0);
 		} catch(IOException e) {
-			if( s1 != null && s1.toFile().exists()) {
-				s1.toFile().delete();
-				s1.toFile().getParentFile().delete();
-			}
+			removeFile(s1);
 			fail();
 		}
 	}
@@ -118,10 +102,7 @@ public class ServerModelTest {
 			sm.loadServers(dir.toFile());
 			assertEquals(sm.getServers().size(), 0);
 		} catch(IOException e) {
-			if( s1 != null && s1.toFile().exists()) {
-				s1.toFile().delete();
-				s1.toFile().getParentFile().delete();
-			}
+			removeFile(s1);
 			fail();
 		}
 	}
@@ -141,10 +122,7 @@ public class ServerModelTest {
 			sm.loadServers(dir.toFile());
 			assertEquals(sm.getServers().size(), 1);
 		} catch(IOException e) {
-			if( s1 != null && s1.toFile().exists()) {
-				s1.toFile().delete();
-				s1.toFile().getParentFile().delete();
-			}
+			removeFile(s1);
 			fail();
 		}
 	}
@@ -166,20 +144,63 @@ public class ServerModelTest {
 			assertNotNull(sm.getServerHandles());
 			assertEquals(sm.getServerHandles().length, 1);
 			ServerHandle sh = sm.getServerHandles()[0];
-			assertNotNull(sh);
-			assertEquals(sh.getId(), "abc123");
-			assertNotNull(sh.getType());
-			ServerType st = sh.getType();
-			assertEquals(st.getId(), "wonka5");
+			assertServerHandle("abc123", "wonka5", sh);
 		} catch(IOException e) {
-			if( s1 != null && s1.toFile().exists()) {
-				s1.toFile().delete();
-				s1.toFile().getParentFile().delete();
-			}
+			removeFile(s1);
 			fail();
 		}
 	}
 	
+	@Test
+	public void testLoadMultipleServerHandles() {
+		sm.addServerType(mockServerType("wonka1"));
+		Path dir = null;
+		Path s1 = null, s2 = null, s3 = null;
+		try {
+			dir = Files.createTempDirectory("servermodeltest");
+			s1 = createServerFile("s1", getServerString("abc123", "wonka1"), dir);
+			s2 = createServerFile("s2", getServerString("abc456", "wonka1"), dir);
+			s3 = createServerFile("s3", getServerString("abc789", "wonka1"), dir);
+			sm.loadServers(dir.toFile());
+			assertEquals(3, sm.getServers().size());
+			
+			assertNotNull(sm.getServerHandles());
+			assertEquals(3, sm.getServerHandles().length);
+			ServerHandle sh = sm.getServerHandles()[1];
+			assertServerHandle("abc456", "wonka1", sh);
+			IServer server = sm.getServer(sh.getId());
+			assertEquals("abc456", server.getId());
+		} catch(IOException e) {
+			removeFile(s1);
+			removeFile(s2);
+			removeFile(s3);
+			if (dir != null && dir.toFile().exists()) {
+				dir.toFile().delete();
+			}
+			fail();
+		}
+	}
+
+	private void assertServerHandle(String id, String serverTypeId, ServerHandle sh) {
+		assertNotNull(sh);
+		assertEquals(id, sh.getId());
+		assertNotNull(sh.getType());
+		ServerType st = sh.getType();
+		assertEquals(serverTypeId, st.getId());
+	}
+
+	private void removeFile(Path file) {
+		if( file != null && file.toFile().exists()) {
+			file.toFile().delete();
+		}
+	}
+
+	private Path createServerFile(String serverFilename, String contents, Path serversDir) throws IOException {
+		Path serverFile = serversDir.resolve(serverFilename);
+		Files.write(serverFile, contents.getBytes());
+		return serverFile;
+	}
+
 	@Test
 	public void testAddAndRemoveServerType() {
 		assertNotNull(sm.getServerTypes());
@@ -225,7 +246,9 @@ public class ServerModelTest {
 			assertEquals(sm.getServers().size(), 1);
 			assertNotNull(sm.getServer("abc123"));
 			assertTrue(added[0].booleanValue());
-			sm.removeServer("abc123");
+			IServer server = sm.getServer("abc123");
+
+			sm.removeServer(server);
 			assertEquals(sm.getServers().size(), 0);
 			assertNull(sm.getServer("abc123"));
 			assertTrue(removed[0].booleanValue());
@@ -243,20 +266,18 @@ public class ServerModelTest {
 			assertEquals(sm.getServers().size(), 1);
 			assertNotNull(sm.getServer("abc123"));
 			assertFalse(added[0].booleanValue());
-			sm.removeServer("abc123");
+			
+			server = sm.getServer("abc123");
+			sm.removeServer(server);
 			assertEquals(sm.getServers().size(), 0);
 			assertNull(sm.getServer("abc123"));
 			assertFalse(removed[0].booleanValue());
 			assertFalse(s1.toFile().exists());
 		} catch(IOException e) {
-			if( s1 != null && s1.toFile().exists()) {
-				s1.toFile().delete();
-				s1.toFile().getParentFile().delete();
-			}
+			removeFile(s1);
 			fail();
 		}
 	}
-
 	
 	private String getServerString(String name, String type) {
 		String contents = "{id:\"" + name + "\", id-set:\"true\", " + 

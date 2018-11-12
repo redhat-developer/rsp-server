@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +32,12 @@ public class JSONMemento implements IMemento {
 	
 	public static JSONMemento createReadRoot(InputStream in) {
 		Gson gson = new Gson();
-		JsonElement rootElement = gson.fromJson(new InputStreamReader(in), JsonElement.class);
-		return new JSONMemento(rootElement.getAsJsonObject(), "");
+		try (Reader reader = new InputStreamReader(in)) {
+			JsonElement rootElement = gson.fromJson(reader, JsonElement.class);
+			return new JSONMemento(rootElement.getAsJsonObject(), "");
+		} catch (IOException e) {
+			return null;
+		}
 	}
 	
 	/*
@@ -51,7 +56,10 @@ public class JSONMemento implements IMemento {
 
 	@Override
 	public JSONMemento getChild(String childName) {
-		return new JSONMemento(this.jsonObject.getAsJsonObject(childName), childName);
+		JsonObject obj = this.jsonObject.getAsJsonObject(childName);
+		if( obj == null )
+			return null;
+		return new JSONMemento(obj, childName);
 	}
 
 	@Override
@@ -101,7 +109,13 @@ public class JSONMemento implements IMemento {
 
 	@Override
 	public List<String> getNames() {
-		return new ArrayList<String>(this.jsonObject.keySet());
+		List<String> ret = new ArrayList<>();
+		for (String key: this.jsonObject.keySet()) {
+			if (!this.jsonObject.get(key).isJsonObject()) {
+				ret.add(key);
+			}
+		}
+		return ret;
 	}
 
 	@Override
@@ -137,9 +151,11 @@ public class JSONMemento implements IMemento {
 	public void save(OutputStream os) throws IOException {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		JsonElement jsonElement = gson.fromJson(this.jsonObject, JsonElement.class);
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
-		gson.toJson(jsonElement, bw);
-		bw.flush();
+		
+		try(BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os))) {
+			gson.toJson(jsonElement, bw);
+			bw.flush();
+		}
 	}
 
 }

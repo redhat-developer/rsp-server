@@ -12,6 +12,7 @@ import java.io.File;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
+import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
@@ -82,14 +83,14 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 			return new Status(IStatus.ERROR, Activator.BUNDLE_ID,
 					"Server may not be launched in mode " + launchMode);
 		}
-		if( getServerState() == IServerDelegate.STATE_STOPPED ) {
+		if( getServerRunState() == IServerDelegate.STATE_STOPPED ) {
 			IStatus v = validate().getStatus();
 			if( !v.isOK() )
 				return v;
 			return Status.OK_STATUS;
 		} else {
 			String stateString = null;
-			switch(getServerState()) {
+			switch(getServerRunState()) {
 			case IServerDelegate.STATE_STARTED:
 				stateString = "started";break;
 			case IServerDelegate.STATE_STARTING:
@@ -224,6 +225,21 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 	public IStatus clientSetServerStarted(LaunchParameters attr) {
 		setServerState(STATE_STARTED, true);
 		return Status.OK_STATUS;
+	}
+	
+	
+	/**
+	 * This server type can't publish nothin yet!
+	 */
+	
+	@Override
+	public IStatus canAddDeployable(DeployableReference reference) {
+		return Status.CANCEL_STATUS;
+	}
+	
+	@Override
+	public IStatus canRemoveDeployable(DeployableReference reference) {
+		return Status.CANCEL_STATUS;
 	}
 
 }

@@ -84,7 +84,8 @@ public class SpecificationGenerator {
 
 									if (jsonString.isEmpty() || tsString.isEmpty()) {
 										throw new RuntimeException(
-												"Endpoints should have a single object parameter if possible.");
+												"Endpoints should have a single object parameter if possible: " 
+										+ f.getAbsolutePath() + "    -   " + methodName);
 									}
 
 									sb.append("\n<tr>");

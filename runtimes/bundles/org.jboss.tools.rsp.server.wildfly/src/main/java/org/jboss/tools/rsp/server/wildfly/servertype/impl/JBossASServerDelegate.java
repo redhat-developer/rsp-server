@@ -13,6 +13,8 @@ import org.jboss.tools.rsp.server.spi.launchers.IShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IStartLauncher;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.wildfly.servertype.AbstractJBossServerDelegate;
+import org.jboss.tools.rsp.server.wildfly.servertype.publishing.IJBossPublishController;
+import org.jboss.tools.rsp.server.wildfly.servertype.publishing.StandardJBossPublishController;
 
 public class JBossASServerDelegate extends AbstractJBossServerDelegate {
 	public JBossASServerDelegate(IServer server) {
@@ -30,5 +32,9 @@ public class JBossASServerDelegate extends AbstractJBossServerDelegate {
 	protected String getPollURL(IServer server) {
 		// TODO?
 		return "http://localhost:8080";
+	}
+	@Override
+	protected IJBossPublishController createPublishController() {
+		return new StandardJBossPublishController(getServer(), this);
 	}
 }

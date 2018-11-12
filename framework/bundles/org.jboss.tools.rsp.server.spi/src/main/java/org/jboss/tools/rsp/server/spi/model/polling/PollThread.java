@@ -166,7 +166,7 @@ public class PollThread extends Thread {
 	}
 	
 	private void handleUncertainTermination() {
-		int state = server.getDelegate().getServerState();
+		int state = server.getDelegate().getServerRunState();
 		boolean success = false;
 		if (expectedState == SERVER_STATE.UP)
 			success = state == IServerDelegate.STATE_STARTED;
@@ -183,7 +183,7 @@ public class PollThread extends Thread {
 	}
 
 	protected boolean checkServerState() {
-		int state = server.getDelegate().getServerState();
+		int state = server.getDelegate().getServerRunState();
 		if (state == IServerDelegate.STATE_STARTED)
 			return true;
 		if (state == IServerDelegate.STATE_STOPPED)

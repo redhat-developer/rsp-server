@@ -20,7 +20,7 @@ import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerProcess;
 import org.jboss.tools.rsp.api.dao.ServerProcessOutput;
-import org.jboss.tools.rsp.api.dao.ServerStateChange;
+import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.StringPrompt;
 
 public class ClientImpl implements RSPClient {
@@ -62,7 +62,7 @@ public class ClientImpl implements RSPClient {
 	}
 
 	@Override
-	public void serverStateChanged(ServerStateChange state) {
+	public void serverStateChanged(ServerState state) {
 		String stateString = null;
 		switch(state.getState()) {
 		case ServerManagementAPIConstants.STATE_STARTED:

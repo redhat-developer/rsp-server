@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2018-10-17 12:52:36.
+// Generated using typescript-generator version 2.2.413 on 2018-11-05 17:44:21.
 
 export interface Attribute {
     type: string;
@@ -11,11 +11,6 @@ export interface Attributes {
     attributes: { [index: string]: Attribute };
 }
 
-export interface ServerCapabilitiesResponse {
-    serverCapabilities: { [index: string]: string };
-    clientRegistrationStatus: Status;
-}
-
 export interface ClientCapabilitiesRequest {
     map: { [index: string]: string };
 }
@@ -25,6 +20,22 @@ export interface CommandLineDetails {
     workingDir: string;
     envp: string[];
     properties: { [index: string]: string };
+}
+
+export interface CreateServerResponse {
+    status: Status;
+    invalidKeys: string[];
+}
+
+export interface DeployableReference {
+    label: string;
+    path: string;
+}
+
+export interface DeployableState {
+    reference: DeployableReference;
+    state: number;
+    publishState: number;
 }
 
 export interface DiscoveryPath {
@@ -41,6 +52,16 @@ export interface LaunchParameters {
     params: ServerAttributes;
 }
 
+export interface ModifyDeployableRequest {
+    server: ServerHandle;
+    deployable: DeployableReference;
+}
+
+export interface PublishServerRequest {
+    server: ServerHandle;
+    kind: number;
+}
+
 export interface ServerAttributes {
     serverType: string;
     id: string;
@@ -55,6 +76,11 @@ export interface ServerBean {
     version: string;
     fullVersion: string;
     serverAdapterTypeId: string;
+}
+
+export interface ServerCapabilitiesResponse {
+    serverCapabilities: { [index: string]: string };
+    clientRegistrationStatus: Status;
 }
 
 export interface ServerHandle {
@@ -84,9 +110,11 @@ export interface ServerStartingAttributes {
     request: LaunchParameters;
 }
 
-export interface ServerStateChange {
+export interface ServerState {
     server: ServerHandle;
     state: number;
+    publishState: number;
+    deployableStates: DeployableState[];
 }
 
 export interface ServerType {

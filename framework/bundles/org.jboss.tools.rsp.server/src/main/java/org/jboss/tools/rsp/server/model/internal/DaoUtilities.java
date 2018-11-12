@@ -15,7 +15,10 @@ import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 
 public class DaoUtilities {
 	
-	public static Class getAttributeTypeClass(String type) {
+	private DaoUtilities() {
+	}
+	
+	public static Class<?> getAttributeTypeClass(String type) {
 		if( ServerManagementAPIConstants.ATTR_TYPE_INT.equals(type)) {
 			return Integer.class;
 		} else if( ServerManagementAPIConstants.ATTR_TYPE_BOOL.equals(type)) {

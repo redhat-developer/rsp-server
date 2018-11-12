@@ -32,7 +32,7 @@ public class JBossEAP61ExtendedProperties extends JBossAS710ExtendedProperties {
 //	}
 
 	@Override
-	public boolean allowExplodedModulesInWarLibs() {
+	public boolean allowExplodedDeploymentsInWarLibs() {
 		return true;
 	}
 
@@ -42,8 +42,8 @@ public class JBossEAP61ExtendedProperties extends JBossAS710ExtendedProperties {
 	}
 	
 	@Override
-	public boolean allowExplodedModulesInEars() {
-		return allowExplodedModulesInWarLibs();
+	public boolean allowExplodedDeploymentsInEars() {
+		return allowExplodedDeploymentsInWarLibs();
 	}
 
 }

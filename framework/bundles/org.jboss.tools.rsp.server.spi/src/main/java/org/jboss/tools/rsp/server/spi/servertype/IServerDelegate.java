@@ -10,11 +10,14 @@ package org.jboss.tools.rsp.server.spi.servertype;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
-import org.jboss.tools.rsp.api.dao.CreateServerResponse;
+import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
+import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
+import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 
@@ -24,8 +27,9 @@ public interface IServerDelegate {
 	 * Server state constant (value 0) indicating that the
 	 * server is in an unknown state.
 	 * 
-	 * @see #getServerState()
-	 * @see #getModuleState(IModule[])
+	 * @see #getServerRunState()
+	 * @see IServerPublishModel#getDeployableState(DeployableReference)
+	 * @see DeployableState#getState()
 	 */
 	public static final int STATE_UNKNOWN = ServerManagementAPIConstants.STATE_UNKNOWN;
 
@@ -33,8 +37,9 @@ public interface IServerDelegate {
 	 * Server state constant (value 1) indicating that the
 	 * server is starting, but not yet ready to serve content.
 	 * 
-	 * @see #getServerState()
-	 * @see #getModuleState(IModule[])
+	 * @see #getServerRunState()
+	 * @see IServerPublishModel#getDeployableState(DeployableReference)
+	 * @see DeployableState#getState()
 	 */
 	public static final int STATE_STARTING = ServerManagementAPIConstants.STATE_STARTING;
 
@@ -42,8 +47,9 @@ public interface IServerDelegate {
 	 * Server state constant (value 2) indicating that the
 	 * server is ready to serve content.
 	 * 
-	 * @see #getServerState()
-	 * @see #getModuleState(IModule[])
+	 * @see #getServerRunState()
+	 * @see IServerPublishModel#getDeployableState(DeployableReference)
+	 * @see DeployableState#getState()
 	 */
 	public static final int STATE_STARTED = ServerManagementAPIConstants.STATE_STARTED;
 
@@ -51,8 +57,9 @@ public interface IServerDelegate {
 	 * Server state constant (value 3) indicating that the
 	 * server is shutting down.
 	 * 
-	 * @see #getServerState()
-	 * @see #getModuleState(IModule[])
+	 * @see #getServerRunState()
+	 * @see IServerPublishModel#getDeployableState(DeployableReference)
+	 * @see DeployableState#getState()
 	 */
 	public static final int STATE_STOPPING = ServerManagementAPIConstants.STATE_STOPPING;
 
@@ -60,8 +67,9 @@ public interface IServerDelegate {
 	 * Server state constant (value 4) indicating that the
 	 * server is stopped.
 	 * 
-	 * @see #getServerState()
-	 * @see #getModuleState(IModule[])
+	 * @see #getServerRunState()
+	 * @see IServerPublishModel#getDeployableState(DeployableReference)
+	 * @see DeployableState#getState()
 	 */
 	public static final int STATE_STOPPED = ServerManagementAPIConstants.STATE_STOPPED;
 
@@ -69,8 +77,9 @@ public interface IServerDelegate {
 	 * Publish state constant (value 0) indicating that it's
 	 * in an unknown state.
 	 * 
-	 * @see #getServerPublishState()
-	 * @see #getModulePublishState(IModule[])
+	 * @see #getServerRunState()
+	 * @see IServerPublishModel#getDeployableState(DeployableReference)
+	 * @see DeployableState#getPublishState()
 	 */
 	public static final int PUBLISH_STATE_UNKNOWN = ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN;
 
@@ -78,8 +87,9 @@ public interface IServerDelegate {
 	 * Publish state constant (value 1) indicating that there
 	 * is no publish required.
 	 * 
-	 * @see #getServerPublishState()
-	 * @see #getModulePublishState(IModule[])
+	 * @see #getServerRunState()
+	 * @see IServerPublishModel#getDeployableState(DeployableReference)
+	 * @see DeployableState#getPublishState()
 	 */
 	public static final int PUBLISH_STATE_NONE = ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 
@@ -87,8 +97,9 @@ public interface IServerDelegate {
 	 * Publish state constant (value 2) indicating that an
 	 * incremental publish is required.
 	 * 
-	 * @see #getServerPublishState()
-	 * @see #getModulePublishState(IModule[])
+	 * @see #getServerRunState()
+	 * @see IServerPublishModel#getDeployableState(DeployableReference)
+	 * @see DeployableState#getPublishState()
 	 */
 	public static final int PUBLISH_STATE_INCREMENTAL = ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL;
 
@@ -96,8 +107,9 @@ public interface IServerDelegate {
 	 * Publish state constant (value 3) indicating that a
 	 * full publish is required.
 	 * 
-	 * @see #getServerPublishState()
-	 * @see #getModulePublishState(IModule[])
+	 * @see #getServerRunState()
+	 * @see IServerPublishModel#getDeployableState(DeployableReference)
+	 * @see DeployableState#getPublishState()
 	 */
 	public static final int PUBLISH_STATE_FULL = ServerManagementAPIConstants.PUBLISH_STATE_FULL;
 
@@ -140,7 +152,7 @@ public interface IServerDelegate {
 	 * @return one of the server state (<code>STATE_XXX</code>)
 	 * constants declared on {@link IServer}
 	 */
-	public int getServerState();
+	public int getServerRunState();
 	
 	/**
 	 * Get the IServer wrapper and holder of attribute key/value pairs
@@ -230,4 +242,52 @@ public interface IServerDelegate {
 	 * @return
 	 */
 	public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params);
+	
+	
+	/**
+	 * Get the publish model for this server
+	 * @return
+	 */
+	public IServerPublishModel getServerPublishModel();
+
+	/**
+	 * Can this deployable be added to this server? 
+	 * @param handle
+	 * @param reference
+	 * @return
+	 */
+	public IStatus canAddDeployable(DeployableReference reference);
+
+	
+	/**
+	 * Can this deployable be removed from this server?
+	 * @param reference
+	 * @return
+	 */
+	public IStatus canRemoveDeployable(DeployableReference reference);
+
+	/**
+	 * A request to publish the server
+	 * @param kind
+	 * @return
+	 * @throws CoreException 
+	 */
+	public IStatus publish(int kind);
+
+	/**
+	 * Get the server state, including run state, publish state, 
+	 * as well as the run state and publish state for the deployables.
+	 * @return
+	 */
+	public ServerState getServerState();
+
+	/**
+	 * Is the server in a state that can be published to?
+	 * @return
+	 */
+	public IStatus canPublish();
+
+	int getServerPublishState();
+	
+
 }

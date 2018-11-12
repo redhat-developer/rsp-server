@@ -18,15 +18,20 @@ import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
+import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
+import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
+import org.jboss.tools.rsp.api.dao.PublishServerRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerBean;
 import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
+import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.Status;
@@ -245,6 +250,13 @@ public interface RSPServer {
 	@JsonRequest
 	CompletableFuture<Status> serverStartedByClient(LaunchParameters attr);
 
+	
+	/**
+	 * Get the state of the current server
+	 */
+	@JsonRequest
+	CompletableFuture<ServerState> getServerState(ServerHandle handle);
+	
 	/**
 	 * The `server/startServerAsync` request is sent by the client to the server to
 	 * start an existing server in the model.
@@ -256,11 +268,6 @@ public interface RSPServer {
 	@JsonRequest
 	CompletableFuture<StartServerResponse> startServerAsync(LaunchParameters params);
 
-	
-	
-	/*
-	 * Shutdown
-	 */
 	/**
 	 * The `server/stopServerAsync` request is sent by the client to the server to
 	 * stop an existing server in the model.
@@ -268,6 +275,56 @@ public interface RSPServer {
 	@JsonRequest
 	CompletableFuture<Status> stopServerAsync(StopServerAttributes attr);
 
+	
+	/*
+	 * Provisional
+	 */
+	/**
+	 * The `server/getDeployables` request is sent by the client to the server to
+	 * get a list of all deployables
+	 */
+	@JsonRequest
+	CompletableFuture<List<DeployableState>> getDeployables(ServerHandle handle);
+	
+	
+
+	/**
+	 * The `server/addDeployable` request is sent by the client to the server
+	 * to add a deployable reference to a server's list of deployable items
+	 * so that it can be published thereafter.
+	 * 
+	 * @param handle
+	 * @param reference
+	 * @return
+	 */
+	@JsonRequest
+	public CompletableFuture<Status> addDeployable(ModifyDeployableRequest req);
+	
+	/**
+	 * The `server/removeDeployable` request is sent by the client to the server
+	 * to remove a deployable reference from a server's list of deployable items
+	 * so that it can be unpublished thereafter.
+	 * 
+	 * @param handle
+	 * @param reference
+	 * @return
+	 */
+	@JsonRequest
+	public CompletableFuture<Status> removeDeployable(ModifyDeployableRequest req);
+	
+
+	/**
+	 * The `server/publish` request is sent by the client to the server
+	 * to instruct the server adapter to publish any changes to the backing runtime.
+	 * 
+	 * @param request
+	 * @return
+	 */
+	@JsonRequest
+	public CompletableFuture<Status> publish(PublishServerRequest request);
+	
+
+	
 	/**
 	 * The `server/shutdown` notification is sent by the client to shut down the
 	 * RSP itself. 

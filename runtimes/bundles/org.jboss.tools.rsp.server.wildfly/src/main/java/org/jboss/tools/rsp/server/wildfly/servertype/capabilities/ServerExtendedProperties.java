@@ -97,13 +97,9 @@ public class ServerExtendedProperties {
 		return Status.OK_STATUS;
 	}
 	
-	public boolean canVerifyRemoteModuleState() {
+	public boolean canVerifyRemoteDeploymentState() {
 		return false;
 	}
-	
-//	public IServerModuleStateVerifier getModuleStateVerifier() {
-//		return null;
-//	}
 	
 	public static final int FILE_STRUCTURE_UNKNOWN = 0;
 	public static final int FILE_STRUCTURE_SERVER_CONFIG_DEPLOY = 1;
@@ -113,17 +109,17 @@ public class ServerExtendedProperties {
 	}
 
 	/**
-	 * Server allows exploded modules in some.war/WEB-INF/lib (JBIDE-20071, AS7-4704).
+	 * Server allows exploded deployments in some.war/WEB-INF/lib (JBIDE-20071, AS7-4704).
 	 * <p>
 	 * The default is to assume that the server allows this.
 	 * 
 	 * @return exploded modules in some.war/WEB-INF/lib are allowed
 	 */
-	public boolean allowExplodedModulesInWarLibs() {
+	public boolean allowExplodedDeploymentsInWarLibs() {
 		return true;
 	}
 	
-	public boolean allowExplodedModulesInEars() {
+	public boolean allowExplodedDeploymentsInEars() {
 		return true;
 	}
 

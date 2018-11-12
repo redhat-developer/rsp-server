@@ -66,7 +66,7 @@ public class JBossDefaultLaunchArguments implements IDefaultLaunchArguments, IJB
 	protected String getProgramNameArgs() {
 		String name = server.getName();
 		String ret = QUOTE + SYSPROP + PROGRAM_NAME_ARG + EQ +  
-			"JBossTools: " + name + QUOTE + SPACE; //$NON-NLS-1$
+			"rsp:" + name + QUOTE + SPACE; //$NON-NLS-1$
 		return ret;
 	}
 	

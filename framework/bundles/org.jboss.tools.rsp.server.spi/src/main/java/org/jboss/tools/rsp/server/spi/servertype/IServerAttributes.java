@@ -23,7 +23,7 @@ import java.util.Map;
  * server. A more exact definition is not required for the purposes of this API.
  * From a tool-centric point of view, a server
  * is something that the developer is writing "content" for.
- * The unit of content is termed a module.
+ * The unit of content is termed a deployable.
  * In a sense, the server exists, but lacks useful content. The
  * development task is to provide that content. The content can include
  * anything from simple, static HTML web pages to complex, highly dynamic
@@ -62,9 +62,9 @@ import java.util.Map;
  * to commit the changes.
  * Server attributes. Serialization.
  * Chained working copies for runtime, server configuration.
- * Server has a set of root modules.
- * Modules have state wrt a server.
- * Restarting modules.]
+ * Server has a set of root deployable.
+ * Deployabes have state wrt a server.
+ * Restarting deployables.]
  * </p>
  * <p>
  * Two servers are identical if and only if they have the same id.

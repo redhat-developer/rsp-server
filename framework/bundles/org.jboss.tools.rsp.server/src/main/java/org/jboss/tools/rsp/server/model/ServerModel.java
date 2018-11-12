@@ -22,8 +22,11 @@ import java.util.Set;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
+import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
+import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
@@ -158,7 +161,7 @@ public class ServerModel implements IServerModel {
 	}
 
 	private Server loadServer(File serverFile) {
-		Server server = new Server(serverFile, managementModel.getSecureStorageProvider());
+		Server server = new Server(serverFile, managementModel);
 		try {
 			server.load(new NullProgressMonitor());
 			String tid = server.getTypeId();
@@ -173,7 +176,7 @@ public class ServerModel implements IServerModel {
 				if( typeId == null ) {
 					log(new Exception(
 							"Unable to load server from file " + serverFile.getAbsolutePath() + "; server type is missing or null."));
-				} else if( getServerType(typeId) == null ) {
+				} else if( createServerTypeDAO(typeId) == null ) {
 					log(new Exception(
 							"Unable to load server from file " + serverFile.getAbsolutePath() + "; server type " + typeId + " is not found in model."));
 				}
@@ -204,8 +207,16 @@ public class ServerModel implements IServerModel {
 		}
 	}
 	
-	private CreateServerResponse createServerUnprotected(String serverType, String id, Map<String, Object> attributes) throws CoreException {
-		IServerType type = getServerType(serverType, id);
+	private CreateServerResponse createServerUnprotected(String serverType, String id, Map<String, Object> attributes) 
+			throws CoreException {
+		if( servers.get(id) != null ) {
+			throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+					"Server with id " + id + " already exists."));
+		}
+		IServerType type = serverTypes.get(serverType);
+		if( type == null ) {
+			throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server Type " + serverType + " not found"));
+		}
 		IStatus validAttributes = validateAttributes(type, attributes);
 		if( !validAttributes.isOK()) {
 			throw new CoreException(validAttributes);
@@ -222,19 +233,6 @@ public class ServerModel implements IServerModel {
 		server.save(new NullProgressMonitor());
 		return valid.toDao();
 	}
-
-	private IServerType getServerType(String serverType, String id) throws CoreException {
-		IServerType type = null;
-		if( servers.get(id) != null ) {
-			throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server with id " + id + " already exists."));
-		} else {
-			type = serverTypes.get(serverType);
-			if( type == null ) {
-				throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server Type " + serverType + " not found"));
-			}
-		}
-		return type;
-	}
 	
 	private IStatus validateAttributes(IServerType type, Map<String, Object> map) {
 		Attributes attr = type.getRequiredAttributes();
@@ -242,7 +240,7 @@ public class ServerModel implements IServerModel {
 		Set<String> required = util.listAttributes();
 		for( String attrKey : required ) {
 			if( map.get(attrKey) == null ) {
-				return new Status(IStatus.ERROR, "org.jboss.tools.rsp.server", "Attribute " + attrKey + " must not be null");
+				return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Attribute " + attrKey + " must not be null");
 			}
 			Object v = map.get(attrKey);
 			Class actual = v.getClass();
@@ -316,7 +314,7 @@ public class ServerModel implements IServerModel {
 	}
 	
 	@Override
-	public void fireServerStateChanged(IServer server, int state) {
+	public void fireServerStateChanged(IServer server, ServerState state) {
 		for( IServerModelListener l : listeners ) {
 			l.serverStateChanged(toHandle(server), state);
 		}
@@ -330,15 +328,15 @@ public class ServerModel implements IServerModel {
 	
 	private ServerHandle toHandle(IServer s) {
 		String typeId = s.getTypeId();
-		return new ServerHandle(s.getId(), getServerType(typeId));
+		return new ServerHandle(s.getId(), createServerTypeDAO(typeId));
 	}
 	
 	@Override
-	public boolean removeServer(String serverId) {
-		IServer toRemove = servers.get(serverId);
-		if( toRemove == null ) {
+	public boolean removeServer(IServer toRemove) {
+		if( toRemove == null || toRemove.getId() == null) {
 			return false;
 		}
+		String serverId = toRemove.getId();
 		servers.remove(serverId);
 		IServerDelegate s = serverDelegates.get(serverId);
 		serverDelegates.remove(serverId);
@@ -360,17 +358,16 @@ public class ServerModel implements IServerModel {
 		for( String serverKey : serverKeys ) {
 			String id = serverKey;
 			String type = servers.get(id).getTypeId();
-			handles.add(new ServerHandle(id,  getServerType(type)));
+			handles.add(new ServerHandle(id,  createServerTypeDAO(type)));
 		}
 		return handles.toArray(new ServerHandle[handles.size()]);
 	}
 	
-	private ServerType getServerType(String typeId) {
+	private ServerType createServerTypeDAO(String typeId) {
 		IServerType st = serverTypes.get(typeId);
 		if( st == null )
 			return null;
 		return new ServerType(typeId, st.getName(), st.getDescription());
-		
 	}
 	
 	@Override
@@ -435,41 +432,36 @@ public class ServerModel implements IServerModel {
 	}
 
 	@Override
-	public Attributes getRequiredAttributes(String type) {
-		IServerType t = serverTypes.get(type);
-		Attributes ret = t == null ? null : t.getRequiredAttributes();
-		return validateAttributes(ret, type);
+	public Attributes getRequiredAttributes(IServerType serverType) {
+		Attributes ret = serverType == null ? null : serverType.getRequiredAttributes();
+		return validateAttributes(ret, serverType);
 	}
 	
 	@Override
-	public Attributes getOptionalAttributes(String type) {
-		IServerType t = serverTypes.get(type);
-		Attributes ret = t == null ? null : t.getOptionalAttributes();
-		return validateAttributes(ret, type);
+	public Attributes getOptionalAttributes(IServerType serverType) {
+		Attributes ret = serverType == null ? null : serverType.getOptionalAttributes();
+		return validateAttributes(ret, serverType);
 	}
 
 	@Override
-	public List<ServerLaunchMode> getLaunchModes(String serverType) {
-		IServerType t = serverTypes.get(serverType);
-		ServerLaunchMode[] ret = t == null ? null : t.getLaunchModes();
+	public List<ServerLaunchMode> getLaunchModes(IServerType serverType) {
+		ServerLaunchMode[] ret = serverType == null ? null : serverType.getLaunchModes();
 		return ret == null ? null : Arrays.asList(ret);
 	}
 	
 	@Override
-	public Attributes getRequiredLaunchAttributes(String type) {
-		IServerType t = serverTypes.get(type);
-		Attributes ret = t == null ? null : t.getRequiredLaunchAttributes();
-		return validateAttributes(ret, type);
+	public Attributes getRequiredLaunchAttributes(IServerType serverType) {
+		Attributes ret = serverType == null ? null : serverType.getRequiredLaunchAttributes();
+		return validateAttributes(ret, serverType);
 	}
 	
 	@Override
-	public Attributes getOptionalLaunchAttributes(String type) {
-		IServerType t = serverTypes.get(type);
-		Attributes ret = t == null ? null : t.getOptionalLaunchAttributes();
-		return validateAttributes(ret, type);
+	public Attributes getOptionalLaunchAttributes(IServerType serverType) {
+		Attributes ret = serverType == null ? null : serverType.getOptionalLaunchAttributes();
+		return validateAttributes(ret, serverType);
 	}
 
-	private Attributes validateAttributes(Attributes ret, String serverType) {
+	private Attributes validateAttributes(Attributes ret, IServerType serverType) {
 		if( ret != null ) {
 			CreateServerAttributesUtility util = new CreateServerAttributesUtility(ret);
 			Set<String> all = util.listAttributes();
@@ -484,4 +476,57 @@ public class ServerModel implements IServerModel {
 		}
 		return null;
 	}
+
+	@Override
+	public IStatus addDeployable(IServer server, DeployableReference reference) {
+		IServerDelegate s = serverDelegates.get(server.getId());
+		if( s == null ) {
+			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+					"Server " + server.getId() + " not found.");
+		}
+		IStatus canAdd = s.canAddDeployable(reference);
+		if(!canAdd.isOK()) {
+			return canAdd;
+		}
+		return s.getServerPublishModel().addDeployable(reference);
+	}
+
+	@Override
+	public IStatus removeDeployable(IServer server, DeployableReference reference) {
+		IServerDelegate s = serverDelegates.get(server.getId());
+		if( s == null ) {
+			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+					"Server " + server.getId() + " not found.");
+		}
+		IStatus canRemove = s.canRemoveDeployable(reference);
+		if (!canRemove.isOK()) {
+			return canRemove;
+		}
+		return s.getServerPublishModel().removeDeployable(reference);
+	}
+
+	@Override
+	public List<DeployableState> getDeployables(IServer server) {
+		IServerDelegate s = serverDelegates.get(server.getId());
+		if( s != null ) {
+			return s.getServerPublishModel().getDeployableStates();
+		}
+		return new ArrayList<>();
+	}
+
+	@Override
+	public IStatus publish(IServer server, int kind) throws CoreException {
+		IServerDelegate s = serverDelegates.get(server.getId());
+		if( s != null ) {
+			IStatus canPublish = s.canPublish();
+			if( canPublish != null && canPublish.isOK()) {
+				return s.publish(kind);
+			} else {
+				return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+						"Server " + server.getId() + " is not in a state that can be published to: " + canPublish.getMessage());
+			}
+		}
+		return Status.CANCEL_STATUS;
+	}
+
 }

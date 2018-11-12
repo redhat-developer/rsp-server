@@ -93,6 +93,13 @@ public interface IMemento {
 	 */
 	public Boolean getBoolean(String key);
 
+	/**
+	 * Get a list of attribute names.
+	 * This method will not include children. To get references
+	 * to children, please use the relevant getChildren(etc) method.
+	 * 
+	 * @return
+	 */
 	public List<String> getNames();
 	
 	/**

@@ -1,0 +1,22 @@
+{
+  "type" : "object",
+  "properties" : {
+    "reference" : {
+      "type" : "object",
+      "properties" : {
+        "label" : {
+          "type" : "string"
+        },
+        "path" : {
+          "type" : "string"
+        }
+      }
+    },
+    "state" : {
+      "type" : "integer"
+    },
+    "publishState" : {
+      "type" : "integer"
+    }
+  }
+}

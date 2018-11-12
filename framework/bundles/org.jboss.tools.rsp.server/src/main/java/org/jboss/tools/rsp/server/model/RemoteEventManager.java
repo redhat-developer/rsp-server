@@ -15,7 +15,7 @@ import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerProcess;
 import org.jboss.tools.rsp.api.dao.ServerProcessOutput;
-import org.jboss.tools.rsp.api.dao.ServerStateChange;
+import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.VMDescription;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallChangedListener;
@@ -47,27 +47,6 @@ public class RemoteEventManager implements IDiscoveryPathListener, IVMInstallCha
 		}
 	}
 
-	private VMDescription getDescription(IVMInstall vmi) {
-		String vers = vmi.getJavaVersion();
-		return new VMDescription(vmi.getId(), vmi.getInstallLocation().getAbsolutePath(), vers);
-	}
-
-	
-	@Override
-	public void vmAdded(IVMInstall vm) {
-//		List<RSPClient> l = server.getClients();
-//		for( RSPClient c : l) {
-//			c.vmAdded(getDescription(vm));
-//		}
-	}
-	@Override
-	public void vmRemoved(IVMInstall vm) {
-//		List<RSPClient> l = server.getClients();
-//		for( RSPClient c : l) {
-//			c.vmRemoved(getDescription(vm));
-//		}
-	}
-
 	public void serverAdded(ServerHandle server2) {
 		List<RSPClient> l = server.getClients();
 		for( RSPClient c : l) {
@@ -86,10 +65,12 @@ public class RemoteEventManager implements IDiscoveryPathListener, IVMInstallCha
 		// TODO 
 	}
 	
-	public void serverStateChanged(ServerHandle server, int state) {
+	public void serverStateChanged(ServerHandle server, ServerState state) {
 		List<RSPClient> l = this.server.getClients();
-		for( RSPClient c : l) {
-			c.serverStateChanged(new ServerStateChange(server, state));
+		if( this.server.getModel().getServerModel().getServer(server.getId()) != null ) {
+			for( RSPClient c : l) {
+				c.serverStateChanged(state);
+			}
 		}
 	}
 	
@@ -129,5 +110,26 @@ public class RemoteEventManager implements IDiscoveryPathListener, IVMInstallCha
 		// TODO Auto-generated method stub
 		
 	}
+
+
+	private VMDescription getDescription(IVMInstall vmi) {
+		String vers = vmi.getJavaVersion();
+		return new VMDescription(vmi.getId(), vmi.getInstallLocation().getAbsolutePath(), vers);
+	}
+
 	
+	@Override
+	public void vmAdded(IVMInstall vm) {
+//		List<RSPClient> l = server.getClients();
+//		for( RSPClient c : l) {
+//			c.vmAdded(getDescription(vm));
+//		}
+	}
+	@Override
+	public void vmRemoved(IVMInstall vm) {
+//		List<RSPClient> l = server.getClients();
+//		for( RSPClient c : l) {
+//			c.vmRemoved(getDescription(vm));
+//		}
+	}
 }

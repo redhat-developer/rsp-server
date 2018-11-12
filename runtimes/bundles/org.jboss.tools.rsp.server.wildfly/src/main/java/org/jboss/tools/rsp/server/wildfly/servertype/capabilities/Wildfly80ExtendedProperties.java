@@ -43,11 +43,11 @@ public class Wildfly80ExtendedProperties extends JBossAS710ExtendedProperties {
 	}
 	
 	@Override
-	public boolean allowExplodedModulesInWarLibs() {
+	public boolean allowExplodedDeploymentsInWarLibs() {
 		return true;
 	}
 	
-	public boolean allowExplodedModulesInEars() {
+	public boolean allowExplodedDeploymentsInEars() {
 		return true;
 	}
 //	@Override

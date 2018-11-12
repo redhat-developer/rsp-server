@@ -21,8 +21,4 @@ public class JBossEAP5ExtendedProperties extends JBossExtendedProperties {
 	public String getRuntimeTypeVersionString() {
 		return "5.x"; //$NON-NLS-1$
 	}
-
-//	public IServerModuleStateVerifier getModuleStateVerifier() {
-//		return new JBoss6ModuleStateVerifier();
-//	}
 }

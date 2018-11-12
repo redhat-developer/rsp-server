@@ -8,32 +8,27 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.api.dao;
 
-public class ServerStateChange {
+public class ModifyDeployableRequest {
 	private ServerHandle server;
-	private int state;
-
-	public ServerStateChange() {
-
+	private DeployableReference deployable;
+	
+	public ModifyDeployableRequest() {
+		
 	}
-
-	public ServerStateChange(ServerHandle server, int state) {
+	public ModifyDeployableRequest(ServerHandle server, DeployableReference deployable) {
 		this.server = server;
-		this.state = state;
+		this.deployable = deployable;
 	}
-
 	public ServerHandle getServer() {
 		return server;
 	}
-
 	public void setServer(ServerHandle server) {
 		this.server = server;
 	}
-
-	public int getState() {
-		return state;
+	public DeployableReference getDeployable() {
+		return deployable;
 	}
-
-	public void setState(int state) {
-		this.state = state;
+	public void setDeployable(DeployableReference deployable) {
+		this.deployable = deployable;
 	}
 }

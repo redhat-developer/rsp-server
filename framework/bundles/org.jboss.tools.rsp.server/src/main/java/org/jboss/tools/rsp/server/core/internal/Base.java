@@ -324,7 +324,6 @@ public abstract class Base {
 
 	protected void load(IMemento memento) {
 		map = new HashMap<>();
-		
 		Iterator<String> iterator = memento.getNames().iterator();
 		while (iterator.hasNext()) {
 			String key = iterator.next();

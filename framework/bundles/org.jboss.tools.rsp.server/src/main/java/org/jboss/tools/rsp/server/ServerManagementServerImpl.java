@@ -24,19 +24,25 @@ import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
+import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
+import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
+import org.jboss.tools.rsp.api.dao.PublishServerRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerBean;
 import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
+import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.api.dao.StopServerAttributes;
+import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
@@ -47,6 +53,7 @@ import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
+import org.jboss.tools.rsp.server.spi.servertype.IServerType;
 
 public class ServerManagementServerImpl implements RSPServer {
 	
@@ -197,8 +204,8 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( handle == null || isEmpty(handle.getId())) {
 			return invalidParameterStatus();
 		}
-		
-		boolean b = managementModel.getServerModel().removeServer(handle.getId());
+		IServer server = managementModel.getServerModel().getServer(handle.getId());
+		boolean b = managementModel.getServerModel().removeServer(server);
 		return booleanToStatus(b, "Server not removed: " + handle.getId());
 	}
 
@@ -211,7 +218,8 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( type == null || isEmpty(type.getId())) {
 			return null;
 		}
-		Attributes rspa = managementModel.getServerModel().getRequiredAttributes(type.getId());
+		IServerType serverType = managementModel.getServerModel().getIServerType(type.getId());
+		Attributes rspa = managementModel.getServerModel().getRequiredAttributes(serverType);
 		return rspa;
 	}
 
@@ -224,7 +232,8 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( type == null || isEmpty(type.getId())) {
 			return null;
 		}
-		return managementModel.getServerModel().getOptionalAttributes(type.getId());
+		IServerType serverType = managementModel.getServerModel().getIServerType(type.getId());
+		return managementModel.getServerModel().getOptionalAttributes(serverType);
 	}
 	
 	@Override
@@ -236,8 +245,9 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( type == null || isEmpty(type.getId()) ) {
 			return null;
 		}
+		IServerType serverType = managementModel.getServerModel().getIServerType(type.getId());
 		List<ServerLaunchMode> l = managementModel.getServerModel()
-				.getLaunchModes(type.getId());
+				.getLaunchModes(serverType);
 		return l;
 	}
 	
@@ -249,7 +259,8 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( req == null || isEmpty(req.getServerTypeId()) || isEmpty(req.getMode())) {
 			return null;
 		}
-		Attributes rspa = managementModel.getServerModel().getRequiredLaunchAttributes(req.getServerTypeId());
+		IServerType serverType = managementModel.getServerModel().getIServerType(req.getServerTypeId());
+		Attributes rspa = managementModel.getServerModel().getRequiredLaunchAttributes(serverType);
 		return rspa;
 	}
 
@@ -262,7 +273,8 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( req == null || isEmpty(req.getServerTypeId()) || isEmpty(req.getMode())) {
 			return null;
 		}
-		Attributes rspa = managementModel.getServerModel().getOptionalLaunchAttributes(req.getServerTypeId());
+		IServerType serverType = managementModel.getServerModel().getIServerType(req.getServerTypeId());
+		Attributes rspa = managementModel.getServerModel().getOptionalLaunchAttributes(serverType);
 		return rspa;
 	}
 	
@@ -351,7 +363,7 @@ public class ServerManagementServerImpl implements RSPServer {
 			return (StatusConverter.convert(is));
 		}
 		
-		if(del.getServerState() == IServerDelegate.STATE_STOPPED && !attr.isForce()) {
+		if(del.getServerRunState() == IServerDelegate.STATE_STOPPED && !attr.isForce()) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
 					"The server is already marked as stopped. If you wish to force a stop request, please set the force flag to true.");
 			return (StatusConverter.convert(is));
@@ -393,7 +405,17 @@ public class ServerManagementServerImpl implements RSPServer {
 			return null;
 		}
 	}
+	
+	@Override
+	public CompletableFuture<ServerState> getServerState(ServerHandle handle) {
+		return createCompletableFuture(() -> getServerStateSync(handle));
+	}
 
+	public ServerState getServerStateSync(ServerHandle handle) {
+		IServer is = managementModel.getServerModel().getServer(handle.getId());
+		return is.getDelegate().getServerState();
+	}
+	
 	@Override
 	public CompletableFuture<Status> serverStartingByClient(ServerStartingAttributes attr) {
 		return createCompletableFuture(() -> serverStartingByClientSync(attr));
@@ -466,7 +488,7 @@ public class ServerManagementServerImpl implements RSPServer {
 		ServerCapabilitiesResponse resp = new ServerCapabilitiesResponse(st, resp2);
 		return CompletableFuture.completedFuture(resp);
 	}
-	
+
 	/*
 	 * Utility methods below
 	 */	
@@ -480,7 +502,7 @@ public class ServerManagementServerImpl implements RSPServer {
 		}
 		return StatusConverter.convert(s);
 	}
-	
+
 	private boolean isEmpty(String s) {
 		return s == null || s.isEmpty();
 	}
@@ -489,6 +511,51 @@ public class ServerManagementServerImpl implements RSPServer {
 		IStatus s = new org.jboss.tools.rsp.eclipse.core.runtime.Status(
 				IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Parameter is invalid. It may be null, missing required fields, or unacceptable values.");
 		return StatusConverter.convert(s);
+	}
+
+	@Override
+	public CompletableFuture<List<DeployableState>> getDeployables(ServerHandle handle) {
+		return createCompletableFuture(() -> getDeployablesSync(handle));
+	}
+
+	public List<DeployableState> getDeployablesSync(ServerHandle handle) {
+		IServer server = managementModel.getServerModel().getServer(handle.getId());
+		 return managementModel.getServerModel().getDeployables(server);
+	}
+	
+	public CompletableFuture<Status> addDeployable(ModifyDeployableRequest request) {
+		return createCompletableFuture(() -> addDeployableSync(request.getServer(), request.getDeployable()));
+	}
+
+	public Status addDeployableSync(ServerHandle handle, DeployableReference reference) {
+		IServer server = managementModel.getServerModel().getServer(handle.getId());
+		IStatus stat = managementModel.getServerModel().addDeployable(server, reference);
+		return StatusConverter.convert(stat);
+	}
+	
+	public CompletableFuture<Status> removeDeployable(ModifyDeployableRequest request) {
+		return createCompletableFuture(() -> removeDeployableSync(request.getServer(), request.getDeployable()));
+	}
+
+	public Status removeDeployableSync(ServerHandle handle, DeployableReference reference) {
+		IServer server = managementModel.getServerModel().getServer(handle.getId());
+		IStatus stat = managementModel.getServerModel().removeDeployable(server, reference);
+		return StatusConverter.convert(stat);
+	}
+
+	@Override
+	public CompletableFuture<Status> publish(PublishServerRequest request) {
+		return createCompletableFuture(() -> publishSync(request));
+	}
+
+	private Status publishSync(PublishServerRequest request) {
+		try {
+			IServer server = managementModel.getServerModel().getServer(request.getServer().getId());
+			IStatus stat = managementModel.getServerModel().publish(server, request.getKind());
+			return StatusConverter.convert(stat);
+		} catch(CoreException ce) {
+			return StatusConverter.convert(ce.getStatus());
+		}
 	}
 
 	private static <T> CompletableFuture<T> createCompletableFuture(Supplier<T> supplier) {
