@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.rsp.server.filewatcher;
 
 import java.io.File;
@@ -18,7 +26,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class FileWatcherService implements Runnable {
+import org.jboss.tools.rsp.server.spi.filewatcher.FileWatcherEvent;
+import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherEventListener;
+import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
+
+public class FileWatcherService implements Runnable, IFileWatcherService {
 	// The watch service from java.nio
 	private WatchService watchService;
 	
@@ -43,7 +55,7 @@ public class FileWatcherService implements Runnable {
 	
 	private boolean closing = false;
 
-	protected FileWatcherService() {
+	public FileWatcherService() {
 	}
 	
 	private void log(Exception e) {

@@ -30,6 +30,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.jboss.tools.rsp.server.filewatcher.FileWatcherService.RegistrationRequest;
 import org.jboss.tools.rsp.server.filewatcher.FilewatcherModelTest.TestableFileWatcherService;
+import org.jboss.tools.rsp.server.spi.filewatcher.FileWatcherEvent;
+import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherEventListener;
 import org.junit.Test;
 
 public class FilewatcherModificationsTest {

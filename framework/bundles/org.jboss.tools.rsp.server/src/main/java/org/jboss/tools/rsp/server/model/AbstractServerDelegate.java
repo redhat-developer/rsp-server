@@ -61,7 +61,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	protected final HashMap<String, Object> sharedData = new HashMap<>();
 	private final IServer server;
 	
-	private final ServerPublishStateModel publishModel = new ServerPublishStateModel();
+	private final ServerPublishStateModel publishModel = new ServerPublishStateModel(this);
 	
 	public AbstractServerDelegate(IServer server) {
 		this.server = server;

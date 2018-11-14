@@ -6,25 +6,8 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.rsp.server.filewatcher;
+package org.jboss.tools.rsp.server.spi.filewatcher;
 
-import java.nio.file.Path;
-import java.nio.file.WatchEvent;
-
-public class FileWatcherEvent {
-	private Path path;
-	private WatchEvent.Kind<?> kind;
-
-	public FileWatcherEvent(Path path, WatchEvent.Kind<?> kind) {
-		this.path = path;
-		this.kind = kind;
-	}
-
-	public Path getPath() {
-		return path;
-	}
-
-	public WatchEvent.Kind<?> getKind() {
-		return kind;
-	}
+public interface IFileWatcherEventListener {
+	public void fireEvent(FileWatcherEvent event);
 }

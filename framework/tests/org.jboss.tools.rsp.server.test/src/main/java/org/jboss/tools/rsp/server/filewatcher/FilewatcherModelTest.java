@@ -21,6 +21,7 @@ import java.nio.file.WatchService;
 import java.util.HashMap;
 import java.util.List;
 
+import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherEventListener;
 import org.junit.Test;
 
 public class FilewatcherModelTest {

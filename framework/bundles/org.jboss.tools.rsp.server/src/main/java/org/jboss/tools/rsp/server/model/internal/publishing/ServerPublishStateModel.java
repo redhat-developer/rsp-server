@@ -8,6 +8,8 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.model.internal.publishing;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,16 +22,44 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
+import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
+import org.jboss.tools.rsp.server.spi.filewatcher.FileWatcherEvent;
+import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherEventListener;
+import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
+import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
 
-public class ServerPublishStateModel implements IServerPublishModel {
+public class ServerPublishStateModel implements IServerPublishModel, IFileWatcherEventListener {
 
 	private final Map<String, DeployableState> state;
+	private AbstractServerDelegate server;
+	private IFileWatcherService fileWatcher;
 
-	public ServerPublishStateModel() {
+	public ServerPublishStateModel(AbstractServerDelegate delegate) {
+		this.server = delegate;
+		this.fileWatcher = delegate.getServer().getServerManagementModel().getFileWatcherService();
 		this.state = new LinkedHashMap<>();
 	}
 
+	@Override
+	public void initialize(List<DeployableReference> references) {
+		for( DeployableReference reference : references ) {
+			addDeployableImpl(reference);
+		}
+	}
+	
+	private void addDeployableImpl(DeployableReference reference) {
+		DeployableState sActual = new DeployableState();
+		sActual.setReference(reference);
+		sActual.setState(ServerManagementAPIConstants.STATE_UNKNOWN);
+		sActual.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_FULL);
+		state.put(getKey(reference), sActual);
+		
+		// TODO Maybe make this recursive if we support exploded deployments
+		String path = reference.getPath();
+		fileWatcher.registerListener(new File(path).toPath(), this, false);
+	}
+	
 	@Override
 	public IStatus addDeployable(DeployableReference reference) {
 		if (contains(reference)) {
@@ -37,11 +67,7 @@ public class ServerPublishStateModel implements IServerPublishModel {
 					NLS.bind("Could not add deploybale with path {0}: it already exists.", getKey(reference)),
 							null);
 		}
-		DeployableState newState = new DeployableState();
-		newState.setReference(reference);
-		newState.setState(ServerManagementAPIConstants.STATE_UNKNOWN);
-		newState.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_ADD);
-		state.put(getKey(reference), newState);
+		addDeployableImpl(reference);
 		return Status.OK_STATUS;
 	}
 
@@ -83,17 +109,6 @@ public class ServerPublishStateModel implements IServerPublishModel {
 	public List<DeployableState> getDeployableStates() {
 		return new ArrayList<>(state.values());
 	}
-
-	@Override
-	public void initialize(List<DeployableReference> references) {
-		for( DeployableReference reference : references ) {
-			DeployableState sActual = new DeployableState();
-			sActual.setReference(reference);
-			sActual.setState(ServerManagementAPIConstants.STATE_UNKNOWN);
-			sActual.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_FULL);
-			state.put(getKey(reference), sActual);
-		}
-	}
 	
 	@Override
 	public DeployableState getDeployableState(DeployableReference reference) {
@@ -129,6 +144,48 @@ public class ServerPublishStateModel implements IServerPublishModel {
 		next.setState(runState);
 		next.setPublishState(ds.getPublishState());
 		state.put(getKey(reference), next);
+	}
+
+	/*
+	 * If a path matching one of our deployments has been modified,
+	 * created, or deleted, we should respond to this. However, most 
+	 * cases will not require us to do much of anything. 
+	 * 
+	 *  If the deployment is currently set to be 'added', we should not make any changes
+	 *  to the publish state, since the next publish will do the full add as expected.
+	 *  
+	 *  If the deployment is currently set to be 'removed', we should not make any 
+	 *  changes to the publish state, since the next publish will remove the deployment.
+	 *  
+	 *  If the deployment is currently set to be 'incremental', 
+	 *  no change is needed. It's already marked as requiring a publish. 
+	 *  
+	 *  If the deployment is currently set to be 'full',
+	 *  no change is needed. It's already marked as requiring a publish.
+	 *  
+	 *  If the deployment is currently set to 'unknown', 
+	 *  we should not make any change, so the delegate knows the state is still uncertain.
+	 *  
+	 *  So only if the deployment is currently set to 'none' do we know 
+	 *  that we should now mark it as requiring an incremental publish. 
+	 * 
+	 */
+	@Override
+	public void fireEvent(FileWatcherEvent event) {
+		Path affected = event.getPath();
+		List<DeployableState> ds = new ArrayList<>(state.values());
+		for( DeployableState d : ds ) {
+			Path deploymentPath = new File(d.getReference().getPath()).toPath();
+			if( affected.startsWith(deploymentPath)) {
+				int currentPubState = d.getPublishState();
+				if( currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_NONE) {
+					d.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL);
+					// Feels strange to allow this class to fire the event
+					// but whatever
+					server.getServer().getServerManagementModel().getServerModel().fireServerStateChanged(server.getServer(), server.getServerState());
+				}
+			}
+		}
 	}
 	
 }
