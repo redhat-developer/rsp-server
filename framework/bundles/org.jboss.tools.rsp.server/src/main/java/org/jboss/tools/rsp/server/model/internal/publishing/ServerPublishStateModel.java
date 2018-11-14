@@ -26,7 +26,6 @@ import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
 import org.jboss.tools.rsp.server.spi.filewatcher.FileWatcherEvent;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherEventListener;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
-import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
 
 public class ServerPublishStateModel implements IServerPublishModel, IFileWatcherEventListener {
@@ -35,29 +34,31 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	private AbstractServerDelegate server;
 	private IFileWatcherService fileWatcher;
 
-	public ServerPublishStateModel(AbstractServerDelegate delegate) {
+	public ServerPublishStateModel(AbstractServerDelegate delegate, IFileWatcherService fileWatcher) {
 		this.server = delegate;
-		this.fileWatcher = delegate.getServer().getServerManagementModel().getFileWatcherService();
+		this.fileWatcher = fileWatcher;
 		this.state = new LinkedHashMap<>();
 	}
 
 	@Override
 	public void initialize(List<DeployableReference> references) {
 		for( DeployableReference reference : references ) {
-			addDeployableImpl(reference);
+			addDeployableImpl(reference, ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN);
 		}
 	}
 	
-	private void addDeployableImpl(DeployableReference reference) {
+	private void addDeployableImpl(DeployableReference reference, int publishState) {
 		DeployableState sActual = new DeployableState();
 		sActual.setReference(reference);
 		sActual.setState(ServerManagementAPIConstants.STATE_UNKNOWN);
-		sActual.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_FULL);
+		sActual.setPublishState(publishState);
 		state.put(getKey(reference), sActual);
 		
 		// TODO Maybe make this recursive if we support exploded deployments
 		String path = reference.getPath();
-		fileWatcher.registerListener(new File(path).toPath(), this, false);
+		if( fileWatcher != null ) {
+			fileWatcher.registerListener(new File(path).toPath(), this, false);
+		}
 	}
 	
 	@Override
@@ -67,7 +68,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 					NLS.bind("Could not add deploybale with path {0}: it already exists.", getKey(reference)),
 							null);
 		}
-		addDeployableImpl(reference);
+		addDeployableImpl(reference, ServerManagementAPIConstants.PUBLISH_STATE_ADD);
 		return Status.OK_STATUS;
 	}
 
@@ -90,6 +91,10 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 			deployableRemoved(reference);
 		}
 		ds.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_REMOVE);
+		String path = reference.getPath();
+		if( fileWatcher != null ) {
+			fileWatcher.deregisterListener(new File(path).toPath(), this);
+		}
 		return Status.OK_STATUS;
 	}
 

@@ -61,7 +61,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	protected final HashMap<String, Object> sharedData = new HashMap<>();
 	private final IServer server;
 	
-	private final ServerPublishStateModel publishModel = new ServerPublishStateModel(this);
+	private ServerPublishStateModel publishModel = null;
 	
 	public AbstractServerDelegate(IServer server) {
 		this.server = server;
@@ -405,7 +405,10 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	
 	@Override
 	public IServerPublishModel getServerPublishModel() {
-		return publishModel;
+		if( this.publishModel == null ) {
+			this.publishModel = new ServerPublishStateModel(this, getServer().getServerManagementModel().getFileWatcherService());
+		}
+		return this.publishModel;
 	}
 	
 	@Override

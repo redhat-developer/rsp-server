@@ -99,9 +99,9 @@ public class ServerDeployableTest {
 		this.serversDir = Files.createTempDirectory(SERVERS_DIR);
 		this.war = createWar();
 		this.sm = new ServerModel(mock(IServerManagementModel.class));
-		sm.addServerType(mockServerType(SERVER_TYPE, TestServerDelegate::new));
+		this.sm.addServerType(mockServerType(SERVER_TYPE, TestServerDelegate::new));
 		this.serverFile = createServerFile(SERVER_FILENAME, getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE));
-		sm.loadServers(serversDir.toFile());
+		this.sm.loadServers(serversDir.toFile());
 		this.server = sm.getServer(SERVER_ID);
 		this.deployable = new DeployableReference(DEPLOYABLE_LABEL, DEPLOYABLE_PATH);
 	}
@@ -393,7 +393,7 @@ public class ServerDeployableTest {
 		DeployableState ds1 = deployables.get(0);
 		assertNotNull(ds1);
 		assertEquals(ServerManagementAPIConstants.STATE_UNKNOWN, ds1.getState());
-		assertEquals(ServerManagementAPIConstants.PUBLISH_STATE_FULL, ds1.getPublishState());
+		assertEquals(ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN, ds1.getPublishState());
 		assertEquals(DEPLOYABLE_LABEL, ds1.getReference().getLabel());
 	}
 
