@@ -14,9 +14,10 @@
   <packaging>pom</packaging>
 
   <modules>
-  <module>org.jboss.tools.rsp.launching.test</module>
+    <module>org.jboss.tools.rsp.launching.test</module>
     <module>org.jboss.tools.rsp.launching.java.test</module>
     <module>org.jboss.tools.rsp.secure.test</module>
     <module>org.jboss.tools.rsp.server.test</module>
+    <module>org.jboss.tools.rsp.server.spi.test</module>
   </modules>
 </project>

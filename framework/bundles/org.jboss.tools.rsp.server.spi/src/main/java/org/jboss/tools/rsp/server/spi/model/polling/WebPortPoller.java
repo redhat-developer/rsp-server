@@ -21,6 +21,11 @@ public abstract class WebPortPoller extends AbstractPoller implements IServerSta
 
 	private String name;
 
+	public WebPortPoller(String string) {
+		super();
+		this.name = string;
+	}
+
 	@Override
 	protected SERVER_STATE onePing(IServer server) {
 		return onePing(getURL(server));
@@ -55,10 +60,5 @@ public abstract class WebPortPoller extends AbstractPoller implements IServerSta
 	@Override
 	protected String getThreadName() {
 		return "Web Poller: " + name;
-	}
-
-	public WebPortPoller(String string) {
-		super();
-		this.name = string;
 	}
 }

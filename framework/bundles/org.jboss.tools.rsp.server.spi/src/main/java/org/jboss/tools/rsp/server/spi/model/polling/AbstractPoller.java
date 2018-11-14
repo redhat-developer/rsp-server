@@ -8,19 +8,26 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.spi.model.polling;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
 public abstract class AbstractPoller implements IServerStatePoller {
 
+	private static final long POLLING_DELAY = 200;
+
 	private IServer server;
-	private boolean canceled, done;
+	private boolean canceled; 
+	private boolean done;
 	private SERVER_STATE state;
 	private SERVER_STATE expectedState;
-
+	private ExecutorService executor = Executors.newSingleThreadExecutor(
+			(Runnable runnable) -> new Thread(runnable, getThreadName()));
+	
 	public void beginPolling(IServer server, SERVER_STATE expectedState) {
 		this.server = server;
 		this.canceled = done = false;
@@ -30,69 +37,72 @@ public abstract class AbstractPoller implements IServerStatePoller {
 	}
 
 	protected void launchThread() {
-		Thread t = new Thread(new Runnable(){
-			public void run() {
-				pollerRun();
-			}
-		}, getThreadName()); //$NON-NLS-1$
-		t.start();
+		executor.execute(() -> pollerRun());
 	}
-	
-	protected abstract String getThreadName();
 
-	private synchronized void setStateInternal(boolean done, SERVER_STATE state) {
-		this.done = done;
-		this.state = state;
-	}
-	
 	private void pollerRun() {
 		setStateInternal(false, state);
 		while(!canceled && !done) {
 			SERVER_STATE stat = onePing(server);
-			if( stat == expectedState ) {
-				setStateInternal(true, expectedState);
+			if (expectedState == stat) {
+				setStateInternal(true, stat);
 			}
 			try {
-				Thread.sleep(100);
-			} catch(InterruptedException ie) {} // ignore
+					Thread.sleep(POLLING_DELAY);
+			} catch (InterruptedException e) {
+				cancel(CANCELATION_CAUSE.CANCEL);
+			}
 		}
 	}
 
 	protected abstract SERVER_STATE onePing(IServer server);
 	
+	private synchronized void setStateInternal(boolean done, SERVER_STATE state) {
+		this.done = done;
+		this.state = state;
+	}
+	
+	protected abstract String getThreadName();
+
+	@Override
 	public IServer getServer() {
 		return server;
 	}
 
+	@Override
 	public synchronized boolean isComplete() throws PollingException, RequiresInfoException {
 		return done;
 	}
 
+	@Override
 	public synchronized SERVER_STATE getState() throws PollingException, RequiresInfoException {
 		return state;
 	}
-
-	private SERVER_STATE fromBool(boolean b) {
-		return b ? SERVER_STATE.UP : SERVER_STATE.DOWN;
-	}
 	
+	@Override
 	public void cleanup() {
+		executor.shutdownNow();
 	}
 
+	@Override
 	public List<String> getRequiredProperties() {
-		return new ArrayList<String>();
+		return Collections.emptyList();
 	}
 
+	@Override
 	public void provideCredentials(Properties properties) {
 	}
 
+	@Override
 	public SERVER_STATE getCurrentStateSynchronous(IServer server) {
 		return onePing(server);
 	}
 
 	@Override
 	public synchronized void cancel(CANCELATION_CAUSE cause) {
-		canceled = true;
+		this.canceled = true;
+		this.state = null;
+		cleanup();
 	}
 
 	@Override

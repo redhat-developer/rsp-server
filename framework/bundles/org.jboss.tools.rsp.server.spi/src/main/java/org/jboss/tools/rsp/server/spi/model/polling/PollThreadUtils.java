@@ -17,8 +17,14 @@ import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
  * @author André Dietisheim
  */
 public class PollThreadUtils {
-	private static final String PROP_POLL_THREAD_KEY = "org.jboss.tools.rsp.server.spi.model.polling.PollThreadKey";
-	
+
+	public static final String PROP_POLL_THREAD_KEY = "org.jboss.tools.rsp.server.spi.model.polling.PollThreadKey";
+
+	private static final int DEFAULT_TIMEOUT = 2*60*1000;
+
+	private PollThreadUtils() {
+	}
+
 	/**
 	 * Stops the given poll thread.
 	 * 
@@ -35,28 +41,15 @@ public class PollThreadUtils {
 	 * @param pollThread the poll thread to cancel
 	 */
 	public static void cancelPolling(String message, PollThread pollThread) {
-		if (pollThread != null) {
+		if (pollThread == null
+				|| !pollThread.isAlive()) {
+			return;
+		}
+		if (message != null) {
+			pollThread.cancel(message, IServerStatePoller.CANCELATION_CAUSE.CANCEL);
+		} else {
 			pollThread.cancel();
 		}
-	}
-
-
-	/**
-	 * Stops the given poll thread and creates a new poll thread for the given
-	 * expected state, poller, result listener and server.
-	 * 
-	 * @param expectedState the state to wait for 
-	 * @param poller the poller to use to wait for the expected state
-	 * @param pollThread the poll thread to stop
-	 * @param listener the listener to inform about the polling result 
-	 * @return the new poll thread
-	 */
-	public static PollThread pollServer(SERVER_STATE expectedState, IServerStatePoller poller, PollThread currentPollThread,
-			IPollResultListener listener, IServer server, int timeout) {
-		stopPolling(currentPollThread);
-		PollThread newPollThread = new PollThread(expectedState, poller, listener, server, timeout);
-		newPollThread.start();
-		return newPollThread;
 	}
 	
 	/*
@@ -65,26 +58,55 @@ public class PollThreadUtils {
 	 * but some pollers such as timeout poller cannot actively check
 	 */
 	public static SERVER_STATE isServerStarted(IServer server,IServerStatePoller poller ) {
-		SERVER_STATE started = ((IServerStatePoller)poller).getCurrentStateSynchronous(server);
-		return started;
+		return poller.getCurrentStateSynchronous(server);
 	}
 	
 
-	public static void pollServer(IServer server, SERVER_STATE expectedState, IServerStatePoller poller, IPollResultListener listener) {
-		pollServer(server, expectedState, poller, listener, 2*60*1000);
+	public static PollThread pollServer(IServer server, SERVER_STATE expectedState, IServerStatePoller poller, IPollResultListener listener) {
+		return pollServer(server, expectedState, poller, listener, DEFAULT_TIMEOUT); 
 	}
 
-	public static void pollServer(IServer server, SERVER_STATE expectedState, IServerStatePoller poller,
+	public static PollThread pollServer(IServer server, SERVER_STATE expectedState, IServerStatePoller poller,
 			IPollResultListener listener, int timeout) {
 		IServerDelegate del = server.getDelegate();
-		PollThread pollThread = (PollThread)del.getSharedData(PROP_POLL_THREAD_KEY);
-		pollThread = PollThreadUtils.pollServer(expectedState, poller, pollThread, listener, server, timeout);
-		del.putSharedData(PROP_POLL_THREAD_KEY, pollThread);
+		PollThread pollThread = getPollThread(del);
+		pollThread = pollServer(server, expectedState, poller, pollThread, listener, timeout);
+		return pollThread;
+	}
+
+	/**
+	 * Stops the given PollThread and creates a new PollThread, that polls the given
+	 * IServer for the given SERVER_STATE using the given IServerStatePoller and
+	 * notifies the given IPollResultListener of the results.
+	 *
+	 * @param expectedState the state to wait for
+	 * @param poller        the poller to use to wait for the expected state
+	 * @param pollThread    the poll thread to stop
+	 * @param listener      the listener to inform about the polling result
+	 * @return the new poll thread
+	 * 
+	 * @see PollThread
+	 * @see SERVER_STATE
+	 * @see IServerStatePoller
+	 * @see IServer
+	 */
+	public static PollThread pollServer(IServer server, SERVER_STATE expectedState, IServerStatePoller poller, PollThread currentPollThread,
+			IPollResultListener listener, int timeout) {
+		stopPolling(currentPollThread);
+		PollThread newPollThread = new PollThread(expectedState, poller, listener, server, timeout);
+		newPollThread.start();
+		savePollThread(newPollThread, server.getDelegate());
+		return newPollThread;
+	}
+
+	public static PollThread getPollThread(IServerDelegate delegate) {
+		return (PollThread) delegate.getSharedData(PROP_POLL_THREAD_KEY);
 	}
 	
+	public static void savePollThread(PollThread poller, IServerDelegate delegate) {
+		delegate.putSharedData(PROP_POLL_THREAD_KEY, poller);
+	}
 
-	
-	
 //
 //	/**
 //	 * The credential provider is alerted that credentials are needed. 

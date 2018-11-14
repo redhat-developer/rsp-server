@@ -11,7 +11,6 @@ package org.jboss.tools.rsp.server.spi.model.polling;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller.CANCELATION_CAUSE;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller.SERVER_STATE;
-import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller.TIMEOUT_BEHAVIOR;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.slf4j.Logger;
@@ -24,8 +23,10 @@ import org.slf4j.LoggerFactory;
 public class PollThread extends Thread {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PollThread.class);
+
+	private static final int POLL_DELAY = 100;
 	
-	private boolean abort, stateStartedOrStopped;
+	private boolean abort;
 	private SERVER_STATE expectedState;
 	private IServerStatePoller poller;
 	private IPollResultListener listener;
@@ -42,31 +43,13 @@ public class PollThread extends Thread {
 		this.timeout = timeout;
 	}
 
-	public void cancel() {
-		abort = true;
-		poller.cancel(IServerStatePoller.CANCELATION_CAUSE.CANCEL);
-	}
-
-	private SERVER_STATE oppositeState(SERVER_STATE state) {
-		if( state == SERVER_STATE.UNKNOWN) {
-			// There's no opposite to unknown... 
-			return SERVER_STATE.UNKNOWN;
-		}
-		if( state == SERVER_STATE.UP)
-			return SERVER_STATE.DOWN;
-		return SERVER_STATE.UP;
-	}
-	
-	public int getTimeout() {
-		return timeout;
-	}
 
 	@Override
 	public void run() {
 		// Poller not found. Abort
 		if (poller == null) {
 			LOG.error("No poller defined, aborting polling.");
-			alertListener(oppositeState(expectedState));
+			alertListener(getOpposite(expectedState));
 			return;
 		}
 
@@ -74,28 +57,21 @@ public class PollThread extends Thread {
 
 		long startTime = System.currentTimeMillis();
 		boolean done = false;
+		boolean serverStartedOrStopped = false;
 		try {
 			poller.beginPolling(getServer(), expectedState);
 	
 			// begin the loop; ask the poller every so often
-			while (!stateStartedOrStopped 
+			while (!serverStartedOrStopped
 					&& !abort 
 					&& !done
 					&& !timeoutReached(startTime, maxWait)) {
 				try {
-					Thread.sleep(100);
-				} catch (InterruptedException ie) {
-					// I have no idea what I'm supposed to do here to make this 'not empty'
-				}
-	
-				try {
+					Thread.sleep(POLL_DELAY);
 					done = poller.isComplete();
-				} catch (PollingException e) {
+				} catch (PollingException | InterruptedException e) {
 					// abort and put the message in event log
-					poller.cancel(CANCELATION_CAUSE.CANCEL);
-					poller.cleanup();
-					LOG.error("Error occurred while polling, aborting.");
-					alertListener(oppositeState(expectedState));
+					cancel(e.getMessage(), CANCELATION_CAUSE.FAILED);
 					return;
 				} catch (RequiresInfoException rie) {
 					// This way each request for new info is checked only once.
@@ -104,14 +80,11 @@ public class PollThread extends Thread {
 						fireRequestCredentials(expectedState, poller);
 					}
 				}
-				stateStartedOrStopped = checkServerState();
+				serverStartedOrStopped = isStartedOrStopped(server.getDelegate());
 			}
-			if (stateStartedOrStopped) {
+			if (serverStartedOrStopped) {
 				// we stopped. Did we abort?
 				handleUncertainTermination();
-			} else if (abort) {
-				// Definite abort
-				poller.cleanup();
 			} else if (done) {
 				// the poller has an answer
 				handlePollerHasAnswer();
@@ -121,9 +94,21 @@ public class PollThread extends Thread {
 			}
 		} catch(Exception e) {
 			LOG.error("Error occurred while polling, aborting.", e);
-			handleExceptionTermination();
+			cancel(e.getMessage(), CANCELATION_CAUSE.FAILED);
 		}
+	}
 
+	private SERVER_STATE getOpposite(SERVER_STATE state) {
+		switch(state) {
+		case UNKNOWN:
+			// There's no opposite to unknown... 
+			return SERVER_STATE.UNKNOWN;
+		case UP:
+			return SERVER_STATE.DOWN;
+		case DOWN:
+		default:
+			return SERVER_STATE.UP;
+		}
 	}
 
 	private void handlePollerHasAnswer() {
@@ -134,64 +119,76 @@ public class PollThread extends Thread {
 		} catch (PollingException pe) {
 			// Poller's answer was exception:  abort and put the message in event log
 			poller.cancel(CANCELATION_CAUSE.CANCEL);
-			poller.cleanup();
-			alertListener(oppositeState(expectedState));
+			alertListener(getOpposite(expectedState));
 		} catch (RequiresInfoException rie) {
 			// You don't have an answer... liar!
 		}
 	}
 
-	private void handleExceptionTermination() {
-		cancel();
-		poller.cleanup();
-		handleTimeoutBehavior();
-	}
-
 	private void handleTimeoutTermination() {
-		poller.cancel(CANCELATION_CAUSE.TIMEOUT_REACHED);
-		poller.cleanup();
-		handleTimeoutBehavior();
-	}
-
-	private void handleTimeoutBehavior() {
-		TIMEOUT_BEHAVIOR behavior = poller.getTimeoutBehavior();
-		// xnor;
-		// if behavior is to succeed and we're expected to go up, we're up
-		// if behavior is to fail and we're expecting to be down, we're up (failed to shutdown)
-		// all other cases, we're down.
-		boolean expectedAsBool = (expectedState == SERVER_STATE.UP);
-		boolean currentState = (expectedAsBool == (behavior == TIMEOUT_BEHAVIOR.SUCCEED));
-		SERVER_STATE ret = (currentState ? SERVER_STATE.UP : SERVER_STATE.DOWN);
-		alertListener(ret);
+		cancelPoller(CANCELATION_CAUSE.TIMEOUT_REACHED);
+		SERVER_STATE state = poller.getTimeoutBehavior().getServerState(expectedState);
+		alertListener(state);
 	}
 	
 	private void handleUncertainTermination() {
 		int state = server.getDelegate().getServerRunState();
 		boolean success = false;
-		if (expectedState == SERVER_STATE.UP)
-			success = state == IServerDelegate.STATE_STARTED;
-		else
-			success = state == IServerDelegate.STATE_STOPPED;
+		if (expectedState == SERVER_STATE.UP) {
+			success = (state == IServerDelegate.STATE_STARTED);
+		} else {
+			success = (state == IServerDelegate.STATE_STOPPED);
+		}
 
-		poller.cancel(success ? CANCELATION_CAUSE.SUCCESS
+		poller.cancel(success ? 
+				CANCELATION_CAUSE.SUCCESS
 				: CANCELATION_CAUSE.FAILED);
-		poller.cleanup();
 	}
 	
 	private boolean timeoutReached(long startTime, int maxWait) {
 		return System.currentTimeMillis() >= (startTime + maxWait);
 	}
 
-	protected boolean checkServerState() {
-		int state = server.getDelegate().getServerRunState();
-		if (state == IServerDelegate.STATE_STARTED)
+	private boolean isStartedOrStopped(IServerDelegate delegate) {
+		int state = delegate.getServerRunState();
+		switch(state) {
+		case IServerDelegate.STATE_STARTED:
+		case IServerDelegate.STATE_STOPPED:
 			return true;
-		if (state == IServerDelegate.STATE_STOPPED)
-			return true;
-		return false;
+		default:
+			return false;
+		}
+	}
+
+	public void cancel() {
+		cancel(null, IServerStatePoller.CANCELATION_CAUSE.CANCEL);
+	}
+
+	protected void cancel(String message, IServerStatePoller.CANCELATION_CAUSE cause) {
+		this.abort = true;
+		cancelPoller(cause);
+		log(message, cause);
+		alertListener(getOpposite(expectedState));
+	}
+
+	private void cancelPoller(IServerStatePoller.CANCELATION_CAUSE cause) {
+		if (poller != null) {
+			poller.cancel(cause);
+		}
+	}
+
+	private void log(String message, IServerStatePoller.CANCELATION_CAUSE cause) {
+		if (cause != null) {
+			cause.log(message, server, LOG);
+		} else {
+			LOG.info(NLS.bind("Polling server {0} cancelled", server.getName()));
+		}
 	}
 
 	protected void alertListener(SERVER_STATE currentState) {
+		if (listener == null) {
+			return;
+		}
 		if (currentState != expectedState) {
 			listener.stateNotAsserted(expectedState, currentState);
 		} else {
@@ -199,14 +196,16 @@ public class PollThread extends Thread {
 		}
 	}
 	
+	protected int getTimeout() {
+		return timeout;
+	}
+
 	protected IServer getServer() {
 		return server;
 	}
 
 	public static void fireRequestCredentials(SERVER_STATE expectedState, IServerStatePoller poller) {
 		// TODO We need to find a way to accomplish this
-		
 		//PollThreadUtils.requestCredentialsAsynch(poller, poller.getRequiredProperties());
-		
 	}
 }
