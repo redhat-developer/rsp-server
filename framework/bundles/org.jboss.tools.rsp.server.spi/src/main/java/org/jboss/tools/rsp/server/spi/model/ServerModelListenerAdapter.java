@@ -26,7 +26,6 @@ public class ServerModelListenerAdapter implements IServerModelListener {
 	}
 
 	@Override
-
 	public void serverStateChanged(ServerHandle server, ServerState state) {
 	}
 

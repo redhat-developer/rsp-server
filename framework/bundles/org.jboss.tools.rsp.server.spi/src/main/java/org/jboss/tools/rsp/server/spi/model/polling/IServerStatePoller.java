@@ -11,9 +11,12 @@ package org.jboss.tools.rsp.server.spi.model.polling;
 import java.util.List;
 import java.util.Properties;
 
+import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
+import org.slf4j.Logger;
 
 public interface IServerStatePoller {
+
 	public static final int POLLING_CODE = 1 << 24;
 	public static final int POLLER_MASK = 0xFF << 16;
 	
@@ -22,41 +25,129 @@ public interface IServerStatePoller {
 	}
 
 	public enum CANCELATION_CAUSE {
-		CANCEL, TIMEOUT_REACHED, SUCCESS, FAILED
+		CANCEL {
+			@Override
+			String getExplanation() {
+				return "Aborted polling";
+			}
+
+			@Override
+			void log(String message, IServer server, Logger log) {
+				log.info(message);
+			}			
+		}, 
+		
+		TIMEOUT_REACHED {
+			@Override
+			String getExplanation() {
+				return "Timeout reached, aborted polling";
+			}
+
+			@Override
+			void log(String message, IServer server, Logger log) {
+				log.info(message);
+			}
+		}, 
+		
+		SUCCESS {
+			@Override
+			String getExplanation() {
+				return "Polling succeeded, aborting poller";
+			}
+
+			@Override
+			void log(String message, IServer server, Logger log) {
+				log.info(message);
+			}
+			
+		}, 
+		
+		FAILED {
+			@Override
+			String getExplanation() {
+				return "Failed polling, aborting poller";
+			}
+
+			@Override
+			void log(String message, IServer server, Logger log) {
+				log.error(message);
+			}
+
+		};
+		
+		public String getMessage(String message, IServer server) {
+			if (message != null) {
+				return NLS.bind(getExplanation() + " for server {0}: {1}", server.getName(), message);
+			} else {
+				return NLS.bind(getExplanation() + " for server {0}", server.getName());
+			}
+		}
+
+		abstract String getExplanation();
+		abstract void log(String message, IServer server, Logger log);
 	}
 	
 	public enum TIMEOUT_BEHAVIOR {
-		SUCCEED, //If we timeout, set new state to expected state 
-		FAIL //If we timeout, set new state to old state
+		SUCCEED { // if we timeout, return expected state
+
+			@Override
+			public SERVER_STATE getServerState(SERVER_STATE expectedState) {
+				switch(expectedState) {
+				case UP:
+					return SERVER_STATE.UP;
+				case DOWN:
+					return SERVER_STATE.DOWN;
+				case UNKNOWN:
+				default:
+					return SERVER_STATE.UNKNOWN;
+				}
+			}
+			
+		},  
+		FAIL { // if we timeout, return the inversion of the expected state
+
+			@Override
+			public SERVER_STATE getServerState(SERVER_STATE expectedState) {
+				switch(expectedState) {
+				case UP:
+					return SERVER_STATE.DOWN;
+				case DOWN:
+					return SERVER_STATE.UP;
+				case UNKNOWN:
+				default:
+					return SERVER_STATE.UNKNOWN;
+				}
+			}
+		};		
+		
+		public abstract SERVER_STATE getServerState(SERVER_STATE expectedState);
 	}
 
 	
 	/**
-	 * Begin polling the provided server for its state, while the server transitions into expectedState.
+	 * Begins polling the provided server for its state, while the server transitions into expectedState.
 	 * 
 	 * @param server
-	 * @param expectedState one of IServerStatePoller.SERVER_UP or IServerStatePoller.SERVER_DOWN
+	 * @param expectedState one of IServerStatePoller#SERVER_UP or IServerStatePoller#SERVER_DOWN
 	 * @throws PollingException
 	 */
 	public void beginPolling(IServer server, SERVER_STATE expectedState) throws PollingException;
 	
 	/**
-	 * Check whether the polling has completed. 
-	 * What this means is has the expected transition in state been recognized?
+	 * Returns {@code true} if the polling has completed. Returns {@code false} otherwise.
 	 * 
 	 * @return
-	 * @throws PollingException
-	 * @throws RequiresInfoException
+	 * @throws PollingException, RequiresInfoException
 	 */
 	public boolean isComplete() throws PollingException, RequiresInfoException;
 	
 	/**
-	 * Called only after poller is "done".  
-	 * Should return cached final state rather than poll again. 
-	 *  
+	 * Returns the state that resulted from polling. Returns {@code null} before the
+	 * polling was executed, {@link SERVER_STATE} afterwards. Called only after
+	 * poller is "done". Should return cached final state rather than poll again.
+	 * 
 	 * @return
-	 * @throws PollingException
-	 * @throws RequiresInfoException
+	 * @throws PollingException, RequiresInfoException
 	 */
 	public SERVER_STATE getState() throws PollingException, RequiresInfoException; 
 	/*
