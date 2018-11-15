@@ -140,6 +140,12 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+	<dependency>
+            <groupId>org.jboss.tools.rsp.framework</groupId>
+            <artifactId>org.jboss.tools.rsp.server.spi.test</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>net.lingala.zip4j</groupId>
             <artifactId>zip4j</artifactId>
