@@ -69,6 +69,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 							null);
 		}
 		addDeployableImpl(reference, ServerManagementAPIConstants.PUBLISH_STATE_ADD);
+		fireState();
 		return Status.OK_STATUS;
 	}
 
@@ -95,6 +96,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		if( fileWatcher != null ) {
 			fileWatcher.deregisterListener(new File(path).toPath(), this);
 		}
+		fireState();
 		return Status.OK_STATUS;
 	}
 
@@ -185,11 +187,18 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 				int currentPubState = d.getPublishState();
 				if( currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_NONE) {
 					d.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL);
-					// Feels strange to allow this class to fire the event
-					// but whatever
-					server.getServer().getServerManagementModel().getServerModel().fireServerStateChanged(server.getServer(), server.getServerState());
+					fireState();
 				}
 			}
+		}
+	}
+	
+	private void fireState() {
+		// Feels strange to allow this class to fire the event
+		// but whatever. This feels so dirty. 
+		if( server != null && server.getServer() != null && server.getServer().getServerManagementModel() != null 
+				&& server.getServer().getServerManagementModel().getServerModel() != null ) {
+			server.getServer().getServerManagementModel().getServerModel().fireServerStateChanged(server.getServer(), server.getServerState());
 		}
 	}
 	

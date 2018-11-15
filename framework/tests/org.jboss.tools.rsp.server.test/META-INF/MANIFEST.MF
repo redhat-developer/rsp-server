@@ -26,3 +26,4 @@ Require-Bundle: org.jboss.tools.rsp.api,
  org.jboss.tools.rsp.server,
  org.junit,
  org.jboss.tools.locus.mockito
+Export-Package: org.jboss.tools.rsp.server.util.generation
