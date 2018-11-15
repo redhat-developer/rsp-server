@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.client.cli;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -39,49 +40,439 @@ import org.jboss.tools.rsp.client.bindings.ServerManagementClientLauncher;
 
 public class StandardCommandHandler implements InputHandler {
 
-	private static final String LIST_PATHS = "list paths";
-	private static final String ADD_PATH = "add path ";
-	private static final String REMOVE_PATH = "remove path ";
-	private static final String SEARCH_PATH = "search path ";
+	private enum Commands {
+		SHUTDOWN("shutdown") {
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
+				launcher.getServerProxy().shutdown();
+				System.out.println("The server has been shutdown");
+				System.exit(0);
+			}
+		},
+		ADD_PATH("add path") {
+			@Override
+			public boolean isMatching(String command) {
+				return command.startsWith(this.command);
+			}
 
-	private static final String LIST_SERVERS = "list servers";
-	private static final String LIST_SERVER_TYPES = "list servertypes";
-	private static final String LIST_SERVERTYPE_ATTRIBUTES_REQUIRED = "list attributes required";
-	private static final String LIST_SERVERTYPE_ATTRIBUTES_OPTIONAL = "list attributes optional";
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
+			}
+		},
+		LIST_PATHS("list paths") {
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
+				List<DiscoveryPath> list = launcher.getServerProxy().getDiscoveryPaths().get();
+				System.out.println("Paths:");
+				if (list != null) {
+					for( DiscoveryPath dp : list) {
+						System.out.println("   " + dp.getFilepath());
+					}
+				}
+			}
+		},
+		SEARCH_PATH("search path") {
+			@Override
+			public boolean isMatching(String command) {
+				return command.startsWith(this.command);
+			}
 
-	private static final String ADD_SERVER = "add server";
-	private static final String REMOVE_SERVER = "remove server ";
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
+				String suffix = command.substring(this.command.length());
+				DiscoveryPath dp = new DiscoveryPath(suffix.trim());
+				List<ServerBean> beans = launcher.getServerProxy().findServerBeans(dp).get();
+				System.out.println("Beans:");
+				if (beans != null) {
+					for( ServerBean b : beans) {
+						System.out.println("   " + b.toString());
+					}
+				}
+			}
+		},
+		REMOVE_PATH("remove path") {
+			@Override
+			public boolean isMatching(String command) {
+				return command.startsWith(this.command);
+			}
 
-	private static final String START_SERVER = "start server ";
-	private static final String STOP_SERVER = "stop server ";
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
+				String suffix = command.substring(this.command.length());
+				DiscoveryPath dp = new DiscoveryPath(suffix.trim());
+				launcher.getServerProxy().removeDiscoveryPath(dp);
+			}
+		},
+		START_SERVER("start server") {
+			@Override
+			public boolean isMatching(String command) {
+				return command.startsWith(this.command) 
+						|| command.startsWith(this.command.substring(0, this.command.length()-2));
+			}
 
-	private static final String LAUNCH_COMMAND = "launch command";
-	private static final String LAUNCH_LOCAL = "launch local";
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
+				String suffix = command.substring(this.command.length()).trim();
+				String serverId = suffix;
+				ServerHandle selected = null;
+				if( serverId.isEmpty()) {
+					selected = assistant.selectServer();
+					if( selected != null ) {
+						serverId = selected.getId();
+					}
+				}
+				
+				if( serverId == null || serverId.isEmpty()) {
+					System.out.println("No server chosen.");
+					return;
+				}
+
+				if( selected == null ) {
+					selected = findServer(serverId, launcher);
+				}
+				if (selected == null) {
+					System.out.println("Server " + serverId + " not found.");
+				} else {
+					String mode = assistant.selectLaunchMode(selected.getType());
+					ServerAttributes sa = new ServerAttributes(selected.getType().getId(), selected.getId(), new HashMap<String,Object>());
+					LaunchParameters params = new LaunchParameters(sa, mode);
+					StartServerResponse stat = launcher.getServerProxy().startServerAsync(params).get();
+					System.out.println(stat.getStatus().toString());
+				}
+			}
+		},
+		LAUNCH_COMMAND("launch command") {
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
+				LaunchParameters getLaunchReq = getLaunchCommandRequest(launcher, assistant);
+				if( getLaunchReq != null )
+					printLocalLaunchCommandDetails(getLaunchReq, launcher);
+			}
+		},
+		LAUNCH_LOCAL("launch local") {
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
+				LaunchParameters getLaunchReq = getLaunchCommandRequest(launcher, assistant);
+				printLocalLaunchCommandDetails(getLaunchReq, launcher);
+				
+				// This CLI will not actually launch this server locally. 
+				// We are just stubbing this out for now. 
+				System.out.println("We wont actually run this from the client here in this CLI.");
+				System.out.println("This Proof-of-concept will just simulate running it.");
+				
+
+				ServerStartingAttributes ssa = new ServerStartingAttributes(getLaunchReq, false);
+				Status status1 = launcher.getServerProxy().serverStartingByClient(ssa).get();
+				System.out.println(status1.toString());
+				Status status2 = launcher.getServerProxy().serverStartedByClient(getLaunchReq).get();
+				System.out.println(status2.toString());
+			}
+		},
+		STOP_SERVER("stop server") {
+			@Override
+			public boolean isMatching(String command) {
+				return command.startsWith(this.command) 
+						|| command.equals(this.command.trim());
+			}
+
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
+				String suffix = command.substring(this.command.length());
+				String trimmed = suffix.trim();
+				
+				if( trimmed.length() == 0 ) {
+					ServerHandle selected = assistant.selectServer();
+					if( selected != null ) {
+						trimmed = selected.getId();
+					} else {
+						System.out.println("Syntax: stop server servername [boolean:force]");
+						return;
+					}
+				}
+				String[] split = trimmed.split(" ");
+				boolean force = false;
+				if( split.length == 2 ) {
+					force = Boolean.parseBoolean(split[1]);
+				}
+				StopServerAttributes ssa = new StopServerAttributes(split[0], force);
+				Status stat = launcher.getServerProxy().stopServerAsync(ssa).get();
+				System.out.println(stat.toString());
+			}
+		},
+		LIST_SERVER_TYPES("list servertypes") {
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
+				List<ServerType> handles = launcher.getServerProxy().getServerTypes().get();
+				System.out.println(handles.size() + " servers found:");
+				for( ServerType sh : handles ) {
+					System.out.println("   " + sh.getId() + ": " + sh.getVisibleName());
+				}
+			}
+		},
+		LIST_SERVERTYPE_ATTRIBUTES_REQUIRED("list attributes required") {
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
+				ServerType st = assistant.chooseServerType();
+				if (st != null) {
+					Attributes attr = launcher.getServerProxy().getRequiredAttributes(st).get();
+					printAttr(attr);
+				}
+			}
+		},
+		LIST_SERVERTYPE_ATTRIBUTES_OPTIONAL("list attributes optional") {
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
+				ServerType st = assistant.chooseServerType();
+				if( st != null ) {
+					Attributes attr = launcher.getServerProxy().getOptionalAttributes(st).get();
+					printAttr(attr);
+				}
+			}
+		},
+		LIST_SERVERS("list servers") {
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
+				List<ServerHandle> handles = launcher.getServerProxy().getServerHandles().get();
+				System.out.println(handles.size() + " servers found:");
+				for( ServerHandle sh : handles ) {
+					System.out.println("   " + sh.getType().getId() + ":" + sh.getId());
+				}
+			}
+		},
+		ADD_SERVER("add server") {
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
+				try {
+					ServerType selected = assistant.chooseServerType();
+					if (selected == null) {
+						System.out.println("Canceling request.");
+						return;
+					}
+					
+					System.out.println("Please choose a unique name: ");
+					String name = assistant.nextLine();
+					if (name == null || name.isEmpty()) {
+						System.out.println("Name cannot be empty. Canceling request.");
+						return;
+					}
+					
+					Map<String, Object> store = new HashMap<>();
+					Attributes required2 = launcher.getServerProxy()
+							.getRequiredAttributes(selected).get();
+					Attributes optional2 = launcher.getServerProxy()
+							.getOptionalAttributes(selected).get();
+					assistant.promptForAttributes(required2, store, true);
+					assistant.promptForAttributes(optional2, store, false);
+					
+					System.out.println("Adding Server...");
+					ServerAttributes csa = new ServerAttributes(selected.getId(), name, store);
+					CreateServerResponse result = launcher.getServerProxy().createServer(csa).get();
+					if (result.getStatus().isOK()) {
+						System.out.println("Server Added");
+					} else {
+						while(assistant.updateInvalidAttributes(result, required2, optional2, store)) {
+							System.out.println("Adding Server...");
+							csa = new ServerAttributes(selected.getId(), name, store);
+							result = launcher.getServerProxy().createServer(csa).get();
+							if (result.getStatus().isOK()) {
+								System.out.println("Server Added");
+								return;
+							}
+						}
+					}
+				} catch(InterruptedException | ExecutionException ioe) {
+					ioe.printStackTrace();
+				}			}
+		},
+		REMOVE_SERVER("remove server") {
+			@Override
+			public boolean isMatching(String command) {
+				return command.startsWith(this.command);
+			}
+
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
+				String suffix = command.substring(this.command.length());
+				ServerHandle sh = findServer(suffix.trim(), launcher);
+				if (sh != null)
+					launcher.getServerProxy().deleteServer(sh);
+				else
+					System.out.println("Server not found: " + suffix.trim());
+			}
+		},
+		LIST_DEPLOYMENTS("list deployments") {
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
+				try {
+					ServerHandle server = assistant.selectServer();
+					if( server != null ) {
+						List<DeployableState> deployables = launcher.getServerProxy().getDeployables(server).get();
+						System.out.println(deployables.size() + " deployments found:");
+						int c = 1;
+						for( DeployableState ds : deployables ) {
+							int pubState = ds.getPublishState();
+							String pubStateString = null;
+							if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_ADD) pubStateString = "[add]";
+							else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_FULL) pubStateString = "[full]";
+							else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL) pubStateString = "[inc]";
+							else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_NONE) pubStateString = "[none]";
+							else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) pubStateString = "[remove]";
+							else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN) pubStateString = "[unknown]";
+							System.out.println(c++ + ") " + ds.getReference().getLabel() + " " + pubStateString); // TODO add run state?
+						}
+					}
+				} catch(InterruptedException | ExecutionException ioe) {
+					ioe.printStackTrace();
+				}
+			}
+		},
+		ADD_DEPLOYMENT("add deployment") {
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
+				try {
+					ServerHandle server = assistant.selectServer();
+					if( server != null ) {
+						System.out.println("Please enter a filesystem path of your deployment:");
+						String filePath = assistant.nextLine().trim();
+						if( new File(filePath).exists()) {
+							DeployableReference ref = new DeployableReference(filePath, filePath);
+							ModifyDeployableRequest req = new ModifyDeployableRequest(server, ref);
+							Status ret = launcher.getServerProxy().addDeployable(req).get();
+							System.out.println(ret.toString());
+						}
+					}
+				} catch(InterruptedException | ExecutionException ioe) {
+					ioe.printStackTrace();
+				}
+			}
+		},
+		REMOVE_DEPLOYMENT("remove deployment") {
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
+				try {
+					ServerHandle server = assistant.selectServer();
+					if( server != null ) {
+						DeployableReference ref = assistant.chooseDeployment(server);
+						if( ref != null ) {
+							ModifyDeployableRequest req = new ModifyDeployableRequest(server, ref);
+							Status ret = launcher.getServerProxy().removeDeployable(req).get();
+							System.out.println(ret.toString());
+						}
+					}
+				} catch(InterruptedException | ExecutionException ioe) {
+					ioe.printStackTrace();
+				}
+			}
+		},
+		PUBLISH("publish server") {
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
+				try {
+					ServerHandle server = assistant.selectServer();
+					if( server != null ) {
+						int publishType = assistant.selectPublishType();
+						if( publishType != -1 ) {
+							Status stat = launcher.getServerProxy().publish(new PublishServerRequest(server, publishType)).get();
+							System.out.println(stat.toString());
+						}
+					}
+				} catch(InterruptedException | ExecutionException ioe) {
+					ioe.printStackTrace();
+				}
+			}
+		},
+		
+		EXIT("exit") {
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
+				launcher.closeConnection();
+				System.exit(0);
+			}
+		};
+		
+		protected String command;
+
+		Commands(String command) {
+			this.command = command;
+		}
+
+		public boolean isMatching(String command) {
+			return command.equals(this.command);
+		}
+
+		public abstract void execute(String command,  ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception;
+
+		public String getCommand() {
+			return command;
+		}
+		
+		protected LaunchParameters getLaunchCommandRequest(ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
+			System.out.println("Which server would you like to run?");
+			List<ServerHandle> handles = launcher.getServerProxy().getServerHandles().get();
+			for( ServerHandle sh : handles ) {
+				System.out.println("   " + sh.getId());
+			}
+			String server = assistant.nextLine().trim();
+			ServerHandle handle = findServer(server, launcher);
+			if (handle == null) {
+				System.out.println("Server " + server + " not found.");
+				return null;
+			}
+			String mode = assistant.selectLaunchMode(handle.getType());
+			LaunchAttributesRequest req = new LaunchAttributesRequest(handle.getType().getId(), mode);
+			
+			Attributes attrs = launcher.getServerProxy().getRequiredLaunchAttributes(req).get();
+			HashMap<String, Object> toSend = new HashMap<String, Object>(); 
+			assistant.promptForAttributes(attrs, toSend, true);
+			
+			ServerAttributes servAttr = new ServerAttributes(handle.getType().getId(), handle.getId(), toSend);
+			LaunchParameters getLaunchReq = 
+					new LaunchParameters(servAttr, mode);
+			return getLaunchReq;
+		}
+
+		protected ServerHandle findServer(String id, ServerManagementClientLauncher launcher) throws Exception {
+			List<ServerHandle> handles = launcher.getServerProxy().getServerHandles().get();
+			for (ServerHandle sh : handles) {
+				if (sh.getId().equals(id))
+					return sh;
+			}
+			return null;
+		}
+
+		protected void printAttr(Attributes attr) {
+			Map<String, Attribute> map = attr.getAttributes();
+			Iterator<String> kit = map.keySet().iterator();
+			while (kit.hasNext()) {
+				String key = kit.next();
+				Attribute val = map.get(key);
+				System.out.println(key);
+				System.out.println("    type=" + val.getType());
+				System.out.println("    desc=" + val.getDescription());
+				System.out.println("    defaultVal=" + val.getDefaultVal());
+			}
+		}
+
+		protected void printLocalLaunchCommandDetails(LaunchParameters getLaunchReq, ServerManagementClientLauncher launcher) throws Exception {
+			CommandLineDetails det = launcher.getServerProxy().getLaunchCommand(getLaunchReq).get();
+			if (det == null) {
+				System.out.println("The SSP returned no launch command for this request.");
+				return;
+			}
+			String[] cmdline = det.getCmdLine();
+			String wd = det.getWorkingDir();
+			String[] envp = det.getEnvp();
+			
+			System.out.println("Got it.");
+			System.out.println("command: " + String.join(" ", cmdline));
+		}
+
+	}
 	
-	/*
-	 * Publishing
-	 */
-	private static final String LIST_DEPLOYMENTS = "list deployments";
-	private static final String ADD_DEPLOYMENT = "add deployment";
-	private static final String REMOVE_DEPLOYMENT = "remove deployment";
-	private static final String PUBLISH = "publish server";
-	
-	private static final String EXIT = "exit";
-	private static final String SHUTDOWN = "shutdown";
-
-	private static final String[] CMD_ARR = new String[] {
-			LIST_PATHS, ADD_PATH, REMOVE_PATH, SEARCH_PATH, 
-			LIST_SERVERS, LIST_SERVER_TYPES, 
-			LIST_SERVERTYPE_ATTRIBUTES_REQUIRED, LIST_SERVERTYPE_ATTRIBUTES_OPTIONAL,
-			ADD_SERVER, REMOVE_SERVER, 
-			LAUNCH_COMMAND, LAUNCH_LOCAL, START_SERVER, STOP_SERVER,
-			LIST_DEPLOYMENTS, ADD_DEPLOYMENT, REMOVE_DEPLOYMENT, PUBLISH,
-			EXIT, SHUTDOWN
-	};
-
 	private ServerManagementClientLauncher launcher;
 	private InputProvider provider;
 	private PromptAssistant assistant;
+
 	public StandardCommandHandler(ServerManagementClientLauncher launcher, InputProvider provider) {
 		this.launcher = launcher;
 		this.provider = provider;
@@ -101,404 +492,26 @@ public class StandardCommandHandler implements InputHandler {
 		}
 
 		String command = s.trim();
-		if (command.equals(SHUTDOWN)) {
-			shutdown();
-		} else if (command.startsWith(ADD_PATH)) {
-			addPath(command);
-		} else if (command.startsWith(REMOVE_PATH)) {
-			removePath(command);
-		} else if (command.equals(LIST_PATHS)) {
-			listPaths();
-		} else if (command.startsWith(SEARCH_PATH)) {
-			searchPaths(command);
-		} else if (command.startsWith(START_SERVER) 
-				|| command.startsWith(START_SERVER.substring(0, START_SERVER.length()-2))) {
-			startServer(command);
-		} else if (command.equals(LAUNCH_COMMAND)) {
-			launchCommand();
-		} else if (command.equals(LAUNCH_LOCAL)) {
-			launchLocal();
-		} else if (command.startsWith(STOP_SERVER) || command.equals(STOP_SERVER.trim())) {
-			stopServer(command);
-		} else if (command.equals(LIST_SERVER_TYPES)) {
-			listServerTypes();
-		} else if (command.equals(LIST_SERVERTYPE_ATTRIBUTES_REQUIRED)) {
-			listRequiredServerTypeAttributes();
-		} else if (command.equals(LIST_SERVERTYPE_ATTRIBUTES_OPTIONAL)) {
-			listOptionalServerTypeAttributes();
-		} else if (command.equals(LIST_SERVERS)) {
-			listServers();
-		} else if (command.startsWith(REMOVE_SERVER)) {
-			removeServer(s);
-		} else if (command.equals(ADD_SERVER)) {
-			addServer();
-		} else if (command.equals(LIST_DEPLOYMENTS)) {
-			listDeployments();
-		} else if (command.equals(ADD_DEPLOYMENT)) {
-			addDeployment();
-		} else if (command.equals(REMOVE_DEPLOYMENT)) {
-			removeDeployment();
-		} else if (command.equals(PUBLISH)) {
-			publish();
-		} else if (command.equals(EXIT)) {
-			exit();
-		} else {
+		Commands known = getCommand(command);
+		if (known == null) {
 			showCommands();
-		}
-	}
-
-	private void exit() {
-		launcher.closeConnection();
-		System.exit(0);
-	}
-
-	private void shutdown() {
-		launcher.getServerProxy().shutdown();
-		System.out.println("The server has been shutdown");
-		System.exit(0);
-	}
-
-	private void addPath(String command) {
-		String suffix = command.substring(ADD_PATH.length());
-		DiscoveryPath dp = new DiscoveryPath(suffix.trim());
-		launcher.getServerProxy().addDiscoveryPath(dp);
-	}
-
-	private void removePath(String command) {
-		String suffix = command.substring(REMOVE_PATH.length());
-		DiscoveryPath dp = new DiscoveryPath(suffix.trim());
-		launcher.getServerProxy().removeDiscoveryPath(dp);
-	}
-
-	private void launchCommand() throws Exception {
-		LaunchParameters getLaunchReq = getLaunchCommandRequest();
-		if( getLaunchReq != null )
-			printLocalLaunchCommandDetails(getLaunchReq);
-	}
-
-	private void removeServer(String s) throws Exception {
-		String suffix = s.substring(REMOVE_SERVER.length());
-		ServerHandle sh = findServer(suffix.trim());
-		if (sh != null)
-			launcher.getServerProxy().deleteServer(sh);
-		else
-			System.out.println("Server not found: " + suffix.trim());
-	}
-
-	private void listServers() throws InterruptedException, ExecutionException {
-		List<ServerHandle> handles = launcher.getServerProxy().getServerHandles().get();
-		System.out.println(handles.size() + " servers found:");
-		for( ServerHandle sh : handles ) {
-			System.out.println("   " + sh.getType().getId() + ":" + sh.getId());
-		}
-	}
-
-	private void listOptionalServerTypeAttributes() throws InterruptedException, ExecutionException {
-		ServerType st = assistant.chooseServerType();
-		if( st != null ) {
-			Attributes attr = launcher.getServerProxy().getOptionalAttributes(st).get();
-			printAttr(attr);
-		}
-	}
-
-	private void listRequiredServerTypeAttributes() throws InterruptedException, ExecutionException {
-		ServerType st = assistant.chooseServerType();
-		if (st != null) {
-			Attributes attr = launcher.getServerProxy().getRequiredAttributes(st).get();
-			printAttr(attr);
-		}
-	}
-
-	private void listServerTypes() throws InterruptedException, ExecutionException {
-		List<ServerType> handles = launcher.getServerProxy().getServerTypes().get();
-		System.out.println(handles.size() + " servers found:");
-		for( ServerType sh : handles ) {
-			System.out.println("   " + sh.getId() + ": " + sh.getVisibleName());
-		}
-	}
-
-	private void searchPaths(String s) throws InterruptedException, ExecutionException {
-		String suffix = s.substring(SEARCH_PATH.length());
-		DiscoveryPath dp = new DiscoveryPath(suffix.trim());
-		List<ServerBean> beans = launcher.getServerProxy().findServerBeans(dp).get();
-		System.out.println("Beans:");
-		if (beans != null) {
-			for( ServerBean b : beans) {
-				System.out.println("   " + b.toString());
-			}
-		}
-	}
-
-	private void listPaths() throws InterruptedException, ExecutionException {
-		List<DiscoveryPath> list = launcher.getServerProxy().getDiscoveryPaths().get();
-		System.out.println("Paths:");
-		if (list != null) {
-			for( DiscoveryPath dp : list) {
-				System.out.println("   " + dp.getFilepath());
-			}
-		}
-	}
-
-	private void stopServer(String s) throws Exception {
-		String suffix = s.substring(STOP_SERVER.trim().length());
-		String trimmed = suffix.trim();
-		
-		if( trimmed.length() == 0 ) {
-			ServerHandle selected = assistant.selectServer();
-			if( selected != null ) {
-				trimmed = selected.getId();
-			} else {
-				System.out.println("Syntax: stop server servername [boolean:force]");
-				return;
-			}
-		}
-		String[] split = trimmed.split(" ");
-		boolean force = false;
-		if( split.length == 2 ) {
-			force = Boolean.parseBoolean(split[1]);
-		}
-		StopServerAttributes ssa = new StopServerAttributes(split[0], force);
-		Status stat = launcher.getServerProxy().stopServerAsync(ssa).get();
-		System.out.println(stat.toString());
-	}
-	
-	private void startServer(String s) throws Exception {
-		String suffix = s.substring(START_SERVER.trim().length()).trim();
-		String serverId = suffix;
-		ServerHandle selected = null;
-		if( serverId.isEmpty()) {
-			selected = assistant.selectServer();
-			if( selected != null ) {
-				serverId = selected.getId();
-			}
-		}
-		
-		if( serverId == null || serverId.isEmpty()) {
-			System.out.println("No server chosen.");
 			return;
 		}
-		
-		if( selected == null ) {
-			selected = findServer(serverId);
-		}
-		if (selected == null) {
-			System.out.println("Server " + serverId + " not found.");
-		} else {
-			String mode = assistant.selectLaunchMode(selected.getType());
-			ServerAttributes sa = new ServerAttributes(selected.getType().getId(), selected.getId(), new HashMap<String,Object>());
-			LaunchParameters params = new LaunchParameters(sa, mode);
-			StartServerResponse stat = launcher.getServerProxy().startServerAsync(params).get();
-			System.out.println(stat.getStatus().toString());
-		}
-	}
-	
-	
-	private void publish() {
-		try {
-			ServerHandle server = assistant.selectServer();
-			if( server != null ) {
-				int publishType = assistant.selectPublishType();
-				if( publishType != -1 ) {
-					Status stat = launcher.getServerProxy().publish(new PublishServerRequest(server, publishType)).get();
-					System.out.println(stat.toString());
-				}
-			}
-		} catch(InterruptedException | ExecutionException ioe) {
-			ioe.printStackTrace();
-		}
+		known.execute(command, launcher, assistant);
 	}
 
-	private void removeDeployment() {
-		try {
-			ServerHandle server = assistant.selectServer();
-			if( server != null ) {
-				DeployableReference ref = assistant.chooseDeployment(server);
-				if( ref != null ) {
-					ModifyDeployableRequest req = new ModifyDeployableRequest(server, ref);
-					Status ret = launcher.getServerProxy().removeDeployable(req).get();
-					System.out.println(ret.toString());
-				}
-			}
-		} catch(InterruptedException | ExecutionException ioe) {
-			ioe.printStackTrace();
-		}
+	private Commands getCommand(String command) {
+		return Arrays.stream(Commands.values())
+				.filter(known -> known.isMatching(command))
+				.findFirst()
+				.orElse(null);
 	}
 
-
-	
-	private void listDeployments() {
-		try {
-			ServerHandle server = assistant.selectServer();
-			if( server != null ) {
-				List<DeployableState> deployables = launcher.getServerProxy().getDeployables(server).get();
-				System.out.println(deployables.size() + " deployments found:");
-				int c = 1;
-				for( DeployableState ds : deployables ) {
-					int pubState = ds.getPublishState();
-					String pubStateString = null;
-					if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_ADD) pubStateString = "[add]";
-					else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_FULL) pubStateString = "[full]";
-					else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL) pubStateString = "[inc]";
-					else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_NONE) pubStateString = "[none]";
-					else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) pubStateString = "[remove]";
-					else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN) pubStateString = "[unknown]";
-					System.out.println(c++ + ") " + ds.getReference().getLabel() + " " + pubStateString); // TODO add run state?
-				}
-			}
-		} catch(InterruptedException | ExecutionException ioe) {
-			ioe.printStackTrace();
-		}
-	}
-	private void addDeployment() {
-		try {
-			ServerHandle server = assistant.selectServer();
-			if( server != null ) {
-				System.out.println("Please enter a filesystem path of your deployment:");
-				String filePath = assistant.nextLine().trim();
-				if( new File(filePath).exists()) {
-					DeployableReference ref = new DeployableReference(filePath, filePath);
-					ModifyDeployableRequest req = new ModifyDeployableRequest(server, ref);
-					Status ret = launcher.getServerProxy().addDeployable(req).get();
-					System.out.println(ret.toString());
-				}
-			}
-		} catch(InterruptedException | ExecutionException ioe) {
-			ioe.printStackTrace();
-		}
-	}
-
-	private void printAttr(Attributes attr) {
-		Map<String, Attribute> map = attr.getAttributes();
-		Iterator<String> kit = map.keySet().iterator();
-		while (kit.hasNext()) {
-			String key = kit.next();
-			Attribute val = map.get(key);
-			System.out.println(key);
-			System.out.println("    type=" + val.getType());
-			System.out.println("    desc=" + val.getDescription());
-			System.out.println("    defaultVal=" + val.getDefaultVal());
-		}
-	}
-
-	private void launchLocal() throws Exception {
-		LaunchParameters getLaunchReq = getLaunchCommandRequest();
-		printLocalLaunchCommandDetails(getLaunchReq);
-		
-		// This CLI will not actually launch this server locally. 
-		// We are just stubbing this out for now. 
-		System.out.println("We wont actually run this from the client here in this CLI.");
-		System.out.println("This Proof-of-concept will just simulate running it.");
-		
-
-		ServerStartingAttributes ssa = new ServerStartingAttributes(getLaunchReq, false);
-		Status status1 = launcher.getServerProxy().serverStartingByClient(ssa).get();
-		System.out.println(status1.toString());
-		Status status2 = launcher.getServerProxy().serverStartedByClient(getLaunchReq).get();
-		System.out.println(status2.toString());
-
-	}
-	private void printLocalLaunchCommandDetails(LaunchParameters getLaunchReq) throws Exception {
-		CommandLineDetails det = launcher.getServerProxy().getLaunchCommand(getLaunchReq).get();
-		if (det == null) {
-			System.out.println("The SSP returned no launch command for this request.");
-			return;
-		}
-		String[] cmdline = det.getCmdLine();
-		String wd = det.getWorkingDir();
-		String[] envp = det.getEnvp();
-		
-		System.out.println("Got it.");
-		System.out.println("command: " + String.join(" ", cmdline));
-	}
-
-	private LaunchParameters getLaunchCommandRequest() throws Exception {
-		System.out.println("Which server would you like to run?");
-		List<ServerHandle> handles = launcher.getServerProxy().getServerHandles().get();
-		for( ServerHandle sh : handles ) {
-			System.out.println("   " + sh.getId());
-		}
-		String server = assistant.nextLine().trim();
-		ServerHandle handle = findServer(server);
-		if (handle == null) {
-			System.out.println("Server " + server + " not found.");
-			return null;
-		}
-		String mode = assistant.selectLaunchMode(handle.getType());
-		LaunchAttributesRequest req = new LaunchAttributesRequest(handle.getType().getId(), mode);
-		
-		Attributes attrs = launcher.getServerProxy().getRequiredLaunchAttributes(req).get();
-		HashMap<String, Object> toSend = new HashMap<String, Object>(); 
-		assistant.promptForAttributes(attrs, toSend, true);
-		
-		ServerAttributes servAttr = new ServerAttributes(handle.getType().getId(), handle.getId(), toSend);
-		LaunchParameters getLaunchReq = 
-				new LaunchParameters(servAttr, mode);
-		return getLaunchReq;
-	}
-
-	private ServerHandle findServer(String id) throws Exception {
-		List<ServerHandle> handles = launcher.getServerProxy().getServerHandles().get();
-		for (ServerHandle sh : handles) {
-			if (sh.getId().equals(id))
-				return sh;
-		}
-		return null;
-	}
-	
-	
-	private void addServer() {
-
-		try {
-			ServerType selected = assistant.chooseServerType();
-			if (selected == null) {
-				System.out.println("Canceling request.");
-				return;
-			}
-			
-			System.out.println("Please choose a unique name: ");
-			String name = assistant.nextLine();
-			if (name == null || name.isEmpty()) {
-				System.out.println("Name cannot be empty. Canceling request.");
-				return;
-			}
-			
-			HashMap<String, Object> store = new HashMap<>();
-			Attributes required2 = launcher.getServerProxy()
-					.getRequiredAttributes(selected).get();
-			Attributes optional2 = launcher.getServerProxy()
-					.getOptionalAttributes(selected).get();
-			assistant.promptForAttributes(required2, store, true);
-			assistant.promptForAttributes(optional2, store, false);
-			
-			System.out.println("Adding Server...");
-			ServerAttributes csa = new ServerAttributes(selected.getId(), name, store);
-			CreateServerResponse result = launcher.getServerProxy().createServer(csa).get();
-			if (result.getStatus().isOK()) {
-				System.out.println("Server Added");
-			} else {
-				while(assistant.updateInvalidAttributes(result, required2, optional2, store)) {
-					System.out.println("Adding Server...");
-					csa = new ServerAttributes(selected.getId(), name, store);
-					result = launcher.getServerProxy().createServer(csa).get();
-					if (result.getStatus().isOK()) {
-						System.out.println("Server Added");
-						return;
-					}
-				}
-			}
-		} catch(InterruptedException | ExecutionException ioe) {
-			ioe.printStackTrace();
-		}
-	}
-	
-	
-	
 	private void showCommands() {
 		System.out.println("Invalid Command");
 		System.out.println("Possible commands: ");
-		for (int i = 0; i < CMD_ARR.length; i++) {
-			System.out.println("   " + CMD_ARR[i]);
-		}
+		Arrays.stream(Commands.values())
+			.forEach(command -> System.out.println("   " + command.getCommand()));
 	}
 
 
