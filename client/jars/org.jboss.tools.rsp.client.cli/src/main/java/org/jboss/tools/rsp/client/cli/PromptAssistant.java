@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.rsp.client.cli;
 
 import java.util.ArrayList;
@@ -22,15 +30,13 @@ import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.client.bindings.ServerManagementClientLauncher;
 
 public class PromptAssistant {
-	public ServerManagementClientLauncher launcher;
-	public InputProvider provider;
+	public final ServerManagementClientLauncher launcher;
+	public final InputProvider provider;
 
 	public PromptAssistant(ServerManagementClientLauncher launcher, InputProvider provider) {
 		this.launcher = launcher;
 		this.provider = provider;
 	}
-
-
 
 	public int selectPublishType() {
 		String[] options = new String[] {"Incremental", "Full", "Clean"};
@@ -42,7 +48,6 @@ public class PromptAssistant {
 		System.out.println("Invalid selection.");
 		return -1;
 	}
-	
 
 	public String selectLaunchMode(ServerType st) throws Exception {
 		List<ServerLaunchMode> modes = launcher.getServerProxy().getLaunchModes(st).get();
@@ -120,14 +125,15 @@ public class PromptAssistant {
 			return list.get(num-1);
 		return null;
 	}
-	
-	public void promptForAttributeSingleKey(CreateServerAttributesUtility attrsUtil, String k, boolean required2, HashMap<String, Object> toSend) {
+
+	public void promptForAttributeSingleKey(CreateServerAttributesUtility attrsUtil, String k, boolean required2, Map<String, Object> toSend) {
 		String attrType = attrsUtil.getAttributeType(k);
-		Class c = getAttributeTypeAsClass(attrType);
-		String reqType = c.getName();
+		Class<?> c = getAttributeTypeAsClass(attrType);
 		if (c == null) {
 			System.out.println("unknown attribute type " + attrType + ". Aborting.");
+			return;
 		}
+		String reqType = c.getName();
 		String reqDesc = attrsUtil.getAttributeDescription(k);
 		Object defVal = attrsUtil.getAttributeDefaultValue(k);
 		
@@ -176,7 +182,7 @@ public class PromptAssistant {
 
 	public List<String> promptListValue() {
 		System.out.println("Please enter a list value. Send a blank line to end the list.");
-		List<String> arr = new ArrayList<String>();
+		List<String> arr = new ArrayList<>();
 		String tmp = nextLine();
 		while (!tmp.trim().isEmpty()) {
 			arr.add(tmp);
@@ -190,9 +196,8 @@ public class PromptAssistant {
 		String val = nextLine();
 		return convertType(val, type);
 	}
-	
 
-	public boolean updateInvalidAttributes(CreateServerResponse result, Attributes required2, Attributes optional2, HashMap<String, Object> store ) {
+	public boolean updateInvalidAttributes(CreateServerResponse result, Attributes required2, Attributes optional2, Map<String, Object> store ) {
 		System.out.println("Error adding server: " + result.getStatus().getMessage());
 		List<String> list = result.getInvalidKeys();
 		System.out.println("Invalid attributes: ");
@@ -214,19 +219,17 @@ public class PromptAssistant {
 	public boolean promptBoolean(String msg) {
 		System.out.println(msg);
 		String tryAgain = nextLine();
-		if (tryAgain == null || tryAgain.isEmpty() || tryAgain.toLowerCase().equals("n")) {
-			return false;
-		}
-		return true;
+		return tryAgain != null 
+				&& !tryAgain.isEmpty()
+				&& !tryAgain.toLowerCase().equals("n");
 	}
-		
-	
-	void promptForAttributes(Attributes attr, HashMap<String, Object> store, boolean required2) {
+
+	public void promptForAttributes(Attributes attr, Map<String, Object> store, boolean required2) {
 		if (attr == null)
 			return;
 		
 		CreateServerAttributesUtility attrsUtil = new CreateServerAttributesUtility(attr);
-		HashMap<String, Object> toSend = store;
+		Map<String, Object> toSend = store;
 		if (attrsUtil != null) {
 			Set<String> keys = attrsUtil.listAttributes();
 			for (String k : keys) {
@@ -235,7 +238,7 @@ public class PromptAssistant {
 		}
 	}
 	
-	public void promptForInvalidAttributes(List<String> invalid, Attributes attr, HashMap<String, Object> store, boolean required2) {
+	public void promptForInvalidAttributes(List<String> invalid, Attributes attr, Map<String, Object> store, boolean required2) {
 		if (attr == null)
 			return;
 		
@@ -248,14 +251,10 @@ public class PromptAssistant {
 			}
 		}
 	}
-	
-	
-	
+
 	/*
 	 * Conversion
 	 */
-
-
 	public Object workaroundDoubles(Object defaultVal, String attrType) {
 
 		// Workaround for the problems with json transfer
@@ -266,7 +265,7 @@ public class PromptAssistant {
 		return defaultVal;
 	}
 	
-	public Class getAttributeTypeAsClass(String type) {
+	public Class<?> getAttributeTypeAsClass(String type) {
 		if (ServerManagementAPIConstants.ATTR_TYPE_INT.equals(type)) {
 			return Integer.class;
 		} else if (ServerManagementAPIConstants.ATTR_TYPE_BOOL.equals(type)) {
@@ -305,9 +304,11 @@ public class PromptAssistant {
 	}
 
 	public static class StandardPrompt implements InputHandler {
-		public String prompt;
+
+		public final String prompt;
 		public String ret;
-		public CountDownLatch doneSignal = new CountDownLatch(1);
+		public final CountDownLatch doneSignal = new CountDownLatch(1);
+
 		public StandardPrompt(String prompt) {
 			this.prompt = prompt;
 		}
