@@ -8,7 +8,9 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.client.bindings;
 
+import java.io.IOException;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 import org.jboss.tools.rsp.api.RSPServer;
 import org.jboss.tools.rsp.api.SocketLauncher;
@@ -30,7 +32,7 @@ public class ServerManagementClientLauncher {
 		this.provider = provider;
 	}
 	
-	public void launch() throws Exception {
+	public void launch() throws UnknownHostException, IOException {
 		// create the chat client
 		ServerManagementClientImpl client = new ServerManagementClientImpl();
 		// connect to the server

@@ -8,101 +8,86 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.client.cli;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
 
 import org.jboss.tools.rsp.api.ICapabilityKeys;
 import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
-import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
 import org.jboss.tools.rsp.client.bindings.IClientConnectionClosedListener;
 import org.jboss.tools.rsp.client.bindings.ServerManagementClientLauncher;
 
 public class ServerManagementCLI implements InputProvider, IClientConnectionClosedListener {
-	public static void main(String[] args) {
-		ServerManagementCLI cli = new ServerManagementCLI();
-		try {
-			cli.connect(args[0], args[1]);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return;
-		}
-
-		System.out.println("Connected to: " + args[0] + ":" + args[1]);
-		cli.readInput();
-	}
 
 	private Scanner scanner = null;
 	private ServerManagementClientLauncher launcher;
-	private ConcurrentLinkedQueue<InputHandler> q = new ConcurrentLinkedQueue<>();
+	private ConcurrentLinkedQueue<InputHandler> queue = new ConcurrentLinkedQueue<>();
 	private StandardCommandHandler defaultHandler;
 
-	public void connect(String host, String port) throws Exception {
+	private void connect(String host, String port) throws Exception {
 		if (host == null) {
 			System.out.print("Enter server host: ");
-			host = nextLine();
+			host = getUserInput();
 		}
 		if (port == null) {
 			System.out.print("Enter server port: ");
-			port = nextLine();
+			port = getUserInput();
 		}
 
-		launcher = new ServerManagementClientLauncher(host, Integer.parseInt(port), this);
-		launcher.launch();
+		this.launcher = launch(host, port);
+		this.defaultHandler = new StandardCommandHandler(launcher, this);
+	}
+
+	private ServerManagementClientLauncher launch(String host, String port) throws IOException, InterruptedException, ExecutionException {
+		ServerManagementClientLauncher launcher = new ServerManagementClientLauncher(host, Integer.parseInt(port), this);
 		launcher.setListener(this);
-		
-		Map<String, String> clientCap2 = new HashMap<String, String>();
-		clientCap2.put(ICapabilityKeys.STRING_PROTOCOL_VERSION, ICapabilityKeys.PROTOCOL_VERSION_0_10_0);
-		clientCap2.put(ICapabilityKeys.BOOLEAN_STRING_PROMPT, Boolean.toString(true));
-		ClientCapabilitiesRequest clientCap = new ClientCapabilitiesRequest(clientCap2);
-		ServerCapabilitiesResponse rsp = launcher.getServerProxy().registerClientCapabilities(clientCap).get();
-		defaultHandler = new StandardCommandHandler(launcher, this);
+		launcher.launch();
+		ClientCapabilitiesRequest clientCapRequest = createClientCapabilitiesRequest();
+		launcher.getServerProxy().registerClientCapabilities(clientCapRequest).get();
+		return launcher;
 	}
 
+	private ClientCapabilitiesRequest createClientCapabilitiesRequest() {
+		Map<String, String> clientCap = new HashMap<>();
+		clientCap.put(ICapabilityKeys.STRING_PROTOCOL_VERSION, ICapabilityKeys.PROTOCOL_VERSION_0_10_0);
+		clientCap.put(ICapabilityKeys.BOOLEAN_STRING_PROMPT, Boolean.toString(true));
+		return new ClientCapabilitiesRequest(clientCap);
+	}
+
+	@Override
 	public void addInputRequest(InputHandler handler) {
-		if (q.peek() == null) {
-			String prompt = handler.getPrompt();
-			if (prompt != null) {
-				System.out.println(prompt);
-			}
+		if (queue.peek() == null) {
+			printUserPrompt(handler);
 		}
-		q.add(handler);
+		queue.add(handler);
 	}
 
-	protected String nextLine() {
+	protected String getUserInput() {
 		if (scanner == null) {
 			scanner = new Scanner(System.in);
 		}
 		return scanner.nextLine();
 	}
 
-	private void readInput() {
+	private void readInputs() {
 		while (true) {
-			if (q.peek() != null) {
-				InputHandler handler = q.peek();
-				String prompt = handler.getPrompt();
-				if (prompt != null) {
-					System.out.println(prompt);
-				}
+			if (queue.peek() != null) {
+				printUserPrompt(queue.peek());
 			}
-			String content = nextLine();
-			InputHandler h = null;
-			if (q.peek() == null) {
-				h = defaultHandler;
-			} else {
-				h = q.remove();
-			}
-			if (h != null) {
-				if( !launcher.isConnectionActive()) {
-					initShutdown();
+			String content = getUserInput();
+			InputHandler handler = getInputHandler();
+			if (handler != null) {
+				if (!launcher.isConnectionActive()) {
+					close();
 				}
 				
-				final InputHandler h2 = h;
 				new Thread("Handle input") {
 					public void run() {
 						try {
-							h2.handleInput(content);
+							handler.handleInput(content);
 						} catch (Exception e) {
 							e.printStackTrace();
 							// Try to recover
@@ -113,13 +98,44 @@ public class ServerManagementCLI implements InputProvider, IClientConnectionClos
 		}
 	}
 
+	private InputHandler getInputHandler() {
+		InputHandler h = null;
+		if (queue.peek() == null) {
+			h = defaultHandler;
+		} else {
+			h = queue.remove();
+		}
+		return h;
+	}
+
+	private void printUserPrompt(InputHandler handler) {
+		String prompt = handler.getPrompt();
+		if (prompt != null) {
+			System.out.println(prompt);
+		}
+	}
+
 	@Override
 	public void connectionClosed() {
-		initShutdown();
+		close();
 	}
 	
-	private synchronized void initShutdown() {
+	private void close() {
 		System.out.println("Connection with remote server has terminated.");
 		System.exit(0);
 	}
+
+	public static void main(String[] args) {
+		ServerManagementCLI cli = new ServerManagementCLI();
+		try {
+			cli.connect(args[0], args[1]);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
+
+		System.out.println("Connected to: " + args[0] + ":" + args[1]);
+		cli.readInputs();
+	}
+
 }

@@ -33,7 +33,7 @@ public class ServerManagementClientImpl implements RSPClient {
 		// here for debugging
 	}
 	
-	public void initialize(RSPServer server, InputProvider inputProvider) throws Exception {
+	public void initialize(RSPServer server, InputProvider inputProvider) {
 		this.server = server;
 		this.inputProvider = inputProvider;
 	}
