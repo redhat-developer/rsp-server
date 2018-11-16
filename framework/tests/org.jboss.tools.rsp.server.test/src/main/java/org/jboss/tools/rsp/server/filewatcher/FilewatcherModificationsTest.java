@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.server.filewatcher;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -222,10 +223,11 @@ public class FilewatcherModificationsTest {
 	/*
 	 * This test verifies that if someone creates a folder, 
 	 * registers to listen to it, deletes the folder, recreates the folder, 
-	 * and adds a file several folders deeper, we receive all the proper events. 
+	 * and adds a file several folders deeper, we receive all the proper events
+	 * when the request is recursive.
 	 */
 	@Test
-	public void testFileWatcherEvent_subscribeDeleteRecreateDeep() {
+	public void testFileWatcherEvent_subscribeRootDeleteRootRecreateDeep() {
 
 		FileWatcherServiceWithLatches service = new FileWatcherServiceWithLatches();
 		service.start();
@@ -242,7 +244,7 @@ public class FilewatcherModificationsTest {
 			Path childFile = nested4.resolve("out.txt");
 			
 			
-			// Subscribe to folder/out.txt, which registers 
+			// Subscribe to root, which registers 
 			// listeners to all folders above in tree
 			IFileWatcherEventListener listener1 = (events2) -> listenerEvents.add(events2);
 			service.addFileWatcherListener(root, listener1, true);
@@ -282,6 +284,78 @@ public class FilewatcherModificationsTest {
 		}
 	}
 	
+	/*
+	 * This test verifies that if someone creates a folder, 
+	 * registers to listen to it, deletes the folder, recreates the folder, 
+	 * and adds a file several folders deeper, we receive all the proper events
+	 * when the request is recursive.
+	 */
+	@Test
+	public void testFileWatcherEvent_subscribeDeepDeleteRootRecreateDeep() {
+		_testFileWatcherEvent_subscribeDeepDeleteRootRecreateDeep(false);
+	}
+
+	@Test
+	public void testFileWatcherEvent_subscribeDeepDeleteRootRecreateDeepRecursive() {
+		_testFileWatcherEvent_subscribeDeepDeleteRootRecreateDeep(true);
+	}
+
+	private void _testFileWatcherEvent_subscribeDeepDeleteRootRecreateDeep(boolean recursive) {
+
+		FileWatcherServiceWithLatches service = new FileWatcherServiceWithLatches();
+		service.start();
+		service.reset();
+		
+		ArrayList<FileWatcherEvent> listenerEvents = new ArrayList<>();
+		
+		try {
+			Path root = Files.createTempDirectory(getClass().getName() + "_4");
+			Path nested1 = root.resolve("nested1");
+			Path nested2 = nested1.resolve("nested2");
+			Path nested3 = nested2.resolve("nested3");
+			Path nested4 = nested3.resolve("nested4");
+			Path childFile = nested4.resolve("out.txt");
+			
+			
+			// Subscribe to the deep file, which registers 
+			// listeners to all folders above in tree
+			IFileWatcherEventListener listener1 = (events2) -> listenerEvents.add(events2);
+			service.addFileWatcherListener(childFile, listener1, recursive);
+			
+			assertTrue(root.toFile().delete());
+			root.toFile().mkdirs();
+			nested1.toFile().mkdirs();
+			nested2.toFile().mkdirs();
+			nested3.toFile().mkdirs();
+			nested4.toFile().mkdirs();
+			
+			Files.write(childFile, "test".getBytes());
+			service.waitOnLatches();
+
+			assertFalse(matchingFWEventFound(root, 
+					StandardWatchEventKinds.ENTRY_DELETE, listenerEvents));
+			assertFalse(matchingFWEventFound(root, 
+					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
+			assertFalse(matchingFWEventFound(nested1, 
+					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
+			assertFalse(matchingFWEventFound(nested2, 
+					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
+			assertFalse(matchingFWEventFound(nested3, 
+					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
+			assertFalse(matchingFWEventFound(nested4, 
+					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
+			assertTrue(matchingFWEventFound(childFile, 
+					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
+			
+			
+		} catch(IOException ioe) {
+			fail();
+		} finally {
+			service.stop();
+			assertNull(service.getExecutor());
+			assertNull(service.getWatchService());
+		}
+	}
 	private static class WatchKeyEvent {
 		private WatchKey key;
 		private WatchEvent<?> event;
