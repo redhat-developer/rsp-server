@@ -23,14 +23,19 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jboss.tools.rsp.server.spi.filewatcher.FileWatcherEvent;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherEventListener;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileWatcherService implements Runnable, IFileWatcherService {
+	private static final Logger LOG = LoggerFactory.getLogger(FileWatcherService.class);
+
 	// The watch service from java.nio
 	private WatchService watchService;
 	
@@ -51,7 +56,7 @@ public class FileWatcherService implements Runnable, IFileWatcherService {
 	 * It will possibly contain recursive subscriptions, as well 
 	 * as parent subscriptions up to the root of the filesystem. 
 	 */
-	private HashMap<Path, WatchKey> subscriptions = new HashMap<>();
+	private Map<Path, WatchKey> subscriptions = new HashMap<>();
 	
 	private boolean closing = false;
 
@@ -59,8 +64,7 @@ public class FileWatcherService implements Runnable, IFileWatcherService {
 	}
 	
 	private void log(Exception e) {
-		// TODO log
-		e.printStackTrace();
+		LOG.error(e.getMessage(), e);
 	}
 
 	private synchronized void setClosing(boolean b) {
@@ -71,19 +75,20 @@ public class FileWatcherService implements Runnable, IFileWatcherService {
 		return this.closing;
 	}
 	
-	public void start() throws IllegalStateException {
+	@Override
+	public synchronized void start() throws IllegalStateException {
 		try {
 			watchService = FileSystems.getDefault().newWatchService();
-		} catch (IOException e) {
+		} catch (IOException | UnsupportedOperationException e) {
 			log(e);
+			throw new IllegalStateException("Unable to create a filesystem watch service");
 		}
-		if( watchService == null )
-			throw new IllegalStateException();
 		serviceThread = new Thread(this);
 		serviceThread.start();
 	}
 	
-	public void stop() {
+	@Override
+	public synchronized void stop() {
 		setClosing(true);
 		if( serviceThread != null ) {
 			serviceThread.interrupt();
@@ -93,21 +98,21 @@ public class FileWatcherService implements Runnable, IFileWatcherService {
 		try {
 			if( watchService != null ) 
 				watchService.close();
-			watchService = null;
 		} catch (IOException e) {
-			e.printStackTrace();
+			log(e);
 		}
+		watchService = null;
 	}
 	
-	private void clearModel() {
+	private synchronized void clearModel() {
 		for( WatchKey key : subscriptions.values()) {
 			key.cancel();
 		}
 		subscriptions.clear();
 	}
 	
-	
-	public synchronized void registerListener(Path path, 
+	@Override
+	public synchronized void addFileWatcherListener(Path path, 
 			IFileWatcherEventListener listener, boolean recursive) {
 		RegistrationRequest req = new RegistrationRequest(path, listener, recursive);
 		List<RegistrationRequest> list = requests.get(path);
@@ -174,8 +179,9 @@ public class FileWatcherService implements Runnable, IFileWatcherService {
 			log(e);
 		}
 	}
-
-	public synchronized void deregisterListener(Path path, IFileWatcherEventListener listener) {
+	
+	@Override
+	public synchronized void removeFileWatcherListener(Path path, IFileWatcherEventListener listener) {
 		List<RegistrationRequest> list = requests.get(path);
 		if( list != null ) {
 			Iterator<RegistrationRequest> rit = list.iterator();
@@ -186,7 +192,7 @@ public class FileWatcherService implements Runnable, IFileWatcherService {
 					rit.remove();
 				}
 			}
-			if( list.size() == 0 ) {
+			if( list.isEmpty() ) {
 				requests.remove(path);
 			}
 			updateSubscriptionsForRemovedRegistration(path);
@@ -255,7 +261,7 @@ public class FileWatcherService implements Runnable, IFileWatcherService {
 			return true;
 		
 		// A request still exists for this exact path, so I'm still needed
-		if( requests.get(path) != null && requests.get(path).size() > 0 )
+		if( requests.get(path) != null && !requests.get(path).isEmpty() )
 			return true;
 		
 		// A request for a subfolder (or lower) still exists, so I'm still needed
@@ -298,7 +304,10 @@ public class FileWatcherService implements Runnable, IFileWatcherService {
 		WatchKey key;
 		try {
 			while (watchService != null && (key = watchService.take()) != null) {
-				// Get the list and reset immedietely
+				// Get the list and reset immediately
+				// when the WatchKey instance is returned by either of 
+				// the poll or take APIs, it will not capture more events 
+				// if it’s reset API is not invoked:
 				List<WatchEvent<?>> events = key.pollEvents();
 				key.reset();
 				
@@ -312,9 +321,8 @@ public class FileWatcherService implements Runnable, IFileWatcherService {
 				}
 			}
 		} catch (InterruptedException | ClosedWatchServiceException e) {
-			if( isClosing() == false ) {
-				// unexpected error
-				e.printStackTrace();
+			if( !isClosing()) {
+				log(e);
 			}
 		}
 		setClosing(false);
@@ -351,7 +359,7 @@ public class FileWatcherService implements Runnable, IFileWatcherService {
 	}
 
 	private boolean requestMatchesExact(Path path) {
-		return requests.get(path) != null && requests.get(path).size() > 0;
+		return requests.get(path) != null && !requests.get(path).isEmpty();
 	}
 	
 	private boolean recursiveRequestMatches(Path path) {
@@ -397,7 +405,7 @@ public class FileWatcherService implements Runnable, IFileWatcherService {
 		Set<IFileWatcherEventListener> nonRecursive = findListenersForExactPath(context, false);
 		// and fire their simple events
 		for(IFileWatcherEventListener one : nonRecursive  ) {
-			one.fireEvent(toFire);
+			one.fileChanged(toFire);
 		}
 		
 		// Find all recursive listeners at level 'context' or above
@@ -407,7 +415,7 @@ public class FileWatcherService implements Runnable, IFileWatcherService {
 		
 		// Now let's fire this item's event to all recursive listeners
 		for(IFileWatcherEventListener one : recursiveListeners  ) {
-			one.fireEvent(toFire);
+			one.fileChanged(toFire);
 		}
 		
 		/* 
@@ -434,7 +442,7 @@ public class FileWatcherService implements Runnable, IFileWatcherService {
 			List<ListenerEvent> events = createRecursiveSyntheticCreationEvents(
 					context, recursiveListeners);
 			for( ListenerEvent e : events ) {
-				e.getListener().fireEvent(e.getEvent());
+				e.getListener().fileChanged(e.getEvent());
 			}
 		}
 		
@@ -517,7 +525,7 @@ public class FileWatcherService implements Runnable, IFileWatcherService {
 			ret.add(working);
 			working = working.getParent();
 		}
-		return (Path[]) ret.toArray(new Path[ret.size()]);
+		return ret.toArray(new Path[ret.size()]);
 	}
 	
 	protected static class ListenerEvent {
@@ -578,7 +586,7 @@ public class FileWatcherService implements Runnable, IFileWatcherService {
 		return requests;
 	}
 
-	protected HashMap<Path, WatchKey> getSubscriptions() {
+	protected Map<Path, WatchKey> getSubscriptions() {
 		return subscriptions;
 	}
 }

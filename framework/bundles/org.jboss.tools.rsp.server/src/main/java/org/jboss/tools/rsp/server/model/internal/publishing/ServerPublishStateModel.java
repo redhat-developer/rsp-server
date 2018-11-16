@@ -57,7 +57,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		// TODO Maybe make this recursive if we support exploded deployments
 		String path = reference.getPath();
 		if( fileWatcher != null ) {
-			fileWatcher.registerListener(new File(path).toPath(), this, false);
+			fileWatcher.addFileWatcherListener(new File(path).toPath(), this, false);
 		}
 	}
 	
@@ -94,7 +94,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		ds.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_REMOVE);
 		String path = reference.getPath();
 		if( fileWatcher != null ) {
-			fileWatcher.deregisterListener(new File(path).toPath(), this);
+			fileWatcher.removeFileWatcherListener(new File(path).toPath(), this);
 		}
 		fireState();
 		return Status.OK_STATUS;
@@ -178,7 +178,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	 * 
 	 */
 	@Override
-	public void fireEvent(FileWatcherEvent event) {
+	public void fileChanged(FileWatcherEvent event) {
 		Path affected = event.getPath();
 		List<DeployableState> ds = new ArrayList<>(state.values());
 		for( DeployableState d : ds ) {

@@ -20,6 +20,7 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherEventListener;
 import org.junit.Test;
@@ -33,19 +34,23 @@ public class FilewatcherModelTest {
 		/*
 		 * Getters For testing
 		 */
+		@Override
 		public WatchService getWatchService() {
 			return super.getWatchService();
 		}
 
+		@Override
 		public Thread getServiceThread() {
 			return super.getServiceThread();
 		}
 
+		@Override
 		public HashMap<Path, List<RegistrationRequest>> getRequests() {
 			return super.getRequests();
 		}
 
-		public HashMap<Path, WatchKey> getSubscriptions() {
+		@Override
+		public Map<Path, WatchKey> getSubscriptions() {
 			return super.getSubscriptions();
 		}
 	}
@@ -89,10 +94,10 @@ public class FilewatcherModelTest {
 			IFileWatcherEventListener listener = (events) -> System.out.println(events);
 			Path root = Files.createTempDirectory(getClass().getName() + "_1");
 
-			service.registerListener(root, listener, false);
+			service.addFileWatcherListener(root, listener, false);
 			verifyModel(service, root, 1, 1, root.getNameCount()+1);
 			
-			service.deregisterListener(root, listener);
+			service.removeFileWatcherListener(root, listener);
 			verifyModel(service, root, 0, 0, 0);
 		} catch(IOException ioe) {
 			fail();
@@ -115,10 +120,10 @@ public class FilewatcherModelTest {
 			Files.write(childFile, "test".getBytes());
 			
 			verifyModel(service, null, 0, 0, 0);
-			service.registerListener(childFile, listener, false);
+			service.addFileWatcherListener(childFile, listener, false);
 			verifyModel(service, childFile, 1, 1, root.getNameCount() + 1);
 			
-			service.deregisterListener(childFile, listener);
+			service.removeFileWatcherListener(childFile, listener);
 			verifyModel(service, childFile, 0,0,0);
 
 		} catch(IOException ioe) {
@@ -147,23 +152,23 @@ public class FilewatcherModelTest {
 			
 			int tmpDirNameCount = root.getNameCount() + 1;
 
-			service.registerListener(nested1, listener, false);
+			service.addFileWatcherListener(nested1, listener, false);
 			verifyModel(service, nested1, 1, 1, tmpDirNameCount+1);
 
-			service.registerListener(nested2, listener, false);
+			service.addFileWatcherListener(nested2, listener, false);
 			verifyModel(service, nested2, 2, 1, tmpDirNameCount+2);
 
-			service.registerListener(nested3, listener, false);
+			service.addFileWatcherListener(nested3, listener, false);
 			verifyModel(service, nested3, 3, 1, tmpDirNameCount+3);
 
 			// Remove them
-			service.deregisterListener(nested2, listener);
+			service.removeFileWatcherListener(nested2, listener);
 			verifyModel(service, nested2, 2, 0, tmpDirNameCount+2);
 
-			service.deregisterListener(nested1, listener);
+			service.removeFileWatcherListener(nested1, listener);
 			verifyModel(service, nested1, 1, 0, tmpDirNameCount+1);
 
-			service.deregisterListener(nested3, listener);
+			service.removeFileWatcherListener(nested3, listener);
 			verifyModel(service, nested3, 0,0,0);
 		} catch(IOException ioe) {
 			fail();
@@ -184,17 +189,17 @@ public class FilewatcherModelTest {
 			Path root = Files.createTempDirectory(getClass().getName() + "_4");
 			int tmpDirNameCount = root.getNameCount() + 1;
 
-			service.registerListener(root, listener, false);
+			service.addFileWatcherListener(root, listener, false);
 			assertEquals(1, service.getRequests().size());
 			assertEquals(1, service.getRequests().get(root).size());
 			assertEquals(tmpDirNameCount, service.getSubscriptions().size());
 
-			service.registerListener(root, listener, false);
+			service.addFileWatcherListener(root, listener, false);
 			assertEquals(1, service.getRequests().size());
 			assertEquals(1, service.getRequests().get(root).size());
 			assertEquals(tmpDirNameCount, service.getSubscriptions().size());
 
-			service.deregisterListener(root, listener);
+			service.removeFileWatcherListener(root, listener);
 			assertEquals(0, service.getRequests().size());
 			assertNull(service.getRequests().get(root));
 			assertEquals(0, service.getSubscriptions().size());
@@ -219,19 +224,19 @@ public class FilewatcherModelTest {
 			Path root = Files.createTempDirectory(getClass().getName() + "_5");
 			int tmpDirNameCount = root.getNameCount() + 1;
 
-			service.registerListener(root, listener1, false);
+			service.addFileWatcherListener(root, listener1, false);
 			verifyModel(service, root, 1, 1, tmpDirNameCount);
 
-			service.registerListener(root, listener2, false);
+			service.addFileWatcherListener(root, listener2, false);
 			// requests only has 1 key (the path) 
 			// but it's value is a list w 2 request objects
 			verifyModel(service, root, 1, 2, tmpDirNameCount);
 
 			// Remove 
-			service.deregisterListener(root, listener2);
+			service.removeFileWatcherListener(root, listener2);
 			verifyModel(service, root, 1, 1, tmpDirNameCount);
 
-			service.deregisterListener(root, listener1);
+			service.removeFileWatcherListener(root, listener1);
 			verifyModel(service, root, 0,0,0);
 		} catch(IOException ioe) {
 			fail();
@@ -261,11 +266,11 @@ public class FilewatcherModelTest {
 			
 			int tmpDirNameCount = root.getNameCount() + 1;
 
-			service.registerListener(root, listener, true);
+			service.addFileWatcherListener(root, listener, true);
 			verifyModel(service, root, 1, 1, tmpDirNameCount+3);
 
 			// Remove them
-			service.deregisterListener(root, listener);
+			service.removeFileWatcherListener(root, listener);
 			assertEquals(0, service.getRequests().size());
 			assertEquals(0, service.getSubscriptions().size());
 			verifyModel(service, root, 0,0,0);
@@ -297,17 +302,17 @@ public class FilewatcherModelTest {
 			
 			int tmpDirNameCount = root.getNameCount() + 1;
 
-			service.registerListener(root, listener1, true);
+			service.addFileWatcherListener(root, listener1, true);
 			verifyModel(service, root, 1, 1, tmpDirNameCount+3);
 
-			service.registerListener(root, listener2, true);
+			service.addFileWatcherListener(root, listener2, true);
 			verifyModel(service, root, 1, 2, tmpDirNameCount+3);
 
 			// Remove them
-			service.deregisterListener(root, listener1);
+			service.removeFileWatcherListener(root, listener1);
 			verifyModel(service, root, 1, 1, tmpDirNameCount+3);
 
-			service.deregisterListener(root, listener2);
+			service.removeFileWatcherListener(root, listener2);
 			verifyModel(service, root, 0,0,0);
 		} catch(IOException ioe) {
 			fail();
@@ -347,26 +352,26 @@ public class FilewatcherModelTest {
 			int subsNested3 = 4 + tmpDirNameCount;
 			int subsNested2 = 1 + tmpDirNameCount;
 
-			service.registerListener(nested3, listener1, true);
+			service.addFileWatcherListener(nested3, listener1, true);
 			verifyModel(service, nested3, 1, 1, subsNested3);
 			
-			service.registerListener(root, listener1, true);
+			service.addFileWatcherListener(root, listener1, true);
 			verifyModel(service, root, 2, 1, totalSubs);
 			
-			service.deregisterListener(nested3, listener1);
+			service.removeFileWatcherListener(nested3, listener1);
 			verifyModel(service, nested3, 1, 0, totalSubs);
 			verifyModel(service, root, 1, 1, totalSubs);
 
 			
-			service.registerListener(nested2, listener1, true);
+			service.addFileWatcherListener(nested2, listener1, true);
 			verifyModel(service, nested2, 2, 1, totalSubs);
 
-			service.deregisterListener(root, listener1);
+			service.removeFileWatcherListener(root, listener1);
 			verifyModel(service, nested3, 1, 0, subsNested2);
 			verifyModel(service, root, 1,0,subsNested2);
 			verifyModel(service, nested2, 1,1,subsNested2);
 			
-			service.deregisterListener(nested2, listener1);
+			service.removeFileWatcherListener(nested2, listener1);
 			verifyModel(service, nested2, 0,0,0);
 
 		} catch(IOException ioe) {

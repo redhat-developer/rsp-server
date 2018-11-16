@@ -16,8 +16,8 @@ public interface IFileWatcherService {
 	
 	public void stop();
 	
-	public void registerListener(Path path, 
+	public void addFileWatcherListener(Path path, 
 			IFileWatcherEventListener listener, boolean recursive);
 	
-	public void deregisterListener(Path path, IFileWatcherEventListener listener);
+	public void removeFileWatcherListener(Path path, IFileWatcherEventListener listener);
 }

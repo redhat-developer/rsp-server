@@ -9,5 +9,5 @@
 package org.jboss.tools.rsp.server.spi.filewatcher;
 
 public interface IFileWatcherEventListener {
-	public void fireEvent(FileWatcherEvent event);
+	public void fileChanged(FileWatcherEvent event);
 }

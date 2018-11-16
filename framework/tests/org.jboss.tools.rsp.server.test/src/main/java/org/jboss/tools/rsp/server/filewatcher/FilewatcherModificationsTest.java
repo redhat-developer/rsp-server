@@ -19,16 +19,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
 import java.nio.file.WatchEvent.Kind;
+import java.nio.file.WatchKey;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.jboss.tools.rsp.server.filewatcher.FileWatcherService.RegistrationRequest;
 import org.jboss.tools.rsp.server.filewatcher.FilewatcherModelTest.TestableFileWatcherService;
 import org.jboss.tools.rsp.server.spi.filewatcher.FileWatcherEvent;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherEventListener;
@@ -54,7 +51,7 @@ public class FilewatcherModificationsTest {
 			
 			Path root = Files.createTempDirectory(getClass().getName() + "_1");
 			Path childFile = root.resolve("out.txt");
-			service.registerListener(root, listener1, true);
+			service.addFileWatcherListener(root, listener1, true);
 			
 			Files.write(childFile, "test".getBytes());
 			service.waitOnLatches();
@@ -71,7 +68,7 @@ public class FilewatcherModificationsTest {
 			assertTrue(matchingEventFound(childFile, 
 					StandardWatchEventKinds.ENTRY_MODIFY, new ArrayList<>(service.events)));
 			
-			service.deregisterListener(root, listener1);
+			service.removeFileWatcherListener(root, listener1);
 			verifyModel(service, root, 0,0,0);
 			
 		} catch(IOException ioe) {
@@ -121,7 +118,7 @@ public class FilewatcherModificationsTest {
 			// Subscribe to folder/out.txt, which registers 
 			// listeners to all folders above in tree
 			IFileWatcherEventListener listener1 = (events2) -> System.out.println(events2);
-			service.registerListener(root, listener1, true);
+			service.addFileWatcherListener(root, listener1, true);
 			
 			assertTrue(root.toFile().delete());
 			service.waitOnLatches();
@@ -154,7 +151,7 @@ public class FilewatcherModificationsTest {
 			assertTrue(matchingEventFound(childFile, 
 					StandardWatchEventKinds.ENTRY_MODIFY, new ArrayList<>(service.events)));
 			
-			service.deregisterListener(root, listener1);
+			service.removeFileWatcherListener(root, listener1);
 			verifyModel(service, root, 0,0,0);
 			
 		} catch(IOException ioe) {
@@ -192,7 +189,7 @@ public class FilewatcherModificationsTest {
 			// Subscribe to folder/out.txt, which registers 
 			// listeners to all folders above in tree
 			IFileWatcherEventListener listener1 = (events2) -> listenerEvents.add(events2);
-			service.registerListener(root, listener1, true);
+			service.addFileWatcherListener(root, listener1, true);
 			
 			assertTrue(root.toFile().delete());
 			root.toFile().mkdirs();
@@ -248,7 +245,7 @@ public class FilewatcherModificationsTest {
 			// Subscribe to folder/out.txt, which registers 
 			// listeners to all folders above in tree
 			IFileWatcherEventListener listener1 = (events2) -> listenerEvents.add(events2);
-			service.registerListener(root, listener1, true);
+			service.addFileWatcherListener(root, listener1, true);
 			
 			assertTrue(root.toFile().delete());
 			root.toFile().mkdirs();
