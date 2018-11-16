@@ -25,6 +25,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import org.jboss.tools.rsp.server.spi.filewatcher.FileWatcherEvent;
@@ -33,15 +36,11 @@ import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FileWatcherService implements Runnable, IFileWatcherService {
+public class FileWatcherService implements IFileWatcherService {
 	private static final Logger LOG = LoggerFactory.getLogger(FileWatcherService.class);
 
 	// The watch service from java.nio
 	private WatchService watchService;
-	
-	// A thread which runs and listens for events
-	private Thread serviceThread;
-
 	/* 
 	 *  A map of paths and associated listeners that have been specifically
 	 *  requested by some client to be listened to.
@@ -59,10 +58,17 @@ public class FileWatcherService implements Runnable, IFileWatcherService {
 	private Map<Path, WatchKey> subscriptions = new HashMap<>();
 	
 	private boolean closing = false;
+	
+	private ExecutorService executor = null;
+	private Future<?> executorFuture = null;
 
 	public FileWatcherService() {
 	}
 	
+	private String getThreadName() {
+		return "RSP File Watcher Service";
+	}
+
 	private void log(Exception e) {
 		LOG.error(e.getMessage(), e);
 	}
@@ -83,17 +89,19 @@ public class FileWatcherService implements Runnable, IFileWatcherService {
 			log(e);
 			throw new IllegalStateException("Unable to create a filesystem watch service");
 		}
-		serviceThread = new Thread(this);
-		serviceThread.start();
+		executor = Executors.newSingleThreadExecutor(
+				(Runnable runnable) -> new Thread(runnable, getThreadName()));
+		executorFuture = executor.submit(() -> runFileWatcher());
 	}
 	
 	@Override
 	public synchronized void stop() {
 		setClosing(true);
-		if( serviceThread != null ) {
-			serviceThread.interrupt();
-		}
-		serviceThread = null;
+		if( executorFuture != null ) 
+			executorFuture.cancel(true);
+		executor.shutdownNow();
+		executor = null;
+		executorFuture = null;
 		clearModel();
 		try {
 			if( watchService != null ) 
@@ -299,8 +307,7 @@ public class FileWatcherService implements Runnable, IFileWatcherService {
 		return false;
 	}
 
-	@Override
-	public void run() {
+	public void runFileWatcher() {
 		WatchKey key;
 		try {
 			while (watchService != null && (key = watchService.take()) != null) {
@@ -578,8 +585,8 @@ public class FileWatcherService implements Runnable, IFileWatcherService {
 		return watchService;
 	}
 
-	protected Thread getServiceThread() {
-		return serviceThread;
+	protected ExecutorService getExecutor() {
+		return executor;
 	}
 
 	protected HashMap<Path, List<RegistrationRequest>> getRequests() {

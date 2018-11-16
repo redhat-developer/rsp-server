@@ -9,8 +9,10 @@
 package org.jboss.tools.rsp.server.filewatcher;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -21,6 +23,7 @@ import java.nio.file.WatchService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherEventListener;
 import org.junit.Test;
@@ -38,17 +41,14 @@ public class FilewatcherModelTest {
 		public WatchService getWatchService() {
 			return super.getWatchService();
 		}
-
-		@Override
-		public Thread getServiceThread() {
-			return super.getServiceThread();
-		}
-
 		@Override
 		public HashMap<Path, List<RegistrationRequest>> getRequests() {
 			return super.getRequests();
 		}
-
+		@Override
+		public ExecutorService getExecutor() {
+			return super.getExecutor();
+		}
 		@Override
 		public Map<Path, WatchKey> getSubscriptions() {
 			return super.getSubscriptions();
@@ -61,14 +61,14 @@ public class FilewatcherModelTest {
 		assertNotNull(service.getRequests());
 		assertNotNull(service.getSubscriptions());
 		assertNull(service.getWatchService());
-		assertNull(service.getServiceThread());
+		assertNull(service.getExecutor());
 		
 		service.start();
-		assertNotNull(service.getServiceThread());
+		assertFalse(service.getExecutor().isShutdown());
 		assertNotNull(service.getWatchService());
 		
 		service.stop();
-		assertNull(service.getServiceThread());
+		assertNull(service.getExecutor());
 		assertNull(service.getWatchService());
 	}
 
@@ -79,10 +79,10 @@ public class FilewatcherModelTest {
 		assertNotNull(service.getRequests());
 		assertNotNull(service.getSubscriptions());
 		assertNull(service.getWatchService());
-		assertNull(service.getServiceThread());
+		assertNull(service.getExecutor());
 		
 		service.start();
-		assertNotNull(service.getServiceThread());
+		assertFalse(service.getExecutor().isShutdown());
 		assertNotNull(service.getWatchService());
 
 		
@@ -103,7 +103,7 @@ public class FilewatcherModelTest {
 			fail();
 		} finally {
 			service.stop();
-			assertNull(service.getServiceThread());
+			assertNull(service.getExecutor());
 			assertNull(service.getWatchService());
 		}
 	}
@@ -130,7 +130,7 @@ public class FilewatcherModelTest {
 			fail();
 		} finally {
 			service.stop();
-			assertNull(service.getServiceThread());
+			assertNull(service.getExecutor());
 			assertNull(service.getWatchService());
 		}
 	}
@@ -174,7 +174,7 @@ public class FilewatcherModelTest {
 			fail();
 		} finally {
 			service.stop();
-			assertNull(service.getServiceThread());
+			assertNull(service.getExecutor());
 			assertNull(service.getWatchService());
 		}
 	}
@@ -208,7 +208,7 @@ public class FilewatcherModelTest {
 			fail();
 		} finally {
 			service.stop();
-			assertNull(service.getServiceThread());
+			assertNull(service.getExecutor());
 			assertNull(service.getWatchService());
 		}
 	}
@@ -242,7 +242,7 @@ public class FilewatcherModelTest {
 			fail();
 		} finally {
 			service.stop();
-			assertNull(service.getServiceThread());
+			assertNull(service.getExecutor());
 			assertNull(service.getWatchService());
 		}
 	}
@@ -278,7 +278,7 @@ public class FilewatcherModelTest {
 			fail();
 		} finally {
 			service.stop();
-			assertNull(service.getServiceThread());
+			assertNull(service.getExecutor());
 			assertNull(service.getWatchService());
 		}
 	}
@@ -318,7 +318,7 @@ public class FilewatcherModelTest {
 			fail();
 		} finally {
 			service.stop();
-			assertNull(service.getServiceThread());
+			assertNull(service.getExecutor());
 			assertNull(service.getWatchService());
 		}
 	}
@@ -378,7 +378,7 @@ public class FilewatcherModelTest {
 			fail();
 		} finally {
 			service.stop();
-			assertNull(service.getServiceThread());
+			assertNull(service.getExecutor());
 			assertNull(service.getWatchService());
 		}
 	}

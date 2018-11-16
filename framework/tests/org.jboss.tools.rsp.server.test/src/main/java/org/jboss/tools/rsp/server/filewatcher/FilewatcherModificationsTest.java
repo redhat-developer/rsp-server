@@ -75,7 +75,7 @@ public class FilewatcherModificationsTest {
 			fail();
 		} finally {
 			service.stop();
-			assertNull(service.getServiceThread());
+			assertNull(service.getExecutor());
 			assertNull(service.getWatchService());
 		}
 	}
@@ -158,7 +158,7 @@ public class FilewatcherModificationsTest {
 			fail();
 		} finally {
 			service.stop();
-			assertNull(service.getServiceThread());
+			assertNull(service.getExecutor());
 			assertNull(service.getWatchService());
 		}
 	}
@@ -213,7 +213,7 @@ public class FilewatcherModificationsTest {
 			fail();
 		} finally {
 			service.stop();
-			assertNull(service.getServiceThread());
+			assertNull(service.getExecutor());
 			assertNull(service.getWatchService());
 		}
 	}
@@ -277,12 +277,10 @@ public class FilewatcherModificationsTest {
 			fail();
 		} finally {
 			service.stop();
-			assertNull(service.getServiceThread());
+			assertNull(service.getExecutor());
 			assertNull(service.getWatchService());
 		}
 	}
-	
-	
 	
 	private static class WatchKeyEvent {
 		private WatchKey key;
@@ -398,7 +396,7 @@ public class FilewatcherModificationsTest {
 		}
 	}
 	
-	private boolean matchingFWEventFound(Path path, Kind kind, List<FileWatcherEvent> events) {
+	private boolean matchingFWEventFound(Path path, Kind<?> kind, List<FileWatcherEvent> events) {
 		for( FileWatcherEvent keyvent : events ) {
 			Path absolute = keyvent.getPath();
 			if( absolute.equals(path) && kind.equals(keyvent.getKind()))
@@ -406,7 +404,7 @@ public class FilewatcherModificationsTest {
 		}
 		return false;
 	}
-	private boolean matchingEventFound(Path path, Kind kind, List<WatchKeyEvent> events) {
+	private boolean matchingEventFound(Path path, Kind<?> kind, List<WatchKeyEvent> events) {
 		for( WatchKeyEvent keyvent : events ) {
 			WatchEvent<?> event = keyvent.getEvent();
 			Path matched = ((Path)event.context());
