@@ -358,6 +358,14 @@ public class FileWatcherService implements IFileWatcherService {
 					ensureChildrenSubscribed(eventContext);
 				} else if( requestMatchesExact(eventContext) ) {
 					subscribeSinglePath(eventContext);
+				} else {
+					// We don't have any recursive requests, or any 
+					// exact-match requests. But, there still might be a 
+					// non-recursive request matching a deeper path
+					List<Path> childRequests = findAllChildRequestPaths(eventContext);
+					for( Path p : childRequests) {
+						ensurePathAndParentsSubscribed(p);
+					}
 				}
 			}
 		}
@@ -365,6 +373,12 @@ public class FileWatcherService implements IFileWatcherService {
 		
 	}
 
+	
+	private List<Path> findAllChildRequestPaths(Path context) {
+		return requests.keySet().stream().filter(x -> x.startsWith(context))
+				.collect(Collectors.toList());
+	}
+	
 	private boolean requestMatchesExact(Path path) {
 		return requests.get(path) != null && !requests.get(path).isEmpty();
 	}
