@@ -9,16 +9,17 @@
 package org.jboss.tools.rsp.api.dao.util;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.jboss.tools.rsp.api.dao.Attribute;
 import org.jboss.tools.rsp.api.dao.Attributes;
 
 public class CreateServerAttributesUtility {
-	private HashMap<String, Attribute> attrs;
+	private Map<String, Attribute> attrs;
 	
 	public CreateServerAttributesUtility() {
-		attrs = new HashMap<>();
+		this.attrs = new HashMap<>();
 	}
 	
 	public CreateServerAttributesUtility(Attributes original) {

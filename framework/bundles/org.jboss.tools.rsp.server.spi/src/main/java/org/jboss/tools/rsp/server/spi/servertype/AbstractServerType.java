@@ -13,17 +13,17 @@ import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 
 public abstract class AbstractServerType implements IServerType {
+
 	private String id;
 	private String name;
 	private String desc;
+
 	public AbstractServerType(String id, String name, String desc) {
 		this.id = id;
 		this.name = name;
 		this.desc = desc;
 	}
 
-	public abstract IServerDelegate createServerDelegate(IServer server);
-	
 	public Attributes getRequiredAttributes() {
 		return new CreateServerAttributesUtility().toPojo();
 	}
