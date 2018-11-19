@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
@@ -31,8 +32,10 @@ import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
+import org.jboss.tools.rsp.eclipse.core.runtime.MultiStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
+import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.launching.utils.StatusConverter;
 import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
@@ -199,14 +202,22 @@ public class ServerModel implements IServerModel {
 		try {
 			return createServerUnprotected(serverType, id, attributes);
 		} catch(CoreException e) {
-			return new CreateServerResponse(StatusConverter.convert(e.getStatus()), null);
+			IStatus status = e.getStatus();
+			List<String> invalidKeys = getInvalidKeys(status);
+			return new CreateServerResponse(StatusConverter.convert(status), invalidKeys);
 		} catch(Exception e) {
-			Status s = new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+			IStatus s = new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
 					"An unexpected error occurred", e);
 			return new CreateServerResponse(StatusConverter.convert(s), null);
 		}
 	}
 	
+	private List<String> getInvalidKeys(IStatus status) {
+		return Arrays.stream(status.getChildren())
+			.map(IStatus::getPlugin)
+			.collect(Collectors.toList());
+	}
+
 	private CreateServerResponse createServerUnprotected(String serverType, String id, Map<String, Object> attributes) 
 			throws CoreException {
 		if( servers.get(id) != null ) {
@@ -235,33 +246,44 @@ public class ServerModel implements IServerModel {
 	}
 	
 	private IStatus validateAttributes(IServerType type, Map<String, Object> map) {
+		MultiStatus multiStatus = new MultiStatus(ServerCoreActivator.BUNDLE_ID, 0, "The following attributes are invalid:", null);
 		Attributes attr = type.getRequiredAttributes();
 		CreateServerAttributesUtility util = new CreateServerAttributesUtility(attr);
 		Set<String> required = util.listAttributes();
-		for( String attrKey : required ) {
-			if( map.get(attrKey) == null ) {
-				return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Attribute " + attrKey + " must not be null");
+		for (String attrKey : required) {
+			if (!map.containsKey(attrKey)) {
+				multiStatus.add(new Status(IStatus.ERROR, attrKey, 
+						NLS.bind("Attribute {0} must not be null", attrKey)));
 			}
 			Object v = map.get(attrKey);
-			Class actual = v.getClass();
-			Class expected = DaoUtilities.getAttributeTypeClass(util.getAttributeType(attrKey));
-			if( !actual.equals(expected)) {
+			Class<?> actual = v.getClass();
+			Class<?> expected = DaoUtilities.getAttributeTypeClass(util.getAttributeType(attrKey));
+			if (!actual.equals(expected)) {
 				// Something's different than expectations based on json transfer
 				// Try to convert it
 				Object converted = convertJSonTransfer(v, expected);
-				if( converted == null ) {
-					return new Status(IStatus.ERROR, "org.jboss.tools.rsp.server", 
-							"Attribute " + attrKey + " must be of type " + expected.getName() 
-							+ " but is of type " + actual.getName());
+				if (converted == null) {
+					multiStatus.add(new Status(IStatus.ERROR, attrKey, 
+							NLS.bind("Attribute {0} must be of type {1} but is of type {2}", 
+									new String[] { attrKey, expected.getName(), actual.getName() })));
 				} else {
 					map.put(attrKey, converted);
 				}
 			}
+			
+			if (String.class.equals(expected)) {
+				String stringValue = (String) v;
+				if (stringValue == null
+						|| stringValue.trim().isEmpty()) {
+					multiStatus.add(new Status(IStatus.ERROR, attrKey, 
+							NLS.bind("Attribute {0} must not be empty", attrKey)));
+				}
+			}
 		}
-		return Status.OK_STATUS;
+		return multiStatus;
 	}
 
-	private Object convertJSonTransfer(Object value, Class expected) {
+	private Object convertJSonTransfer(Object value, Class<?> expected) {
 		// TODO check more things here for errors in the transfer
 		if( Integer.class.equals(expected) && Double.class.equals(value.getClass())) {
 			return Integer.valueOf(((Double)value).intValue());
