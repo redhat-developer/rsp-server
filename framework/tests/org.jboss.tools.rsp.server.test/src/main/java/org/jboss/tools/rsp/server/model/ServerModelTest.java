@@ -8,6 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.model;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -17,16 +18,25 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.Attribute;
+import org.jboss.tools.rsp.api.dao.Attributes;
+import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerType;
+import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
+import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.model.ServerModelListenerAdapter;
+import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
@@ -39,6 +49,14 @@ import org.junit.Test;
 public class ServerModelTest {
 	private static final DataLocationSysProp dataLocation = new DataLocationSysProp();
 
+	private static final String BONNET_COLOR_ATTRIBUTE_ID = "Bonnet";
+	private static final String HAS_BEARD_ATTRIBUTE_ID = "HasBeard";
+	private static final Map<String, Attribute> ATTRIBUTES = new HashMap<String, Attribute>() {{
+		put(BONNET_COLOR_ATTRIBUTE_ID, new Attribute(ServerManagementAPIConstants.ATTR_TYPE_STRING, null, null));
+		put(HAS_BEARD_ATTRIBUTE_ID, new Attribute(ServerManagementAPIConstants.ATTR_TYPE_BOOL, null, null));
+	}};
+
+	
 	@BeforeClass
 	public static void beforeClass() {
 		dataLocation.backup().set("ServerModelTest");
@@ -278,7 +296,122 @@ public class ServerModelTest {
 			fail();
 		}
 	}
-	
+
+	@Test
+	public void shouldNotCreateNewServerWithExistingId() {
+		// given
+		String serverId = "papa-smurf";
+		IServer server = mockServer(serverId);
+		IServerModel serverModel = new TestableServerModel(mock(IServerManagementModel.class), 
+				Collections.emptyMap(), 
+				new HashMap<String, IServer>() {{
+					put(serverId, server);
+				}}, 
+				Collections.emptyMap());
+		String serverTypeId = "smurfs";
+		// when
+		CreateServerResponse response = serverModel.createServer(serverTypeId, serverId, Collections.emptyMap());
+		// then
+		assertThat(response.getStatus().isOK()).isFalse();
+	}
+
+	@Test
+	public void shouldNotCreateNewServerForUnknownServerType() {
+		// given
+		TestableServerModel serverModelSpy = new TestableServerModel(mock(IServerManagementModel.class), 
+				Collections.emptyMap(),
+				Collections.emptyMap(), 
+				Collections.emptyMap());
+		// when
+		CreateServerResponse response = serverModelSpy.createServer("smurfs", "papa-smurf", Collections.emptyMap());
+		// then
+		assertThat(response.getStatus().isOK()).isFalse();
+	}
+
+	@Test
+	public void shouldNotCreateNewServerWithEmptyAttribute() {
+		// given
+		String serverTypeId = "smurfs";
+		IServerModel serverModel = createServerModel(serverTypeId);
+		// when
+		CreateServerResponse response = serverModel.createServer(serverTypeId, "papa-smurf", 
+				new HashMap<String, Object>() {{
+					put(BONNET_COLOR_ATTRIBUTE_ID, "");
+					put(HAS_BEARD_ATTRIBUTE_ID, Boolean.TRUE);
+				}});
+		// then
+		assertThat(response.getStatus().isOK()).isFalse();
+		assertThat(response.getInvalidKeys()).containsExactly(BONNET_COLOR_ATTRIBUTE_ID);
+	}
+
+	@Test
+	public void shouldNotCreateNewServerWithAttributeInWrongType() {
+		// given
+		String serverTypeId = "smurfs";
+		IServerModel serverModel = createServerModel(serverTypeId);
+		// when
+		CreateServerResponse response = serverModel.createServer(serverTypeId, "papa-smurf", 
+				new HashMap<String, Object>() {{
+					put(BONNET_COLOR_ATTRIBUTE_ID, "Red");
+					put(HAS_BEARD_ATTRIBUTE_ID, Integer.valueOf("100"));
+				}});
+		// then
+		assertThat(response.getStatus().isOK()).isFalse();
+		assertThat(response.getInvalidKeys()).containsExactly(HAS_BEARD_ATTRIBUTE_ID);
+	}
+
+	@Test
+	public void shouldNotCreateNewServerWithNullAttribute() {
+		// given
+		String serverTypeId = "smurfs";
+		IServerModel serverModel = createServerModel(serverTypeId);
+		// when
+		CreateServerResponse response = serverModel.createServer(serverTypeId, "papa-smurf", 
+				new HashMap<String, Object>() {{
+					put(BONNET_COLOR_ATTRIBUTE_ID, "Red");
+					put(HAS_BEARD_ATTRIBUTE_ID, null);
+				}});
+		// then
+		assertThat(response.getStatus().isOK()).isFalse();
+		assertThat(response.getInvalidKeys()).containsExactly(HAS_BEARD_ATTRIBUTE_ID);
+	}
+
+	@Test
+	public void shouldNotCreateNewServerIfDelegateDoesntValidate() {
+		// given
+		CreateServerValidation validation = new CreateServerValidation(Status.CANCEL_STATUS, null);
+		IServerDelegate delegate = mockServerDelegate(validation);
+		IServerType serverType = mockServerType("smurfs", delegate, ATTRIBUTES);
+		IServerModel serverModel = createServerModel(serverType);
+		// when
+		CreateServerResponse response = serverModel.createServer(serverType.getId(), "papa-smurf", 
+				new HashMap<String, Object>() {{
+					put(BONNET_COLOR_ATTRIBUTE_ID, "Red");
+					put(HAS_BEARD_ATTRIBUTE_ID, Boolean.TRUE);
+				}});
+		// then
+		assertThat(response.getStatus().isOK()).isFalse();
+		assertThat(response.getInvalidKeys()).isEmpty();
+	}
+
+	@Test
+	public void shouldCreateNewServerIfAllValidationIsOK() {
+		// given
+		CreateServerValidation validation = new CreateServerValidation(Status.OK_STATUS, null);
+		IServerDelegate delegate = mockServerDelegate(validation);
+		IServerType serverType = mockServerType("smurfs", delegate, ATTRIBUTES);
+		IServerModel serverModel = createServerModel(serverType);
+		// when
+		CreateServerResponse response = serverModel.createServer("smurfs", "papa-smurf", 
+				new HashMap<String, Object>() {{
+					put(BONNET_COLOR_ATTRIBUTE_ID, "Red");
+					put(HAS_BEARD_ATTRIBUTE_ID, Boolean.TRUE);
+				}});
+		// then
+		assertThat(response.getStatus().isOK()).isTrue();
+		assertThat(response.getInvalidKeys()).isEmpty();
+	}
+
 	private String getServerString(String name, String type) {
 		String contents = "{id:\"" + name + "\", id-set:\"true\", " + 
 				"org.jboss.tools.rsp.server.typeId=\"" + type + "\"}\n";
@@ -289,13 +422,66 @@ public class ServerModelTest {
 		String contents = "{id:\"" + name + "\", id-set:\"true\"}\n";
 		return contents;
 	}
-	
-	private IServerType mockServerType(String typeId) {
-		IServerType ist = mock(IServerType.class);
-		doReturn(typeId).when(ist).getId();
-		IServerDelegate isd = mock(IServerDelegate.class);
-		when(ist.createServerDelegate(any(IServer.class))).thenReturn(isd);
-		return ist;
+
+	private IServerModel createServerModel(String serverTypeId) {
+		return createServerModel(mockServerType(serverTypeId, ATTRIBUTES));
 	}
 
+	private IServerModel createServerModel(IServerType serverType) {
+		IServerModel serverModel = new TestableServerModel(mock(IServerManagementModel.class), 
+				new HashMap<String, IServerType>() {{
+					put(serverType.getId(), serverType);
+				}}, 
+				new HashMap<>(), 
+				new HashMap<>());
+		return serverModel;		
+	}
+
+	private IServerType mockServerType(String typeId) {
+		return mockServerType(typeId, Collections.emptyMap());
+	}
+
+	private IServerType mockServerType(String typeId, Map<String, Attribute> attributes) {
+		return mockServerType(typeId, mock(IServerDelegate.class), attributes);
+	}
+
+	private IServerType mockServerType(String typeId, IServerDelegate delegate, Map<String, Attribute> attributes) {
+		IServerType type = mock(IServerType.class);
+		doReturn(typeId).when(type).getId();
+		doReturn(delegate).when(type).createServerDelegate(any(IServer.class));
+		Attributes attrs = mock(Attributes.class);
+		doReturn(attributes).when(attrs).getAttributes();
+		doReturn(attrs).when(type).getRequiredAttributes();
+		return type;
+	}
+
+	private IServer mockServer(String serverId) {
+		IServer server = mock(IServer.class);
+		doReturn(serverId).when(server).getId();
+		return server;
+	}
+
+	private IServerDelegate mockServerDelegate(CreateServerValidation validation) {
+		IServerDelegate delegate = mock(IServerDelegate.class);
+		doReturn(validation).when(delegate).validate();
+		return delegate;
+	}
+
+	public class TestableServerModel extends ServerModel {
+
+		public TestableServerModel(IServerManagementModel managementModel) {
+			super(managementModel);
+		}
+
+		public TestableServerModel(IServerManagementModel managementModel, 
+				Map<String, IServerType> serverTypes, Map<String, IServer> servers, Map<String, IServerDelegate> delegates) {
+			super(managementModel, serverTypes, servers, delegates);
+		}
+
+		@Override
+		public void addServer(IServer server, IServerDelegate delegate) {
+			super.addServer(server, delegate);
+		}
+	}
+	
 }

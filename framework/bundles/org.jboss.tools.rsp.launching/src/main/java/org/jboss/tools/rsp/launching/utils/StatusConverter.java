@@ -22,6 +22,9 @@ public class StatusConverter {
 	
 	public static org.jboss.tools.rsp.api.dao.Status convert(
 			org.jboss.tools.rsp.eclipse.core.runtime.IStatus status) {
+		if (status == null) {
+			return null;
+		}
 		int sev = status.getSeverity();
 		String plugin = status.getPlugin();
 		String msg = status.getMessage();

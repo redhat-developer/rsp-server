@@ -25,5 +25,6 @@ Require-Bundle: org.jboss.tools.rsp.api,
  org.jboss.tools.rsp.server.spi,
  org.jboss.tools.rsp.server,
  org.junit,
- org.jboss.tools.locus.mockito
+ org.jboss.tools.locus.mockito,
+ org.assertj.core;bundle-version="2.1.0"
 Export-Package: org.jboss.tools.rsp.server.util.generation
