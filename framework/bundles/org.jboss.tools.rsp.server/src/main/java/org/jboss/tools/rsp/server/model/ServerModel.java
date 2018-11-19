@@ -57,16 +57,26 @@ public class ServerModel implements IServerModel {
 
 	private static final String SERVERS_DIRECTORY = "servers";
 
-	private final HashMap<String, IServerType> serverTypes = new HashMap<>();
-	private final HashMap<String, IServer> servers = new HashMap<>();
-	private final HashMap<String, IServerDelegate> serverDelegates = new HashMap<>();
+	private final Map<String, IServerType> serverTypes;
+	private final Map<String, IServer> servers;
+	private final Map<String, IServerDelegate> serverDelegates;
 	private final List<IServerModelListener> listeners = new ArrayList<>();
 	private final Set<String> approvedAttributeTypes = new HashSet<>();
 	private final IServerManagementModel managementModel;
 
 	public ServerModel(IServerManagementModel managementModel) {
+		this(managementModel, 
+				new HashMap<String, IServerType>(), new HashMap<String, IServer>(), new HashMap<String, IServerDelegate>());
+	}
+
+	/** for testing purposes **/
+	protected ServerModel(IServerManagementModel managementModel, 
+			Map<String, IServerType> serverTypes, Map<String, IServer> servers, Map<String, IServerDelegate> delegates) {
+		this.serverTypes = serverTypes;
+		this.servers = servers;
+		this.serverDelegates = delegates;
 		this.managementModel = managementModel;
-		
+
 		// Server attributes must be one of the following types
 		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_INT);
 		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_BOOL);
@@ -202,9 +212,7 @@ public class ServerModel implements IServerModel {
 		try {
 			return createServerUnprotected(serverType, id, attributes);
 		} catch(CoreException e) {
-			IStatus status = e.getStatus();
-			List<String> invalidKeys = getInvalidKeys(status);
-			return new CreateServerResponse(StatusConverter.convert(status), invalidKeys);
+			return new CreateServerResponse(StatusConverter.convert(e.getStatus()), Collections.emptyList());
 		} catch(Exception e) {
 			IStatus s = new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
 					"An unexpected error occurred", e);
@@ -212,30 +220,25 @@ public class ServerModel implements IServerModel {
 		}
 	}
 	
-	private List<String> getInvalidKeys(IStatus status) {
-		return Arrays.stream(status.getChildren())
-			.map(IStatus::getPlugin)
-			.collect(Collectors.toList());
-	}
 
-	private CreateServerResponse createServerUnprotected(String serverType, String id, Map<String, Object> attributes) 
-			throws CoreException {
-		if( servers.get(id) != null ) {
+	private CreateServerResponse createServerUnprotected(String serverType, String id, Map<String, Object> attributes) throws CoreException {
+		if( servers.get(id) != null) {
 			throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
 					"Server with id " + id + " already exists."));
 		}
 		IServerType type = serverTypes.get(serverType);
 		if( type == null ) {
-			throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server Type " + serverType + " not found"));
+			return new CreateServerResponse(createDaoErrorStatus("Server Type " + serverType + " not found"), 
+					Collections.emptyList());
 		}
 		IStatus validAttributes = validateAttributes(type, attributes);
 		if( !validAttributes.isOK()) {
-			throw new CoreException(validAttributes);
+			return new CreateServerResponse(StatusConverter.convert(validAttributes), 
+					getInvalidAttributeKeys(validAttributes));
 		}
 		
 		Server server = createServer2(type, id, attributes);
 		IServerDelegate del = server.getDelegate();
-
 		CreateServerValidation valid = del.validate();
 		if( !valid.getStatus().isOK()) {
 			return valid.toDao();
@@ -246,41 +249,44 @@ public class ServerModel implements IServerModel {
 	}
 	
 	private IStatus validateAttributes(IServerType type, Map<String, Object> map) {
-		MultiStatus multiStatus = new MultiStatus(ServerCoreActivator.BUNDLE_ID, 0, "The following attributes are invalid:", null);
+		MultiStatus multiStatus = new MultiStatus(ServerCoreActivator.BUNDLE_ID, 0, 
+				NLS.bind("There are missing/invalid required attributes for server type {0}", type), null);
 		Attributes attr = type.getRequiredAttributes();
 		CreateServerAttributesUtility util = new CreateServerAttributesUtility(attr);
 		Set<String> required = util.listAttributes();
 		for (String attrKey : required) {
-			if (!map.containsKey(attrKey)) {
-				multiStatus.add(new Status(IStatus.ERROR, attrKey, 
-						NLS.bind("Attribute {0} must not be null", attrKey)));
-			}
-			Object v = map.get(attrKey);
-			Class<?> actual = v.getClass();
-			Class<?> expected = DaoUtilities.getAttributeTypeClass(util.getAttributeType(attrKey));
-			if (!actual.equals(expected)) {
-				// Something's different than expectations based on json transfer
-				// Try to convert it
-				Object converted = convertJSonTransfer(v, expected);
-				if (converted == null) {
-					multiStatus.add(new Status(IStatus.ERROR, attrKey, 
-							NLS.bind("Attribute {0} must be of type {1} but is of type {2}", 
-									new String[] { attrKey, expected.getName(), actual.getName() })));
-				} else {
-					map.put(attrKey, converted);
-				}
-			}
-			
-			if (String.class.equals(expected)) {
-				String stringValue = (String) v;
-				if (stringValue == null
-						|| stringValue.trim().isEmpty()) {
-					multiStatus.add(new Status(IStatus.ERROR, attrKey, 
-							NLS.bind("Attribute {0} must not be empty", attrKey)));
-				}
-			}
+			String attributeType = util.getAttributeType(attrKey);
+			validateAttribute(attrKey, map, attributeType , multiStatus);
 		}
 		return multiStatus;
+	}
+
+	private void validateAttribute(String attrKey, Map<String, Object> attributeValues, String attributeType, MultiStatus multiStatus) {
+		Object value = attributeValues.get(attrKey);
+		if (value == null) {
+			multiStatus.add(
+					new Status(IStatus.ERROR, attrKey, NLS.bind("Attribute {0} must not be null", attrKey)));
+		} else {
+			Class<?> actualType = value.getClass();
+			Class<?> expectedType = DaoUtilities.getAttributeTypeClass(attributeType);
+			if (!actualType.equals(expectedType)) {
+				// Something's different than expectations based on json transfer
+				// Try to convert it
+				Object converted = convertJSonTransfer(value, expectedType);
+				if (converted == null) {
+					multiStatus.add(new Status(IStatus.ERROR, attrKey,
+							NLS.bind("Attribute {0} must be of type {1} but is of type {2}",
+									new String[] { attrKey, expectedType.getName(), actualType.getName() })));
+				} else {
+					attributeValues.put(attrKey, converted);
+				}
+			} 
+			if (String.class.equals(expectedType) 
+					&& ((String) value).trim().isEmpty()) {
+					multiStatus.add(new Status(IStatus.ERROR, attrKey,
+							NLS.bind("Attribute {0} must not be empty", attrKey)));
+			}
+		}
 	}
 
 	private Object convertJSonTransfer(Object value, Class<?> expected) {
@@ -291,7 +297,13 @@ public class ServerModel implements IServerModel {
 		return null;
 	}
 
-	private Server createServer2(IServerType serverType, String id, Map<String, Object> attributes) throws CoreException {
+	private List<String> getInvalidAttributeKeys(IStatus status) {
+		return Arrays.stream(status.getChildren())
+			.map(IStatus::getPlugin)
+			.collect(Collectors.toList());
+	}
+
+	private Server createServer2(IServerType serverType, String id, Map<String, Object> attributes) {
 		File data = LaunchingCore.getDataLocation();
 		File serversDirectory = new File(data, SERVERS_DIRECTORY);
 		if( !serversDirectory.exists()) {
@@ -301,8 +313,8 @@ public class ServerModel implements IServerModel {
 		File serverFile = new File(serversDirectory, id);
 		return new Server(serverFile, serverType, id, attributes, managementModel);
 	}
-	
-	private void addServer(IServer server, IServerDelegate del) {
+
+	protected void addServer(IServer server, IServerDelegate del) {
 		servers.put(server.getId(), server);
 		serverDelegates.put(server.getId(), del);
 		fireServerAdded(server);
@@ -551,4 +563,8 @@ public class ServerModel implements IServerModel {
 		return Status.CANCEL_STATUS;
 	}
 
+	private org.jboss.tools.rsp.api.dao.Status createDaoErrorStatus(String message) {
+		return new org.jboss.tools.rsp.api.dao.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, message, null);
+	}
+	
 }
