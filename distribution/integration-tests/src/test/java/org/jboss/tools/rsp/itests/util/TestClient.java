@@ -19,6 +19,7 @@ import org.jboss.tools.rsp.client.bindings.ServerManagementClientImpl;
 public class TestClient extends ServerManagementClientImpl {
 
     private String stateString;
+    private ServerState state;
 
     @Override
     public void serverStateChanged(ServerState state) {
@@ -36,9 +37,19 @@ public class TestClient extends ServerManagementClientImpl {
                 stateString = "stopping";
                 break;
         }
+        this.state = state;
     }
 
-    public String getState() {
+    public String getStateString() {
         return stateString;
+    }
+    
+    public ServerState getStateObject() {
+    	return state;
+    }
+    
+    public void clearState() {
+    	this.state = null;
+    	this.stateString = null;
     }
 }

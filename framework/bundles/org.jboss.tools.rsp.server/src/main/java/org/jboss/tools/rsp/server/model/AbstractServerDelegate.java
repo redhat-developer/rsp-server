@@ -37,8 +37,8 @@ import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.launching.RuntimeProcessEventManager;
 import org.jboss.tools.rsp.launching.utils.StatusConverter;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
-import org.jboss.tools.rsp.server.model.internal.ServerPublishStateModel;
 import org.jboss.tools.rsp.server.model.internal.ServerStreamListener;
+import org.jboss.tools.rsp.server.model.internal.publishing.ServerPublishStateModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.model.polling.IPollResultListener;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller;
@@ -61,7 +61,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	protected final HashMap<String, Object> sharedData = new HashMap<>();
 	private final IServer server;
 	
-	private final ServerPublishStateModel publishModel = new ServerPublishStateModel();
+	private ServerPublishStateModel publishModel = null;
 	
 	public AbstractServerDelegate(IServer server) {
 		this.server = server;
@@ -405,7 +405,10 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	
 	@Override
 	public IServerPublishModel getServerPublishModel() {
-		return publishModel;
+		if( this.publishModel == null ) {
+			this.publishModel = new ServerPublishStateModel(this, getServer().getServerManagementModel().getFileWatcherService());
+		}
+		return this.publishModel;
 	}
 	
 	@Override

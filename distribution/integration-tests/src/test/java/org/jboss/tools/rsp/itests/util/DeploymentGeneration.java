@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.rsp.server.util.generation;
+package org.jboss.tools.rsp.itests.util;
 
 import java.io.File;
 import java.io.FileOutputStream;

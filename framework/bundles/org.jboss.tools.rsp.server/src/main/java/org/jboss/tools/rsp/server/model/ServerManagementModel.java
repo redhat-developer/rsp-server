@@ -18,9 +18,11 @@ import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
 import org.jboss.tools.rsp.server.CapabilityManagement;
 import org.jboss.tools.rsp.server.discovery.DiscoveryPathModel;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanTypeManager;
+import org.jboss.tools.rsp.server.filewatcher.FileWatcherService;
 import org.jboss.tools.rsp.server.secure.SecureStorageGuardian;
 import org.jboss.tools.rsp.server.spi.discovery.IDiscoveryPathModel;
 import org.jboss.tools.rsp.server.spi.discovery.IServerBeanTypeManager;
+import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
 import org.jboss.tools.rsp.server.spi.model.ICapabilityManagement;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
@@ -39,6 +41,7 @@ public class ServerManagementModel implements IServerManagementModel {
 	private IServerBeanTypeManager serverBeanTypeManager;
 	private IServerModel serverModel;
 	private IVMInstallRegistry vmModel;
+	private IFileWatcherService fileWatcherService;
 
 	public ServerManagementModel() {
 		this(LaunchingCore.getDataLocation());
@@ -53,32 +56,45 @@ public class ServerManagementModel implements IServerManagementModel {
 		this.serverModel = createServerModel(secureStorage);
 		this.vmModel = createVMInstallRegistry();
 		this.vmModel.addActiveVM();
+		this.fileWatcherService = createFileWatcherService();
+		this.fileWatcherService.start();
 	}
 	
+	@Override
 	public ISecureStorageProvider getSecureStorageProvider() {
 		return secureStorage;
 	}
 
+	@Override
 	public IDiscoveryPathModel getDiscoveryPathModel() {
 		return rpm;
 	}
 
+	@Override
 	public IServerBeanTypeManager getServerBeanTypeManager() {
 		return serverBeanTypeManager;
 	}
 
+	@Override
 	public IServerModel getServerModel() {
 		return serverModel;
 	}
 
+	@Override
 	public IVMInstallRegistry getVMInstallModel() {
 		return vmModel;
 	}
 
+	@Override
 	public ICapabilityManagement getCapabilityManagement() {
 		return capabilities;
 	}
 
+	@Override
+	public IFileWatcherService getFileWatcherService() {
+		return fileWatcherService;
+	}
+	
 	public void clientRemoved(RSPClient client) {
 		capabilities.clientRemoved(client);
 		if( secureStorage instanceof SecureStorageGuardian ) 
@@ -120,5 +136,9 @@ public class ServerManagementModel implements IServerManagementModel {
 
 	protected IServerBeanTypeManager createServerBeanTypeManager() {
 		return new ServerBeanTypeManager();
+	}
+
+	private IFileWatcherService createFileWatcherService() {
+		return new FileWatcherService();
 	}
 }

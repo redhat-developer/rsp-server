@@ -8,14 +8,19 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.itests;
 
+import org.jboss.tools.rsp.itests.wildfly.WildFlyDiscoveryTest;
+import org.jboss.tools.rsp.itests.wildfly.WildFlyLaunchingTest;
+import org.jboss.tools.rsp.itests.wildfly.WildFlyPublishingTest;
+import org.jboss.tools.rsp.itests.wildfly.WildFlyServerModelTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    DiscoveryTest.class,
-    ServerModelTest.class,
-    ServerLaunchingTest.class
+    WildFlyDiscoveryTest.class,
+    WildFlyServerModelTest.class,
+    WildFlyLaunchingTest.class,
+    WildFlyPublishingTest.class
 })
 public class AllTests {
 

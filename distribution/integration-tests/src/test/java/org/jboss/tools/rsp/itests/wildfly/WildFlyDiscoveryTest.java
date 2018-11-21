@@ -6,17 +6,18 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.rsp.itests;
+package org.jboss.tools.rsp.itests.wildfly;
 
 import java.util.List;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.ServerBean;
 import org.jboss.tools.rsp.api.dao.Status;
+import org.jboss.tools.rsp.itests.RSPTestCase;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class DiscoveryTest extends RSPTestCase {    
+public class WildFlyDiscoveryTest extends RSPTestCase {    
     
     @Test
     public void testFindServerBeansWildfly() throws Exception {
