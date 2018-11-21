@@ -20,5 +20,6 @@
     <module>org.jboss.tools.rsp.launching.java</module>
     <module>org.jboss.tools.rsp.server</module>
     <module>org.jboss.tools.rsp.server.spi</module>
+    <module>org.jboss.tools.rsp.stacks.core</module>
   </modules>
 </project>
