@@ -28,6 +28,7 @@ import org.jboss.tools.rsp.eclipse.jdt.launching.IVMRunner;
 import org.jboss.tools.rsp.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.jboss.tools.rsp.launching.java.ICommandProvider;
 import org.jboss.tools.rsp.launching.java.VMInstallClasspath;
+import org.jboss.tools.rsp.launching.utils.LaunchingCommandLineDetails;
 import org.jboss.tools.rsp.launching.utils.NativeEnvironmentUtils;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
@@ -64,11 +65,21 @@ public abstract class AbstractJavaLauncher implements IStartLauncher {
 		launch = createLaunch(mode);
 		runConfig = configureRunner();
 		if (runner instanceof ICommandProvider) {
-			launchedDetails = ((ICommandProvider) runner).getCommandLineDetails(runConfig, launch,
+			LaunchingCommandLineDetails det1 = ((ICommandProvider) runner).getCommandLineDetails(runConfig, launch,
 					new NullProgressMonitor());
+			launchedDetails = convert(det1);
 			return launchedDetails;
 		}
 		return null;
+	}
+	
+	private CommandLineDetails convert(LaunchingCommandLineDetails det) {
+		CommandLineDetails ret = new CommandLineDetails();
+		ret.setCmdLine(det.getCmdLine());
+		ret.setEnvp(det.getEnvp());
+		ret.setProperties(det.getProperties());
+		ret.setWorkingDir(det.getWorkingDir());
+		return ret;
 	}
 
 	public CommandLineDetails getLaunchedDetails() {

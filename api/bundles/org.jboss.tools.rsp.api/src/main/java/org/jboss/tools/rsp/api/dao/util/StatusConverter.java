@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.rsp.launching.utils;
+package org.jboss.tools.rsp.api.dao.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

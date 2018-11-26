@@ -21,8 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
-import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
@@ -32,6 +30,8 @@ import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.VMRunnerConfiguration;
+import org.jboss.tools.rsp.launching.utils.LaunchingCommandLineDetails;
+import org.jboss.tools.rsp.launching.utils.LaunchingDebugProperties;
 import org.jboss.tools.rsp.launching.utils.NativeEnvironmentUtils;
 import org.jboss.tools.rsp.launching.utils.OSUtils;
 
@@ -85,7 +85,7 @@ public class StandardVMDebugger extends StandardVMRunner {
 	}
 
 	@Override
-	public CommandLineDetails getCommandLineDetails(VMRunnerConfiguration config, ILaunch launch, IProgressMonitor subMonitor) throws CoreException {
+	public LaunchingCommandLineDetails getCommandLineDetails(VMRunnerConfiguration config, ILaunch launch, IProgressMonitor subMonitor) throws CoreException {
 		// TODO maybe make these adjustable?  idk
 		String transport = "dt_socket";
 		String server = "y";
@@ -189,7 +189,7 @@ public class StandardVMDebugger extends StandardVMRunner {
 		subMonitor.worked(1);
 		subMonitor.subTask(StandardVMDebugger_Starting_virtual_machine____4);
 		Map<String,String> debugFlagMap = generateDebugFlagMap(transport, server, suspend, host, port);
-		return new CommandLineDetails(cmdLine, wd, newenvp, debugFlagMap);
+		return new LaunchingCommandLineDetails(cmdLine, wd, newenvp, debugFlagMap);
 	}
 	
 	
@@ -200,9 +200,9 @@ public class StandardVMDebugger extends StandardVMRunner {
 	private HashMap<String,String> generateDebugFlagMap(String transport, String server, 
 			String suspend, String host, int port) {
 		HashMap<String,String> ret = new HashMap<>();
-		ret.put(ServerManagementAPIConstants.DEBUG_DETAILS_TYPE, "java"); // TODO extract to better loc?
-		ret.put(ServerManagementAPIConstants.DEBUG_DETAILS_HOST, host); 
-		ret.put(ServerManagementAPIConstants.DEBUG_DETAILS_PORT, Integer.toString(port));
+		ret.put(LaunchingDebugProperties.DEBUG_DETAILS_TYPE, "java"); // TODO extract to better loc?
+		ret.put(LaunchingDebugProperties.DEBUG_DETAILS_HOST, host); 
+		ret.put(LaunchingDebugProperties.DEBUG_DETAILS_PORT, Integer.toString(port));
 		ret.put(DEBUG_TRANSPORT_KEY, transport);
 		ret.put(DEBUG_TRANSPORT_SERVER, server);
 		ret.put(DEBUG_TRANSPORT_SUSPEND, suspend);

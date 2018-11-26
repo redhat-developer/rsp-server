@@ -8,11 +8,11 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.launching.java;
 
-import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.jdt.launching.VMRunnerConfiguration;
+import org.jboss.tools.rsp.launching.utils.LaunchingCommandLineDetails;
 
 public interface ICommandProvider {
 	/**
@@ -30,6 +30,6 @@ public interface ICommandProvider {
 	 *  is propagated up the top-level parent monitor. The provided monitor is not guaranteed to have been started.
 	 * @exception CoreException if an exception occurs while launching
 	 */
-	public CommandLineDetails getCommandLineDetails(VMRunnerConfiguration configuration, ILaunch launch, IProgressMonitor monitor) throws CoreException;
+	public LaunchingCommandLineDetails getCommandLineDetails(VMRunnerConfiguration configuration, ILaunch launch, IProgressMonitor monitor) throws CoreException;
 
 }

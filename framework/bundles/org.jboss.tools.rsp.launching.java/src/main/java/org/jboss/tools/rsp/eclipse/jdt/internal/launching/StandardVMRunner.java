@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
@@ -39,6 +38,7 @@ import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.StandardVMType;
 import org.jboss.tools.rsp.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
+import org.jboss.tools.rsp.launching.utils.LaunchingCommandLineDetails;
 import org.jboss.tools.rsp.launching.utils.NativeEnvironmentUtils;
 import org.jboss.tools.rsp.launching.utils.OSUtils;
 import org.slf4j.Logger;
@@ -380,7 +380,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 		return vmargs;
 	}
 
-	public CommandLineDetails getCommandLineDetails(VMRunnerConfiguration config, ILaunch launch, IProgressMonitor subMonitor) throws CoreException {
+	public LaunchingCommandLineDetails getCommandLineDetails(VMRunnerConfiguration config, ILaunch launch, IProgressMonitor subMonitor) throws CoreException {
 		String program= constructProgramString(config);
 
 		List<String> arguments= new ArrayList<>();
@@ -431,7 +431,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 		if(newCmdLine != null) {
 			cmdLine = newCmdLine;
 		}
-		return new CommandLineDetails(cmdLine, wd, newenvp, new HashMap<String,String>());
+		return new LaunchingCommandLineDetails(cmdLine, wd, newenvp, new HashMap<String,String>());
 	}	
 	
 	/* (non-Javadoc)
@@ -452,7 +452,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 		subMonitor.beginTask(StandardVMRunner_Launching_VM____1, 2);
 		subMonitor.subTask(StandardVMRunner_Constructing_command_line____2);
 		
-		CommandLineDetails det = getCommandLineDetails(config, launch, subMonitor);
+		LaunchingCommandLineDetails det = getCommandLineDetails(config, launch, subMonitor);
 
 		Process p= null;
 		File workingDir = (det.getWorkingDir() == null ? null : new File(det.getWorkingDir()));
