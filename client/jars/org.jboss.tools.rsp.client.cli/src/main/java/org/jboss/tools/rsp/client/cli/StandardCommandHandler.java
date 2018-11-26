@@ -311,20 +311,54 @@ public class StandardCommandHandler implements InputHandler {
 						int c = 1;
 						for( DeployableState ds : deployables ) {
 							int pubState = ds.getPublishState();
-							String pubStateString = null;
-							if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_ADD) pubStateString = "[add]";
-							else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_FULL) pubStateString = "[full]";
-							else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL) pubStateString = "[inc]";
-							else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_NONE) pubStateString = "[none]";
-							else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) pubStateString = "[remove]";
-							else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN) pubStateString = "[unknown]";
-							System.out.println(c++ + ") " + ds.getReference().getLabel() + " " + pubStateString); // TODO add run state?
+							String pubStateString = getPublishState(pubState);
+							int runState = ds.getState();
+							String runStateString = getRunState(runState);
+							System.out.println(c++ + ") " + ds.getReference().getLabel() + " " + 
+									runStateString + " " + pubStateString); // TODO add run state?
 						}
 					}
 				} catch(InterruptedException | ExecutionException ioe) {
 					ioe.printStackTrace();
 				}
 			}
+
+			private String getPublishState(int publishState) {
+				switch (publishState) {
+				case ServerManagementAPIConstants.PUBLISH_STATE_ADD:
+					return "[add]";
+				case ServerManagementAPIConstants.PUBLISH_STATE_FULL:
+					return "[full]";
+				case ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL:
+					return "[inc]";
+				case ServerManagementAPIConstants.PUBLISH_STATE_NONE:
+					return "[none]";
+				case ServerManagementAPIConstants.PUBLISH_STATE_REMOVE:
+					return "[remove]";
+				case ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN:
+					return "[unknown]";
+				default:
+					return String.valueOf(publishState);
+				}
+			}
+
+			private String getRunState(int runState) {
+				switch (runState) {
+				case ServerManagementAPIConstants.STATE_STARTING:
+					return "[starting]";
+				case ServerManagementAPIConstants.STATE_STARTED:
+					return "[started]";
+				case ServerManagementAPIConstants.STATE_STOPPING:
+					return "[stopping]";
+				case ServerManagementAPIConstants.STATE_STOPPED:
+					return "[stopped]";
+				case ServerManagementAPIConstants.STATE_UNKNOWN:
+					return "[unknown]";
+				default:
+					return String.valueOf(runState);
+				}
+			}
+
 		},
 		ADD_DEPLOYMENT("add deployment") {
 			@Override
@@ -422,7 +456,7 @@ public class StandardCommandHandler implements InputHandler {
 			LaunchAttributesRequest req = new LaunchAttributesRequest(handle.getType().getId(), mode);
 			
 			Attributes attrs = launcher.getServerProxy().getRequiredLaunchAttributes(req).get();
-			HashMap<String, Object> toSend = new HashMap<String, Object>(); 
+			HashMap<String, Object> toSend = new HashMap<>(); 
 			assistant.promptForAttributes(attrs, toSend, true);
 			
 			ServerAttributes servAttr = new ServerAttributes(handle.getType().getId(), handle.getId(), toSend);
