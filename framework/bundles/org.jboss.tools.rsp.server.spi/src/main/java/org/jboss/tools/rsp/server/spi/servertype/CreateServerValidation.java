@@ -11,8 +11,8 @@ package org.jboss.tools.rsp.server.spi.servertype;
 import java.util.List;
 
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
+import org.jboss.tools.rsp.api.dao.util.StatusConverter;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
-import org.jboss.tools.rsp.launching.utils.StatusConverter;
 
 public class CreateServerValidation {
 

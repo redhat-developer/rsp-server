@@ -110,6 +110,7 @@ public interface ServerManagementAPIConstants {
 	
 	/*
 	 * Debugging details: keys
+	 * These should match the keys in org.jboss.tools.rsp.launching.utils.LaunchingDebugProperties
 	 */
 	public static final String DEBUG_DETAILS_HOST = "debug.details.host";
 	
