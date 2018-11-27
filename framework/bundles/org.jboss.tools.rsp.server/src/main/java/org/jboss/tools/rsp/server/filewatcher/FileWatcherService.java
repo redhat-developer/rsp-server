@@ -61,9 +61,6 @@ public class FileWatcherService implements IFileWatcherService {
 	
 	private ExecutorService executor = null;
 	private Future<?> executorFuture = null;
-
-	public FileWatcherService() {
-	}
 	
 	private String getThreadName() {
 		return "RSP File Watcher Service";
@@ -89,20 +86,20 @@ public class FileWatcherService implements IFileWatcherService {
 			log(e);
 			throw new IllegalStateException("Unable to create a filesystem watch service");
 		}
-		executor = Executors.newSingleThreadExecutor(
+		this.executor = Executors.newSingleThreadExecutor(
 				(Runnable runnable) -> new Thread(runnable, getThreadName()));
-		executorFuture = executor.submit(() -> runFileWatcher());
+		this.executorFuture = executor.submit(() -> runFileWatcher());
 	}
 	
 	@Override
 	public synchronized void stop() {
 		setClosing(true);
-		if( executorFuture != null ) 
-			executorFuture.cancel(true);
-		executor.shutdownNow();
-		executor = null;
-		executorFuture = null;
-		clearModel();
+		disposeExecutor();
+		disposeModel();
+		disposeWatchService();
+	}
+
+	private void disposeWatchService() {
 		try {
 			if( watchService != null ) 
 				watchService.close();
@@ -111,12 +108,22 @@ public class FileWatcherService implements IFileWatcherService {
 		}
 		watchService = null;
 	}
+
+	private void disposeExecutor() {
+		if (executorFuture != null) {
+			executorFuture.cancel(true);
+		}
+		executor.shutdownNow();
+		this.executor = null;
+		this.executorFuture = null;
+	}
 	
-	private synchronized void clearModel() {
+	private synchronized void disposeModel() {
 		for( WatchKey key : subscriptions.values()) {
 			key.cancel();
 		}
 		subscriptions.clear();
+		this.subscriptions = null;
 	}
 	
 	@Override
