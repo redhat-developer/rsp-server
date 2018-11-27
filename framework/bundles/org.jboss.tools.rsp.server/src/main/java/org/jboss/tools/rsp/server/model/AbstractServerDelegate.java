@@ -53,7 +53,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	private static final String PROCESS_ID_KEY = "process.id.key";
 	
 	private int serverState = STATE_UNKNOWN;
-	private int publishState = STATE_UNKNOWN;
+	private int publishState = PUBLISH_STATE_UNKNOWN;
 	
 	
 	private String currentMode = null;

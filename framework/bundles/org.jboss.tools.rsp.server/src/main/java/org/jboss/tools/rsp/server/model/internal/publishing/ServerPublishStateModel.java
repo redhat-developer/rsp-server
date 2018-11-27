@@ -45,6 +45,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		for( DeployableReference reference : references ) {
 			addDeployableImpl(reference, ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN);
 		}
+		fireState();
 	}
 	
 	private void addDeployableImpl(DeployableReference reference, int publishState) {

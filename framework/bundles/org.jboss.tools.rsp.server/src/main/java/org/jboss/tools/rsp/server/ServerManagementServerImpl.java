@@ -90,12 +90,13 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	public void clientAdded(SocketLauncher<RSPClient> launcher) {
-		managementModel.clientAdded(launcher.getRemoteProxy());
+		this.managementModel.clientAdded(launcher.getRemoteProxy());
+		this.remoteEventManager.initClientWithServerStates(launcher.getRemoteProxy());
 	}
 	
 	protected void removeClient(SocketLauncher<RSPClient> launcher) {
 		this.launchers.remove(launcher);
-		managementModel.clientRemoved(launcher.getRemoteProxy());
+		this.managementModel.clientRemoved(launcher.getRemoteProxy());
 		this.clients.remove(launcher.getRemoteProxy());
 	}
 	
