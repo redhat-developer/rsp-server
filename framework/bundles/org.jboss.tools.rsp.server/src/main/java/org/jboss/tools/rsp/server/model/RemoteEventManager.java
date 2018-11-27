@@ -8,6 +8,8 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.model;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.jboss.tools.rsp.api.RSPClient;
@@ -22,7 +24,9 @@ import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallChangedListener;
 import org.jboss.tools.rsp.eclipse.jdt.launching.PropertyChangeEvent;
 import org.jboss.tools.rsp.server.ServerManagementServerImpl;
 import org.jboss.tools.rsp.server.spi.discovery.IDiscoveryPathListener;
+import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModelListener;
+import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
 public class RemoteEventManager implements IDiscoveryPathListener, IVMInstallChangedListener, IServerModelListener {
 	private ServerManagementServerImpl server;
@@ -71,6 +75,19 @@ public class RemoteEventManager implements IDiscoveryPathListener, IVMInstallCha
 			for( RSPClient c : l) {
 				c.serverStateChanged(state);
 			}
+		}
+	}
+	
+	/*
+	 * Initialize a new client with all server states
+	 */
+	public void initClientWithServerStates(RSPClient client) {
+		IServerModel model = server.getModel().getServerModel();
+		List<IServer> all = new ArrayList<>(model.getServers().values());
+		ServerState state = null;
+		for( Iterator<IServer> it = all.iterator(); it.hasNext(); ) {
+			state = it.next().getDelegate().getServerState();
+			client.serverStateChanged(state);
 		}
 	}
 	

@@ -97,6 +97,9 @@ public class ServerManagementClientImpl implements RSPClient {
 	private String getRunStateString(int state) {
 		String stateString = null;
 		switch(state) {
+		case ServerManagementAPIConstants.STATE_UNKNOWN:
+			stateString = "unknown";
+			break;
 		case ServerManagementAPIConstants.STATE_STARTED:
 			stateString = "started";
 			break;
