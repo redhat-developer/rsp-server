@@ -8,9 +8,8 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .,
  lib/gson-2.8.2.jar,
  lib/org.eclipse.lsp4j.jsonrpc-0.4.1.jar
-Import-Package: org.jboss.tools.rsp.eclipse.core.runtime,
- org.jboss.tools.rsp.launching.utils,
- org.osgi.framework
+Import-Package: org.osgi.framework,
+ org.jboss.tools.rsp.eclipse.core.runtime 
 Export-Package: com.google.gson,
  com.google.gson.annotations,
  com.google.gson.internal,
