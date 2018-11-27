@@ -24,7 +24,6 @@ import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
-import org.jboss.tools.rsp.api.dao.util.StatusConverter;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.MultiStatus;
@@ -47,6 +46,7 @@ import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
+import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 
 public abstract class AbstractServerDelegate implements IServerDelegate, IDebugEventSetListener {
 

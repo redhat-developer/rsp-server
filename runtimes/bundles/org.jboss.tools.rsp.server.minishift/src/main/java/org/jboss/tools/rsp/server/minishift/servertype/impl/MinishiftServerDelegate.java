@@ -15,10 +15,8 @@ import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
-import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
-import org.jboss.tools.rsp.api.dao.util.StatusConverter;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
@@ -38,6 +36,7 @@ import org.jboss.tools.rsp.server.spi.model.polling.PollThreadUtils;
 import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
+import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
