@@ -35,5 +35,6 @@ Import-Package: org.eclipse.lsp4j.jsonrpc,
  org.jboss.tools.rsp.server.spi.model,
  org.jboss.tools.rsp.server.spi.model.polling,
  org.jboss.tools.rsp.server.spi.servertype,
+ org.jboss.tools.rsp.server.spi.util,
  org.osgi.framework,
  org.slf4j

@@ -26,4 +26,6 @@ Export-Package: org.jboss.tools.rsp.server.spi,
  org.jboss.tools.rsp.server.spi.launchers,
  org.jboss.tools.rsp.server.spi.model,
  org.jboss.tools.rsp.server.spi.model.polling,
- org.jboss.tools.rsp.server.spi.servertype
+ org.jboss.tools.rsp.server.spi.servertype,
+ org.jboss.tools.rsp.server.spi.servertype.deploy,
+ org.jboss.tools.rsp.server.spi.util
