@@ -20,9 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jboss.tools.rsp.launching.utils.IMemento;
-import org.jboss.tools.rsp.launching.utils.JSONMemento;
-import org.jboss.tools.rsp.launching.utils.XMLMemento;
+import org.jboss.tools.rsp.launching.memento.IMemento;
+import org.jboss.tools.rsp.launching.memento.JSONMemento;
+import org.jboss.tools.rsp.launching.memento.XMLMemento;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

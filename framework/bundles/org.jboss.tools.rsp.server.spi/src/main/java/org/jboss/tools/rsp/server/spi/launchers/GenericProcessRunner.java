@@ -18,23 +18,15 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.rsp.server.spi.SPIActivator;
-import org.jboss.tools.rsp.server.spi.servertype.IServer;
-import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
 public class GenericProcessRunner {
 
-	private IServerDelegate serverDel;
 	private CommandConfig details;
 
-	public GenericProcessRunner(IServerDelegate serverDel, CommandConfig config) {
-		this.serverDel = serverDel;
+	public GenericProcessRunner(CommandConfig config) {
 		this.details = config;
 	}
-	
-	public IServer getServer() {
-		return serverDel.getServer();
-	}
-	
+
 	public CommandLineDetails getCommandLineDetails(ILaunch launch, IProgressMonitor monitor) {
 		return getTemporaryDetails().toDetails();
 	}

@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.launching.internal;
 
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -30,5 +31,9 @@ public class LaunchingActivator implements BundleActivator {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		this.bc = null;
+	}
+	
+	public Bundle getBundle() {
+		return this.bc == null ? null : this.bc.getBundle();
 	}
 }

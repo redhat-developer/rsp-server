@@ -19,7 +19,7 @@ import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.Launch;
 import org.jboss.tools.rsp.server.minishift.servertype.impl.EnvironmentUtility;
 import org.jboss.tools.rsp.server.spi.launchers.CommandConfig;
-import org.jboss.tools.rsp.server.spi.launchers.GenericProcessRunner;
+import org.jboss.tools.rsp.server.spi.launchers.GenericServerProcessRunner;
 import org.jboss.tools.rsp.server.spi.launchers.IStartLauncher;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
@@ -28,7 +28,7 @@ public abstract class AbstractLauncher implements IStartLauncher {
 	private IServerDelegate delegate;
 	private ILaunch launch;
 	private CommandLineDetails launchedDetails = null;
-	private GenericProcessRunner runner;
+	private GenericServerProcessRunner runner;
 	
 	
 	public AbstractLauncher(IServerDelegate msDelegate) {
@@ -81,9 +81,9 @@ public abstract class AbstractLauncher implements IStartLauncher {
 	public abstract String getProgramArguments();
 	
 	
-	public GenericProcessRunner configureRunner() {
+	public GenericServerProcessRunner configureRunner() {
 		if( runner == null ) {
-			runner = new GenericProcessRunner(delegate, getCommandConfig());
+			runner = new GenericServerProcessRunner(delegate, getCommandConfig());
 		}
 		return runner;
 	}

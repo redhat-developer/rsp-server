@@ -18,8 +18,10 @@
     <module>org.jboss.tools.rsp.secure</module>
     <module>org.jboss.tools.rsp.launching</module>
     <module>org.jboss.tools.rsp.launching.java</module>
+    <module>org.jboss.tools.rsp.foundation.core</module>
     <module>org.jboss.tools.rsp.server</module>
     <module>org.jboss.tools.rsp.server.spi</module>
     <module>org.jboss.tools.rsp.stacks.core</module>
+    <module>org.jboss.tools.rsp.runtime.core</module>
   </modules>
 </project>

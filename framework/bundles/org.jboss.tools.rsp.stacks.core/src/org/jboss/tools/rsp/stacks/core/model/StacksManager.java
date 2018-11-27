@@ -34,6 +34,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.eclipse.core.runtime.SubProgressMonitor;
+import org.jboss.tools.rsp.foundation.core.transport.URLTransportCache;
 import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -223,7 +224,7 @@ public class StacksManager {
 		if( cache == null ) {
 			File data = LaunchingCore.getDataLocation();
 			File stacks = new File(data, "stacks");
-			cache = new URLTransportCache(new Path(stacks.getAbsolutePath()));
+			cache = URLTransportCache.getCache(new Path(stacks.getAbsolutePath()));
 		}
 		return cache;
 	}
