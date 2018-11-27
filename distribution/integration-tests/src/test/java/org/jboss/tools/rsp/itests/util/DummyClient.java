@@ -16,7 +16,7 @@ import org.jboss.tools.rsp.client.bindings.ServerManagementClientImpl;
  *
  * @author jrichter
  */
-public class TestClient extends ServerManagementClientImpl {
+public class DummyClient extends ServerManagementClientImpl {
 
     private String stateString;
     private ServerState state;

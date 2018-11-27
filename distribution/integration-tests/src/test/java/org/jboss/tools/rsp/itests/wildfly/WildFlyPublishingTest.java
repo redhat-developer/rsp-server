@@ -31,19 +31,19 @@ import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.StopServerAttributes;
-import org.jboss.tools.rsp.itests.RSPTestCase;
+import org.jboss.tools.rsp.itests.RSPCase;
 import org.jboss.tools.rsp.itests.util.DeploymentGeneration;
-import org.jboss.tools.rsp.itests.util.TestClient;
+import org.jboss.tools.rsp.itests.util.DummyClient;
 import org.junit.Test;
 
 /**
  *
  * @author jrichter
  */
-public class WildFlyPublishingTest extends RSPTestCase {
+public class WildFlyPublishingTest extends RSPCase {
     
     private static final String WAR_FILENAME = "test9.war";
-    private final TestClient client = launcher.getClient();
+    private final DummyClient client = launcher.getClient();
     
     @Test
     public void testStartServer() throws Exception {

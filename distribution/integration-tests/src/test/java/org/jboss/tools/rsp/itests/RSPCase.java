@@ -18,7 +18,7 @@ import org.jboss.tools.rsp.api.dao.ServerBean;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.itests.util.RSPServerHandler;
-import org.jboss.tools.rsp.itests.util.TestClientLauncher;
+import org.jboss.tools.rsp.itests.util.DummyClientLauncher;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -26,14 +26,14 @@ import org.junit.BeforeClass;
  *
  * @author jrichter
  */
-public class RSPTestCase {
+public class RSPCase {
     protected static final String WILDFLY13_ROOT = Paths.get("target/wildfly-13.0.0.Final").toAbsolutePath().toString();    
     protected static final ServerType wfly13Type = new ServerType("org.jboss.ide.eclipse.as.wildfly.130",
             "WildFly 13.x", "A server adapter capable of discovering and controlling a WildFly 13.x runtime instance.");
     protected static final String INVALID_PARAM =
             "Parameter is invalid. It may be null, missing required fields, or unacceptable values.";
     
-    protected static TestClientLauncher launcher;
+    protected static DummyClientLauncher launcher;
     protected static RSPServer serverProxy;
     
     @BeforeClass
@@ -41,7 +41,7 @@ public class RSPTestCase {
         RSPServerHandler.clearServerData(true);
         RSPServerHandler.prepareServer();
         RSPServerHandler.startServer();
-        launcher = new TestClientLauncher("localhost", 27511);
+        launcher = new DummyClientLauncher("localhost", 27511);
         launcher.launch();
         serverProxy = launcher.getServerProxy();
     }
