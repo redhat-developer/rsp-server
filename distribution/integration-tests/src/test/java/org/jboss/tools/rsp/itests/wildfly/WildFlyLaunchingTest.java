@@ -22,8 +22,8 @@ import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.api.dao.StopServerAttributes;
-import org.jboss.tools.rsp.itests.RSPTestCase;
-import org.jboss.tools.rsp.itests.util.TestClient;
+import org.jboss.tools.rsp.itests.RSPCase;
+import org.jboss.tools.rsp.itests.util.DummyClient;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -32,9 +32,9 @@ import static org.junit.Assert.*;
  *
  * @author jrichter
  */
-public class WildFlyLaunchingTest extends RSPTestCase {
+public class WildFlyLaunchingTest extends RSPCase {
     
-    private final TestClient client = launcher.getClient();
+    private final DummyClient client = launcher.getClient();
     
     @Test
     public void testGetLaunchModes() throws Exception {

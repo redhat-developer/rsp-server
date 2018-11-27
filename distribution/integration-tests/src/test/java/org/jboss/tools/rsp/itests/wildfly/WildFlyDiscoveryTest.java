@@ -12,12 +12,12 @@ import java.util.List;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.ServerBean;
 import org.jboss.tools.rsp.api.dao.Status;
-import org.jboss.tools.rsp.itests.RSPTestCase;
+import org.jboss.tools.rsp.itests.RSPCase;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class WildFlyDiscoveryTest extends RSPTestCase {    
+public class WildFlyDiscoveryTest extends RSPCase {    
     
     @Test
     public void testFindServerBeansWildfly() throws Exception {

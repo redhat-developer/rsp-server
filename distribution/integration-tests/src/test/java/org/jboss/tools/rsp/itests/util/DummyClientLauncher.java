@@ -17,22 +17,22 @@ import org.jboss.tools.rsp.client.cli.ServerManagementCLI;
  *
  * @author jrichter
  */
-public class TestClientLauncher {
+public class DummyClientLauncher {
 
-    private TestClient myClient;
+    private DummyClient myClient;
     private SocketLauncher<RSPServer> launcher;
     private Socket socket;
     private String host;
     private int port;
     private boolean connectionOpen = false;
 
-    public TestClientLauncher(String host, int port) {
+    public DummyClientLauncher(String host, int port) {
         this.host = host;
         this.port = port;
     }
 
     public void launch() throws Exception {
-        TestClient client = new TestClient();
+        DummyClient client = new DummyClient();
         this.socket = new Socket(host, port);
         this.launcher = new SocketLauncher<>(client, RSPServer.class, socket);
         launcher.startListening().thenRun(() -> clientClosed());
@@ -52,7 +52,7 @@ public class TestClientLauncher {
         }
     }
 
-    public TestClient getClient() {
+    public DummyClient getClient() {
         return this.myClient;
     }
 

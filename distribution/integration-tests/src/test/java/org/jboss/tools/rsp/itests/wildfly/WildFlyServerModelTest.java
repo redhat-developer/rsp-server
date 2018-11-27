@@ -17,7 +17,7 @@ import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.Status;
-import org.jboss.tools.rsp.itests.RSPTestCase;
+import org.jboss.tools.rsp.itests.RSPCase;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
  *
  * @author jrichter
  */
-public class WildFlyServerModelTest extends RSPTestCase {
+public class WildFlyServerModelTest extends RSPCase {
     
     @Test
     public void testWildflySupport() throws Exception {
