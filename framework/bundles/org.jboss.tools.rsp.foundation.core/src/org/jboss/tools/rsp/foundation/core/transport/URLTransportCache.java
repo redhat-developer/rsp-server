@@ -8,7 +8,7 @@
  * Contributors:
  *     Red Hat, Inc. - initial API and implementation
  ******************************************************************************/
-package org.jboss.tools.rsp.stacks.core.model;
+package org.jboss.tools.rsp.foundation.core.transport;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -28,6 +28,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -36,11 +37,14 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
-import org.jboss.tools.rsp.stacks.core.StacksCoreActivator;
+import org.jboss.tools.rsp.foundation.core.FoundationCoreActivator;
+import org.jboss.tools.rsp.foundation.core.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 public class URLTransportCache {
+	
 	
 	private static final Logger LOG = LoggerFactory.getLogger(URLTransportCache.class);
 
@@ -113,7 +117,7 @@ public class URLTransportCache {
 		try {
 			url2 = new URL(url);
 		} catch (MalformedURLException murle) {
-			throw new CoreException(new Status(IStatus.ERROR, StacksCoreActivator.PLUGIN_ID, murle.getMessage(), murle));
+			throw new CoreException(new Status(IStatus.ERROR, FoundationCoreActivator.PLUGIN_ID, murle.getMessage(), murle));
 		}
 
 		long remoteModified = getLastModified(url2, monitor);
@@ -328,28 +332,63 @@ public class URLTransportCache {
 		}
 	}
 	
-	private long getLastModified(URL url2, IProgressMonitor monitor) {
+	public long getLastModified(URL url2, IProgressMonitor monitor) {
 		try {
 			HttpURLConnection con = (HttpURLConnection) url2.openConnection();
-			try (AutoCloseable conc = () -> con.disconnect()) {
-				return con.getLastModified();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			return getLastModified(con, monitor);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		return -1;
 	}
-	private IStatus download(String displayName, String url, FileOutputStream fileOutputStream, int timeout, IProgressMonitor monitor) throws MalformedURLException, IOException {
+	
+
+	public long getLastModified(URL url, String user, String pass, IProgressMonitor monitor) {
+		try {
+			return getLastModified(getURLConnection(url, user, pass), monitor);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return -1;
+	}
+
+	private long getLastModified(HttpURLConnection con, IProgressMonitor monitor) {
+		try (AutoCloseable conc = () -> con.disconnect()) {
+			return con.getLastModified();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return -1;
+	}
+
+	
+	private IStatus download(String displayName, String url, 
+			FileOutputStream fileOutputStream, int timeout, 
+			IProgressMonitor monitor) throws MalformedURLException, IOException {
+		return download(displayName, createStream(url), fileOutputStream, timeout, monitor);
+	}
+
+	public IStatus download(String displayName, String url, 
+			String user, String pass, 
+			FileOutputStream fileOutputStream, int timeout,
+			IProgressMonitor monitor) throws MalformedURLException, IOException {
+		return download(displayName, createStream(url, user, pass), 
+				fileOutputStream, timeout, monitor);
+	}
+
+
+	public IStatus download(String name, InputStream istream,
+			FileOutputStream out, int timeout,
+			IProgressMonitor monitor) throws IOException {
 		// TODO respect timeout
 		ReadableByteChannel readableByteChannel = null;
 		FileChannel fileChannel = null;
 		try {
-			readableByteChannel = Channels.newChannel(new URL(url).openStream());
-			fileChannel = fileOutputStream.getChannel();
+			readableByteChannel = Channels.newChannel(istream);
+			fileChannel = out.getChannel();
 			fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
 			return Status.OK_STATUS;
 		} finally {
@@ -362,6 +401,26 @@ public class URLTransportCache {
 		}
 	}
 
+	private InputStream createStream(String url) throws MalformedURLException, IOException {
+		return new URL(url).openStream();
+	}
 
+	private InputStream createStream(String webPage, String user, String pass) throws MalformedURLException, IOException {
+		return getURLConnection(webPage, user, pass).getInputStream();
+	}
 	
+	private HttpURLConnection getURLConnection(String webPage, String user, String pass) throws MalformedURLException, IOException {
+		URL url = new URL(webPage);
+		return getURLConnection(url, user, pass);
+	}
+	private HttpURLConnection getURLConnection(URL url, String user, String pass) throws MalformedURLException, IOException {
+		String authString = user + ":" + pass;
+		byte[] authEncBytes = Base64.getEncoder().encode(authString.getBytes());
+		String authStringEnc = new String(authEncBytes);
+
+		HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
+		urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
+		return urlConnection;
+	}
+
 }

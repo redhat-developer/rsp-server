@@ -8,7 +8,7 @@
  * Contributors:
  *     Red Hat Incorporated - initial API and implementation
  *******************************************************************************/
-package org.jboss.tools.rsp.launching.utils;
+package org.jboss.tools.rsp.launching.memento;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;

@@ -8,7 +8,7 @@
  * Contributors:
  *		 JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.rsp.stacks.core.model;
+package org.jboss.tools.rsp.foundation.core.digest;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

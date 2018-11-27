@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.jboss.tools.rsp.framework</groupId>
+		<artifactId>bundles</artifactId>
+		<version>0.11.0-SNAPSHOT</version>
+	</parent>
+	<groupId>org.jboss.tools.runtime.plugins</groupId>
+	<artifactId>org.jboss.tools.rsp.runtime.core</artifactId>
+	
+	<packaging>eclipse-plugin</packaging>
+	
+	<properties>
+		<jboss.runtime.directory.url>http://download.jboss.org/jbosstools/examples/download_runtimes.xml</jboss.runtime.directory.url>
+	</properties>
+
+    <!-- 
+	<profiles>
+		<profile>
+			<id>4.0.juno</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<jboss.runtime.directory.url>http://download.jboss.org/jbosstools/updates/nightly/core/4.0.juno/jbosstools-runtime.xml</jboss.runtime.directory.url>
+			</properties>
+		</profile>
+		<profile>
+			<id>trunk</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<jboss.runtime.directory.url>http://download.jboss.org/jbosstools/updates/nightly/core/trunk/jbosstools-runtime.xml</jboss.runtime.directory.url>
+			</properties>
+		</profile>
+	</profiles>
+	 -->
+	<build>
+		<resources>
+			<resource>
+				<directory>src</directory>
+				<includes>
+					<include>**/runtime.properties</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					<execution>
+						<id>resource-filtering</id>
+						<!-- Need to execute resource filtering AFTER tycho-compiler-plugin 
+							is executed -->
+						<phase>process-classes</phase>
+						<goals>
+							<goal>resources</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	
+</project>

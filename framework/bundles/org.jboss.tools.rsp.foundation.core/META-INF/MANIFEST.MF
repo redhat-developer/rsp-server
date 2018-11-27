@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Secure
+Bundle-SymbolicName: org.jboss.tools.rsp.foundation.core
+Bundle-Version: 0.11.0.qualifier
+Bundle-Activator: org.jboss.tools.rsp.foundation.core.FoundationCoreActivator
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: org.jboss.tools.rsp.eclipse.core.runtime,
+ org.jboss.tools.rsp.foundation.core,
+ org.osgi.framework;version="1.9.0",
+ org.slf4j;version="1.7.10"
+Automatic-Module-Name: org.jboss.tools.rsp.foundation.core
+Export-Package: org.jboss.tools.rsp.foundation.core,
+ org.jboss.tools.rsp.foundation.core.plugin,
+ org.jboss.tools.rsp.foundation.core.tasks,
+ org.jboss.tools.rsp.foundation.core.transport

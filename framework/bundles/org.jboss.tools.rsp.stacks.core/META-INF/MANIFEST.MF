@@ -18,6 +18,7 @@ Export-Package: org.jboss.jdf.stacks.model,
 Bundle-Localization: plugin
 Import-Package: org.jboss.tools.rsp.eclipse.core.runtime,
  org.jboss.tools.rsp.eclipse.osgi.util,
+ org.jboss.tools.rsp.foundation.core.transport,
  org.jboss.tools.rsp.launching,
  org.osgi.framework;version="1.9.0",
  org.slf4j;version="1.7.10"

@@ -30,9 +30,9 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
-import org.jboss.tools.rsp.launching.utils.IMemento;
-import org.jboss.tools.rsp.launching.utils.JSONMemento;
-import org.jboss.tools.rsp.launching.utils.XMLMemento;
+import org.jboss.tools.rsp.launching.memento.IMemento;
+import org.jboss.tools.rsp.launching.memento.JSONMemento;
+import org.jboss.tools.rsp.launching.memento.XMLMemento;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
 
 import com.google.gson.JsonSyntaxException;
