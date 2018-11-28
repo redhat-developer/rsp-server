@@ -23,6 +23,7 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchKey;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -30,55 +31,61 @@ import java.util.concurrent.TimeUnit;
 import org.jboss.tools.rsp.server.filewatcher.FilewatcherModelTest.TestableFileWatcherService;
 import org.jboss.tools.rsp.server.spi.filewatcher.FileWatcherEvent;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherEventListener;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class FilewatcherModificationsTest {
 
 	private static boolean DEBUG = false;
+
 	private static void debug(String msg) {
 		if( DEBUG ) {
 			System.out.println(msg);
 		}
 	}
-	
-	@Test
-	public void testSimpleEvent() {
-		System.out.println("\n\n*****testSimpleEvent");
-		FileWatcherServiceWithLatches service = new FileWatcherServiceWithLatches();
+
+	private FileWatcherServiceWithLatches service;
+
+	@Before
+	public void before() {
+		this.service = new FileWatcherServiceWithLatches();
 		service.start();
+	}
+
+	@After
+	public void after() {
+		service.stop();
+		assertNull(service.getExecutor());
+		assertNull(service.getWatchService());
+	}
+
+	@Test
+	public void testSimpleEvent() throws IOException {
+		System.out.println("\n\n*****testSimpleEvent");
+		IFileWatcherEventListener listener1 = (events2) -> System.out.println(events2);
+		
+		Path root = Files.createTempDirectory(getClass().getName() + "_1");
+		Path childFile = root.resolve("out.txt");
+		service.addFileWatcherListener(root, listener1, true);
+		
+		Files.write(childFile, "test".getBytes());
+		service.waitOnLatches();
+
+		// Now verify the events
+		assertTrue(matchingEventFound(childFile, 
+				StandardWatchEventKinds.ENTRY_CREATE, new ArrayList<>(service.events)));
 		service.reset();
-		try {
-			IFileWatcherEventListener listener1 = (events2) -> System.out.println(events2);
-			
-			Path root = Files.createTempDirectory(getClass().getName() + "_1");
-			Path childFile = root.resolve("out.txt");
-			service.addFileWatcherListener(root, listener1, true);
-			
-			Files.write(childFile, "test".getBytes());
-			service.waitOnLatches();
 
-			// Now verify the events
-			assertTrue(matchingEventFound(childFile, 
-					StandardWatchEventKinds.ENTRY_CREATE, new ArrayList<>(service.events)));
-			service.reset();
+		Files.write(childFile, "test2".getBytes());
+		service.waitOnLatches();
 
-			Files.write(childFile, "test2".getBytes());
-			service.waitOnLatches();
-
-			// Now verify the events
-			assertTrue(matchingEventFound(childFile, 
-					StandardWatchEventKinds.ENTRY_MODIFY, new ArrayList<>(service.events)));
-			
-			service.removeFileWatcherListener(root, listener1);
-			verifyModel(service, root, 0,0,0);
-			
-		} catch(IOException ioe) {
-			fail();
-		} finally {
-			service.stop();
-			assertNull(service.getExecutor());
-			assertNull(service.getWatchService());
-		}
+		// Now verify the events
+		assertTrue(matchingEventFound(childFile, 
+				StandardWatchEventKinds.ENTRY_MODIFY, new ArrayList<>(service.events)));
+		
+		service.removeFileWatcherListener(root, listener1);
+		verifyModel(service, root, 0,0,0);
 	}
 
 	/*
@@ -106,65 +113,50 @@ public class FilewatcherModificationsTest {
 	 * will need to make these events up somehow. 
 	 */
 	@Test
-	public void testSubscribeDeleteRecreateEvent() {
+	public void testSubscribeDeleteRecreateEvent() throws IOException {
 		System.out.println("\n\n*****testSubscribeDeleteRecreateEvent");
+		Path root = Files.createTempDirectory(getClass().getName() + "_2");
+		Path childFile = root.resolve("out.txt");
 
-		FileWatcherServiceWithLatches service = new FileWatcherServiceWithLatches();
-		service.start();
+		// Subscribe to folder/out.txt, which registers 
+		// listeners to all folders above in tree
+		IFileWatcherEventListener listener1 = (events2) -> System.out.println(events2);
+		service.addFileWatcherListener(root, listener1, true);
+		
+		assertTrue(root.toFile().delete());
+		service.waitOnLatches();
+		
+		// Now verify we receive an event for the parent folder delete
+		assertTrue(matchingEventFound(root, 
+				StandardWatchEventKinds.ENTRY_DELETE, new ArrayList<>(service.events)));
 		service.reset();
-		try {
-			Path root = Files.createTempDirectory(getClass().getName() + "_2");
-			Path childFile = root.resolve("out.txt");
 
-			// Subscribe to folder/out.txt, which registers 
-			// listeners to all folders above in tree
-			IFileWatcherEventListener listener1 = (events2) -> System.out.println(events2);
-			service.addFileWatcherListener(root, listener1, true);
-			
-			assertTrue(root.toFile().delete());
-			service.waitOnLatches();
-			
-			// Now verify we receive an event for the parent folder delete
-			assertTrue(matchingEventFound(root, 
-					StandardWatchEventKinds.ENTRY_DELETE, new ArrayList<>(service.events)));
-			service.reset();
+		// Now verify we receive an event for the parent folder mkdir
+		root.toFile().mkdirs();
+		service.waitOnLatches();
+		assertTrue(matchingEventFound(root, 
+				StandardWatchEventKinds.ENTRY_CREATE, new ArrayList<>(service.events)));
+		service.reset();
 
-			// Now verify we receive an event for the parent folder mkdir
-			root.toFile().mkdirs();
-			service.waitOnLatches();
-			assertTrue(matchingEventFound(root, 
-					StandardWatchEventKinds.ENTRY_CREATE, new ArrayList<>(service.events)));
-			service.reset();
+		
+		Files.write(childFile, "test".getBytes());
+		service.waitOnLatches();
 
-			
-			Files.write(childFile, "test".getBytes());
-			service.waitOnLatches();
+		// Now verify the events for the child
+		assertTrue(matchingEventFound(childFile, 
+				StandardWatchEventKinds.ENTRY_CREATE, new ArrayList<>(service.events)));
+		service.reset();
 
-			// Now verify the events for the child
-			assertTrue(matchingEventFound(childFile, 
-					StandardWatchEventKinds.ENTRY_CREATE, new ArrayList<>(service.events)));
-			service.reset();
+		Files.write(childFile, "test2".getBytes());
+		service.waitOnLatches();
 
-			Files.write(childFile, "test2".getBytes());
-			service.waitOnLatches();
-
-			// Now verify the events
-			assertTrue(matchingEventFound(childFile, 
-					StandardWatchEventKinds.ENTRY_MODIFY, new ArrayList<>(service.events)));
-			
-			service.removeFileWatcherListener(root, listener1);
-			verifyModel(service, root, 0,0,0);
-			
-		} catch(IOException ioe) {
-			fail();
-		} finally {
-			service.stop();
-			assertNull(service.getExecutor());
-			assertNull(service.getWatchService());
-		}
+		// Now verify the events
+		assertTrue(matchingEventFound(childFile, 
+				StandardWatchEventKinds.ENTRY_MODIFY, new ArrayList<>(service.events)));
+		
+		service.removeFileWatcherListener(root, listener1);
+		verifyModel(service, root, 0,0,0);
 	}
-	
-	
 
 	/*
 	 * This test verifies that if someone creates a folder, 
@@ -174,51 +166,33 @@ public class FilewatcherModificationsTest {
 	 * It's the same as above but without so many delays.
 	 */
 	@Test
-	public void testFileWatcherEvent_subscribeDeleteRecreate() {
+	public void testFileWatcherEvent_subscribeDeleteRecreate() throws IOException {
 		System.out.println("\n\n*****testFileWatcherEvent_subscribeDeleteRecreate");
-
-		FileWatcherServiceWithLatches service = new FileWatcherServiceWithLatches();
-		service.start();
-		service.reset();
 		
-		ArrayList<FileWatcherEvent> listenerEvents = new ArrayList<>();
+		List<FileWatcherEvent> listenerEvents = new ArrayList<>();
 		
-		try {
-			Path root = Files.createTempDirectory(getClass().getName() + "_3");
-			Path childFile = root.resolve("out.txt");
+		Path root = Files.createTempDirectory(getClass().getName() + "_3");
+		Path childFile = root.resolve("out.txt");
 
-			// Subscribe to folder/out.txt, which registers 
-			// listeners to all folders above in tree
-			IFileWatcherEventListener listener1 = (events2) -> listenerEvents.add(events2);
-			service.addFileWatcherListener(root, listener1, true);
-			
-			assertTrue(root.toFile().delete());
-			root.toFile().mkdirs();
-			Files.write(childFile, "test".getBytes());
-			service.waitOnLatches();
+		// Subscribe to folder/out.txt, which registers 
+		// listeners to all folders above in tree
+		IFileWatcherEventListener listener1 = (events2) -> listenerEvents.add(events2);
+		service.addFileWatcherListener(root, listener1, true);
+		
+		assertTrue(root.toFile().delete());
+		root.toFile().mkdirs();
+		Files.write(childFile, "test".getBytes());
+		service.waitOnLatches();
 
-			debug(""+listenerEvents.size());
-			for( FileWatcherEvent event : listenerEvents ) {
-				debug(event.getKind() + " " + event.getPath().toString());
-			}
-
-			assertTrue(matchingFWEventFound(root, 
-					StandardWatchEventKinds.ENTRY_DELETE, listenerEvents));
-			assertTrue(matchingFWEventFound(root, 
-					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
-			assertTrue(matchingFWEventFound(childFile, 
-					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
-			
-			
-		} catch(IOException ioe) {
-			fail();
-		} finally {
-			service.stop();
-			assertNull(service.getExecutor());
-			assertNull(service.getWatchService());
+		debug(""+listenerEvents.size());
+		for( FileWatcherEvent event : listenerEvents ) {
+			debug(event.getKind() + " " + event.getPath().toString());
 		}
+				
+		assertTrue(modifyOrCreateAndDeleteExists(root, listenerEvents));
+		assertTrue(matchingFWEventFound(childFile, 
+				StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
 	}
-	
 
 	/*
 	 * This test verifies that if someone creates a folder, 
@@ -227,61 +201,48 @@ public class FilewatcherModificationsTest {
 	 * when the request is recursive.
 	 */
 	@Test
-	public void testFileWatcherEvent_subscribeRootDeleteRootRecreateDeep() {
-
-		FileWatcherServiceWithLatches service = new FileWatcherServiceWithLatches();
-		service.start();
-		service.reset();
+	public void testFileWatcherEvent_subscribeRootDeleteRootRecreateDeep() throws IOException {
+		List<FileWatcherEvent> listenerEvents = new ArrayList<>();
+		Path root = Files.createTempDirectory(getClass().getName() + "_4");
+		Path nested1 = root.resolve("nested1");
+		Path nested2 = nested1.resolve("nested2");
+		Path nested3 = nested2.resolve("nested3");
+		Path nested4 = nested3.resolve("nested4");
+		Path childFile = nested4.resolve("out.txt");
 		
-		ArrayList<FileWatcherEvent> listenerEvents = new ArrayList<>();
 		
-		try {
-			Path root = Files.createTempDirectory(getClass().getName() + "_4");
-			Path nested1 = root.resolve("nested1");
-			Path nested2 = nested1.resolve("nested2");
-			Path nested3 = nested2.resolve("nested3");
-			Path nested4 = nested3.resolve("nested4");
-			Path childFile = nested4.resolve("out.txt");
-			
-			
-			// Subscribe to root, which registers 
-			// listeners to all folders above in tree
-			IFileWatcherEventListener listener1 = (events2) -> listenerEvents.add(events2);
-			service.addFileWatcherListener(root, listener1, true);
-			
-			assertTrue(root.toFile().delete());
-			root.toFile().mkdirs();
-			nested1.toFile().mkdirs();
-			nested2.toFile().mkdirs();
-			nested3.toFile().mkdirs();
-			nested4.toFile().mkdirs();
-			
-			Files.write(childFile, "test".getBytes());
-			service.waitOnLatches();
+		// Subscribe to root, which registers 
+		// listeners to all folders above in tree
+		IFileWatcherEventListener listener1 = (events2) -> listenerEvents.add(events2);
+		service.addFileWatcherListener(root, listener1, true);
+		
+		assertTrue(root.toFile().delete());
+		root.toFile().mkdirs();
+		nested1.toFile().mkdirs();
+		nested2.toFile().mkdirs();
+		nested3.toFile().mkdirs();
+		nested4.toFile().mkdirs();
+		
+		Files.write(childFile, "test".getBytes());
+		service.waitOnLatches();
 
-			assertTrue(matchingFWEventFound(root, 
-					StandardWatchEventKinds.ENTRY_DELETE, listenerEvents));
-			assertTrue(matchingFWEventFound(root, 
-					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
-			assertTrue(matchingFWEventFound(nested1, 
-					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
-			assertTrue(matchingFWEventFound(nested2, 
-					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
-			assertTrue(matchingFWEventFound(nested3, 
-					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
-			assertTrue(matchingFWEventFound(nested4, 
-					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
-			assertTrue(matchingFWEventFound(childFile, 
-					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
-			
-			
-		} catch(IOException ioe) {
-			fail();
-		} finally {
-			service.stop();
-			assertNull(service.getExecutor());
-			assertNull(service.getWatchService());
+		Iterator<FileWatcherEvent> it =	listenerEvents.iterator();
+		while(it.hasNext()) {
+			FileWatcherEvent e = it.next();
+			System.out.println(e.getKind() + " - " + e.getPath().toString());
 		}
+		
+		assertTrue(modifyOrCreateAndDeleteExists(root, listenerEvents));
+		assertTrue(matchingFWEventFound(nested1, 
+				StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
+		assertTrue(matchingFWEventFound(nested2, 
+				StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
+		assertTrue(matchingFWEventFound(nested3, 
+				StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
+		assertTrue(matchingFWEventFound(nested4, 
+				StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
+		assertTrue(matchingFWEventFound(childFile, 
+				StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
 	}
 	
 	/*
@@ -291,71 +252,57 @@ public class FilewatcherModificationsTest {
 	 * when the request is recursive.
 	 */
 	@Test
-	public void testFileWatcherEvent_subscribeDeepDeleteRootRecreateDeep() {
+	public void testFileWatcherEvent_subscribeDeepDeleteRootRecreateDeep() throws IOException {
 		_testFileWatcherEvent_subscribeDeepDeleteRootRecreateDeep(false);
 	}
 
 	@Test
-	public void testFileWatcherEvent_subscribeDeepDeleteRootRecreateDeepRecursive() {
+	public void testFileWatcherEvent_subscribeDeepDeleteRootRecreateDeepRecursive() throws IOException {
 		_testFileWatcherEvent_subscribeDeepDeleteRootRecreateDeep(true);
 	}
 
-	private void _testFileWatcherEvent_subscribeDeepDeleteRootRecreateDeep(boolean recursive) {
+	private void _testFileWatcherEvent_subscribeDeepDeleteRootRecreateDeep(boolean recursive) throws IOException {
+		List<FileWatcherEvent> listenerEvents = new ArrayList<>();
 
-		FileWatcherServiceWithLatches service = new FileWatcherServiceWithLatches();
-		service.start();
-		service.reset();
+		Path root = Files.createTempDirectory(getClass().getName() + "_4");
+		Path nested1 = root.resolve("nested1");
+		Path nested2 = nested1.resolve("nested2");
+		Path nested3 = nested2.resolve("nested3");
+		Path nested4 = nested3.resolve("nested4");
+		Path childFile = nested4.resolve("out.txt");
 		
-		ArrayList<FileWatcherEvent> listenerEvents = new ArrayList<>();
 		
-		try {
-			Path root = Files.createTempDirectory(getClass().getName() + "_4");
-			Path nested1 = root.resolve("nested1");
-			Path nested2 = nested1.resolve("nested2");
-			Path nested3 = nested2.resolve("nested3");
-			Path nested4 = nested3.resolve("nested4");
-			Path childFile = nested4.resolve("out.txt");
-			
-			
-			// Subscribe to the deep file, which registers 
-			// listeners to all folders above in tree
-			IFileWatcherEventListener listener1 = (events2) -> listenerEvents.add(events2);
-			service.addFileWatcherListener(childFile, listener1, recursive);
-			
-			assertTrue(root.toFile().delete());
-			root.toFile().mkdirs();
-			nested1.toFile().mkdirs();
-			nested2.toFile().mkdirs();
-			nested3.toFile().mkdirs();
-			nested4.toFile().mkdirs();
-			
-			Files.write(childFile, "test".getBytes());
-			service.waitOnLatches();
+		// Subscribe to the deep file, which registers 
+		// listeners to all folders above in tree
+		IFileWatcherEventListener listener1 = (events2) -> listenerEvents.add(events2);
+		service.addFileWatcherListener(childFile, listener1, recursive);
+		
+		assertTrue(root.toFile().delete());
+		root.toFile().mkdirs();
+		nested1.toFile().mkdirs();
+		nested2.toFile().mkdirs();
+		nested3.toFile().mkdirs();
+		nested4.toFile().mkdirs();
+		
+		Files.write(childFile, "test".getBytes());
+		service.waitOnLatches();
 
-			assertFalse(matchingFWEventFound(root, 
-					StandardWatchEventKinds.ENTRY_DELETE, listenerEvents));
-			assertFalse(matchingFWEventFound(root, 
-					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
-			assertFalse(matchingFWEventFound(nested1, 
-					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
-			assertFalse(matchingFWEventFound(nested2, 
-					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
-			assertFalse(matchingFWEventFound(nested3, 
-					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
-			assertFalse(matchingFWEventFound(nested4, 
-					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
-			assertTrue(matchingFWEventFound(childFile, 
-					StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
-			
-			
-		} catch(IOException ioe) {
-			fail();
-		} finally {
-			service.stop();
-			assertNull(service.getExecutor());
-			assertNull(service.getWatchService());
-		}
+		assertFalse(matchingFWEventFound(root, 
+				StandardWatchEventKinds.ENTRY_DELETE, listenerEvents));
+		assertFalse(matchingFWEventFound(root, 
+				StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
+		assertFalse(matchingFWEventFound(nested1, 
+				StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
+		assertFalse(matchingFWEventFound(nested2, 
+				StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
+		assertFalse(matchingFWEventFound(nested3, 
+				StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
+		assertFalse(matchingFWEventFound(nested4, 
+				StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
+		assertTrue(matchingFWEventFound(childFile, 
+				StandardWatchEventKinds.ENTRY_CREATE, listenerEvents));
 	}
+
 	private static class WatchKeyEvent {
 		private WatchKey key;
 		private WatchEvent<?> event;
@@ -364,9 +311,11 @@ public class FilewatcherModificationsTest {
 			this.key = key;
 			this.event = event;
 		}
+
 		public WatchKey getKey() {
 			return key;
 		}
+
 		public WatchEvent<?> getEvent() {
 			return event;
 		}
@@ -379,14 +328,12 @@ public class FilewatcherModificationsTest {
 		// This tests the raw events, and so may include events
 		// from ANY watched path
 		
+		private static final int WAIT_FOR_EVENT = 10000;
 		final CountDownLatch[] startLatch = new CountDownLatch[1];
 		final CountDownLatch[] endLatch = new CountDownLatch[1];
 		final ArrayList<WatchKeyEvent> events = new ArrayList<>();
 		private boolean waiting = false;
 		
-		public FileWatcherServiceWithLatches() {
-			super();
-		}
 		@Override
 		public void start() throws IllegalStateException {
 			super.start();
@@ -455,7 +402,7 @@ public class FilewatcherModificationsTest {
 				startLatch[0].countDown();
 				debug("waitOnLatches[2]");
 				try {
-					if( !endLatch[0].await(200, TimeUnit.MILLISECONDS)) {
+					if( !endLatch[0].await(WAIT_FOR_EVENT, TimeUnit.MILLISECONDS)) {
 						done = true;
 					}
 					debug("waitOnLatches[3]");
@@ -488,7 +435,17 @@ public class FilewatcherModificationsTest {
 		}
 		return false;
 	}
-	
+
+	private boolean modifyOrCreateAndDeleteExists(Path path, List<FileWatcherEvent> listenerEvents) {
+		boolean deleteExists = matchingFWEventFound(path, 
+				StandardWatchEventKinds.ENTRY_DELETE, listenerEvents);
+		boolean createExists = matchingFWEventFound(path, 
+				StandardWatchEventKinds.ENTRY_CREATE, listenerEvents);
+		boolean modifyExists = matchingFWEventFound(path, 
+				StandardWatchEventKinds.ENTRY_MODIFY, listenerEvents);
+		return modifyExists || (deleteExists && createExists);
+	}
+
 	private void verifyModel(TestableFileWatcherService service, Path path, 
 			int uniquePaths, int requestForPath, int watchedFolders) {
 		assertNotNull(service.getRequests());

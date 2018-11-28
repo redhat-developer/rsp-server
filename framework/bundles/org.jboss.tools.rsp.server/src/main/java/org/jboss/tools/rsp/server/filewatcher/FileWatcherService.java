@@ -182,8 +182,22 @@ public class FileWatcherService implements IFileWatcherService {
 			// The service should return the same watchkey for 
 			// the same path, assuming the folder hasn't been deleted
 			// and recreated. 
-			WatchKey k = working.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, 
-			        StandardWatchEventKinds.ENTRY_DELETE,  StandardWatchEventKinds.ENTRY_MODIFY);
+			WatchKey k = working.register(watchService, new WatchEvent.Kind<?>[] { 
+				StandardWatchEventKinds.ENTRY_CREATE,
+				StandardWatchEventKinds.ENTRY_DELETE,
+				StandardWatchEventKinds.ENTRY_MODIFY }, 
+					/*
+					 * WatchService is not native on MacOS, it's polling, requires high sensitivity
+					 * to work more or less reliably. The problem with SensitivityWatchEventModifier
+					 * is that it's in com.sun.nio.file and thus it's not portable to other jvms
+					 * 
+					 * @see https://bugs.openjdk.java.net/browse/JDK-7133447
+					 * 
+					 * @see
+					 * https://stackoverflow.com/questions/9588737/is-java-7-watchservice-slow-for-
+					 * anyone-else
+					 */
+					com.sun.nio.file.SensitivityWatchEventModifier.HIGH);
 			WatchKey existing = subscriptions.get(working);
 			if( !k.equals(existing)) {
 				subscriptions.put(working, k);
