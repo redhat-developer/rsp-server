@@ -9,8 +9,8 @@
 package org.jboss.tools.rsp.server.wildfly.servertype.impl;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
-import org.jboss.tools.rsp.server.spi.launchers.IShutdownLauncher;
-import org.jboss.tools.rsp.server.spi.launchers.IStartLauncher;
+import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
+import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.wildfly.servertype.AbstractJBossServerDelegate;
 import org.jboss.tools.rsp.server.wildfly.servertype.publishing.IJBossPublishController;
@@ -21,11 +21,11 @@ public class WildFlyServerDelegate extends AbstractJBossServerDelegate {
 		super(server);
 		setServerState(ServerManagementAPIConstants.STATE_STOPPED);
 	}
-	protected IStartLauncher getStartLauncher() {
+	protected IServerStartLauncher getStartLauncher() {
 		return new WildFlyStartLauncher(this);
 	}
 	
-	protected IShutdownLauncher getStopLauncher() {
+	protected IServerShutdownLauncher getStopLauncher() {
 		return new WildFlyStopLauncher(this);
 	}
 	@Override

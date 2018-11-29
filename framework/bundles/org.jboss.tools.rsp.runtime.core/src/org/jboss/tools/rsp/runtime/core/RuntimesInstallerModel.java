@@ -8,7 +8,7 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.rsp.runtime.core.internal;
+package org.jboss.tools.rsp.runtime.core;
 
 import java.util.ArrayList;
 import java.util.Iterator;

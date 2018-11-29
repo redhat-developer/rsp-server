@@ -9,11 +9,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: %BundleVendor
 Bundle-Localization: plugin
 Export-Package: org.jboss.tools.rsp.runtime.core,
- org.jboss.tools.rsp.runtime.core.extract;x-friends:="org.jboss.tools.runtime.ui,org.jboss.tools.runtime.test",
- org.jboss.tools.rsp.runtime.core.internal;x-friends:="org.jboss.tools.runtime.test",
- org.jboss.tools.rsp.runtime.core.model,
- org.jboss.tools.rsp.runtime.core.util,
- org.jboss.tools.rsp.runtime.core.util.internal;x-friends:="org.jboss.tools.runtime.ui"
+ org.jboss.tools.rsp.runtime.core.model
 Import-Package: org.apache.commons.compress.archivers.tar,
  org.apache.commons.compress.compressors.gzip,
  org.jboss.tools.rsp.api.dao,
@@ -22,11 +18,11 @@ Import-Package: org.apache.commons.compress.archivers.tar,
  org.jboss.tools.rsp.eclipse.debug.core.model,
  org.jboss.tools.rsp.eclipse.jdt.launching,
  org.jboss.tools.rsp.eclipse.osgi.util,
+ org.jboss.tools.rsp.foundation.core.launchers,
  org.jboss.tools.rsp.foundation.core.plugin,
  org.jboss.tools.rsp.foundation.core.tasks,
  org.jboss.tools.rsp.foundation.core.transport,
  org.jboss.tools.rsp.launching,
  org.jboss.tools.rsp.launching.memento,
  org.jboss.tools.rsp.launching.utils,
- org.jboss.tools.rsp.server.spi.launchers,
  org.osgi.framework;version="1.9.0"

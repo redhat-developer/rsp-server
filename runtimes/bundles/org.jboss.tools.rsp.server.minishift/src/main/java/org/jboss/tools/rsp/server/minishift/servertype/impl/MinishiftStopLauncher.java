@@ -11,10 +11,10 @@ package org.jboss.tools.rsp.server.minishift.servertype.impl;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.server.minishift.servertype.AbstractLauncher;
-import org.jboss.tools.rsp.server.spi.launchers.IShutdownLauncher;
+import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
-public class MinishiftStopLauncher extends AbstractLauncher implements IShutdownLauncher{
+public class MinishiftStopLauncher extends AbstractLauncher implements IServerShutdownLauncher{
 	public MinishiftStopLauncher(IServerDelegate jBossServerDelegate) {
 		super(jBossServerDelegate);
 	}

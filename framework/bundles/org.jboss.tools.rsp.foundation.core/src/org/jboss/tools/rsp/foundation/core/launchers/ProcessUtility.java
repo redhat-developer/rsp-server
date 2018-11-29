@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.rsp.server.spi.launchers;
+package org.jboss.tools.rsp.foundation.core.launchers;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,9 +37,8 @@ import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
+import org.jboss.tools.rsp.foundation.core.FoundationCoreActivator;
 import org.jboss.tools.rsp.launching.utils.ExecUtil;
-import org.jboss.tools.rsp.server.spi.SPIActivator;
-import org.jboss.tools.rsp.server.spi.launchers.internal.StreamGobbler;
 
 public class ProcessUtility {
 
@@ -79,7 +78,7 @@ public class ProcessUtility {
 	}
 	
 	protected void abort(String message, Throwable exception, int code) throws CoreException {
-		throw new CoreException(new Status(IStatus.ERROR, SPIActivator.BUNDLE_ID, code, message, exception));
+		throw new CoreException(new Status(IStatus.ERROR, FoundationCoreActivator.PLUGIN_ID, code, message, exception));
 	}
 	
 	/**

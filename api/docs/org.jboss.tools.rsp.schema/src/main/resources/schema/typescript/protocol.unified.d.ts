@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2018-11-05 17:44:21.
+// Generated using typescript-generator version 2.2.413 on 2018-12-03 11:53:56.
 
 export interface Attribute {
     type: string;
@@ -40,6 +40,23 @@ export interface DeployableState {
 
 export interface DiscoveryPath {
     filepath: string;
+}
+
+export interface DownloadRuntimeDescription {
+    name: string;
+    id: string;
+    version: string;
+    url: string;
+    licenseURL: string;
+    humanUrl: string;
+    disclaimer: boolean;
+    properties: { [index: string]: string };
+    size: string;
+    installationMethod: string;
+}
+
+export interface DownloadRuntimeResponse {
+    runtimes: DownloadRuntimeDescription[];
 }
 
 export interface LaunchAttributesRequest {

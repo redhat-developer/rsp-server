@@ -11,11 +11,13 @@ package org.jboss.tools.rsp.server;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.RSPServer;
@@ -27,6 +29,8 @@ import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
+import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
+import org.jboss.tools.rsp.api.dao.DownloadRuntimeResponse;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
@@ -45,7 +49,9 @@ import org.jboss.tools.rsp.api.dao.StopServerAttributes;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
+import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
+import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.rsp.server.model.RemoteEventManager;
 import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
@@ -568,5 +574,21 @@ public class ServerManagementServerImpl implements RSPServer {
 			ClientThreadLocal.setActiveClient(null);
 		});
 		return completableFuture;
+	}
+
+	@Override
+	public CompletableFuture<DownloadRuntimeResponse> listDownloadableRuntimes() {
+		return createCompletableFuture(() -> listDownloadableRuntimesInternal());
+	}
+
+	private DownloadRuntimeResponse listDownloadableRuntimesInternal() {
+		Map<String, DownloadRuntime> map = managementModel.getDownloadRuntimeModel().getOrLoadDownloadRuntimes(new NullProgressMonitor());
+		List<DownloadRuntimeDescription> list = map.values().stream().sorted(
+				Comparator.comparing(DownloadRuntime::getName))
+				.map(dlrt -> dlrt.toDao())
+				.collect(Collectors.toList());
+		DownloadRuntimeResponse resp = new DownloadRuntimeResponse();
+		resp.setRuntimes(list);
+		return resp;
 	}
 }

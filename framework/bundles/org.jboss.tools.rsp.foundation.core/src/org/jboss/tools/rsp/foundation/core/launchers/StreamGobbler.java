@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.rsp.server.spi.launchers.internal;
+package org.jboss.tools.rsp.foundation.core.launchers;
 
 import java.io.BufferedReader;
 import java.io.IOException;

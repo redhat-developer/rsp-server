@@ -6,15 +6,12 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.rsp.server.spi.launchers;
+package org.jboss.tools.rsp.foundation.core.launchers;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
-import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
 public interface IShutdownLauncher {
-	public IServer getServer();
-	
 	public ILaunch launch(boolean force) throws CoreException;
 	
 	public ILaunch getLaunch();

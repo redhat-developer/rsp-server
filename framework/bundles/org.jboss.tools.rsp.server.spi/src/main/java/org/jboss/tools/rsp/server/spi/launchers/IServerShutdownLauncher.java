@@ -8,19 +8,9 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.spi.launchers;
 
-import org.jboss.tools.rsp.api.dao.CommandLineDetails;
-import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
-import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
+import org.jboss.tools.rsp.foundation.core.launchers.IShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
-public interface IStartLauncher {
+public interface IServerShutdownLauncher extends IShutdownLauncher {
 	public IServer getServer();
-	
-	public ILaunch launch(String mode) throws CoreException;
-
-	public CommandLineDetails getLaunchedDetails();
-
-	public CommandLineDetails getLaunchCommand(String mode) throws CoreException;
-
-	public ILaunch getLaunch();
 }

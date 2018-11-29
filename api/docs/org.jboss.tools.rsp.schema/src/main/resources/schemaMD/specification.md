@@ -274,6 +274,14 @@ export interface Status {
     plugin: string;
 }</pre></td></tr></table>
 
+#### server/shutdown
+
+ The `server/shutdown` notification is sent by the client to shut down the RSP itself. 
+
+This endpoint takes no parameters. 
+
+This endpoint returns no value
+
 #### server/getDiscoveryPaths
 
  The `server/getDiscoveryPaths` request is sent by the client to fetch a list of discovery paths that can be searched. Discovery paths exist in the RSP model as paths suitable to be searched for server runtime installations. Additional paths may be added via the `server/addDiscoveryPath` entry point, or removed via the `server/removeDiscoveryPath` entry point. 
@@ -1898,13 +1906,78 @@ This endpoint returns the following schema as a return value:
     plugin: string;
 }</pre></td></tr></table>
 
-#### server/shutdown
+#### server/listDownloadableRuntimes
 
- The `server/shutdown` notification is sent by the client to shut down the RSP itself. 
+ Get a list of all downloadable runtimes @return 
 
 This endpoint takes no parameters. 
 
-This endpoint returns no value
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "runtimes" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "version" : {
+            "type" : "string"
+          },
+          "url" : {
+            "type" : "string"
+          },
+          "licenseURL" : {
+            "type" : "string"
+          },
+          "humanUrl" : {
+            "type" : "string"
+          },
+          "disclaimer" : {
+            "type" : "boolean"
+          },
+          "properties" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "size" : {
+            "type" : "string"
+          },
+          "installationMethod" : {
+            "type" : "string"
+          }
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface DownloadRuntimeResponse {
+    runtimes: DownloadRuntimeDescription[];
+}
+
+export interface DownloadRuntimeDescription {
+    name: string;
+    id: string;
+    version: string;
+    url: string;
+    licenseURL: string;
+    humanUrl: string;
+    disclaimer: boolean;
+    properties: { [index: string]: string };
+    size: string;
+    installationMethod: string;
+}</pre></td></tr></table>
+
+
 
 ### The Client Interface
 
@@ -1953,7 +2026,9 @@ This endpoint takes the following json schemas as parameters:
     filepath: string;
 }</pre></td></tr></table>
 
-This endpoint returns no value#### client/discoveryPathRemoved
+This endpoint returns no value
+
+#### client/discoveryPathRemoved
 
  The `client/discoveryPathRemoved` notification is sent by the server to all clients in response to the `server/removeDiscoveryPath` notification. This call indicates that a discovery path has been removed from the RSP model which keeps track of filesystem paths that may be searched for server runtimes. 
 
@@ -1971,7 +2046,9 @@ This endpoint takes the following json schemas as parameters:
     filepath: string;
 }</pre></td></tr></table>
 
-This endpoint returns no value#### client/serverAdded
+This endpoint returns no value
+
+#### client/serverAdded
 
  The `client/serverAdded` notification is sent by the server to all clients in a response to the `server/createServer` notification. This notification indicates that a new server adapter has been created in the RSP model of existing servers. As mentioned above, this was most likely in response to a server/createServer notification, but is not strictly limited to this entrypoint. 
 
@@ -2010,7 +2087,9 @@ export interface ServerType {
     description: string;
 }</pre></td></tr></table>
 
-This endpoint returns no value#### client/serverRemoved
+This endpoint returns no value
+
+#### client/serverRemoved
 
  The `client/serverRemoved` notification is sent by the server to all clients in response to the `server/deleteServer` notification. This notification indicates that a server adapter has been removed from the RSP model of existing servers. As mentioned above, this was most likely in response to a server/deleteServer notification, but is not strictly limited to this entrypoint. 
 
@@ -2049,7 +2128,9 @@ export interface ServerType {
     description: string;
 }</pre></td></tr></table>
 
-This endpoint returns no value#### client/serverAttributesChanged
+This endpoint returns no value
+
+#### client/serverAttributesChanged
 
  The `client/serverRemoved` notification is sent by the server to all clients when any server has had one of its attributes changed. 
 
@@ -2088,7 +2169,9 @@ export interface ServerType {
     description: string;
 }</pre></td></tr></table>
 
-This endpoint returns no value#### client/serverStateChanged
+This endpoint returns no value
+
+#### client/serverStateChanged
 
  The `client/serverStateChanged` notification is sent by the server to all clients when any server has had its state change. Possible values include: `0` representing an unknown state `1` representing starting `2` representing started `3` representing stopping `4` representing stopped 
 
@@ -2181,7 +2264,9 @@ export interface DeployableReference {
     path: string;
 }</pre></td></tr></table>
 
-This endpoint returns no value#### client/serverProcessCreated
+This endpoint returns no value
+
+#### client/serverProcessCreated
 
  The `client/serverProcessCreated` notification is sent by the server to all clients when any server has launched a new process which can be monitored. This notification is most often sent in response to a call to `server/startServerAsync` which will typically launch a process to run the server in question. 
 
@@ -2233,7 +2318,9 @@ export interface ServerType {
     description: string;
 }</pre></td></tr></table>
 
-This endpoint returns no value#### client/serverProcessTerminated
+This endpoint returns no value
+
+#### client/serverProcessTerminated
 
  The `client/serverProcessTerminated` notification is sent by the server to all clients when any process associated with a server has been terminated. This notification is most often sent as a result of a call to `server/stopServerAsync`, which should shut down a given server and cause all of that server's processes to terminate after some time. 
 
@@ -2285,7 +2372,9 @@ export interface ServerType {
     description: string;
 }</pre></td></tr></table>
 
-This endpoint returns no value#### client/serverProcessOutputAppended
+This endpoint returns no value
+
+#### client/serverProcessOutputAppended
 
  The `client/serverProcessOutputAppended` notification is sent by the server to all clients when any process associated with a server generated output on any of its output streams. This notification may be sent as a result of anything that causes a given server process to emit output, such as a change in configuration, a deployment, an error, normal logging, or any other number of possibilities. 
 
@@ -2346,3 +2435,4 @@ export interface ServerType {
 }</pre></td></tr></table>
 
 This endpoint returns no value
+

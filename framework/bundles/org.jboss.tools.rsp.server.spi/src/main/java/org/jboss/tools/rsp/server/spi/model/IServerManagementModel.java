@@ -10,6 +10,7 @@ package org.jboss.tools.rsp.server.spi.model;
 
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
+import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesModel;
 import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
 import org.jboss.tools.rsp.server.spi.discovery.IDiscoveryPathModel;
 import org.jboss.tools.rsp.server.spi.discovery.IServerBeanTypeManager;
@@ -25,4 +26,5 @@ public interface IServerManagementModel {
 	public ISecureStorageProvider getSecureStorageProvider();
 	public void clientRemoved(RSPClient client);
 	public void clientAdded(RSPClient client);
+	public IDownloadRuntimesModel getDownloadRuntimeModel();
 }

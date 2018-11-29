@@ -15,29 +15,7 @@
 	<properties>
 		<jboss.runtime.directory.url>http://download.jboss.org/jbosstools/examples/download_runtimes.xml</jboss.runtime.directory.url>
 	</properties>
-
-    <!-- 
-	<profiles>
-		<profile>
-			<id>4.0.juno</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<properties>
-				<jboss.runtime.directory.url>http://download.jboss.org/jbosstools/updates/nightly/core/4.0.juno/jbosstools-runtime.xml</jboss.runtime.directory.url>
-			</properties>
-		</profile>
-		<profile>
-			<id>trunk</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<properties>
-				<jboss.runtime.directory.url>http://download.jboss.org/jbosstools/updates/nightly/core/trunk/jbosstools-runtime.xml</jboss.runtime.directory.url>
-			</properties>
-		</profile>
-	</profiles>
-	 -->
+ 
 	<build>
 		<resources>
 			<resource>

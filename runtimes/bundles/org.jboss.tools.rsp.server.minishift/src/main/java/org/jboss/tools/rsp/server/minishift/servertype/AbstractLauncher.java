@@ -17,14 +17,14 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.debug.core.ArgumentUtils;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.Launch;
+import org.jboss.tools.rsp.foundation.core.launchers.CommandConfig;
 import org.jboss.tools.rsp.server.minishift.servertype.impl.EnvironmentUtility;
-import org.jboss.tools.rsp.server.spi.launchers.CommandConfig;
 import org.jboss.tools.rsp.server.spi.launchers.GenericServerProcessRunner;
-import org.jboss.tools.rsp.server.spi.launchers.IStartLauncher;
+import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
-public abstract class AbstractLauncher implements IStartLauncher {
+public abstract class AbstractLauncher implements IServerStartLauncher {
 	private IServerDelegate delegate;
 	private ILaunch launch;
 	private CommandLineDetails launchedDetails = null;

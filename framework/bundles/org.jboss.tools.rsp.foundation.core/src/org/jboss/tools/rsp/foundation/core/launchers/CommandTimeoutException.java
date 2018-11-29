@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.rsp.server.spi.launchers;
+package org.jboss.tools.rsp.foundation.core.launchers;
 
 import java.util.List;
 import java.util.concurrent.TimeoutException;
