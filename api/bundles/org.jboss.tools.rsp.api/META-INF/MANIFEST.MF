@@ -6,7 +6,6 @@ Bundle-Version: 0.11.0.qualifier
 Automatic-Module-Name: org.jboss.tools.rsp.api
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .,
- lib/gson-2.8.2.jar,
  lib/org.eclipse.lsp4j.jsonrpc-0.4.1.jar
 Import-Package: org.osgi.framework
 Export-Package: com.google.gson,
@@ -25,4 +24,5 @@ Export-Package: com.google.gson,
  org.jboss.tools.rsp.api,
  org.jboss.tools.rsp.api.dao,
  org.jboss.tools.rsp.api.dao.util
+Require-Bundle: com.google.gson
 
