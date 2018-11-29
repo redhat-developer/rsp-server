@@ -24,6 +24,7 @@ Require-Bundle: org.jboss.tools.rsp.api,
  org.jboss.tools.rsp.launching.java,
  org.jboss.tools.rsp.server.spi,
  org.jboss.tools.rsp.server,
+ org.jboss.tools.rsp.runtime.core,
  org.junit,
  org.jboss.tools.locus.mockito,
  org.assertj.core;bundle-version="2.1.0"

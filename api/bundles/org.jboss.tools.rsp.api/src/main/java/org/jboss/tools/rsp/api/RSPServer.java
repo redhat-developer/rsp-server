@@ -20,6 +20,7 @@ import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
+import org.jboss.tools.rsp.api.dao.DownloadRuntimeResponse;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
@@ -38,13 +39,25 @@ import org.jboss.tools.rsp.api.dao.StopServerAttributes;
 
 @JsonSegment("server")
 public interface RSPServer {
-	
+	/*
+	 * Server itself
+	 */
 
 	/** 
 	 * Register client capabilities so the server knows what this client can support
 	 */
 	@JsonRequest
 	CompletableFuture<ServerCapabilitiesResponse> registerClientCapabilities(ClientCapabilitiesRequest request);
+
+	/**
+	 * The `server/shutdown` notification is sent by the client to shut down the
+	 * RSP itself. 
+	 */
+	@JsonNotification
+	void shutdown();
+
+	
+	
 	
 	/*
 	 * Discovery
@@ -276,7 +289,7 @@ public interface RSPServer {
 
 	
 	/*
-	 * Provisional
+	 * Publishing
 	 */
 	/**
 	 * The `server/getDeployables` request is sent by the client to the server to
@@ -324,10 +337,15 @@ public interface RSPServer {
 	
 
 	
-	/**
-	 * The `server/shutdown` notification is sent by the client to shut down the
-	 * RSP itself. 
+	
+	/*
+	 * Downloading Runtimes
 	 */
-	@JsonNotification
-	void shutdown();
+	/**
+	 * Get a list of all downloadable runtimes
+	 * @return
+	 */
+	@JsonRequest
+	public CompletableFuture<DownloadRuntimeResponse> listDownloadableRuntimes();
+	
 }

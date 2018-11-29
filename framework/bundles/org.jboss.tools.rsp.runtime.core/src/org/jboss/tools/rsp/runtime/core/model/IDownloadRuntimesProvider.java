@@ -27,15 +27,19 @@ public interface IDownloadRuntimesProvider {
 	 */
 	public static final String PROPERTY_GENERIC_REQUEST = "IDownloadRuntimesProvider.GENERIC_REQUEST"; //$NON-NLS-1$
 	
+	/**
+	 * A unique id to reference this provider of runtimes
+	 * @return
+	 */
+	public String getId();
 	
 	
 	/**
 	 * A method to return the provider's list of downloadable runtimes.
 	 * This returned array may be customized according to the value of requestType
 	 * 
-	 * @param requestType A strng representing a request type, or null if a generic request
 	 * @param monitor A progress Monitor
 	 * @return
 	 */
-	public DownloadRuntime[] getDownloadableRuntimes(String requestType, IProgressMonitor monitor);
+	public DownloadRuntime[] getDownloadableRuntimes(IProgressMonitor monitor);
 }

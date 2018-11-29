@@ -118,7 +118,7 @@ public class SpecificationGenerator {
 							}
 							
 							if (return2 == null || typeName.equals("void")) {
-								sb.append("This endpoint returns no value");
+								sb.append("This endpoint returns no value\n\n");
 							} else {
 								String msg = "This endpoint returns the following schema as a return value: \n\n"; 
 								if( list ) {

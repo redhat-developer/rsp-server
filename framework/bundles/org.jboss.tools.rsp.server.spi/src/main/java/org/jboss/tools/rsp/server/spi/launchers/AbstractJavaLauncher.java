@@ -33,7 +33,7 @@ import org.jboss.tools.rsp.launching.utils.NativeEnvironmentUtils;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
-public abstract class AbstractJavaLauncher implements IStartLauncher {
+public abstract class AbstractJavaLauncher implements IServerStartLauncher {
 	private IServerDelegate delegate;
 	private IVMRunner runner;
 	private ILaunch launch;

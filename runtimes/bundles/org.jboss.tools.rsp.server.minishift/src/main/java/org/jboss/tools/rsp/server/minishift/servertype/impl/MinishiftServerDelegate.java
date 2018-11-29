@@ -27,8 +27,8 @@ import org.jboss.tools.rsp.server.minishift.discovery.MinishiftDiscovery;
 import org.jboss.tools.rsp.server.minishift.impl.Activator;
 import org.jboss.tools.rsp.server.minishift.servertype.IMinishiftServerAttributes;
 import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
-import org.jboss.tools.rsp.server.spi.launchers.IShutdownLauncher;
-import org.jboss.tools.rsp.server.spi.launchers.IStartLauncher;
+import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
+import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
 import org.jboss.tools.rsp.server.spi.model.polling.IPollResultListener;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller.SERVER_STATE;
@@ -48,11 +48,11 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 		super(server);
 		setServerState(ServerManagementAPIConstants.STATE_STOPPED);
 	}
-	protected IStartLauncher getStartLauncher() {
+	protected IServerStartLauncher getStartLauncher() {
 		return new MinishiftStartLauncher(this);
 	}
 	
-	protected IShutdownLauncher getStopLauncher() {
+	protected IServerShutdownLauncher getStopLauncher() {
 		return new MinishiftStopLauncher(this);
 	}
 	
@@ -115,7 +115,7 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 		setServerState(IServerDelegate.STATE_STARTING);
 		CommandLineDetails launchedDetails = null;
 		try {
-			IStartLauncher launcher = getStartLauncher();
+			IServerStartLauncher launcher = getStartLauncher();
 			startLaunch = launcher.launch(mode);
 			launchedDetails = launcher.getLaunchedDetails();
 			registerLaunch(startLaunch);

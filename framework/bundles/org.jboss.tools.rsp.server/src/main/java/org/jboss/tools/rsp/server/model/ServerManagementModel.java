@@ -14,6 +14,8 @@ import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.eclipse.jdt.launching.VMInstallRegistry;
 import org.jboss.tools.rsp.launching.LaunchingCore;
+import org.jboss.tools.rsp.runtime.core.RuntimeCoreActivator;
+import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesModel;
 import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
 import org.jboss.tools.rsp.server.CapabilityManagement;
 import org.jboss.tools.rsp.server.discovery.DiscoveryPathModel;
@@ -42,6 +44,7 @@ public class ServerManagementModel implements IServerManagementModel {
 	private IServerModel serverModel;
 	private IVMInstallRegistry vmModel;
 	private IFileWatcherService fileWatcherService;
+	private IDownloadRuntimesModel downloadRuntimeModel;
 
 	public ServerManagementModel() {
 		this(LaunchingCore.getDataLocation());
@@ -58,6 +61,7 @@ public class ServerManagementModel implements IServerManagementModel {
 		this.vmModel.addActiveVM();
 		this.fileWatcherService = createFileWatcherService();
 		this.fileWatcherService.start();
+		this.downloadRuntimeModel = createDownloadRuntimesModel();
 	}
 	
 	@Override
@@ -94,7 +98,13 @@ public class ServerManagementModel implements IServerManagementModel {
 	public IFileWatcherService getFileWatcherService() {
 		return fileWatcherService;
 	}
+
+	@Override
+	public IDownloadRuntimesModel getDownloadRuntimeModel() {
+		return downloadRuntimeModel;
+	}
 	
+	@Override
 	public void clientRemoved(RSPClient client) {
 		capabilities.clientRemoved(client);
 		if( secureStorage instanceof SecureStorageGuardian ) 
@@ -138,7 +148,11 @@ public class ServerManagementModel implements IServerManagementModel {
 		return new ServerBeanTypeManager();
 	}
 
+	private IDownloadRuntimesModel createDownloadRuntimesModel() {
+		return RuntimeCoreActivator.createDownloadRuntimesModel();
+	}
 	private IFileWatcherService createFileWatcherService() {
 		return new FileWatcherService();
 	}
+
 }

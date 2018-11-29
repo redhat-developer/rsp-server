@@ -10,6 +10,7 @@ package org.jboss.tools.rsp.server.wildfly.impl;
 
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
+import org.jboss.tools.rsp.server.wildfly.runtimes.download.DownloadRuntimesProvider;
 import org.jboss.tools.rsp.server.wildfly.servertype.impl.WildFlyServerTypes;
 
 public class ExtensionHandler {
@@ -46,6 +47,7 @@ public class ExtensionHandler {
 	public static void addExtensions(IServerManagementModel model) {
 		model.getServerBeanTypeManager().addTypeProvider(new JBossServerBeanTypeProvider());
 		model.getServerModel().addServerTypes(TYPES);
+		model.getDownloadRuntimeModel().addDownloadRuntimeProvider(new DownloadRuntimesProvider());
 	}
 	
 	public static void removeExtensions(IServerManagementModel model) {

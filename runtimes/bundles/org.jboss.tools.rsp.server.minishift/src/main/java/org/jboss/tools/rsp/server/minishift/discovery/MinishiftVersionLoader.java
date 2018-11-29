@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Properties;
 
-import org.jboss.tools.rsp.server.spi.launchers.CommandTimeoutException;
-import org.jboss.tools.rsp.server.spi.launchers.ProcessUtility;
+import org.jboss.tools.rsp.foundation.core.launchers.CommandTimeoutException;
+import org.jboss.tools.rsp.foundation.core.launchers.ProcessUtility;
 
 public class MinishiftVersionLoader {
 	public static String ERROR_KEY = "properties.load.error";

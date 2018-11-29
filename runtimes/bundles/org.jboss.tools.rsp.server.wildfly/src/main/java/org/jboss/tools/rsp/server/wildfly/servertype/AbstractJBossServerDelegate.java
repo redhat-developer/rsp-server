@@ -25,8 +25,8 @@ import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
-import org.jboss.tools.rsp.server.spi.launchers.IShutdownLauncher;
-import org.jboss.tools.rsp.server.spi.launchers.IStartLauncher;
+import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
+import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
 import org.jboss.tools.rsp.server.spi.model.polling.IPollResultListener;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller;
 import org.jboss.tools.rsp.server.spi.model.polling.PollThreadUtils;
@@ -50,9 +50,9 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		super(server);
 	}
 
-	protected abstract IStartLauncher getStartLauncher();
+	protected abstract IServerStartLauncher getStartLauncher();
 	
-	protected abstract IShutdownLauncher getStopLauncher();
+	protected abstract IServerShutdownLauncher getStopLauncher();
 
 	protected abstract String getPollURL(IServer server);
 	
@@ -101,7 +101,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		CommandLineDetails launchedDetails = null;
 		try {
 			launchPoller(IServerStatePoller.SERVER_STATE.UP);
-			IStartLauncher launcher = getStartLauncher();
+			IServerStartLauncher launcher = getStartLauncher();
 			startLaunch = launcher.launch(mode);
 			launchedDetails = launcher.getLaunchedDetails();
 			registerLaunch(startLaunch);

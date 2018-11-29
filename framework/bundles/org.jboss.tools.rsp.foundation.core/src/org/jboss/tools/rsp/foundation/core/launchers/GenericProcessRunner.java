@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.rsp.server.spi.launchers;
+package org.jboss.tools.rsp.foundation.core.launchers;
 
 import java.io.IOException;
 
@@ -17,7 +17,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
-import org.jboss.tools.rsp.server.spi.SPIActivator;
+import org.jboss.tools.rsp.foundation.core.FoundationCoreActivator;
 
 public class GenericProcessRunner {
 
@@ -48,7 +48,7 @@ public class GenericProcessRunner {
 	}
 
 	protected void abort(String message, Throwable exception, int code) throws CoreException {
-		throw new CoreException(new Status(IStatus.ERROR, SPIActivator.BUNDLE_ID, code, message, exception));
+		throw new CoreException(new Status(IStatus.ERROR, FoundationCoreActivator.PLUGIN_ID, code, message, exception));
 	}
 	
 }

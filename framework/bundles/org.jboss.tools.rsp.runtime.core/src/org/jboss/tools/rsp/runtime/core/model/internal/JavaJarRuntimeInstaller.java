@@ -29,6 +29,8 @@ import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.eclipse.jdt.launching.VMInstallRegistry;
+import org.jboss.tools.rsp.foundation.core.launchers.CommandConfig;
+import org.jboss.tools.rsp.foundation.core.launchers.GenericProcessRunner;
 import org.jboss.tools.rsp.foundation.core.tasks.TaskModel;
 import org.jboss.tools.rsp.launching.utils.NativeEnvironmentUtils;
 import org.jboss.tools.rsp.launching.utils.OSUtils;
@@ -37,8 +39,6 @@ import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
 import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
 import org.jboss.tools.rsp.runtime.core.util.internal.DownloadRuntimeOperationUtility;
-import org.jboss.tools.rsp.server.spi.launchers.CommandConfig;
-import org.jboss.tools.rsp.server.spi.launchers.GenericServerProcessRunner;
 
 /**
  * A runtime installer that launches the java -jar command on the downloaded file
@@ -143,7 +143,7 @@ public class JavaJarRuntimeInstaller implements IRuntimeInstaller {
 	private static class JavaJarInstallationLauncher {
 		private ILaunch launch;
 		private CommandLineDetails launchedDetails = null;
-		private GenericServerProcessRunner runner;
+		private GenericProcessRunner runner;
 		private IPath javaBin;
 		private IPath workingDirectory;
 		private IPath unzipDir;
@@ -198,9 +198,9 @@ public class JavaJarRuntimeInstaller implements IRuntimeInstaller {
 		}
 		
 		
-		public GenericServerProcessRunner configureRunner() {
+		public GenericProcessRunner configureRunner() {
 			if( runner == null ) {
-				runner = new GenericServerProcessRunner(null, getCommandConfig());
+				runner = new GenericProcessRunner(getCommandConfig());
 			}
 			return runner;
 		}

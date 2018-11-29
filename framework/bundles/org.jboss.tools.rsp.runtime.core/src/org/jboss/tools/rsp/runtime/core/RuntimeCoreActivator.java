@@ -10,16 +10,11 @@
  ************************************************************************************/
 package org.jboss.tools.rsp.runtime.core;
 
-import java.util.Collection;
-import java.util.Map;
-
-import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.foundation.core.plugin.BaseCorePlugin;
 import org.jboss.tools.rsp.foundation.core.plugin.IPluginLog;
 import org.jboss.tools.rsp.foundation.core.plugin.StatusFactory;
-import org.jboss.tools.rsp.runtime.core.internal.DownloadRuntimesModel;
-import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
-import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimes;
+import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesModel;
+import org.jboss.tools.rsp.runtime.core.model.internal.DownloadRuntimesModel;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -36,7 +31,6 @@ public class RuntimeCoreActivator extends BaseCorePlugin {
 	private static RuntimeCoreActivator plugin;
 
 	private BundleContext context;
-	private IDownloadRuntimes downloader = null;
 	
 	/**
 	 * The constructor
@@ -76,55 +70,6 @@ public class RuntimeCoreActivator extends BaseCorePlugin {
 		return context;
 	}
 	
-	public IDownloadRuntimes getDownloader() {
-		return downloader;
-	}
-	
-	public void setDownloader(IDownloadRuntimes downloader) {
-		this.downloader = downloader;
-	}
-
-	
-	/**
-	 * Get a map of download runtime ID to the actual downloadruntime object
-	 * Warning:  This method may involve plugin loading or long-running file or wire IO tasks.
-	 * This should not be called from the UI without the ability to respond to progress or initiate a cancelation
-	 * @return
-	 */
-	public Map<String, DownloadRuntime> getDownloadRuntimes(IProgressMonitor monitor) {
-		return DownloadRuntimesModel.getDefault().getDownloadRuntimes(monitor);
-	}
-
-	/**
-	 * Get an array of download runtime objects
-	 * 
-	 * Warning:  This method may involve plugin loading or long-running file or wire IO tasks.
-	 * This should not be called from the UI without the ability to respond to progress or initiate a cancelation
-	 * 
-	 * @return
-	 */
-	public DownloadRuntime[] getDownloadRuntimeArray(IProgressMonitor monitor) {
-		Map<String, DownloadRuntime> map = DownloadRuntimesModel.getDefault().getDownloadRuntimes(monitor);
-		if( map == null )
-			return new DownloadRuntime[0];
-		Collection<DownloadRuntime> arr = map.values();
-		return (DownloadRuntime[]) arr.toArray(new DownloadRuntime[arr.size()]);
-	}
-
-	
-	/**
-	 * This method will check for a download runtime by checking it's
-	 * id, or, if none is found, by checking for a PROPERTY_ALTERNATE_ID
-	 * property key which matches the id. 
-	 * 
-	 * @param id A found DownloadRuntime or null
-	 * @param IProgressMonitor monitor
-	 * @return
-	 */
-	public DownloadRuntime findDownloadRuntime(String id, IProgressMonitor monitor) {
-		return DownloadRuntimesModel.getDefault().findDownloadRuntime(id, monitor);
-	}
-
 	
 	/**
 	 * Get the IPluginLog for this plugin. This method 
@@ -144,5 +89,9 @@ public class RuntimeCoreActivator extends BaseCorePlugin {
 	 */
 	public static StatusFactory statusFactory() {
 		return getDefault().statusFactoryInternal();
+	}
+	
+	public static IDownloadRuntimesModel createDownloadRuntimesModel() {
+		return new DownloadRuntimesModel();
 	}
 }

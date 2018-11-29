@@ -11,14 +11,14 @@ package org.jboss.tools.rsp.server.wildfly.servertype;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.server.spi.launchers.AbstractJavaLauncher;
-import org.jboss.tools.rsp.server.spi.launchers.IStartLauncher;
+import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.ExtendedServerPropertiesAdapterFactory;
 import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.JBossExtendedProperties;
 import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.ServerExtendedProperties;
 import org.jboss.tools.rsp.server.wildfly.servertype.launch.IDefaultLaunchArguments;
 
-public abstract class AbstractLauncher extends AbstractJavaLauncher implements IStartLauncher {
+public abstract class AbstractLauncher extends AbstractJavaLauncher implements IServerStartLauncher {
 
 	public AbstractLauncher(IServerDelegate serverDelegate) {
 		super(serverDelegate);

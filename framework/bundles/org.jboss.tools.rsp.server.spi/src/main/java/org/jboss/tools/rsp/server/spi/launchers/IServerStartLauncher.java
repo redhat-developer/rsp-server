@@ -8,21 +8,9 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.spi.launchers;
 
-import org.jboss.tools.rsp.foundation.core.launchers.CommandConfig;
-import org.jboss.tools.rsp.foundation.core.launchers.GenericProcessRunner;
+import org.jboss.tools.rsp.foundation.core.launchers.IStartLauncher;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
-import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
-public class GenericServerProcessRunner extends GenericProcessRunner {
-
-	private IServerDelegate serverDel;
-
-	public GenericServerProcessRunner(IServerDelegate serverDel, CommandConfig config) {
-		super(config);
-		this.serverDel = serverDel;
-	}
-	
-	public IServer getServer() {
-		return serverDel == null ? null : serverDel.getServer();
-	}
+public interface IServerStartLauncher extends IStartLauncher {
+	public IServer getServer();
 }
