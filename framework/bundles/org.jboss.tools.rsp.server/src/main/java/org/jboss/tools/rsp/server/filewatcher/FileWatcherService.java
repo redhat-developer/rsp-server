@@ -182,25 +182,10 @@ public class FileWatcherService implements IFileWatcherService {
 			// The service should return the same watchkey for 
 			// the same path, assuming the folder hasn't been deleted
 			// and recreated. 
-			WatchKey k = working.register(watchService, new WatchEvent.Kind<?>[] { 
-				StandardWatchEventKinds.ENTRY_CREATE,
-				StandardWatchEventKinds.ENTRY_DELETE,
-				StandardWatchEventKinds.ENTRY_MODIFY }, 
-					/*
-					 * WatchService is not native on MacOS, it's polling, requires high sensitivity
-					 * to work more or less reliably. The problem with SensitivityWatchEventModifier
-					 * is that it's in com.sun.nio.file and thus it's not portable to other jvms
-					 * 
-					 * @see https://bugs.openjdk.java.net/browse/JDK-7133447
-					 * 
-					 * @see
-					 * https://stackoverflow.com/questions/9588737/is-java-7-watchservice-slow-for-
-					 * anyone-else
-					 */
-					com.sun.nio.file.SensitivityWatchEventModifier.HIGH);
+			WatchKey key = register(working);
 			WatchKey existing = subscriptions.get(working);
-			if( !k.equals(existing)) {
-				subscriptions.put(working, k);
+			if( !key.equals(existing)) {
+				subscriptions.put(working, key);
 				if( existing != null )
 					existing.cancel();
 			}
@@ -208,7 +193,28 @@ public class FileWatcherService implements IFileWatcherService {
 			log(e);
 		}
 	}
-	
+
+	private WatchKey register(Path working) throws IOException {
+		WatchEvent.Kind<?>[] watchEventKinds = new WatchEvent.Kind<?>[] { 
+			StandardWatchEventKinds.ENTRY_CREATE,
+			StandardWatchEventKinds.ENTRY_DELETE, 
+			StandardWatchEventKinds.ENTRY_MODIFY };
+		HighSensitivityWatchEventModifier highSensivity = new HighSensitivityWatchEventModifier();
+
+		if (highSensivity.isRequired()) {
+			if (!highSensivity.exists()) {
+				LOG.warn("Watchservice requires high sensitivity on this system."
+						+ " Unfortunately it isn't present and thus watching the filesystem is unreliable."
+						+ " Please use openjdk or a sun jvm to allow us to use high sensitivity.");
+				return working.register(watchService, watchEventKinds);
+			} else {
+				return working.register(watchService, watchEventKinds, highSensivity.get());
+			}
+		} else {
+			return working.register(watchService, watchEventKinds);
+		}
+	}
+
 	@Override
 	public synchronized void removeFileWatcherListener(Path path, IFileWatcherEventListener listener) {
 		List<RegistrationRequest> list = requests.get(path);
