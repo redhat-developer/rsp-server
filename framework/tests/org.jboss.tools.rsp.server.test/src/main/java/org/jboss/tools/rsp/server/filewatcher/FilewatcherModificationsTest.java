@@ -180,6 +180,10 @@ public class FilewatcherModificationsTest {
 		service.addFileWatcherListener(root, listener1, true);
 
 		assertTrue(root.toFile().delete());
+		// required for the slow WatchService on MacOS to notice the change
+		if (isMac()) {
+			service.waitOnLatches();
+		}
 		root.toFile().mkdirs();
 		Files.write(childFile, "test".getBytes());
 		service.waitOnLatches();
@@ -216,6 +220,10 @@ public class FilewatcherModificationsTest {
 		service.addFileWatcherListener(root, listener1, true);
 
 		assertTrue(root.toFile().delete());
+		// required for the slow WatchService on MacOS to notice the change
+		if (isMac()) {
+			service.waitOnLatches();
+		}
 		root.toFile().mkdirs();
 
 		nested1.toFile().mkdirs();
@@ -326,7 +334,8 @@ public class FilewatcherModificationsTest {
 		// This tests the raw events, and so may include events
 		// from ANY watched path
 		
-		private static final int WAIT_FOR_IDLE = 10000;
+		private static final int MAC_WAIT_FOR_IDLE = 10000;
+		private static final int WAIT_FOR_IDLE = 1000;
 
 		final CountDownLatch[] startLatch = new CountDownLatch[1];
 		final CountDownLatch[] endLatch = new CountDownLatch[1];
@@ -390,7 +399,7 @@ public class FilewatcherModificationsTest {
 				startLatch[0].countDown();
 				debug("waitOnLatches[2]");
 				try {
-					if( !endLatch[0].await(WAIT_FOR_IDLE, TimeUnit.MILLISECONDS)) {
+					if(!endLatch[0].await(isMac()? MAC_WAIT_FOR_IDLE : WAIT_FOR_IDLE, TimeUnit.MILLISECONDS)) {
 						done = true;
 					}
 					debug("waitOnLatches[3]");
@@ -458,4 +467,9 @@ public class FilewatcherModificationsTest {
 		}
 	}
 	
+	private static boolean isMac() {
+		String os = System.getProperty("os.name").toLowerCase();
+		return os.indexOf("mac") >= 0;
+
+	}
 }
