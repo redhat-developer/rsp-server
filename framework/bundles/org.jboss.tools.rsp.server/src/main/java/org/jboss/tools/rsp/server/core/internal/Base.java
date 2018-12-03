@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +49,7 @@ public abstract class Base {
 	protected static final String PROP_ID_SET = "id-set";
 	protected static final String PROP_TIMESTAMP = "timestamp";
 
-	protected Map<String, Object> map = new HashMap<>();
+	protected Map<String, Object> map = new LinkedHashMap<>();
 	protected File file;
 	private transient List<PropertyChangeListener> propertyListeners;
 	/**
@@ -154,19 +155,17 @@ public abstract class Base {
 		return defaultValue;
 	}
 
-	public Map getAttribute(String attributeName, Map defaultValue) {
+	public Map<?, ?> getAttribute(String attributeName, Map<?, ?> defaultValue) {
 		try {
 			Object obj = map.get(attributeName);
 			if (obj == null)
 				return defaultValue;
-			return (Map) obj;
+			return (Map<?, ?>) obj;
 		} catch (Exception e) {
 			// ignore
 		}
 		return defaultValue;
 	}
-
-	
 
 	public void setAttribute(String attributeName, int value) {
 		int current = getAttribute(attributeName, 0);
@@ -218,8 +217,6 @@ public abstract class Base {
 		firePropertyChangeEvent(attributeName, current, value);
 	}
 
-	
-	
 	public String getId() {
 		return getAttribute(PROP_ID, "");
 	}
@@ -251,9 +248,9 @@ public abstract class Base {
 	
 	protected void save(IMemento memento) {
 		IMemento child = memento;
-		Iterator iterator = map.keySet().iterator();
+		Iterator<String> iterator = map.keySet().iterator();
 		while (iterator.hasNext()) {
-			String key = (String) iterator.next();
+			String key = iterator.next();
 			Object obj = map.get(key);
 			if (obj instanceof String)
 				child.putString(key, (String) obj);
@@ -264,34 +261,33 @@ public abstract class Base {
 				Boolean bool = (Boolean) obj;
 				child.putBoolean(key, bool.booleanValue());
 			} else if (obj instanceof List) {
-				List list = (List) obj;
+				List<String> list = (List<String>) obj;
 				saveList(child, key, list);
 			} else if (obj instanceof Map) {
-				Map map2 = (Map) obj;
+				Map<String, String> map2 = (Map<String, String>) obj;
 				saveMap(child, key, map2);
-				
 			}
 		}
 		saveState(child);
 	}
 
-	protected void saveMap(IMemento memento, String key, Map map2) {
+	protected void saveMap(IMemento memento, String key, Map<String,String> map2) {
 		IMemento child = memento.createChild("map");
 		child.putString("key", key);
-		Iterator iterator = map2.keySet().iterator();
+		Iterator<String> iterator = map2.keySet().iterator();
 		while (iterator.hasNext()) {
-			String s = (String) iterator.next();
-			child.putString(s, (String)map2.get(s));
+			String s = iterator.next();
+			child.putString(s, map2.get(s));
 		}
 	}
 	
-	protected void saveList(IMemento memento, String key, List list) {
+	protected void saveList(IMemento memento, String key, List<String> list) {
 		IMemento child = memento.createChild("list");
 		child.putString("key", key);
 		int i = 0;
-		Iterator iterator = list.iterator();
+		Iterator<String> iterator = list.iterator();
 		while (iterator.hasNext()) {
-			String s = (String) iterator.next();
+			String s = iterator.next();
 			child.putString("value" + (i++), s);
 		}
 	}
@@ -309,10 +305,8 @@ public abstract class Base {
 			}
 			Files.write(file.toPath(), bytes);
 		} catch (Exception e) {
-			throw new CoreException(new Status(IStatus.ERROR, 
-					"org.eclipse.wst.server.core", 0, 
-					NLS.bind("Could not save server to file {0}", 
-							file.getAbsolutePath()), e));
+			throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 0, 
+					NLS.bind("Could not save server to file {0}", file.getAbsolutePath()), e));
 		}
 	}
 
@@ -346,8 +340,8 @@ public abstract class Base {
 	protected void loadMap(IMemento memento) {		
 		map.put(memento.getString("key"), getMapFromMemento(memento));
 	}
-	
-	protected Map getMapFromMemento(IMemento memento) {
+
+	protected Map<String, String> getMapFromMemento(IMemento memento) {
 		Map<String, String> vMap = new HashMap<>();
 		Iterator<String> iterator = memento.getNames().iterator();
 		while(iterator.hasNext()) {
@@ -361,8 +355,8 @@ public abstract class Base {
 	protected void loadList(IMemento memento) {
 		map.put(memento.getString("key"), getListFromMemento(memento));
 	}
-	
-	protected List getListFromMemento(IMemento memento) {
+
+	protected List<String> getListFromMemento(IMemento memento) {
 		List<String> list = new ArrayList<>();
 		int i = 0;
 		String key2 = memento.getString("value" + (i++));
@@ -382,7 +376,7 @@ public abstract class Base {
 	public void delete() throws CoreException {
 		if (isWorkingCopy())
 			throw new CoreException(new Status(IStatus.ERROR, 
-					"org.eclipse.wst.server.core", 0, "Cannot delete a working copy", null));
+					ServerCoreActivator.BUNDLE_ID, 0, "Cannot delete a working copy", null));
 		
 		if (file != null)
 			deleteFromFile();
@@ -403,6 +397,7 @@ public abstract class Base {
 		// do nothing
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Base))
 			return false;
@@ -422,15 +417,13 @@ public abstract class Base {
 		return true;
 	}
 
-	/**
-	 * 
-	 */
 	protected void loadFromFile(IProgressMonitor monitor) throws CoreException {
 		try(InputStream in = new ByteArrayInputStream(Files.readAllBytes(file.toPath()))) {
 			IMemento memento = loadMemento(in); 
 			load(memento);
 		} catch (Exception e) {
-			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.wst.server.core", 0, NLS.bind("Could not load server from file {0}", file.getAbsolutePath()), e));
+			throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 0, 
+					NLS.bind("Could not load server from file {0}", file.getAbsolutePath()), e));
 		}
 	}
 	
@@ -443,7 +436,8 @@ public abstract class Base {
 			IMemento memento = loadMemento(in);
 			load(memento);
 		} catch (Exception e) {
-			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.wst.server.core", 0, NLS.bind("Error loading server from file {0}", path.toString()), e));
+			throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 0, 
+					NLS.bind("Error loading server from file {0}", path.toString()), e));
 		}
 	}
 
@@ -472,10 +466,10 @@ public abstract class Base {
 	
 		PropertyChangeEvent event = new PropertyChangeEvent(this, propertyName, oldValue, newValue);
 		try {
-			Iterator iterator = propertyListeners.iterator();
+			Iterator<PropertyChangeListener> iterator = propertyListeners.iterator();
 			while (iterator.hasNext()) {
 				try {
-					PropertyChangeListener listener = (PropertyChangeListener) iterator.next();
+					PropertyChangeListener listener = iterator.next();
 					listener.propertyChange(event);
 				} catch (Exception e) {
 //					if (Trace.SEVERE) {
