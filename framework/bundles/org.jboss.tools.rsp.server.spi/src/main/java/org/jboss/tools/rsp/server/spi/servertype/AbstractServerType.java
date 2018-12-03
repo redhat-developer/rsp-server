@@ -27,12 +27,15 @@ public abstract class AbstractServerType implements IServerType {
 	public Attributes getRequiredAttributes() {
 		return new CreateServerAttributesUtility().toPojo();
 	}
+
 	public Attributes getOptionalAttributes() {
 		return new CreateServerAttributesUtility().toPojo();
 	}
+
 	public Attributes getRequiredLaunchAttributes() {
 		return new CreateServerAttributesUtility().toPojo();
 	}
+
 	public Attributes getOptionalLaunchAttributes() {
 		return new CreateServerAttributesUtility().toPojo();
 	}

@@ -21,7 +21,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +48,7 @@ public abstract class Base {
 	protected static final String PROP_ID_SET = "id-set";
 	protected static final String PROP_TIMESTAMP = "timestamp";
 
-	protected Map<String, Object> map = new LinkedHashMap<>();
+	protected Map<String, Object> map = new HashMap<>();
 	protected File file;
 	private transient List<PropertyChangeListener> propertyListeners;
 	/**

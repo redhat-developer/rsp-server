@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.rsp.server.model;
 
 import static org.junit.Assert.assertEquals;
@@ -50,7 +58,6 @@ public class ServerTypeTest {
 	@Before
 	public void before() {
 		this.sm = new ServerModel(mock(IServerManagementModel.class));
-
 	}
 	
 	@Test
@@ -77,7 +84,6 @@ public class ServerTypeTest {
 		assertNotNull(attrs);
 		assertEquals(attrs.getAttributes().size(), 1);
 		assertEquals(attrs.getAttributes().keySet().iterator().next(), "flag.4");
-
 	}
 
 	@Test
@@ -91,14 +97,17 @@ public class ServerTypeTest {
 				return attrs.toPojo();
 			}
 
+			@Override
 			public Attributes getOptionalAttributes() {
 				return getRequiredAttributes();
 			}
 
+			@Override
 			public Attributes getOptionalLaunchAttributes() {
 				return getRequiredAttributes();
 			}
 
+			@Override
 			public Attributes getRequiredLaunchAttributes() {
 				return getRequiredAttributes();
 			}
@@ -138,6 +147,7 @@ public class ServerTypeTest {
 		assertFalse(stat.getStatus().isOK());
 	}
 
+	@SuppressWarnings("serial")
 	@Test
 	public void testAttributeWrongType() {
 		IServerType testType = new TestType() {
@@ -152,13 +162,11 @@ public class ServerTypeTest {
 		};
 		sm.addServerType(testType);
 		
-		
 		HashMap<String, Object> attr = new HashMap<String, Object>();
 		attr.put("flag.1", new Integer(5));
 		CreateServerResponse stat = sm.createServer(testType.getId(), "test.name1", attr);
 		assertNotNull(stat);
 		assertFalse(stat.getStatus().isOK());
-		
 		
 		attr = new HashMap<String, Object>();
 		attr.put("flag.1", "value");
@@ -184,9 +192,11 @@ public class ServerTypeTest {
 		assertNotNull(stat);
 		assertTrue(stat.getStatus().isOK());
 	}
+
 	@Test
 	public void testValidationError() {
 		IServerType testType = new TestType() {
+
 			@Override
 			public Attributes getRequiredAttributes() {
 				CreateServerAttributesUtility attrs = new CreateServerAttributesUtility();
@@ -195,6 +205,7 @@ public class ServerTypeTest {
 						"flag.1.desc", null);
 				return attrs.toPojo();
 			}
+
 			@Override
 			public IServerDelegate createServerDelegate(IServer server) {
 				return errorMock(server);
@@ -206,9 +217,7 @@ public class ServerTypeTest {
 		CreateServerResponse stat = sm.createServer(testType.getId(), "test.name1", attr);
 		assertNotNull(stat);
 		assertFalse(stat.getStatus().isOK());
-
 	}
-
 	
 	private class TestType implements IServerType {
 		@Override
@@ -270,11 +279,11 @@ public class ServerTypeTest {
 			return attrs.toPojo();
 		}
 
-
 		@Override
 		public IServerDelegate createServerDelegate(IServer server) {
 			return okMock(server);
 		}
+
 		public IServerDelegate errorMock(IServer server) {
 			IStatus error = new Status(IStatus.ERROR, LaunchingActivator.BUNDLE_ID, "Some param is invalid");
 			IServerDelegate del = mock(IServerDelegate.class);

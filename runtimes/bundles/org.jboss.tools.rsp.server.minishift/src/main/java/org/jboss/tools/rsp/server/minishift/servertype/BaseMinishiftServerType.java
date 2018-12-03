@@ -52,7 +52,7 @@ public abstract class BaseMinishiftServerType implements IServerType {
 			attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_BINARY, 
 					ServerManagementAPIConstants.ATTR_TYPE_STRING,
 					"A filesystem path pointing to a minishift binary file.", null);
-			required = attrs.toPojo();
+			this.required = attrs.toPojo();
 		}
 		return required;
 	}

@@ -8,7 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.api.dao.util;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,11 +19,11 @@ public class CreateServerAttributesUtility {
 	private Map<String, Attribute> attrs;
 	
 	public CreateServerAttributesUtility() {
-		this.attrs = new HashMap<>();
+		this.attrs = new LinkedHashMap<>();
 	}
 	
 	public CreateServerAttributesUtility(Attributes original) {
-		attrs = new HashMap<>(original.getAttributes());
+		this.attrs = new LinkedHashMap<>(original.getAttributes());
 	}
 
 	public Set<String> listAttributes() {

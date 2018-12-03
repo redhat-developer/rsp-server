@@ -17,6 +17,7 @@ import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
 public class CDKServerType extends BaseMinishiftServerType {
+
 	public CDKServerType(String id, String name, String desc) {
 		super(id, name, desc);
 	}
