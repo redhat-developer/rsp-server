@@ -8,19 +8,20 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.api.dao;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+
 import org.jboss.tools.rsp.api.dao.util.EqualsUtility;
 
 public class Attributes {
 	private Map<String, Attribute> attributes;
 
 	public Attributes() {
-		attributes = new HashMap<>();
+		this.attributes = new LinkedHashMap<>();
 	}
 
 	public Attributes(Map<String, Attribute> a) {
-		attributes = new HashMap<>(a);
+		this.attributes = new LinkedHashMap<>(a);
 	}
 
 	public Map<String, Attribute> getAttributes() {
@@ -28,7 +29,7 @@ public class Attributes {
 	}
 
 	public void setAttributes(Map<String, Attribute> attrs) {
-		this.attributes = attrs;
+		this.attributes = new LinkedHashMap<>(attrs);
 	}
 
 	@Override

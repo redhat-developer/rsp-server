@@ -24,8 +24,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.assertj.core.data.MapEntry;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attribute;
 import org.jboss.tools.rsp.api.dao.Attributes;
@@ -36,6 +38,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.model.ServerModelListenerAdapter;
+import org.jboss.tools.rsp.server.spi.servertype.AbstractServerType;
 import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
@@ -49,13 +52,14 @@ import org.junit.Test;
 public class ServerModelTest {
 	private static final DataLocationSysProp dataLocation = new DataLocationSysProp();
 
-	private static final String BONNET_COLOR_ATTRIBUTE_ID = "Bonnet";
+	private static final String BONNET_COLOR_ATTRIBUTE_ID = "BonnetColor";
 	private static final String HAS_BEARD_ATTRIBUTE_ID = "HasBeard";
+	protected static final String TROUSERS_COLOR_ATTRIBUTE_ID = "throusersColor";
+	protected static final String EAT_APPLE_PIES_ATTRIBUTE_ID = "eatApplePies";
 	private static final Map<String, Attribute> ATTRIBUTES = new HashMap<String, Attribute>() {{
 		put(BONNET_COLOR_ATTRIBUTE_ID, new Attribute(ServerManagementAPIConstants.ATTR_TYPE_STRING, null, null));
 		put(HAS_BEARD_ATTRIBUTE_ID, new Attribute(ServerManagementAPIConstants.ATTR_TYPE_BOOL, null, null));
 	}};
-
 	
 	@BeforeClass
 	public static void beforeClass() {
@@ -345,6 +349,31 @@ public class ServerModelTest {
 	}
 
 	@Test
+	public void shouldReportInvalidAttributesInOrderDefinedInServerType() {
+		// given
+		String serverTypeId = "smurfs";
+		Map<String, Attribute> attributes = new LinkedHashMap<String, Attribute>() {{
+			put(HAS_BEARD_ATTRIBUTE_ID, new Attribute(ServerManagementAPIConstants.ATTR_TYPE_BOOL, null, null));
+			put(BONNET_COLOR_ATTRIBUTE_ID, new Attribute(ServerManagementAPIConstants.ATTR_TYPE_STRING, null, null));
+			put(TROUSERS_COLOR_ATTRIBUTE_ID, new Attribute(ServerManagementAPIConstants.ATTR_TYPE_STRING, null, null));
+			put(EAT_APPLE_PIES_ATTRIBUTE_ID, new Attribute(ServerManagementAPIConstants.ATTR_TYPE_INT, null, null));
+		}};
+		IServerType serverType = mockServerType(serverTypeId, attributes);
+		IServerModel serverModel = createServerModel(serverType);
+		// when
+		CreateServerResponse response = serverModel.createServer(serverTypeId, "papa-smurf", 
+				new HashMap<String, Object>() {{
+					put(BONNET_COLOR_ATTRIBUTE_ID, "Red");
+				}});
+		// then
+		assertThat(response.getStatus().isOK()).isFalse();
+		assertThat(response.getInvalidKeys()).containsExactly(
+				HAS_BEARD_ATTRIBUTE_ID, 
+				TROUSERS_COLOR_ATTRIBUTE_ID, 
+				EAT_APPLE_PIES_ATTRIBUTE_ID);
+	}
+
+	@Test
 	public void shouldNotCreateNewServerWithAttributeInWrongType() {
 		// given
 		String serverTypeId = "smurfs";
@@ -368,12 +397,12 @@ public class ServerModelTest {
 		// when
 		CreateServerResponse response = serverModel.createServer(serverTypeId, "papa-smurf", 
 				new HashMap<String, Object>() {{
-					put(BONNET_COLOR_ATTRIBUTE_ID, "Red");
-					put(HAS_BEARD_ATTRIBUTE_ID, null);
+					put(BONNET_COLOR_ATTRIBUTE_ID, "");
+					put(HAS_BEARD_ATTRIBUTE_ID, Boolean.TRUE);
 				}});
 		// then
 		assertThat(response.getStatus().isOK()).isFalse();
-		assertThat(response.getInvalidKeys()).containsExactly(HAS_BEARD_ATTRIBUTE_ID);
+		assertThat(response.getInvalidKeys()).containsExactly(BONNET_COLOR_ATTRIBUTE_ID);
 	}
 
 	@Test
@@ -410,6 +439,38 @@ public class ServerModelTest {
 		// then
 		assertThat(response.getStatus().isOK()).isTrue();
 		assertThat(response.getInvalidKeys()).isEmpty();
+	}
+
+	@SuppressWarnings("serial")
+	@Test
+	public void shouldPreserveOrderingOfRequiredServerAttributes() {
+		// given
+		final Attribute stringAttribute = new Attribute(ServerManagementAPIConstants.ATTR_TYPE_STRING, null, null);
+		final Attribute intAttribute = new Attribute(ServerManagementAPIConstants.ATTR_TYPE_INT, null, null);
+		final Attribute booleanAttribute = new Attribute(ServerManagementAPIConstants.ATTR_TYPE_BOOL, null, null);
+		final IServerType testType = new AbstractServerType("id", "name", "description") {
+
+			@Override
+			public Attributes getRequiredAttributes() {
+				final LinkedHashMap<String, Attribute> attributesMap = new LinkedHashMap<String, Attribute>() {{
+					put("chimpansee", stringAttribute);
+					put("gorilla", booleanAttribute);
+					put("orangutan", intAttribute);
+				}};
+				return new Attributes(attributesMap);
+			}
+
+			@Override
+			public IServerDelegate createServerDelegate(IServer server) {
+				return null;
+			}
+		};
+		sm.addServerType(testType);
+		Attributes required = sm.getRequiredAttributes(testType);
+		assertThat(required.getAttributes()).containsExactly(
+				MapEntry.entry("chimpansee", stringAttribute),
+				MapEntry.entry("gorilla", booleanAttribute),
+				MapEntry.entry("orangutan", intAttribute));
 	}
 
 	private String getServerString(String name, String type) {
