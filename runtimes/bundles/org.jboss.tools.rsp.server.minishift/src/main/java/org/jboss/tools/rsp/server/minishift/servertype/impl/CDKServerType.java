@@ -42,6 +42,7 @@ public class CDKServerType extends BaseMinishiftServerType {
 		return this.required;
 	}
 
+	@Override
 	protected boolean isCDK() {
 		return true;
 	}
