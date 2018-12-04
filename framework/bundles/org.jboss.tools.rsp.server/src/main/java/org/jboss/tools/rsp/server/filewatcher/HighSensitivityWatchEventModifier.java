@@ -12,6 +12,8 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchEvent.Modifier;
 import java.nio.file.WatchService;
 
+import org.jboss.tools.rsp.launching.utils.OSUtils;
+
 /**
  * A class that allows testing and grabbing SensitivityWatchEventModifier#HIGH
  * reflectively. This allows the code to run in jdks where it does not exists
@@ -32,12 +34,12 @@ public class HighSensitivityWatchEventModifier {
 	private static final String QUALIFIED_CLASSNAME = "com.sun.nio.file.SensitivityWatchEventModifier";
 
 	public boolean isRequired() {
-		return getOS().toLowerCase().indexOf("mac") >= 0;
+		return isMac();
 	}
 
 	/** for testing purposes **/
-	protected String getOS() {
-		return System.getProperty("os.name").toLowerCase();
+	protected boolean isMac() {
+		return OSUtils.isMac();
 	}
 
 	public boolean exists() {
