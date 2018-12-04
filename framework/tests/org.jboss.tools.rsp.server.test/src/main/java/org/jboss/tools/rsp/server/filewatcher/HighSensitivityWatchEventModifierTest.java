@@ -25,7 +25,7 @@ public class HighSensitivityWatchEventModifierTest {
 	@Test
 	public void isRequiredOnMacOS() {
 		// given
-		doReturn("Mac OS X").when(modifier).getOS();
+		doReturn(true).when(modifier).isMac();
 		// when
 		boolean required = modifier.isRequired();
 		// then
@@ -33,19 +33,9 @@ public class HighSensitivityWatchEventModifierTest {
 	}
 
 	@Test
-	public void isNotRequiredOnWindows() {
+	public void isNotRequiredOnNonMac() {
 		// given
-		doReturn("Windows 8.1").when(modifier).getOS();
-		// when
-		boolean required = modifier.isRequired();
-		// then
-		assertThat(required).isFalse();
-	}
-
-	@Test
-	public void isNotRequiredOnLinux() {
-		// given
-		doReturn("Linux").when(modifier).getOS();
+		doReturn(false).when(modifier).isMac();
 		// when
 		boolean required = modifier.isRequired();
 		// then
@@ -113,8 +103,8 @@ public class HighSensitivityWatchEventModifierTest {
 	public class TestableHighSensitivityWatchEventModifier extends HighSensitivityWatchEventModifier {
 
 		@Override
-		public String getOS() {
-			return super.getOS();
+		public boolean isMac() {
+			return super.isMac();
 		}
 
 		@Override
