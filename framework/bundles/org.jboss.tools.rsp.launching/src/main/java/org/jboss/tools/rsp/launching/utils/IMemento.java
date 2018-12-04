@@ -11,6 +11,8 @@
 
 package org.jboss.tools.rsp.launching.utils;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 /**
@@ -131,4 +133,19 @@ public interface IMemento {
 	 * @param value the value
 	 */
 	public void putString(String key, String value);
+	
+	/**
+	 * Save this Memento to a Writer.
+	 *
+	 * @throws IOException if there is a problem saving
+	 */
+	public void save(OutputStream out) throws IOException;
+	
+	/**
+	 * Saves this memento to a file with the given name.
+	 * 
+	 * @param String filename
+	 * @return
+	 */
+	public void saveToFile(String filename) throws IOException;
 }
