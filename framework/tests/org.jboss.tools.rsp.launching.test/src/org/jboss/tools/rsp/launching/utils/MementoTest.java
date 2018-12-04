@@ -11,6 +11,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
+import org.jboss.tools.rsp.launching.memento.IMemento;
+import org.jboss.tools.rsp.launching.memento.JSONMemento;
+import org.jboss.tools.rsp.launching.memento.XMLMemento;
 import org.junit.Test;
 
 public class MementoTest {
