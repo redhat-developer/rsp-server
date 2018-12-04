@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat Inc..
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     Red Hat Incorporated - initial API and implementation
+ *******************************************************************************/
 package org.jboss.tools.rsp.launching.utils;
 
 import java.io.BufferedWriter;
@@ -17,15 +27,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class JSONMemento implements IMemento {
-	
+
 	private JsonObject jsonObject;
 	private String name;
-	
+
 	public JSONMemento(JsonObject jsonObject, String name) {
 		this.jsonObject = jsonObject;
 		this.name = name;
 	}
-	
+
 	public static JSONMemento loadMemento(InputStream in) {
 		return createReadRoot(in);
 	}
@@ -144,10 +154,12 @@ public class JSONMemento implements IMemento {
 	 * @param filename java.lang.String
 	 * @exception java.io.IOException
 	 */
+	@Override
 	public void saveToFile(String filename) throws IOException {
 		save(new FileOutputStream(filename));
 	}
 	
+	@Override
 	public void save(OutputStream os) throws IOException {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		JsonElement jsonElement = gson.fromJson(this.jsonObject, JsonElement.class);

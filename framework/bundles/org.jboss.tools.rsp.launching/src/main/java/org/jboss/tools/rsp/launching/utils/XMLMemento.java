@@ -70,9 +70,7 @@ public final class XMLMemento implements IMemento {
 		element = el;
 	}
 
-	/*
-	 * @see IMemento
-	 */
+	@Override
 	public IMemento createChild(String type) {
 		Element child = factory.createElement(type);
 		element.appendChild(child);
@@ -137,9 +135,7 @@ public final class XMLMemento implements IMemento {
 		}
 	}
 
-	/*
-	 * @see IMemento
-	 */
+	@Override
 	public IMemento getChild(String type) {
 		// Get the nodes.
 		NodeList nodes = element.getChildNodes();
@@ -161,9 +157,7 @@ public final class XMLMemento implements IMemento {
 		return null;
 	}
 
-	/*
-	 * @see IMemento
-	 */
+	@Override
 	public IMemento [] getChildren(String type) {
 		// Get the nodes.
 		NodeList nodes = element.getChildNodes();
@@ -191,9 +185,7 @@ public final class XMLMemento implements IMemento {
 		return results;
 	}
 	
-	/*
-	 * Get all children nodes
-	 */
+	@Override
 	public IMemento [] getChildren() {
 		// Get the nodes.
 		NodeList nodes = element.getChildNodes();
@@ -202,7 +194,7 @@ public final class XMLMemento implements IMemento {
 			return new IMemento[0];
 
 		// Extract each node with given type.
-		List<Element> list = new ArrayList<Element>(size);
+		List<Element> list = new ArrayList<>(size);
 		for (int nX = 0; nX < size; nX ++) {
 			Node node = nodes.item(nX);
 			if (node instanceof Element) {
@@ -219,8 +211,7 @@ public final class XMLMemento implements IMemento {
 		}
 		return results;
 	}
-	
-	
+
 	public String[] getChildNames() {
 		// Get the nodes.
 		NodeList nodes = element.getChildNodes();
@@ -241,6 +232,7 @@ public final class XMLMemento implements IMemento {
 		return list.toArray(new String[list.size()]);
 	}
 
+	@Override
 	public String getNodeName() {
 		return element.getNodeName();
 	}
@@ -269,24 +261,20 @@ public final class XMLMemento implements IMemento {
 		return new ByteArrayInputStream(out.toByteArray());
 	}
 
-	/*
-	 * @see IMemento
-	 */
+	@Override
 	public Float getFloat(String key) {
 		Attr attr = element.getAttributeNode(key);
 		if (attr == null)
 			return null;
 		String strValue = attr.getValue();
 		try {
-			return new Float(strValue);
+			return Float.valueOf(strValue);
 		} catch (NumberFormatException e) {
 			return null;
 		}
 	}
 
-	/*
-	 * @see IMemento
-	 */
+	@Override
 	public Integer getInteger(String key) {
 		Attr attr = element.getAttributeNode(key);
 		if (attr == null)
@@ -299,9 +287,7 @@ public final class XMLMemento implements IMemento {
 		}
 	}
 
-	/*
-	 * @see IMemento
-	 */
+	@Override
 	public String getString(String key) {
 		Attr attr = element.getAttributeNode(key);
 		if (attr == null)
@@ -309,6 +295,7 @@ public final class XMLMemento implements IMemento {
 		return attr.getValue();
 	}
 
+	@Override
 	public List<String> getNames() {
 		NamedNodeMap map = element.getAttributes();
 		int size = map.getLength();
@@ -344,27 +331,19 @@ public final class XMLMemento implements IMemento {
 		}
 	}
 
-	/*
-	 * @see IMemento
-	 */
+	@Override
 	public void putInteger(String key, int n) {
 		element.setAttribute(key, String.valueOf(n));
 	}
 
-	/*
-	 * @see IMemento
-	 */
+	@Override
 	public void putString(String key, String value) {
 		if (value == null)
 			return;
 		element.setAttribute(key, value);
 	}
 
-	/**
-	 * Save this Memento to a Writer.
-	 *
-	 * @throws IOException if there is a problem saving
-	 */
+	@Override
 	public void save(OutputStream os) throws IOException {
 		Result result = new StreamResult(os);
 		Source source = new DOMSource(factory);
@@ -388,6 +367,7 @@ public final class XMLMemento implements IMemento {
 	 * @param filename java.lang.String
 	 * @exception java.io.IOException
 	 */
+	@Override
 	public void saveToFile(String filename) throws IOException {
 		try (BufferedOutputStream w = new BufferedOutputStream(new FileOutputStream(filename))) {
 			save(w);
@@ -403,9 +383,7 @@ public final class XMLMemento implements IMemento {
 		return out.toString("UTF-8"); //$NON-NLS-1$
 	}
 
-	/*
-	 * @see IMemento#getBoolean(String)
-	 */
+	@Override
 	public Boolean getBoolean(String key) {
 		Attr attr = element.getAttributeNode(key);
 		if (attr == null)
@@ -414,52 +392,48 @@ public final class XMLMemento implements IMemento {
 		return Boolean.valueOf(strValue); //$NON-NLS-1$
 	}
 
-	/*
-	 * @see IMemento#putBoolean(String, boolean)
-	 */
+	@Override
 	public void putBoolean(String key, boolean value) {
 		element.setAttribute(key, Boolean.toString(value));
 	}
 
 	/**
-    * Returns the Text node of the memento. Each memento is allowed only
-    * one Text node.
-    *
-    * @return the Text node of the memento, or <code>null</code> if
-    * the memento has no Text node.
-    */
-   public Text getTextNode() {
-       // Get the nodes.
-       NodeList nodes = element.getChildNodes();
-       int size = nodes.getLength();
-       for (int nX = 0; nX < size; nX++) {
-           Node node = nodes.item(nX);
-           if (node instanceof Text) {
-               return (Text) node;
-           }
-       }
-       // a Text node was not found
-       return null;
-   }
+	 * Returns the Text node of the memento. Each memento is allowed only one Text
+	 * node.
+	 *
+	 * @return the Text node of the memento, or <code>null</code> if the memento has
+	 *         no Text node.
+	 */
+	public Text getTextNode() {
+		// Get the nodes.
+		NodeList nodes = element.getChildNodes();
+		int size = nodes.getLength();
+		for (int nX = 0; nX < size; nX++) {
+			Node node = nodes.item(nX);
+			if (node instanceof Text) {
+				return (Text) node;
+			}
+		}
+		// a Text node was not found
+		return null;
+	}
 
-	/* (non-Javadoc)
-    */
-   public void putTextData(String data) {
-       Text textNode = getTextNode();
-       if (textNode == null) {
-           textNode = factory.createTextNode(data);
+	public void putTextData(String data) {
+		Text textNode = getTextNode();
+		if (textNode == null) {
+			textNode = factory.createTextNode(data);
 			// Always add the text node as the first child (fixes bug 93718)
 			element.insertBefore(textNode, element.getFirstChild());
-       } else {
-           textNode.setData(data);
-       }
-   }
+		} else {
+			textNode.setData(data);
+		}
+	}
    
-   public String getTextData() {
-       Text textNode = getTextNode();
-       if (textNode != null) {
-           return textNode.getData();
-       }
-       return ""; //$NON-NLS-1$
-   }
+	public String getTextData() {
+		Text textNode = getTextNode();
+		if (textNode != null) {
+			return textNode.getData();
+		}
+		return ""; //$NON-NLS-1$
+	}
 }
