@@ -18,6 +18,5 @@ Import-Package: org.jboss.tools.rsp.api.dao,
 Automatic-Module-Name: org.jboss.tools.rsp.foundation.core
 Export-Package: org.jboss.tools.rsp.foundation.core,
  org.jboss.tools.rsp.foundation.core.launchers,
- org.jboss.tools.rsp.foundation.core.plugin,
  org.jboss.tools.rsp.foundation.core.tasks,
  org.jboss.tools.rsp.foundation.core.transport
