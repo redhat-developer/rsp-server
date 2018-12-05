@@ -21,12 +21,12 @@ public class FoundationCoreActivator implements BundleActivator {
 
 	@Override
 	public void start(BundleContext context) throws Exception {
-		LOG.debug("Activating bundle org.jboss.tools.rsp.foundation.core");
+		LOG.debug("Activating bundle " + PLUGIN_ID);
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		LOG.debug("Stopping bundle org.jboss.tools.rsp.foundation.core");
+		LOG.debug("Stopping bundle " + PLUGIN_ID);
 	}
 
 }
