@@ -26,7 +26,7 @@ import java.util.Map;
  */
 public class TaskModel {
 
-	private Map<String, Object> map = new HashMap<String, Object>();
+	private Map<String, Object> map = new HashMap<>();
 
 	/**
 	 * Returns the object in the task model with the given id.

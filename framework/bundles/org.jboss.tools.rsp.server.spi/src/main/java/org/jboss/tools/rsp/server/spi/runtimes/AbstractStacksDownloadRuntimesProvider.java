@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.jboss.jdf.stacks.model.Runtime;
 import org.jboss.jdf.stacks.model.Stacks;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.SubProgressMonitor;
@@ -32,14 +33,11 @@ public abstract class AbstractStacksDownloadRuntimesProvider implements IDownloa
 	public static final String LABEL_WTP_RUNTIME = "wtp-runtime-type";
 	public static final String LABEL_RUNTIME_CATEGORY = "runtime-category";
 	public static final String LABEL_RUNTIME_TYPE = "runtime-type";
-	public static final String LABEL_FILE_TYPE = "file-type";;
+	public static final String LABEL_FILE_TYPE = "file-type";
 	
 	public static final String PROP_WTP_RUNTIME = LABEL_WTP_RUNTIME;
 	
-	private ArrayList<DownloadRuntime> downloads = null;
-	
-	public AbstractStacksDownloadRuntimesProvider() {
-	}
+	private List<DownloadRuntime> downloads = null;
 
 	protected abstract Stacks[] getStacks(IProgressMonitor monitor);
 	protected abstract String getLegacyId(String id);
@@ -49,24 +47,24 @@ public abstract class AbstractStacksDownloadRuntimesProvider implements IDownloa
 	@Override
 	public DownloadRuntime[] getDownloadableRuntimes(IProgressMonitor monitor) {
 		if( downloads == null ) {
-			ArrayList<DownloadRuntime> tmp = loadDownloadableRuntimes(monitor);
+			List<DownloadRuntime> tmp = loadDownloadableRuntimes(monitor);
 			if( monitor.isCanceled()) {
 				// Return the incomplete list, but do not cache it
-				return (DownloadRuntime[]) tmp.toArray(new DownloadRuntime[tmp.size()]);
+				return tmp.toArray(new DownloadRuntime[tmp.size()]);
 			}
 			// Cache this, as its assumed to be complete
 			downloads = tmp;
 		}
-		return (DownloadRuntime[]) downloads.toArray(new DownloadRuntime[downloads.size()]);
+		return downloads.toArray(new DownloadRuntime[downloads.size()]);
 	}
 	
 	/*
 	 * Return an arraylist of downloadruntime objects
 	 */
-	private synchronized ArrayList<DownloadRuntime> loadDownloadableRuntimes(IProgressMonitor monitor) {
+	private synchronized List<DownloadRuntime> loadDownloadableRuntimes(IProgressMonitor monitor) {
 		monitor.beginTask("Loading remote runtimes...", 200);
 		Stacks[] stacksArr = getStacks(new SubProgressMonitor(monitor, 100));
-		ArrayList<DownloadRuntime> all = new ArrayList<DownloadRuntime>();
+		List<DownloadRuntime> all = new ArrayList<>();
 		monitor.beginTask("Creating DownloadRuntimes", stacksArr.length * 100);		
 		for( int i = 0; i < stacksArr.length && !monitor.isCanceled(); i++ ) {
 			IProgressMonitor inner = new SubProgressMonitor(monitor, 100);
@@ -78,9 +76,9 @@ public abstract class AbstractStacksDownloadRuntimesProvider implements IDownloa
 		return all;
 	}
 	
-	protected abstract void traverseStacks(Stacks stacks, ArrayList<DownloadRuntime> list, IProgressMonitor monitor);
+	protected abstract void traverseStacks(Stacks stacks, List<DownloadRuntime> list, IProgressMonitor monitor);
 	
-	protected void traverseStacks(Stacks stacks, ArrayList<DownloadRuntime> list, String category, IProgressMonitor monitor) {
+	protected void traverseStacks(Stacks stacks, List<DownloadRuntime> list, String category, IProgressMonitor monitor) {
 		List<org.jboss.jdf.stacks.model.Runtime> runtimes = stacks.getAvailableRuntimes();
 		Iterator<org.jboss.jdf.stacks.model.Runtime> i = runtimes.iterator();
 		org.jboss.jdf.stacks.model.Runtime workingRT = null;
@@ -153,7 +151,7 @@ public abstract class AbstractStacksDownloadRuntimesProvider implements IDownloa
 	 * The map will have the key of one of the above constants,
 	 * and a value of a url. 
 	 */
-	protected String getDownloadURL(org.jboss.jdf.stacks.model.Runtime workingRT) {
+	protected String getDownloadURL(Runtime workingRT) {
 		// First look for an override for this specific OS
 		String[] os = getStacksOSStrings();
 		Object o = workingRT.getLabels().get("additionalDownloadURLs");

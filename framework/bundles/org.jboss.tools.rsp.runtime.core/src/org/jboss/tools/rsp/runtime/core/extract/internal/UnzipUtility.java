@@ -12,7 +12,6 @@ package org.jboss.tools.rsp.runtime.core.extract.internal;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +29,7 @@ import org.jboss.tools.rsp.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.rsp.runtime.core.extract.IOverwrite;
 
 public class UnzipUtility implements IExtractUtility {
-	private static String EXTRACTING = "Extracting ..."; //$NON-NLS-1$
+	private static final String EXTRACTING = "Extracting ..."; //$NON-NLS-1$
 	private static final String SEPARATOR = "/"; //$NON-NLS-1$
 	
 	private File file;
@@ -40,23 +39,19 @@ public class UnzipUtility implements IExtractUtility {
 	public UnzipUtility(File file) {
 		this.file = file;
 	}
-	
-	
+
 	public IStatus extract(File destination, IOverwrite overwriteQuery, IProgressMonitor monitor) {
 		if( file == null || !file.exists()) {
 			return new Status(IStatus.ERROR, RuntimeCoreActivator.PLUGIN_ID, 
-					"Error opening zip file: " + file.getAbsolutePath() + "; File does not exist");
+					"Error opening zip file: " + (file == null? 
+							"File not provided." 
+							: file.getAbsolutePath() + "; File does not exist."));
 		}
 
-		
 		String possibleRoot = null;
-		
-		
-		ZipFile zipFile = null;
 		int overwrite = IOverwrite.NO;
 		destination.mkdirs();
-		try {
-			zipFile = new ZipFile(file);
+		try(ZipFile zipFile = new ZipFile(file)) {
 			Enumeration<? extends ZipEntry> entries = zipFile.entries();
 			monitor.beginTask(EXTRACTING, zipFile.size());
 			while (entries.hasMoreElements()) {
@@ -64,7 +59,7 @@ public class UnzipUtility implements IExtractUtility {
 				if (monitor.isCanceled() || overwrite == IOverwrite.CANCEL) {
 					return Status.CANCEL_STATUS;
 				}
-				ZipEntry entry = (ZipEntry) entries.nextElement();
+				ZipEntry entry = entries.nextElement();
 				String entryName = entry.getName();
 				File entryFile = new File(destination, entryName);
 				monitor.subTask(entry.getName());
@@ -101,19 +96,9 @@ public class UnzipUtility implements IExtractUtility {
 		} catch (IOException e) {
 
 			boolean isZipped = false;
-			ZipInputStream test = null;
-			try {
-				test = new ZipInputStream(new FileInputStream(file));
+			try (ZipInputStream test = new ZipInputStream(new FileInputStream(file))) {
 				isZipped = test.getNextEntry() != null;
 			} catch(IOException ioe) {
-			} finally {
-				if( test != null ) {
-					try {
-						test.close();
-					} catch(IOException ioe) {
-						// Ignore
-					}
-				}
 			}
 			
 			String msg = "Error opening zip file " + file.getAbsolutePath();
@@ -121,24 +106,13 @@ public class UnzipUtility implements IExtractUtility {
 				msg += ";  file may not be a properly formated zip file.";
 			}
 			return new Status(IStatus.ERROR, RuntimeCoreActivator.PLUGIN_ID, msg, e);
-		} finally {
-			if (zipFile != null) {
-				try {
-					zipFile.close();
-				} catch (IOException e) {
-					// ignore
-				}
-			}
-			monitor.done();
 		}
 		discoveredRoot = possibleRoot;
 		return Status.OK_STATUS;
 	}
 
-	
 	private void createEntry(IProgressMonitor monitor, ZipFile zipFile,
-			ZipEntry entry, File entryFile) throws IOException,
-			FileNotFoundException {
+			ZipEntry entry, File entryFile) throws IOException {
 		monitor.setTaskName(EXTRACTING + entry.getName());
 		if (entry.isDirectory()) {
 			entryFile.mkdirs();
@@ -190,16 +164,14 @@ public class UnzipUtility implements IExtractUtility {
 			return null;
 		
 		monitor.beginTask("Locating root folder", 100);
-		ZipFile zipFile = null;
 		String root = null;
-		try {
-			zipFile = new ZipFile(file);
+		try (ZipFile zipFile = new ZipFile(file)){
 			Enumeration<? extends ZipEntry> entries = zipFile.entries();
 			while (entries.hasMoreElements()) {
 				if (monitor.isCanceled()) {
 					return null;
 				}
-				ZipEntry entry = (ZipEntry) entries.nextElement();
+				ZipEntry entry = entries.nextElement();
 				String entryName = entry.getName();
 				if (entryName == null || entryName.isEmpty() 
 						|| entryName.startsWith(SEPARATOR) || entryName.indexOf(SEPARATOR) == -1) {
@@ -217,16 +189,6 @@ public class UnzipUtility implements IExtractUtility {
 		} catch(IOException ioe) {
 			Status s = new Status(IStatus.ERROR, RuntimeCoreActivator.PLUGIN_ID, ioe.getLocalizedMessage(), ioe);
 			throw new CoreException(s);
-		} finally {
-			if (zipFile != null) {
-				try {
-					zipFile.close();
-				} catch (IOException e) {
-					// ignore
-				}
-			}
-			monitor.worked(100);
-			monitor.done();
 		}
 		return root;
 	}

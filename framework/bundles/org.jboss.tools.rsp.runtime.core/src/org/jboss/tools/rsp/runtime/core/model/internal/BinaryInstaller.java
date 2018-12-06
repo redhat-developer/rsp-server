@@ -39,7 +39,7 @@ public class BinaryInstaller implements IRuntimeInstaller {
 		monitor.worked(1);
 		try {
 			File f = new DownloadRuntimeOperationUtility().download(unzipDirectory, downloadDirectory, 
-					getDownloadUrl(downloadRuntime, taskModel), deleteOnExit, user, pass, taskModel, new SubProgressMonitor(monitor, 80));
+					getDownloadUrl(downloadRuntime, taskModel), deleteOnExit, user, pass, new SubProgressMonitor(monitor, 80));
 			File dest = new File(unzipDirectory, f.getName());
 			boolean renamed = f.renameTo(dest);
 			if( !renamed ) {

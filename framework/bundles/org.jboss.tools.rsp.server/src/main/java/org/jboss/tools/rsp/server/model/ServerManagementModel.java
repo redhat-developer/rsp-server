@@ -151,6 +151,7 @@ public class ServerManagementModel implements IServerManagementModel {
 	private IDownloadRuntimesModel createDownloadRuntimesModel() {
 		return RuntimeCoreActivator.createDownloadRuntimesModel();
 	}
+
 	private IFileWatcherService createFileWatcherService() {
 		return new FileWatcherService();
 	}

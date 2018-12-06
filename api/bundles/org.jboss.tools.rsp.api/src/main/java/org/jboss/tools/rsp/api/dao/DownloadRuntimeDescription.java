@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.api.dao;
 
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class DownloadRuntimeDescription {
@@ -37,22 +38,20 @@ public class DownloadRuntimeDescription {
 	private String licenseURL;
 	private String humanUrl;
 	private boolean disclaimer = true;
-	private HashMap<String, String> properties;
+	private Map<String, String> properties;
 	
 	private String size = "?"; //$NON-NLS-1$
 	private String installationMethod;
 	
 	public DownloadRuntimeDescription() {
-		super();
 	}
 	
 	public DownloadRuntimeDescription(String id, String name, String version, String url) {
-		super();
 		this.id = id;
 		this.name = name;
 		this.version = version;
 		this.url = url;
-		this.properties = new HashMap<String, String>();
+		this.properties = new HashMap<>();
 	}
 	
 	public String getName() {
@@ -166,11 +165,11 @@ public class DownloadRuntimeDescription {
 				+ ", size=" + size + ", disclaimer=" + disclaimer + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
-	public HashMap<String, String> getProperties() {
+	public Map<String, String> getProperties() {
 		return properties;
 	}
 
-	public void setProperties(HashMap<String, String> properties) {
+	public void setProperties(Map<String, String> properties) {
 		this.properties = properties;
 	}
 }

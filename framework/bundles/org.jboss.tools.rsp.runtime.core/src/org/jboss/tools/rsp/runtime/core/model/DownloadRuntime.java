@@ -40,12 +40,7 @@ import org.jboss.tools.rsp.runtime.core.RuntimeCoreActivator;
  */
 public class DownloadRuntime extends DownloadRuntimeDescription {
 
-	public DownloadRuntime() {
-		super();
-	}
-
 	public DownloadRuntime(String effectiveId, String name, String version, String dlUrl) {
-		this();
 		setId(effectiveId);
 		setName(name);
 		setVersion(version);
@@ -65,28 +60,18 @@ public class DownloadRuntime extends DownloadRuntimeDescription {
 	
 	
 	public String getLicense(IProgressMonitor monitor) throws CoreException {
-		URL url = null;
-		ByteArrayOutputStream out = null;
-		try {
+		try(ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 			if (getLicenseURL() == null)
 				return null;
 			
-			url = new URL(getLicenseURL());
+			URL url = new URL(getLicenseURL());
 			InputStream in = url.openStream();
-			out = new ByteArrayOutputStream();
 			copyWithSize(in, out, null, 0);
 			return new String(out.toByteArray());
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR, 
 					RuntimeCoreActivator.PLUGIN_ID, 0,
 					NLS.bind(Messages.DownloadRuntime_Unable_to_fetch_license, e.getLocalizedMessage()), e));
-		} finally {
-			try {
-				if (out != null)
-					out.close();
-			} catch (IOException e) {
-				// ignore
-			}
 		}
 	}
 	

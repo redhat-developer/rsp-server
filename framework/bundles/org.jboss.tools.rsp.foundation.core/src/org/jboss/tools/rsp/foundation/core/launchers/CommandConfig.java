@@ -16,9 +16,7 @@ import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 
 
 public class CommandConfig {
-	/**
-	 * 
-	 */
+
 	private String command;
 	private String workingDir;
 	private String[] parsedArgs;
@@ -47,11 +45,10 @@ public class CommandConfig {
 		return environment;
 	}
 	public CommandLineDetails toDetails() {
-		List<String> arguments = new ArrayList<String>();
+		List<String> arguments = new ArrayList<>();
 		arguments.add(command);
 		arguments.addAll(Arrays.asList(parsedArgs));
-		String[] argFinal = (String[]) arguments.toArray(new String[arguments.size()]);
-		return new CommandLineDetails(argFinal, workingDir,
-				environment,new HashMap<String,String>()); 
+		String[] argFinal = arguments.toArray(new String[arguments.size()]);
+		return new CommandLineDetails(argFinal, workingDir, environment,new HashMap<>()); 
 	}
 }
