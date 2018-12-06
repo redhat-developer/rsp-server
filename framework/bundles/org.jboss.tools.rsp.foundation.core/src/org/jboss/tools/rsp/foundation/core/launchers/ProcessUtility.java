@@ -56,7 +56,7 @@ public class ProcessUtility {
 		}
 		if(det.getEnvp() != null) {
 			Arrays.sort(det.getEnvp());
-			StringBuffer buff = new StringBuffer();
+			StringBuilder buff = new StringBuilder();
 			for (int i = 0; i < det.getEnvp().length; i++) {
 				buff.append(det.getEnvp()[i]);
 				if(i < det.getEnvp().length-1) {
@@ -121,7 +121,7 @@ public class ProcessUtility {
 		return p;
 	}
 	
-	public Process callProcess(String rootCommand, String[] args, String dir, HashMap<String,String> envMap) throws IOException {
+	public Process callProcess(String rootCommand, String[] args, String dir, Map<String,String> envMap) throws IOException {
 		String[] envp = convertEnvironment(envMap);
 		return callProcess(rootCommand, args, dir, envp);
 	}
@@ -210,7 +210,7 @@ public class ProcessUtility {
 			inLines = inGob.getOutput();
 		}
 
-		return (String[]) inLines.toArray(new String[inLines.size()]);
+		return inLines.toArray(new String[inLines.size()]);
 	}
 
 	/**

@@ -10,7 +10,7 @@
  ************************************************************************************/
 package org.jboss.tools.rsp.runtime.core.model;
 
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A poorly named interface for some object which is
@@ -40,5 +40,5 @@ public interface IDownloadRuntimes {
 	 * 
 	 * @param data
 	 */ 
-	public void execute(HashMap<String, Object> data);
+	public void execute(Map<String, Object> data);
 }

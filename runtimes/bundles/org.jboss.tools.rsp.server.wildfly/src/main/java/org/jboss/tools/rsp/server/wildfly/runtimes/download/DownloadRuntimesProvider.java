@@ -10,8 +10,9 @@
  ************************************************************************************/
 package org.jboss.tools.rsp.server.wildfly.runtimes.download;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.jboss.jdf.stacks.model.Stacks;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
@@ -24,13 +25,8 @@ import org.jboss.tools.rsp.stacks.core.model.StacksManager;
  * Pull runtimes from a stacks file and return them to runtimes framework
  */
 public class DownloadRuntimesProvider extends AbstractStacksDownloadRuntimesProvider {
-	
 
-	private HashMap<String, String> LEGACY_HASHMAP = null;
-	
-	public DownloadRuntimesProvider() {
-		super();
-	}
+	private Map<String, String> LEGACY_HASHMAP = null;
 	
 	@Override
 	public String getId() {
@@ -45,7 +41,7 @@ public class DownloadRuntimesProvider extends AbstractStacksDownloadRuntimesProv
 	}
 	
 	private synchronized void loadLegacy() {
-		LEGACY_HASHMAP = new HashMap<String, String>();
+		LEGACY_HASHMAP = new HashMap<>();
 		LEGACY_HASHMAP.put("jboss-as328SP1runtime", "org.jboss.tools.runtime.core.as.328" );
 		LEGACY_HASHMAP.put("jboss-as405runtime", "org.jboss.tools.runtime.core.as.405" );
 		LEGACY_HASHMAP.put("jboss-as423runtime", "org.jboss.tools.runtime.core.as.423" );
@@ -63,7 +59,7 @@ public class DownloadRuntimesProvider extends AbstractStacksDownloadRuntimesProv
 		return new StacksManager().getStacks("Loading Downloadable Runtimes", monitor, StacksManager.StacksType.PRESTACKS_TYPE, StacksManager.StacksType.STACKS_TYPE);
 	}
 	
-	protected void traverseStacks(Stacks stacks, ArrayList<DownloadRuntime> list, IProgressMonitor monitor) {
+	protected void traverseStacks(Stacks stacks, List<DownloadRuntime> list, IProgressMonitor monitor) {
 		traverseStacks(stacks, list, "SERVER", monitor);
 	}
 

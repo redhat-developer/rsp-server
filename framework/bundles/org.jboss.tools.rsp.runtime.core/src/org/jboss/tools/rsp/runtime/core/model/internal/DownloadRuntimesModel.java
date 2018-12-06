@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.SubProgressMonitor;
@@ -26,14 +25,13 @@ import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesProvider;
 
 public class DownloadRuntimesModel implements IDownloadRuntimesModel {
 
-	// Member variables
 	private Map<String, DownloadRuntime> cachedDownloadRuntimes = null;
 	private Map<String, Map<String, DownloadRuntime>> cachedDownloadRuntimesByProvider = null;
 	
 	private List<IDownloadRuntimesProvider> downloadRuntimeProviders = null;
 	
 	public DownloadRuntimesModel() {
-		this.downloadRuntimeProviders = new ArrayList<IDownloadRuntimesProvider>();
+		this.downloadRuntimeProviders = new ArrayList<>();
 	}
 
 	@Override
@@ -50,14 +48,17 @@ public class DownloadRuntimesModel implements IDownloadRuntimesModel {
 	
 	@Override
 	public String[] getRegisteredProviders() {
-		List<String> ids = downloadRuntimeProviders.stream().map(e -> e.getId()).collect(Collectors.toList());
-		return (String[]) ids.toArray(new String[ids.size()]);
+		String[] ids = downloadRuntimeProviders.stream()
+				.map(IDownloadRuntimesProvider::getId)
+				.toArray(String[]::new);
+		return ids;
 	}
 
 	@Override
 	public Map<String, DownloadRuntime> getDownloadRuntimesForProvider(String id) {
 		return cachedDownloadRuntimesByProvider.get(id);
 	}
+
 	@Override
 	public DownloadRuntime findDownloadRuntime(String id, IProgressMonitor monitor) {
 		Map<String, DownloadRuntime> runtimes = getOrLoadDownloadRuntimes(monitor);
@@ -113,8 +114,8 @@ public class DownloadRuntimesModel implements IDownloadRuntimesModel {
 						if( id.equals(propVal2[it]))
 							return i1;
 					}
-				} else if( propVal instanceof String ) {
-					if( id.equals(propVal))
+				} else if( propVal instanceof String 
+							&& id.equals(propVal)) {
 						return i1;
 				}
 			}
@@ -123,8 +124,8 @@ public class DownloadRuntimesModel implements IDownloadRuntimesModel {
 	}
 	
 	private void cacheDownloadRuntimes(IProgressMonitor monitor) {
-		HashMap<String, DownloadRuntime> map = new HashMap<>();
-		HashMap<String, Map<String, DownloadRuntime>> byProvider = new HashMap<>();
+		Map<String, DownloadRuntime> map = new HashMap<>();
+		Map<String, Map<String, DownloadRuntime>> byProvider = new HashMap<>();
 		
 		IDownloadRuntimesProvider[] providers = getDownloadRuntimeProviders();
 		monitor.beginTask("Loading Download Runtime Providers", providers.length * 100);

@@ -64,7 +64,7 @@ public class JavaJarRuntimeInstaller implements IRuntimeInstaller {
 		monitor.worked(1);
 		try {
 			File f = new DownloadRuntimeOperationUtility().download(unzipDirectory, downloadDirectory, 
-					getDownloadUrl(downloadRuntime, taskModel), deleteOnExit, user, pass, taskModel, new SubProgressMonitor(monitor, 80));
+					getDownloadUrl(downloadRuntime, taskModel), deleteOnExit, user, pass, new SubProgressMonitor(monitor, 80));
 						
 			ILaunch launch = createExternalToolsLaunchConfiguration(f, unzipDirectory);
 			if( launch == null ) {
@@ -104,8 +104,7 @@ public class JavaJarRuntimeInstaller implements IRuntimeInstaller {
 	
 	static final String JAVA_HOME_PROPERTY_KEY = "java.home";
 	private ILaunch createExternalToolsLaunchConfiguration(File downloadedFile, 
-			String unzipDirectory)
-			throws CoreException {
+			String unzipDirectory) {
 		
 		IVMInstall install = createVMRegistry().getDefaultVMInstall();
 		IPath javaBin = getJavaBin(install);
@@ -189,7 +188,6 @@ public class JavaJarRuntimeInstaller implements IRuntimeInstaller {
 
 		protected IStatus checkPrereqs(String mode) {
 			return Status.OK_STATUS;
-
 		}
 
 		public String getProgramArguments() {

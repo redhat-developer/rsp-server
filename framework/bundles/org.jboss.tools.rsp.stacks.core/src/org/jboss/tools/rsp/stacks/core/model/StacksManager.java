@@ -15,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -48,9 +49,7 @@ public class StacksManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StacksManager.class);
 
-	/**
-	 * @deprecated
-	 */
+	@Deprecated
 	private static final String STACKS_URL_PROPERTY = "org.jboss.examples.stacks.url";
 
 	private static final String URL_PROPERTY_STACKS = "org.jboss.tools.stacks.url_stacks";
@@ -97,16 +96,16 @@ public class StacksManager {
 	public Stacks[] getStacks(String jobName, IProgressMonitor monitor, StacksType... types) {
 		if (types == null)
 			return new Stacks[0];
-		LOG.trace("Request received for " + types.length + " stacks types.");
-		ArrayList<Stacks> ret = new ArrayList<Stacks>(types.length);
+		LOG.trace("Request received for {} stacks types.", types.length);
+		List<Stacks> ret = new ArrayList<>(types.length);
 		monitor.beginTask(jobName, types.length * 100);
 		for (int i = 0; i < types.length; i++) {
 			switch (types[i]) {
 			case STACKS_TYPE:
-				LOG.trace("Loading Stacks Model from " + STACKS_URL);
+				LOG.trace("Loading Stacks Model from {}", STACKS_URL);
 				Stacks s = getStacks(STACKS_URL, jobName, new SubProgressMonitor(monitor, 50));
 				if (s == null && !monitor.isCanceled()) {
-					LOG.warn("Stacks from " + STACKS_URL + " can not be read, using client mechanism instead");
+					LOG.warn("Stacks from {} can not be read, using client mechanism instead", STACKS_URL );
 					s = getDefaultStacksFromClient(new SubProgressMonitor(monitor, 50));
 				}
 				if (s != null)
@@ -114,7 +113,7 @@ public class StacksManager {
 				break;
 			case PRESTACKS_TYPE:
 				// Pre-stacks has no fall-back mechanism at this time
-				LOG.trace("Loading Stacks Model from " + PRESTACKS_URL);
+				LOG.trace("Loading Stacks Model from {}", PRESTACKS_URL);
 				Stacks s2 = getStacks(PRESTACKS_URL, jobName, new SubProgressMonitor(monitor, 100));
 				if (s2 != null)
 					ret.add(s2);
@@ -124,7 +123,7 @@ public class StacksManager {
 			}
 		}
 		monitor.done();
-		return (Stacks[]) ret.toArray(new Stacks[ret.size()]);
+		return ret.toArray(new Stacks[ret.size()]);
 	}
 
 	/**
@@ -156,7 +155,7 @@ public class StacksManager {
 
 		Stacks stacks = null;
 		try {
-			LOG.trace("Locating or downloading file for " + url);
+			LOG.trace("Locating or downloading file for {}", url);
 			File f = getCachedFileForURL(url, jobName, monitor);
 			return getStacksFromFile(f);
 		} catch (Exception e) {
@@ -168,13 +167,9 @@ public class StacksManager {
 	protected Stacks getStacksFromFile(File f) throws IOException {
 		if (f != null && f.exists()) {
 			LOG.trace("Local file for url exists");
-			FileInputStream fis = null;
-			try {
-				fis = new FileInputStream(f);
+			try(FileInputStream fis = new FileInputStream(f)) {
 				Parser p = new Parser();
 				return p.parse(fis);
-			} finally {
-				close(fis);
 			}
 		}
 		return null;
@@ -184,7 +179,7 @@ public class StacksManager {
 		if (!monitor.isCanceled()) {
 			final StacksClient client = new StacksClient(new DefaultStacksClientConfiguration(),
 					new JBTStacksMessages());
-			return runWithTimeout(5000, () -> client.getStacks());
+			return runWithTimeout(5000, client::getStacks);
 		}
 		return null;
 	}

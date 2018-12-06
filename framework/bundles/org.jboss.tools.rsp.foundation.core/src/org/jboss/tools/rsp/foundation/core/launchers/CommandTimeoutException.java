@@ -13,9 +13,6 @@ import java.util.concurrent.TimeoutException;
 
 public class CommandTimeoutException extends TimeoutException {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 37067116146846743L;
 
 	private static String getTimeoutError(List<String> output, List<String> err) {
@@ -26,8 +23,8 @@ public class CommandTimeoutException extends TimeoutException {
 		return msg.toString();
 	}
 
-	private List<String> inLines;
-	private List<String> errLines;
+	private final List<String> inLines;
+	private final List<String> errLines;
 
 	public CommandTimeoutException(List<String> inLines, List<String> errLines) {
 		super(getTimeoutError(inLines, errLines));

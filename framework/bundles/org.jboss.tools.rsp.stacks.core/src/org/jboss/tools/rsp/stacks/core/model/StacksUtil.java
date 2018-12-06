@@ -29,7 +29,7 @@ public class StacksUtil {
 
 	static {
 		// TODO this code should eventually be moved out?
-		Map<String, String> serverIdMap = new HashMap<String, String>();
+		Map<String, String> serverIdMap = new HashMap<>();
 		
 		serverIdMap.put("org.jboss.ide.eclipse.as.runtime.eap.60","jbosseap6runtime"); //$NON-NLS-1$ //$NON-NLS-2$
 		serverIdMap.put("org.jboss.ide.eclipse.as.runtime.71","jboss-as711runtime"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -78,7 +78,7 @@ public class StacksUtil {
 			return Collections.emptyList();
 		}
 
-		List<Runtime> runtimes = new ArrayList<Runtime>();
+		List<Runtime> runtimes = new ArrayList<>();
 		
 		for (Runtime runtime : getRuntimes(fromStacks, runtimeTypes)) {
 			List<ArchetypeVersion> versions = getCompatibleArchetypeVersions(archetype, runtime); 
@@ -94,7 +94,7 @@ public class StacksUtil {
 			return Collections.emptyList();
 		}
 		
-		List<Runtime> runtimes = new ArrayList<Runtime>();
+		List<Runtime> runtimes = new ArrayList<>();
 		List<String> runtimeTypeFilter = null;
 		if (runtimeTypes != null && runtimeTypes.length > 0) {
 			runtimeTypeFilter = Arrays.asList(runtimeTypes);
@@ -125,16 +125,6 @@ public class StacksUtil {
 		}
 		return null;
 	}
-
-	/**
-	 * @deprecated use {@link #getRuntimeFromWtpId(Stacks, String)}
-	 */
-	@Deprecated
-	public static Runtime getRuntimeFromWtp(Stacks fromStacks, String wtpRuntimeId) {
-		return getRuntimeFromWtpId(fromStacks, wtpRuntimeId); 
-	}
-
-
 	
 	public static Runtime getRuntimeFromWtpId(Stacks fromStacks, String wtpRuntimeId) {
 		if (fromStacks == null || wtpRuntimeId == null) {
@@ -167,7 +157,7 @@ public class StacksUtil {
 			return Collections.emptyList();
 		}
 
-		List<ArchetypeVersion> compatibleVersions = new ArrayList<ArchetypeVersion>(); 
+		List<ArchetypeVersion> compatibleVersions = new ArrayList<>(); 
 		List<ArchetypeVersion> versions = runtime.getArchetypes();
 		if (versions != null && !versions.isEmpty()) {
 			String bestVersion = archetype.getRecommendedVersion(); 

@@ -35,16 +35,16 @@ import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
  * and runtime creation for a downloaded runtime. 
  */
 public class DownloadRuntimeOperationUtility {
-	private static final String SEPARATOR = "/"; //$NON-NLS-1$
 
 	protected File getNextUnusedFilename(File destination, String name) {
 		String nameWithoutSuffix = null;
 		if( name.indexOf('.') == -1 ) {
 			nameWithoutSuffix = name;
-		} else if( name.endsWith(".tar.gz"))
+		} else if (name.endsWith(".tar.gz")) {
 			nameWithoutSuffix = name.substring(0, name.length() - ".tar.gz".length());
-		else 
+		} else { 
 			nameWithoutSuffix = name.substring(0, name.lastIndexOf('.'));
+		}
 		String suffix = name.substring(nameWithoutSuffix.length());
 		int i = 1;
 		String tmpName = null;
@@ -89,7 +89,7 @@ public class DownloadRuntimeOperationUtility {
 		}
 	}
 	
-	private boolean cacheOutdated(File local, boolean deleteOnExit, long urlLastModified) {
+	private boolean cacheOutdated(File local, boolean deleteOnExit) {
 		boolean download = true;
 		long urlModified = 0;
 		if (!deleteOnExit) {
@@ -124,7 +124,7 @@ public class DownloadRuntimeOperationUtility {
 	
 
 	public File download(String unzipDirectoryPath, String downloadDirectoryPath, 
-			String urlString, boolean deleteOnExit, String user, String pass, TaskModel tm, IProgressMonitor monitor) throws CoreException {
+			String urlString, boolean deleteOnExit, String user, String pass, IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask("Download runtime from url " + urlString, 500);
 		try {
 			validateInputs(downloadDirectoryPath, unzipDirectoryPath);
@@ -178,9 +178,9 @@ public class DownloadRuntimeOperationUtility {
 					// Ignore error on checking timestamp, may be fluke
 				}
 			}
-			boolean download = cacheOutdated(file, deleteOnExit, urlModified);
+			boolean download = cacheOutdated(file, deleteOnExit);
 
-			IStatus result = null;
+			IStatus result = Status.OK_STATUS;
 			if (download) {
 				result = downloadFileFromRemoteUrl(file, new URL(urlString), urlModified, user, pass, new SubProgressMonitor(monitor, 900));
 			}
@@ -219,11 +219,7 @@ public class DownloadRuntimeOperationUtility {
 	}
 	
 	private IOverwrite createOverwriteFileQuery() {
-		return new IOverwrite() {
-			public int overwrite(File file) {
-				return IOverwrite.YES;
-			}
-		};
+		return (File file) -> IOverwrite.YES;
 	}
 	
 	private String getUpdatedUnzipPath(ExtractUtility util, String unzipDirectoryPath, IProgressMonitor monitor) throws CoreException {
@@ -231,7 +227,7 @@ public class DownloadRuntimeOperationUtility {
 			String root = util.getExtractedRootFolder( new SubProgressMonitor(monitor, 10));
 			if (root != null) {
 				File rootFile = new File(unzipDirectoryPath, root);
-				if (rootFile != null && rootFile.exists()) {
+				if (rootFile.exists()) {
 					unzipDirectoryPath = rootFile.getAbsolutePath();
 				}
 			}
@@ -245,24 +241,14 @@ public class DownloadRuntimeOperationUtility {
 	}
 	
 	private IStatus downloadFileFromRemoteUrl(File toFile, URL url, long remoteUrlModified, String user, String pass, IProgressMonitor monitor) throws IOException {
-		FileOutputStream out = new FileOutputStream(toFile);
-		try {
+		try (FileOutputStream out = new FileOutputStream(toFile)) {
 			IStatus result = getCache().download(
 					toFile.getName(), url.toExternalForm(), user, pass, out, -1, monitor);
 			out.flush();
-			out.close();
 			if (remoteUrlModified > 0) {
 				toFile.setLastModified(remoteUrlModified);
 			}
 			return result;
-		} finally { 
-			if (out != null) {
-				try {
-					out.close();
-				} catch (IOException e) {
-					// ignore
-				}
-			}			
 		}
 	}
 

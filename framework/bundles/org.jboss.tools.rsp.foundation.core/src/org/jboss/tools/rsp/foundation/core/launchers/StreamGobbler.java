@@ -15,13 +15,18 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class StreamGobbler extends Thread {
+
+	private static final Logger LOG = LoggerFactory.getLogger(StreamGobbler.class);
 
 	private static final long MAX_WAIT_AFTER_TERMINATION = 5000;
 	private static final long DELAY = 100;
 
-	InputStream is;
-	ArrayList<String> ret = new ArrayList<String>();
+	private InputStream is;
+	private List<String> ret = new ArrayList<>();
 	private boolean canceled = false;
 	private boolean complete = false;
 
@@ -33,10 +38,11 @@ public class StreamGobbler extends Thread {
 		ret.add(line);
 	}
 
-	private synchronized ArrayList<String> getList() {
+	private synchronized List<String> getList() {
 		return ret;
 	}
 
+	@Override
 	public void run() {
 		try {
 			InputStreamReader isr = new InputStreamReader(is);
@@ -45,16 +51,10 @@ public class StreamGobbler extends Thread {
 			while (!isCanceled() && (line = br.readLine()) != null)
 				add(line);
 		} catch (IOException ioe) {
-			ioe.printStackTrace();
+			LOG.error("Could not read input stream.", ioe);
 		}
 
-		if (is != null) {
-			try {
-				is.close();
-			} catch (IOException ioe) {
-				// ignore
-			}
-		}
+		close();
 		setComplete();
 	}
 
@@ -76,6 +76,10 @@ public class StreamGobbler extends Thread {
 
 	public void cancel() {
 		setCanceled();
+		close();
+	}
+
+	private void close() {
 		if (is != null) {
 			try {
 				is.close();
@@ -92,7 +96,6 @@ public class StreamGobbler extends Thread {
 			try {
 				Thread.sleep(delay);
 			} catch (InterruptedException ie) {
-
 			}
 		}
 		if (!isComplete()) {

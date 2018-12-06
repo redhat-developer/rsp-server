@@ -82,7 +82,7 @@ public class URLTransportCache {
 	private IPath cacheRoot;
 	protected URLTransportCache(IPath cacheRoot) {
 		this.cacheRoot = cacheRoot;
-		this.cache = new HashMap<String, String>();
+		this.cache = new HashMap<>();
 		load();
 	}
 
@@ -108,7 +108,7 @@ public class URLTransportCache {
 	 */
 	public boolean isCacheOutdated(String url, IProgressMonitor monitor)
 			throws CoreException {
-		LOG.trace("Checking if cache is outdated for " + url);
+		LOG.trace("Checking if cache is outdated for {}", url);
 		File f = getCachedFile(url);
 		if (f == null)
 			return true;
@@ -155,12 +155,11 @@ public class URLTransportCache {
 	public File downloadAndCache(String url, String displayName, 
 			int timeout, boolean deleteOnExit, IProgressMonitor monitor) throws CoreException {
 
-		LOG.trace("Downloading and caching " + url);
+		LOG.trace("Downloading and caching {}", url);
 
 		File existing = getExistingRemoteFileCacheLocation(url);
 		File target = createNewRemoteFileCacheLocation(url);
-		try {
-			FileOutputStream os = new FileOutputStream(target);
+		try (FileOutputStream os = new FileOutputStream(target)){
 			IStatus s = download(displayName, url, os, timeout, monitor);
 			if (s.isOK()) {
 				// Download completed successfully, add to cache, delete old copy
@@ -197,7 +196,7 @@ public class URLTransportCache {
 				LOG.error(ioe.getMessage(), ioe);
 			}
 		}
-		LOG.trace("Loaded " + cache.size() + " cache file locations from preferences");
+		LOG.trace("Loaded {} cache file locations from preferences", cache.size());
 	}
 	
 	private void loadIndexFromString(String val) {
@@ -230,9 +229,9 @@ public class URLTransportCache {
 		// Saves are now done to an index file in the cache root. 
 		File index = cacheRoot.append(CACHE_INDEX_FILE).toFile();
 		
-		LOG.trace("Saving " + cache.size() + " cache file locations to " + index.getAbsolutePath());
+		LOG.trace("Saving {} cache file locations to {}", cache.size(), index.getAbsolutePath());
 
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		Iterator<String> it = cache.keySet().iterator();
 		while(it.hasNext()) {
 			String k = it.next();
@@ -320,15 +319,8 @@ public class URLTransportCache {
     }
 	
 	private static void setContents(File file, String contents) throws IOException {
-		Writer out = null;
-		try {
-			out = new BufferedWriter(new OutputStreamWriter(
-				new FileOutputStream(file), ENCODING));
+		try (Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), ENCODING))){
 			out.append(contents);
-		} finally {
-			if (out != null) {
-				out.close();
-			}
 		}
 	}
 	
@@ -337,8 +329,7 @@ public class URLTransportCache {
 			HttpURLConnection con = (HttpURLConnection) url2.openConnection();
 			return getLastModified(con, monitor);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			LOG.error("Could determine modification for url {}", url2);
 		}
 		return -1;
 	}
@@ -348,8 +339,7 @@ public class URLTransportCache {
 		try {
 			return getLastModified(getURLConnection(url, user, pass), monitor);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Could determine modification for url {}", url);
 		}
 		return -1;
 	}
@@ -358,8 +348,7 @@ public class URLTransportCache {
 		try (AutoCloseable conc = () -> con.disconnect()) {
 			return con.getLastModified();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Could determine modification for url {}", con.getURL());
 		}
 		return -1;
 	}
@@ -367,14 +356,14 @@ public class URLTransportCache {
 	
 	private IStatus download(String displayName, String url, 
 			FileOutputStream fileOutputStream, int timeout, 
-			IProgressMonitor monitor) throws MalformedURLException, IOException {
+			IProgressMonitor monitor) throws IOException {
 		return download(displayName, createStream(url), fileOutputStream, timeout, monitor);
 	}
 
 	public IStatus download(String displayName, String url, 
 			String user, String pass, 
 			FileOutputStream fileOutputStream, int timeout,
-			IProgressMonitor monitor) throws MalformedURLException, IOException {
+			IProgressMonitor monitor) throws IOException {
 		return download(displayName, createStream(url, user, pass), 
 				fileOutputStream, timeout, monitor);
 	}
@@ -401,19 +390,20 @@ public class URLTransportCache {
 		}
 	}
 
-	private InputStream createStream(String url) throws MalformedURLException, IOException {
+	private InputStream createStream(String url) throws IOException {
 		return new URL(url).openStream();
 	}
 
-	private InputStream createStream(String webPage, String user, String pass) throws MalformedURLException, IOException {
+	private InputStream createStream(String webPage, String user, String pass) throws IOException {
 		return getURLConnection(webPage, user, pass).getInputStream();
 	}
 	
-	private HttpURLConnection getURLConnection(String webPage, String user, String pass) throws MalformedURLException, IOException {
+	private HttpURLConnection getURLConnection(String webPage, String user, String pass) throws IOException {
 		URL url = new URL(webPage);
 		return getURLConnection(url, user, pass);
 	}
-	private HttpURLConnection getURLConnection(URL url, String user, String pass) throws MalformedURLException, IOException {
+
+	private HttpURLConnection getURLConnection(URL url, String user, String pass) throws IOException {
 		String authString = user + ":" + pass;
 		byte[] authEncBytes = Base64.getEncoder().encode(authString.getBytes());
 		String authStringEnc = new String(authEncBytes);

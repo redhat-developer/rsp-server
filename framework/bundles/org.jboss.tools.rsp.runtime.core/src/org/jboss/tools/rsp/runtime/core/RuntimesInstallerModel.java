@@ -12,6 +12,7 @@ package org.jboss.tools.rsp.runtime.core;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
 import org.jboss.tools.rsp.runtime.core.model.internal.BinaryInstaller;
@@ -19,9 +20,9 @@ import org.jboss.tools.rsp.runtime.core.model.internal.ExtractionRuntimeInstalle
 import org.jboss.tools.rsp.runtime.core.model.internal.JavaJarRuntimeInstaller;
 
 public class RuntimesInstallerModel {
-	// Member variables
 
 	private static RuntimesInstallerModel manager = null;
+
 	public static RuntimesInstallerModel getDefault() {
 		if( manager == null )
 			manager = new RuntimesInstallerModel();
@@ -43,9 +44,9 @@ public class RuntimesInstallerModel {
 		}
 	}
 	
-	private ArrayList<RuntimeInstallerWrapper> installers;
-	private ArrayList<RuntimeInstallerWrapper> loadInstallers() {
-		ArrayList<RuntimeInstallerWrapper> list = new ArrayList<RuntimeInstallerWrapper>();
+	private List<RuntimeInstallerWrapper> installers;
+	private List<RuntimeInstallerWrapper> loadInstallers() {
+		List<RuntimeInstallerWrapper> list = new ArrayList<>();
 		RuntimeInstallerWrapper archive = new RuntimeInstallerWrapper(
 				IRuntimeInstaller.EXTRACT_INSTALLER, new ExtractionRuntimeInstaller());
 		RuntimeInstallerWrapper bin = new RuntimeInstallerWrapper(
