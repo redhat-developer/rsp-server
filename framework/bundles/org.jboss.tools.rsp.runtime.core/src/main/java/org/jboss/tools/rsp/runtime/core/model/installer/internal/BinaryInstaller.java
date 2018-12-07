@@ -8,7 +8,7 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.rsp.runtime.core.model.internal;
+package org.jboss.tools.rsp.runtime.core.model.installer.internal;
 
 import java.io.File;
 import java.io.IOException;

@@ -30,7 +30,8 @@ import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
-import org.jboss.tools.rsp.api.dao.DownloadRuntimeResponse;
+import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
+import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
@@ -46,12 +47,15 @@ import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.api.dao.StopServerAttributes;
+import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
+import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowExecutor;
+import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesProvider;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.rsp.server.model.RemoteEventManager;
 import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
@@ -577,18 +581,38 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	@Override
-	public CompletableFuture<DownloadRuntimeResponse> listDownloadableRuntimes() {
+	public CompletableFuture<ListDownloadRuntimeResponse> listDownloadableRuntimes() {
 		return createCompletableFuture(() -> listDownloadableRuntimesInternal());
 	}
 
-	private DownloadRuntimeResponse listDownloadableRuntimesInternal() {
+	private ListDownloadRuntimeResponse listDownloadableRuntimesInternal() {
 		Map<String, DownloadRuntime> map = managementModel.getDownloadRuntimeModel().getOrLoadDownloadRuntimes(new NullProgressMonitor());
 		List<DownloadRuntimeDescription> list = map.values().stream().sorted(
 				Comparator.comparing(DownloadRuntime::getName))
 				.map(dlrt -> dlrt.toDao())
 				.collect(Collectors.toList());
-		DownloadRuntimeResponse resp = new DownloadRuntimeResponse();
+		ListDownloadRuntimeResponse resp = new ListDownloadRuntimeResponse();
 		resp.setRuntimes(list);
 		return resp;
+	}
+
+	@Override
+	public CompletableFuture<WorkflowResponse> downloadableRuntime(DownloadSingleRuntimeRequest req) {
+		return createCompletableFuture(() -> downloadRuntimeInternal(req));
+	}
+	private WorkflowResponse downloadRuntimeInternal(DownloadSingleRuntimeRequest req) {
+		String id = req.getDownloadRuntimeId();
+		IDownloadRuntimesProvider provider = managementModel.getDownloadRuntimeModel().findProviderForRuntime(id);
+		if( provider != null ) {
+			DownloadRuntime dlrt = managementModel.getDownloadRuntimeModel().findDownloadRuntime(id, new NullProgressMonitor());
+			IDownloadRuntimeWorkflowExecutor executor = provider.getWorkflowExecutor(dlrt);
+			WorkflowResponse response = executor.execute(req);
+			return response;
+		}
+		WorkflowResponse error = new WorkflowResponse();
+		Status s = new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Unable to find an executor for the given download runtime");
+		error.setStatus(s);
+		error.setItems(new ArrayList<>());
+		return error;
 	}
 }

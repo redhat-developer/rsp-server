@@ -8,7 +8,7 @@
  * Contributors:
  *     JBoss by Red Hat
  *******************************************************************************/
-package org.jboss.tools.rsp.runtime.core.model.internal;
+package org.jboss.tools.rsp.runtime.core.model.installer.internal;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;

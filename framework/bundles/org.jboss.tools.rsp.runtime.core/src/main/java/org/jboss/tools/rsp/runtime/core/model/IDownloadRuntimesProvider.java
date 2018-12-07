@@ -42,4 +42,13 @@ public interface IDownloadRuntimesProvider {
 	 * @return
 	 */
 	public DownloadRuntime[] getDownloadableRuntimes(IProgressMonitor monitor);
+	
+	/**
+	 * Get the workflow executor capable of running the download-runtime workflow
+	 * for this specific download runtime type
+	 * 
+	 * @param dr
+	 * @return
+	 */
+	public IDownloadRuntimeWorkflowExecutor getWorkflowExecutor(DownloadRuntime dr);
 }

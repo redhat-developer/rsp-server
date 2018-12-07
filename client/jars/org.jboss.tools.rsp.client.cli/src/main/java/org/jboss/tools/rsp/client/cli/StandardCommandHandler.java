@@ -25,7 +25,7 @@ import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
-import org.jboss.tools.rsp.api.dao.DownloadRuntimeResponse;
+import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
@@ -423,7 +423,7 @@ public class StandardCommandHandler implements InputHandler {
 			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
 				try {
 					List<ServerHandle> res2p = launcher.getServerProxy().getServerHandles().get();
-					DownloadRuntimeResponse resp = launcher.getServerProxy().listDownloadableRuntimes().get();
+					ListDownloadRuntimeResponse resp = launcher.getServerProxy().listDownloadableRuntimes().get();
 					List<DownloadRuntimeDescription> list = resp.getRuntimes();
 					for( DownloadRuntimeDescription d : list ) {
 						System.out.println(d);
