@@ -276,7 +276,7 @@ public class DownloadRuntimeOperationUtility {
 	private URLTransportCache getCache() {
 		if( cache == null ) {
 			File data = LaunchingCore.getDataLocation();
-			File stacks = new File(data, "downloadruntimes");
+			File stacks = new File(data, "downloadruntimescache");
 			cache = URLTransportCache.getCache(new Path(stacks.getAbsolutePath()));
 		}
 		return cache;

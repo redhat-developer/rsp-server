@@ -13,7 +13,7 @@ package org.jboss.tools.rsp.runtime.core.model;
 import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 
-public interface IDownloadRuntimeWorkflowExecutor {
+public interface IDownloadRuntimeRunner {
 
 	/**
 	 * Begin the workflow of downloading DownloadRuntime objects

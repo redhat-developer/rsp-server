@@ -50,5 +50,5 @@ public interface IDownloadRuntimesProvider {
 	 * @param dr
 	 * @return
 	 */
-	public IDownloadRuntimeWorkflowExecutor getWorkflowExecutor(DownloadRuntime dr);
+	public IDownloadRuntimeRunner getDownloadRunner(DownloadRuntime dr);
 }

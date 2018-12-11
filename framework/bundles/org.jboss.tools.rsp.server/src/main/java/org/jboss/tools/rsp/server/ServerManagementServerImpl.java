@@ -54,7 +54,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
-import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowExecutor;
+import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeRunner;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesProvider;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.rsp.server.model.RemoteEventManager;
@@ -605,9 +605,11 @@ public class ServerManagementServerImpl implements RSPServer {
 		IDownloadRuntimesProvider provider = managementModel.getDownloadRuntimeModel().findProviderForRuntime(id);
 		if( provider != null ) {
 			DownloadRuntime dlrt = managementModel.getDownloadRuntimeModel().findDownloadRuntime(id, new NullProgressMonitor());
-			IDownloadRuntimeWorkflowExecutor executor = provider.getWorkflowExecutor(dlrt);
-			WorkflowResponse response = executor.execute(req);
-			return response;
+			IDownloadRuntimeRunner executor = provider.getDownloadRunner(dlrt);
+			if( executor != null ) {
+				WorkflowResponse response = executor.execute(req);
+				return response;
+			}
 		}
 		WorkflowResponse error = new WorkflowResponse();
 		Status s = new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Unable to find an executor for the given download runtime");

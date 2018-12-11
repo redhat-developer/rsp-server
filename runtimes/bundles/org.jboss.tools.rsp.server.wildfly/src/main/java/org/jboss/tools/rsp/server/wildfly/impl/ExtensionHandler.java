@@ -47,7 +47,7 @@ public class ExtensionHandler {
 	public static void addExtensions(IServerManagementModel model) {
 		model.getServerBeanTypeManager().addTypeProvider(new JBossServerBeanTypeProvider());
 		model.getServerModel().addServerTypes(TYPES);
-		model.getDownloadRuntimeModel().addDownloadRuntimeProvider(new DownloadRuntimesProvider());
+		model.getDownloadRuntimeModel().addDownloadRuntimeProvider(new DownloadRuntimesProvider(model));
 	}
 	
 	public static void removeExtensions(IServerManagementModel model) {

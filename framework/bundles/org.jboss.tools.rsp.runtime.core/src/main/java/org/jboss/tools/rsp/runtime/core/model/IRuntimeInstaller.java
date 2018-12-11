@@ -27,7 +27,11 @@ public interface IRuntimeInstaller {
 	 */
 	public static final String JAVA_JAR_INSTALLER = "installer-jar"; //$NON-NLS-1$
 
-	public static final String BINARY_INSTALLER = "binary";
+	/**
+	 * The file is already a binary that can be run directly and 
+	 * does not need to be unzipped or installed
+	 */
+	public static final String BINARY_INSTALLER = "binary"; //$NON-NLS-1$
 	
 	/**
 	 * Download and install the given runtime. 

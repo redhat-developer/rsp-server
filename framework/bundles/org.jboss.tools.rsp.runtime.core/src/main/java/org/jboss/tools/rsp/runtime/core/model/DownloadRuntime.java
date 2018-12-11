@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.HashMap;
 
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
@@ -45,6 +46,7 @@ public class DownloadRuntime extends DownloadRuntimeDescription {
 		setName(name);
 		setVersion(version);
 		setUrl(dlUrl);
+		setProperties(new HashMap<String, String>());
 	}
 
 	public void setProperty(String key, String value) {
