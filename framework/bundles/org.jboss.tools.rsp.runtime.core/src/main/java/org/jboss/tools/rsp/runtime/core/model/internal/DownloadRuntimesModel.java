@@ -46,17 +46,8 @@ public class DownloadRuntimesModel implements IDownloadRuntimesModel {
 		downloadRuntimeProviders.remove(provider);
 		clearCache();
 	}
-	
-	@Override
-	public String[] getRegisteredProviders() {
-		String[] ids = downloadRuntimeProviders.stream()
-				.map(IDownloadRuntimesProvider::getId)
-				.toArray(String[]::new);
-		return ids;
-	}
 
-	@Override
-	public Map<String, DownloadRuntime> getDownloadRuntimesForProvider(String id) {
+	private Map<String, DownloadRuntime> getDownloadRuntimesForProvider(String id) {
 		return cachedDownloadRuntimesByProvider.get(id);
 	}
 
@@ -155,8 +146,7 @@ public class DownloadRuntimesModel implements IDownloadRuntimesModel {
 		return downloadRuntimeProviders.toArray(new IDownloadRuntimesProvider[downloadRuntimeProviders.size()]);
 	}
 
-	@Override
-	public IDownloadRuntimesProvider findDownloadRuntimeProvider(String id) {
+	private IDownloadRuntimesProvider findDownloadRuntimeProvider(String id) {
 		IDownloadRuntimesProvider[] all = getDownloadRuntimeProviders();
 		for( int i = 0; i < all.length; i++ ) {
 			if( id.equals(all[i].getId())) 

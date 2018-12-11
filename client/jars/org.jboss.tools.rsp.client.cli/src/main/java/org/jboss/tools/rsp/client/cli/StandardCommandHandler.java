@@ -25,9 +25,10 @@ import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
-import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
+import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
+import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
 import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
@@ -38,6 +39,8 @@ import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.api.dao.StopServerAttributes;
+import org.jboss.tools.rsp.api.dao.WorkflowResponse;
+import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
 import org.jboss.tools.rsp.client.bindings.ServerManagementClientLauncher;
 
 public class StandardCommandHandler implements InputHandler {
@@ -59,6 +62,9 @@ public class StandardCommandHandler implements InputHandler {
 
 			@Override
 			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
+				String suffix = command.substring(this.command.length());
+				DiscoveryPath dp = new DiscoveryPath(suffix.trim());
+				launcher.getServerProxy().addDiscoveryPath(dp);
 			}
 		},
 		LIST_PATHS("list paths") {
@@ -422,11 +428,77 @@ public class StandardCommandHandler implements InputHandler {
 			@Override
 			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
 				try {
-					List<ServerHandle> res2p = launcher.getServerProxy().getServerHandles().get();
 					ListDownloadRuntimeResponse resp = launcher.getServerProxy().listDownloadableRuntimes().get();
 					List<DownloadRuntimeDescription> list = resp.getRuntimes();
 					for( DownloadRuntimeDescription d : list ) {
 						System.out.println(d);
+					}
+				} catch(InterruptedException | ExecutionException ioe) {
+					ioe.printStackTrace();
+				}
+			}
+		},
+
+		DOWNLOAD_RUNTIME("download runtime") {
+			private boolean validateResponse(WorkflowResponse resp) {
+				if( resp == null || resp.getStatus() == null) {
+					System.out.println("The server has returned an empty response.");
+					return false;
+				}
+				int statusSev = resp.getStatus().getSeverity();
+				if( statusSev == Status.OK) {
+					// All done
+					System.out.println("The runtime is downloading.");
+					return false;
+				} 
+				
+				if( statusSev == Status.CANCEL || statusSev == Status.ERROR ) {
+					System.out.println("The download runtime workflow has failed.");
+					System.out.println(resp.getStatus().getMessage());
+					return false;
+				}
+				return true;
+			}
+			
+			private Map<String, Object> displayPromptsSeekInput(WorkflowResponse resp, PromptAssistant asst) {
+
+				HashMap<String, Object> toSend = new HashMap<>();
+				
+				List<WorkflowResponseItem> respItems = resp.getItems();
+				for( WorkflowResponseItem item : respItems ) {
+					System.out.println("Item: " + item.getId());
+					if( item.getLabel() != null)
+						System.out.println("Label: " + item.getLabel());
+					if( item.getContent() != null )
+						System.out.println("Content:\n" + item.getContent());
+					
+					String type = item.getResponseType();
+					if( type != null && !ServerManagementAPIConstants.ATTR_TYPE_NONE.equals(type)) {
+						// Prompt for input
+						asst.promptForAttributeSingleKey(type, null, null, item.getId(), true, toSend);
+					}
+				}
+				return toSend;
+			}
+			
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
+				try {
+					DownloadRuntimeDescription dlrt = assistant.selectDownloadRuntime();
+					DownloadSingleRuntimeRequest req = new DownloadSingleRuntimeRequest();
+					req.setDownloadRuntimeId(dlrt.getId());
+					WorkflowResponse resp = launcher.getServerProxy().downloadRuntime(req).get();
+					boolean done = false;
+					while( !done ) {
+						boolean continueWorklow = validateResponse(resp);
+						if( !continueWorklow )
+							return;
+						Map<String, Object> toSend = displayPromptsSeekInput(resp, assistant);
+						DownloadSingleRuntimeRequest req2 = new DownloadSingleRuntimeRequest();
+						req2.setRequestId(resp.getRequestId());
+						req2.setDownloadRuntimeId(dlrt.getId());
+						req2.setData(toSend);
+						resp = launcher.getServerProxy().downloadRuntime(req2).get();
 					}
 				} catch(InterruptedException | ExecutionException ioe) {
 					ioe.printStackTrace();

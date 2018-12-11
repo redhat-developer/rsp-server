@@ -597,7 +597,7 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	@Override
-	public CompletableFuture<WorkflowResponse> downloadableRuntime(DownloadSingleRuntimeRequest req) {
+	public CompletableFuture<WorkflowResponse> downloadRuntime(DownloadSingleRuntimeRequest req) {
 		return createCompletableFuture(() -> downloadRuntimeInternal(req));
 	}
 	private WorkflowResponse downloadRuntimeInternal(DownloadSingleRuntimeRequest req) {

@@ -23,6 +23,8 @@ import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
+import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
+import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerType;
@@ -103,6 +105,20 @@ public class PromptAssistant {
 		return null;
 	}
 
+	public DownloadRuntimeDescription selectDownloadRuntime() throws InterruptedException, ExecutionException {
+		ListDownloadRuntimeResponse resp = launcher.getServerProxy().listDownloadableRuntimes().get();
+		List<DownloadRuntimeDescription> rts = resp.getRuntimes();
+		List<String> collectorCollection = rts.stream()
+				.map(DownloadRuntimeDescription::getName)
+				.collect(Collectors.toList());
+		String ret = promptUser(collectorCollection, "Please select a server:");
+		if( ret != null && collectorCollection.contains(ret)) {
+			int ind = collectorCollection.indexOf(ret);
+			return rts.get(ind);
+		}
+		return null;
+	}
+
 	public String promptUser(List<String> list, String msg) {
 		int c = 1;
 		System.out.println(msg);
@@ -128,18 +144,26 @@ public class PromptAssistant {
 
 	public void promptForAttributeSingleKey(CreateServerAttributesUtility attrsUtil, String k, boolean required2, Map<String, Object> toSend) {
 		String attrType = attrsUtil.getAttributeType(k);
+		String reqDesc = attrsUtil.getAttributeDescription(k);
+		Object defVal = attrsUtil.getAttributeDefaultValue(k);
+		promptForAttributeSingleKey(attrType, reqDesc, defVal, k, required2, toSend);
+	}
+		
+	public void promptForAttributeSingleKey(
+			String attrType, String reqDesc, Object defVal,
+			String k, boolean required2, Map<String, Object> toSend) {
 		Class<?> c = getAttributeTypeAsClass(attrType);
 		if (c == null) {
 			System.out.println("unknown attribute type " + attrType + ". Aborting.");
 			return;
 		}
 		String reqType = c.getName();
-		String reqDesc = attrsUtil.getAttributeDescription(k);
-		Object defVal = attrsUtil.getAttributeDefaultValue(k);
 		
 		// Workaround to sending integers over json
 		defVal = workaroundDoubles(defVal, attrType);
-		String toPrint = "Key: " + k + "\nType: " + reqType + "\nDescription: " + reqDesc;
+		String toPrint = "Key: " + k + "\nType: " + reqType;
+		if( reqDesc != null ) 
+			toPrint += "\nDescription: " + reqDesc;
 		if (defVal != null) {
 			toPrint += "\nDefault Value: " + defVal.toString();
 		}
@@ -153,7 +177,7 @@ public class PromptAssistant {
 		
         Object value = null;
 		if (Integer.class.equals(c) || Boolean.class.equals(c) || String.class.equals(c)) {
-			value = promptPrimitiveValue(attrsUtil.getAttributeType(k));
+			value = promptPrimitiveValue(attrType);
 		} else if (List.class.equals(c)) {
 			value = promptListValue();
 		} else if (Map.class.equals(c)) {

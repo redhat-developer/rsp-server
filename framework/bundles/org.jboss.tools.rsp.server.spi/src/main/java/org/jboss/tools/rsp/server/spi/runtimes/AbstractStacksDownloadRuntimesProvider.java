@@ -18,6 +18,7 @@ import java.util.Map;
 import org.jboss.jdf.stacks.model.Runtime;
 import org.jboss.jdf.stacks.model.Stacks;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
+import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.SubProgressMonitor;
 import org.jboss.tools.rsp.launching.utils.OSUtils;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
@@ -56,6 +57,17 @@ public abstract class AbstractStacksDownloadRuntimesProvider implements IDownloa
 			downloads = tmp;
 		}
 		return downloads.toArray(new DownloadRuntime[downloads.size()]);
+	}
+	
+	protected DownloadRuntime findDownloadRuntime(String id) {
+		DownloadRuntime[] arr = getDownloadableRuntimes(new NullProgressMonitor());
+		if( arr == null || id == null)
+			return null;
+		for( int i = 0; i < arr.length; i++ ) {
+			if( arr[i] != null && arr[i].getId().equals(id))
+				return arr[i];
+		}
+		return null;
 	}
 	
 	/*

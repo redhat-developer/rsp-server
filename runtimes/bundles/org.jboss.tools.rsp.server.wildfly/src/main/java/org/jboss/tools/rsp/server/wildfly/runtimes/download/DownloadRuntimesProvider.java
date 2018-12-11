@@ -16,7 +16,9 @@ import java.util.Map;
 
 import org.jboss.jdf.stacks.model.Stacks;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
+import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
+import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowExecutor;
 import org.jboss.tools.rsp.server.spi.runtimes.AbstractStacksDownloadRuntimesProvider;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
 import org.jboss.tools.rsp.stacks.core.model.StacksManager;
@@ -72,5 +74,13 @@ public class DownloadRuntimesProvider extends AbstractStacksDownloadRuntimesProv
 	protected boolean runtimeTypeIsRegistered(String runtimeId) {
 		String val = IServerConstants.RUNTIME_TO_SERVER.get(runtimeId);
 		return val != null;
+	}
+
+	@Override
+	public IDownloadRuntimeWorkflowExecutor getWorkflowExecutor(DownloadRuntime dr) {
+		DownloadRuntime dlrt = findDownloadRuntime(dr.getId());
+		if( dlrt != null && dlrt.equals(dr))
+			return new LicenseOnlyDownloadExecutor(dr);
+		return null;
 	}
 }

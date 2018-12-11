@@ -11,7 +11,11 @@ package org.jboss.tools.rsp.api.dao;
 import java.util.List;
 
 public class WorkflowResponseItem {
+	// An id for this item, such as 'workflow.license', "workflow.username", "workflow.password", etc
+	// Extenders can put whatever they want here and request a client make custom UI for it, 
+	// Or can try to re-use common types listed in ServerManagementAPIConstants
 	private String id;
+	
 	private String itemType;
 
 	// What to show: 
@@ -38,6 +42,12 @@ public class WorkflowResponseItem {
 	// A list of valid responses or null if any conforming type is acceptable
 	private List<String> validResponses;
 
+	
+	
+	/*
+	 * Getters and setters below
+	 */
+	
 	public String getId() {
 		return id;
 	}

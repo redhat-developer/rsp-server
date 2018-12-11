@@ -356,7 +356,7 @@ public interface RSPServer {
 	 * @return
 	 */
 	@JsonRequest
-	public CompletableFuture<WorkflowResponse> downloadableRuntime(DownloadSingleRuntimeRequest req);
+	public CompletableFuture<WorkflowResponse> downloadRuntime(DownloadSingleRuntimeRequest req);
 
 	
 }
