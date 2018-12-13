@@ -7,7 +7,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .
 Import-Package: com.google.gson,
  javax.xml.parsers,
- org.xml.sax,
+ org.assertj.core.api,
  org.jboss.tools.rsp.api,
  org.jboss.tools.rsp.api.dao,
  org.jboss.tools.rsp.api.dao.util,
@@ -19,10 +19,11 @@ Import-Package: com.google.gson,
  org.jboss.tools.rsp.launching.utils,
  org.osgi.framework,
  org.osgi.service.log,
- org.assertj.core.api
+ org.xml.sax
 Require-Bundle: org.jboss.tools.rsp.api;bundle-version="0.0.9",
  org.jboss.tools.rsp.launching;bundle-version="0.0.9",
  org.jboss.tools.rsp.launching.java;bundle-version="0.0.9",
  org.junit,
  org.jboss.tools.locus.mockito,
- org.hamcrest.core
+ org.hamcrest.core,
+ javax.annotation;bundle-version="1.2.0"

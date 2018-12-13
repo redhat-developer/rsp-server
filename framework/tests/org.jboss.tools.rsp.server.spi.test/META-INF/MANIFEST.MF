@@ -12,4 +12,5 @@ Require-Bundle: org.jboss.tools.rsp.api;bundle-version="0.10.0",
  org.jboss.tools.rsp.server.spi;bundle-version="0.10.0",
  org.junit,
  org.jboss.tools.locus.mockito,
- org.assertj;bundle-version="1.7.1"
+ org.assertj;bundle-version="1.7.1",
+ javax.annotation;bundle-version="1.2.0"

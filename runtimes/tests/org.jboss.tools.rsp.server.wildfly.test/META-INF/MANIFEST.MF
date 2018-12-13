@@ -37,4 +37,5 @@ Import-Package: org.eclipse.lsp4j.jsonrpc,
 Require-Bundle: org.jboss.tools.rsp.server,
  org.jboss.tools.rsp.server.wildfly,
  org.junit,
- org.jboss.tools.locus.mockito
+ org.jboss.tools.locus.mockito,
+ javax.annotation;bundle-version="1.2.0"

@@ -10,5 +10,4 @@
   <groupId>org.jboss.tools.rsp</groupId>
   <artifactId>rsp-target</artifactId>
   <packaging>eclipse-target-definition</packaging>
-
 </project>
