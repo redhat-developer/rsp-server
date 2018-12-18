@@ -20,9 +20,10 @@ import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
-import org.jboss.tools.rsp.api.dao.DownloadRuntimeResponse;
+import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
+import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
 import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
@@ -36,6 +37,7 @@ import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.api.dao.StopServerAttributes;
+import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 
 @JsonSegment("server")
 public interface RSPServer {
@@ -346,6 +348,15 @@ public interface RSPServer {
 	 * @return
 	 */
 	@JsonRequest
-	public CompletableFuture<DownloadRuntimeResponse> listDownloadableRuntimes();
+	public CompletableFuture<ListDownloadRuntimeResponse> listDownloadableRuntimes();
+
+	
+	/**
+	 * Initiate a request to download a runtime
+	 * @return
+	 */
+	@JsonRequest
+	public CompletableFuture<WorkflowResponse> downloadRuntime(DownloadSingleRuntimeRequest req);
+
 	
 }

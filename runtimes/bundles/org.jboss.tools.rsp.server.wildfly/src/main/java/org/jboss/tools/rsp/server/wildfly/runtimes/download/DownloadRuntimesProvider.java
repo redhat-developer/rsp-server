@@ -16,7 +16,12 @@ import java.util.Map;
 
 import org.jboss.jdf.stacks.model.Stacks;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
+import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
+import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
+import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeRunner;
+import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
+import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.runtimes.AbstractStacksDownloadRuntimesProvider;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
 import org.jboss.tools.rsp.stacks.core.model.StacksManager;
@@ -28,6 +33,11 @@ public class DownloadRuntimesProvider extends AbstractStacksDownloadRuntimesProv
 
 	private Map<String, String> LEGACY_HASHMAP = null;
 	
+	private IServerManagementModel model;
+	public DownloadRuntimesProvider(IServerManagementModel model) {
+		this.model = model;
+	}
+
 	@Override
 	public String getId() {
 		return "jboss-wildfly-EAP";
@@ -72,5 +82,22 @@ public class DownloadRuntimesProvider extends AbstractStacksDownloadRuntimesProv
 	protected boolean runtimeTypeIsRegistered(String runtimeId) {
 		String val = IServerConstants.RUNTIME_TO_SERVER.get(runtimeId);
 		return val != null;
+	}
+
+	@Override
+	public IDownloadRuntimeRunner getDownloadRunner(DownloadRuntime dr) {
+		DownloadRuntime dlrt = findDownloadRuntime(dr.getId());
+		if( dlrt == null || !dlrt.equals(dr))
+			return null;
+		
+		String installer = (dr.getInstallationMethod() == null ? IRuntimeInstaller.EXTRACT_INSTALLER : dr.getInstallationMethod());
+		if( !IRuntimeInstaller.EXTRACT_INSTALLER.equals(installer))
+				return null;  // we can't handle binary or installer-jar at this time
+		
+		String prop = dr.getProperty(DownloadRuntime.PROPERTY_REQUIRES_CREDENTIALS);
+		if( prop != null && "true".equalsIgnoreCase(prop))
+			return null; // Requires credentials is handled by another executor 
+
+		return new LicenseOnlyDownloadExecutor(dr, model);
 	}
 }

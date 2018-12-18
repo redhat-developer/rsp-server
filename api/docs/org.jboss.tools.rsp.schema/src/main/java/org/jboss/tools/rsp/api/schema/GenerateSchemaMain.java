@@ -18,7 +18,7 @@ import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
-import org.jboss.tools.rsp.api.dao.DownloadRuntimeResponse;
+import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
@@ -69,7 +69,7 @@ public class GenerateSchemaMain {
 				DeployableState.class,
 				DiscoveryPath.class,
 				DownloadRuntimeDescription.class,
-				DownloadRuntimeResponse.class,
+				ListDownloadRuntimeResponse.class,
 				LaunchAttributesRequest.class,
 				LaunchParameters.class,
 				ModifyDeployableRequest.class,

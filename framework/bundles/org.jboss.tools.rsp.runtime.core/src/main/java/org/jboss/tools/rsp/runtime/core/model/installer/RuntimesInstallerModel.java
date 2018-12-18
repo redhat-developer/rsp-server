@@ -8,16 +8,16 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.rsp.runtime.core;
+package org.jboss.tools.rsp.runtime.core.model.installer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
-import org.jboss.tools.rsp.runtime.core.model.internal.BinaryInstaller;
-import org.jboss.tools.rsp.runtime.core.model.internal.ExtractionRuntimeInstaller;
-import org.jboss.tools.rsp.runtime.core.model.internal.JavaJarRuntimeInstaller;
+import org.jboss.tools.rsp.runtime.core.model.installer.internal.BinaryInstaller;
+import org.jboss.tools.rsp.runtime.core.model.installer.internal.ExtractionRuntimeInstaller;
+import org.jboss.tools.rsp.runtime.core.model.installer.internal.JavaJarRuntimeInstaller;
 
 public class RuntimesInstallerModel {
 

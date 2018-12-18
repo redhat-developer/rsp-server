@@ -14,6 +14,11 @@ public interface ServerManagementAPIConstants {
 	public static final int STREAM_TYPE_SYSOUT = 2;
 	public static final int STREAM_TYPE_OTHER = 3;
 	
+	
+	
+	// Used only for workflows?
+	public static final String ATTR_TYPE_NONE = "none";
+	
 	public static final String ATTR_TYPE_BOOL = "bool";
 	public static final String ATTR_TYPE_INT = "int";
 	public static final String ATTR_TYPE_STRING= "string";
@@ -124,5 +129,13 @@ public interface ServerManagementAPIConstants {
 	public static final String SERVER_HOME_DIR = "server.home.dir";
 
 	public static final String SERVER_HOME_FILE = "server.home.file";
+	
+	
+	
+	public static final String WORKFLOW_LICENSE_TEXT_ID = "workflow.license";
+	public static final String WORKFLOW_LICENSE_SIGN_ID = "workflow.license.sign";
+	
+	public static final String WORKFLOW_USERNAME_ID = "workflow.username";
+	public static final String WORKFLOW_PASSWORD_ID = "workflow.password";
 
 }

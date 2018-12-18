@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.SubProgressMonitor;
@@ -45,17 +46,8 @@ public class DownloadRuntimesModel implements IDownloadRuntimesModel {
 		downloadRuntimeProviders.remove(provider);
 		clearCache();
 	}
-	
-	@Override
-	public String[] getRegisteredProviders() {
-		String[] ids = downloadRuntimeProviders.stream()
-				.map(IDownloadRuntimesProvider::getId)
-				.toArray(String[]::new);
-		return ids;
-	}
 
-	@Override
-	public Map<String, DownloadRuntime> getDownloadRuntimesForProvider(String id) {
+	private Map<String, DownloadRuntime> getDownloadRuntimesForProvider(String id) {
 		return cachedDownloadRuntimesByProvider.get(id);
 	}
 
@@ -152,5 +144,26 @@ public class DownloadRuntimesModel implements IDownloadRuntimesModel {
 	
 	private IDownloadRuntimesProvider[] getDownloadRuntimeProviders() {
 		return downloadRuntimeProviders.toArray(new IDownloadRuntimesProvider[downloadRuntimeProviders.size()]);
+	}
+
+	private IDownloadRuntimesProvider findDownloadRuntimeProvider(String id) {
+		IDownloadRuntimesProvider[] all = getDownloadRuntimeProviders();
+		for( int i = 0; i < all.length; i++ ) {
+			if( id.equals(all[i].getId())) 
+				return all[i];
+		}
+		return null;
+	}
+	
+	@Override
+	public IDownloadRuntimesProvider findProviderForRuntime(String id) {
+		Set<String> providerKeys = cachedDownloadRuntimesByProvider.keySet();
+		for( String k : providerKeys ) {
+			Map<String,DownloadRuntime> val = cachedDownloadRuntimesByProvider.get(k);
+			if( val != null && val.get(id) != null ) {
+				return findDownloadRuntimeProvider(k);
+			}
+		}
+		return null;
 	}
 }

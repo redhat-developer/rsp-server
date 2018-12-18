@@ -22,6 +22,5 @@ public interface IDownloadRuntimesModel {
 	public void addDownloadRuntimeProvider(IDownloadRuntimesProvider provider);
 	public void removeDownloadRuntimeProvider(IDownloadRuntimesProvider provider);
 
-	public String[] getRegisteredProviders();
-	public Map<String, DownloadRuntime> getDownloadRuntimesForProvider(String id);
+	public IDownloadRuntimesProvider findProviderForRuntime(String id);
 }

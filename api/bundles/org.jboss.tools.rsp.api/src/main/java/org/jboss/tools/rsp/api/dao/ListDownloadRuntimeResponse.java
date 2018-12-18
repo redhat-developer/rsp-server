@@ -10,9 +10,9 @@ package org.jboss.tools.rsp.api.dao;
 
 import java.util.List;
 
-public class DownloadRuntimeResponse {
+public class ListDownloadRuntimeResponse {
 	private List<DownloadRuntimeDescription> runtimes;
-	public DownloadRuntimeResponse() {
+	public ListDownloadRuntimeResponse() {
 		super();
 	}
 	public List<DownloadRuntimeDescription> getRuntimes() {
