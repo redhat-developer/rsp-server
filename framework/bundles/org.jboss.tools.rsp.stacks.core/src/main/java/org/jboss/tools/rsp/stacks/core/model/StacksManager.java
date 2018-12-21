@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2013 Red Hat, Inc. and others.
+ * Copyright (c) 2013-2018 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,6 +46,8 @@ import org.slf4j.LoggerFactory;
  * client.
  */
 public class StacksManager {
+
+	private static final int DOWNLOAD_STACKS_TIMEOUT = 5000;
 
 	private static final Logger LOG = LoggerFactory.getLogger(StacksManager.class);
 
@@ -152,7 +154,6 @@ public class StacksManager {
 	}
 
 	protected Stacks getStacksFromURL(String url, String jobName, IProgressMonitor monitor) {
-
 		Stacks stacks = null;
 		try {
 			LOG.trace("Locating or downloading file for {}", url);
@@ -179,7 +180,7 @@ public class StacksManager {
 		if (!monitor.isCanceled()) {
 			final StacksClient client = new StacksClient(new DefaultStacksClientConfiguration(),
 					new JBTStacksMessages());
-			return runWithTimeout(5000, client::getStacks);
+			return runWithTimeout(DOWNLOAD_STACKS_TIMEOUT, client::getStacks);
 		}
 		return null;
 	}
@@ -236,16 +237,12 @@ public class StacksManager {
 	}
 
 	private static String getUrlFromJar(String prop) {
-		InputStream is = null;
-		try {
-			is = StacksManager.class.getResourceAsStream("/org/jboss/jdf/stacks/client/config.properties"); //$NON-NLS-1$
+		try (InputStream is = StacksManager.class.getResourceAsStream("/org/jboss/jdf/stacks/client/config.properties")){
 			Properties p = new Properties();
 			p.load(is);
 			return p.getProperty(prop);
 		} catch (Exception e) {
 			LOG.warn("Can't read stacks url from the stacks-client.jar", e); //$NON-NLS-1$
-		} finally {
-			close(is);
 		}
 		return null;
 	}
@@ -272,18 +269,4 @@ public class StacksManager {
 		}
 
 	}
-
-	/*
-	 * Close an inputstream
-	 */
-	private static void close(InputStream is) {
-		if (is != null) {
-			try {
-				is.close();
-			} catch (IOException ie) {
-				// IGNORE
-			}
-		}
-	}
-
 }

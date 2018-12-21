@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2013 Red Hat, Inc. and others.
+ * Copyright (c) 2013-2018 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,10 +47,6 @@ public class DownloadRuntimesModel implements IDownloadRuntimesModel {
 		clearCache();
 	}
 
-	private Map<String, DownloadRuntime> getDownloadRuntimesForProvider(String id) {
-		return cachedDownloadRuntimesByProvider.get(id);
-	}
-
 	@Override
 	public DownloadRuntime findDownloadRuntime(String id, IProgressMonitor monitor) {
 		Map<String, DownloadRuntime> runtimes = getOrLoadDownloadRuntimes(monitor);
@@ -82,6 +78,7 @@ public class DownloadRuntimesModel implements IDownloadRuntimesModel {
 	private synchronized Map<String, DownloadRuntime> getDownloadRuntimesCache() {
 		return cachedDownloadRuntimes == null ? null : new HashMap<>(cachedDownloadRuntimes);
 	}
+
 	private synchronized void clearCache() {
 		cachedDownloadRuntimes = null;
 		cachedDownloadRuntimesByProvider = null;
@@ -94,40 +91,48 @@ public class DownloadRuntimesModel implements IDownloadRuntimesModel {
 		DownloadRuntime rt = runtimes.get(id);
 		if( rt != null )
 			return rt;
+
 		Collection<DownloadRuntime> rts = runtimes.values();
 		Iterator<DownloadRuntime> i = rts.iterator();
 		while(i.hasNext()) {
-			DownloadRuntime i1 = i.next();
-			Object propVal = i1.getProperty(DownloadRuntime.PROPERTY_ALTERNATE_ID);
-			if( propVal != null ) {
-				if( propVal instanceof String[]) {
-					String[] propVal2 = (String[]) propVal;
-					for( int it = 0; it < propVal2.length; it++ ) {
-						if( id.equals(propVal2[it]))
-							return i1;
-					}
-				} else if( propVal instanceof String 
-							&& id.equals(propVal)) {
-						return i1;
-				}
+			DownloadRuntime runtime = i.next();
+			if (matchesInAlternativeId(id, runtime)) {
+				return runtime;
 			}
 		}
 		return null;
+	}
+
+	private boolean matchesInAlternativeId(String id, DownloadRuntime runtime) {
+		Object alternativeId = runtime.getProperty(DownloadRuntime.PROPERTY_ALTERNATE_ID);
+		if( alternativeId != null ) {
+			if( alternativeId instanceof String[]) {
+				String[] propVal2 = (String[]) alternativeId;
+				for( int it = 0; it < propVal2.length; it++ ) {
+					if( id.equals(propVal2[it]))
+						return true;
+				}
+			} else if( alternativeId instanceof String 
+						&& id.equals(alternativeId)) {
+					return true;
+			}
+		}
+		return false;
 	}
 	
 	private void cacheDownloadRuntimes(IProgressMonitor monitor) {
 		Map<String, DownloadRuntime> map = new HashMap<>();
 		Map<String, Map<String, DownloadRuntime>> byProvider = new HashMap<>();
-		
+
 		IDownloadRuntimesProvider[] providers = getDownloadRuntimeProviders();
 		monitor.beginTask("Loading Download Runtime Providers", providers.length * 100);
 		for( int i = 0; i < providers.length && !monitor.isCanceled(); i++ ) {
-			IProgressMonitor inner = new SubProgressMonitor(monitor, 100);
-			DownloadRuntime[] runtimes = providers[i].getDownloadableRuntimes(inner);
+			IProgressMonitor subMon = new SubProgressMonitor(monitor, 100);
 			
 			Map<String, DownloadRuntime> byProviderInner = new HashMap<>();
 			byProvider.put(providers[i].getId(), byProviderInner);
 			
+			DownloadRuntime[] runtimes = providers[i].getDownloadableRuntimes(subMon);
 			if( runtimes != null ) {
 				for( int j = 0; j < runtimes.length; j++ ) {
 					if( runtimes[j] != null ) {
@@ -136,14 +141,38 @@ public class DownloadRuntimesModel implements IDownloadRuntimesModel {
 					}
 				}
 			}
-			inner.done();
+			subMon.done();
 		}
 		setDownloadRuntimesCache(map);
 		setByProviderRuntimesCache(byProvider);
 	}
 	
-	private IDownloadRuntimesProvider[] getDownloadRuntimeProviders() {
+	/** default for testing purposes **/
+	IDownloadRuntimesProvider[] getDownloadRuntimeProviders() {
 		return downloadRuntimeProviders.toArray(new IDownloadRuntimesProvider[downloadRuntimeProviders.size()]);
+	}
+	
+	@Override
+	public IDownloadRuntimesProvider findProviderForRuntime(String id, IProgressMonitor monitor) {
+		ensureCacheLoaded(monitor);
+		return findProviderForRuntime(id);
+	}
+
+	@Override
+	public IDownloadRuntimesProvider findProviderForRuntime(String id) {
+		if (id == null 
+				|| id.isEmpty() 
+				|| cachedDownloadRuntimesByProvider == null) {
+			return null;
+		}
+		Set<String> providerKeys = cachedDownloadRuntimesByProvider.keySet();
+		for( String k : providerKeys ) {
+			Map<String,DownloadRuntime> val = cachedDownloadRuntimesByProvider.get(k);
+			if( val != null && val.containsKey(id) ) {
+				return findDownloadRuntimeProvider(k);
+			}
+		}
+		return null;
 	}
 
 	private IDownloadRuntimesProvider findDownloadRuntimeProvider(String id) {
@@ -154,16 +183,5 @@ public class DownloadRuntimesModel implements IDownloadRuntimesModel {
 		}
 		return null;
 	}
-	
-	@Override
-	public IDownloadRuntimesProvider findProviderForRuntime(String id) {
-		Set<String> providerKeys = cachedDownloadRuntimesByProvider.keySet();
-		for( String k : providerKeys ) {
-			Map<String,DownloadRuntime> val = cachedDownloadRuntimesByProvider.get(k);
-			if( val != null && val.get(id) != null ) {
-				return findDownloadRuntimeProvider(k);
-			}
-		}
-		return null;
-	}
+
 }

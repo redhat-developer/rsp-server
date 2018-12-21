@@ -57,24 +57,31 @@ public class DownloadRuntimeDescription {
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String getId() {
 		return id;
 	}
+
 	public void setId(String id) {
 		this.id = id;
 	}
+
 	public String getVersion() {
 		return version;
 	}
+
 	public void setVersion(String version) {
 		this.version = version;
 	}
+
 	public String getUrl() {
 		return url;
 	}
+
 	public void setUrl(String url) {
 		this.url = url;
 	}
@@ -159,10 +166,16 @@ public class DownloadRuntimeDescription {
 	
 	@Override
 	public String toString() {
-		return "DownloadRuntime: name=" //$NON-NLS-1$ //$NON-NLS-2$
-				+ name + ", id=" + id + ", version=" + version + ", url=" + url //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				+ ", licenseURL=" + licenseURL + ", humanUrl=" + humanUrl //$NON-NLS-1$ //$NON-NLS-2$
-				+ ", size=" + size + ", disclaimer=" + disclaimer + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return "DownloadRuntime: "
+				+ "name=" + name 
+				+ ", id=" + id 
+				+ ", version=" + version 
+				+ ", url=" + url
+				+ ", licenseURL=" + licenseURL 
+				+ ", humanUrl=" + humanUrl
+				+ ", size=" + size 
+				+ ", disclaimer=" + disclaimer 
+				+ "]";
 	}
 
 	public Map<String, String> getProperties() {
