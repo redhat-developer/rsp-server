@@ -21,8 +21,8 @@ import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.eclipse.jdt.internal.launching.LibraryInfo;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.StandardVMType;
-import org.jboss.tools.rsp.internal.launching.java.util.LaunchingSupportUtils;
 import org.jboss.tools.rsp.launching.utils.FileUtil;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class LaunchingJarTest {
@@ -52,6 +52,9 @@ public class LaunchingJarTest {
 		getAssertedLaunchingSupportFile(util);
 	}
 
+	@Ignore("As of org.eclipse.jdt.launching_3.12.0.v20181119-1621 org.eclipse.jdt.internal.launching.support.LibraryDetector "
+			+ "wont detect the boot classpath on Java >= 9. It should check 'java.class.path' where it's using '.boot.class.path'."
+			+ "Extension and Endorsed dir dont exist any more.")
 	@Test
 	public void testLaunchingSupportLibraryDetector() {
 		LaunchingSupportUtils util = new LaunchingSupportUtils();
