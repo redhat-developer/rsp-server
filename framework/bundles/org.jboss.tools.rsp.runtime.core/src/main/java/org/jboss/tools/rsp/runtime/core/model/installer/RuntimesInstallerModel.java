@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2013 Red Hat, Inc. and others.
+ * Copyright (c) 2013-2018 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 package org.jboss.tools.rsp.runtime.core.model.installer;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
@@ -29,33 +28,41 @@ public class RuntimesInstallerModel {
 		return manager;
 	}
 	
-	private static class RuntimeInstallerWrapper {
+	/** default for testing purposes **/
+	RuntimesInstallerModel() {
+	}
+
+	/** default for testing purposes **/
+	static class RuntimeInstallerWrapper {
+
 		private String id;
 		private IRuntimeInstaller installer;
+
 		public RuntimeInstallerWrapper(String id, IRuntimeInstaller installer) {
 			this.id = id;
 			this.installer = installer;
 		}
+
 		public String getId() {
 			return id;
 		}
+
 		public IRuntimeInstaller getInstaller() {
 			return installer;
 		}
 	}
 	
 	private List<RuntimeInstallerWrapper> installers;
-	private List<RuntimeInstallerWrapper> loadInstallers() {
+
+	/** protected for testing purposes **/
+	protected List<RuntimeInstallerWrapper> loadInstallers() {
 		List<RuntimeInstallerWrapper> list = new ArrayList<>();
-		RuntimeInstallerWrapper archive = new RuntimeInstallerWrapper(
-				IRuntimeInstaller.EXTRACT_INSTALLER, new ExtractionRuntimeInstaller());
-		RuntimeInstallerWrapper bin = new RuntimeInstallerWrapper(
-				IRuntimeInstaller.BINARY_INSTALLER, new BinaryInstaller());
-		RuntimeInstallerWrapper installer = new RuntimeInstallerWrapper(
-				IRuntimeInstaller.JAVA_JAR_INSTALLER, new JavaJarRuntimeInstaller());
-		list.add(archive);
-		list.add(bin);
-		list.add(installer);
+		list.add(new RuntimeInstallerWrapper(
+				IRuntimeInstaller.EXTRACT_INSTALLER, new ExtractionRuntimeInstaller()));
+		list.add(new RuntimeInstallerWrapper(
+				IRuntimeInstaller.BINARY_INSTALLER, new BinaryInstaller()));
+		list.add(new RuntimeInstallerWrapper(
+				IRuntimeInstaller.JAVA_JAR_INSTALLER, new JavaJarRuntimeInstaller()));
 		return list;
 	}
 	
@@ -66,17 +73,14 @@ public class RuntimesInstallerModel {
 	 * @return
 	 */
 	public IRuntimeInstaller getRuntimeInstaller(String id) {
-		if( installers == null ) {
+		if (installers == null) {
 			installers = loadInstallers();
 		}
-		Iterator<RuntimeInstallerWrapper> it = installers.iterator();
-		while(it.hasNext()) {
-			RuntimeInstallerWrapper w = it.next();
-			if(id.equals(w.getId())) {
-				return w.getInstaller();
-			}
-		}
-		return null;
+		return installers.stream()
+			.filter(wrapper -> wrapper.getId().equals(id))
+			.findFirst()
+			.map(RuntimeInstallerWrapper::getInstaller)
+			.orElse(null);
 	}
 	
 }
