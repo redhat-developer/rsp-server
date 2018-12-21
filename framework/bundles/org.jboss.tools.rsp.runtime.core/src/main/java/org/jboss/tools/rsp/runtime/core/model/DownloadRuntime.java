@@ -41,6 +41,8 @@ import org.jboss.tools.rsp.runtime.core.RuntimeCoreActivator;
  */
 public class DownloadRuntime extends DownloadRuntimeDescription {
 
+	private static final int BUFFER_SIZE = 8192;
+
 	public DownloadRuntime(String effectiveId, String name, String version, String dlUrl) {
 		setId(effectiveId);
 		setName(name);
@@ -60,7 +62,6 @@ public class DownloadRuntime extends DownloadRuntimeDescription {
 		return null;
 	}
 	
-	
 	public String getLicense(IProgressMonitor monitor) throws CoreException {
 		try(ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 			if (getLicenseURL() == null)
@@ -68,9 +69,9 @@ public class DownloadRuntime extends DownloadRuntimeDescription {
 			
 			URL url = new URL(getLicenseURL());
 			InputStream in = url.openStream();
-			copyWithSize(in, out, null, 0);
+			copyWithSize(in, out, monitor, 0);
 			return new String(out.toByteArray());
-		} catch (Exception e) {
+		} catch (IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, 
 					RuntimeCoreActivator.PLUGIN_ID, 0,
 					NLS.bind(Messages.DownloadRuntime_Unable_to_fetch_license, e.getLocalizedMessage()), e));
@@ -78,13 +79,13 @@ public class DownloadRuntime extends DownloadRuntimeDescription {
 	}
 	
 	private void copyWithSize(InputStream in, OutputStream out, IProgressMonitor monitor, int size) throws IOException {
-		byte[] BUFFER = new byte[8192];
+		byte[] buffer = new byte[BUFFER_SIZE];
 		SubMonitor progress = SubMonitor.convert(monitor, size);
-		int r = in.read(BUFFER);
+		int r = in.read(buffer);
 		while (r >= 0) {
-			out.write(BUFFER, 0, r);
+			out.write(buffer, 0, r);
 			progress.worked(r);
-			r = in.read(BUFFER);
+			r = in.read(buffer);
 		}
 	}
 	
