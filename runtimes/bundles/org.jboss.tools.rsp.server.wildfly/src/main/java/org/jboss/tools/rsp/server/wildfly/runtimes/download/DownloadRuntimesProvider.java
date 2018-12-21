@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2013 Red Hat, Inc. and others.
+ * Copyright (c) 2013-2018 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,9 +16,7 @@ import java.util.Map;
 
 import org.jboss.jdf.stacks.model.Stacks;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
-import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
-import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeRunner;
 import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
@@ -63,12 +61,11 @@ public class DownloadRuntimesProvider extends AbstractStacksDownloadRuntimesProv
 		LEGACY_HASHMAP.put("jboss-as710runtime", "org.jboss.tools.runtime.core.as.710" );
 		LEGACY_HASHMAP.put("jboss-as711runtime", "org.jboss.tools.runtime.core.as.711" );
 	}
-	
-	
+
 	protected Stacks[] getStacks(IProgressMonitor monitor) {
 		return new StacksManager().getStacks("Loading Downloadable Runtimes", monitor, StacksManager.StacksType.PRESTACKS_TYPE, StacksManager.StacksType.STACKS_TYPE);
 	}
-	
+
 	protected void traverseStacks(Stacks stacks, List<DownloadRuntime> list, IProgressMonitor monitor) {
 		traverseStacks(stacks, list, "SERVER", monitor);
 	}
@@ -90,7 +87,8 @@ public class DownloadRuntimesProvider extends AbstractStacksDownloadRuntimesProv
 		if( dlrt == null || !dlrt.equals(dr))
 			return null;
 		
-		String installer = (dr.getInstallationMethod() == null ? IRuntimeInstaller.EXTRACT_INSTALLER : dr.getInstallationMethod());
+		String installer = (dr.getInstallationMethod() == null ? 
+				IRuntimeInstaller.EXTRACT_INSTALLER : dr.getInstallationMethod());
 		if( !IRuntimeInstaller.EXTRACT_INSTALLER.equals(installer))
 				return null;  // we can't handle binary or installer-jar at this time
 		

@@ -600,6 +600,7 @@ public class ServerManagementServerImpl implements RSPServer {
 	public CompletableFuture<WorkflowResponse> downloadRuntime(DownloadSingleRuntimeRequest req) {
 		return createCompletableFuture(() -> downloadRuntimeInternal(req));
 	}
+
 	private WorkflowResponse downloadRuntimeInternal(DownloadSingleRuntimeRequest req) {
 		String id = req.getDownloadRuntimeId();
 		IDownloadRuntimesProvider provider = managementModel.getDownloadRuntimeModel().findProviderForRuntime(id);

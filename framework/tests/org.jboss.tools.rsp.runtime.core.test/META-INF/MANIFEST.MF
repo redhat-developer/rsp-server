@@ -7,6 +7,8 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: org.jboss.tools.rsp.runtime.core.test
 Import-Package: org.osgi.framework
 Require-Bundle: org.jboss.tools.rsp.runtime.core;bundle-version="0.11.0",
+ org.jboss.tools.rsp.api;bundle-version="0.11.0",
+ org.jboss.tools.rsp.launching;bundle-version="0.11.0",
  org.junit;bundle-version="4.8.1",
  org.assertj.core;bundle-version="2.1.0",
  javax.annotation;bundle-version="1.2.0",
