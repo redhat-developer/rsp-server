@@ -147,8 +147,7 @@ public class DownloadRuntimesModel implements IDownloadRuntimesModel {
 		setByProviderRuntimesCache(byProvider);
 	}
 	
-	/** default for testing purposes **/
-	IDownloadRuntimesProvider[] getDownloadRuntimeProviders() {
+	public IDownloadRuntimesProvider[] getDownloadRuntimeProviders() {
 		return downloadRuntimeProviders.toArray(new IDownloadRuntimesProvider[downloadRuntimeProviders.size()]);
 	}
 	

@@ -16,6 +16,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 
 public interface IDownloadRuntimesModel {
 
+	public IDownloadRuntimesProvider[] getDownloadRuntimeProviders();
 	public Map<String, DownloadRuntime> getOrLoadDownloadRuntimes(IProgressMonitor monitor);
 	public DownloadRuntime findDownloadRuntime(String id, IProgressMonitor monitor);
 	

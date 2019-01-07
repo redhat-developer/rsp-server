@@ -13,14 +13,15 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import java.util.Map;
 
 import org.assertj.core.data.MapEntry;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
+import org.jboss.tools.rsp.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
+import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesModel;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesProvider;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -45,13 +46,13 @@ public class DownloadRuntimesModelTest {
 	private final IDownloadRuntimesProvider provider4 = mockDownloadRuntimeProvider("4", 
 			runtime41);
 	
-	private TestableDownloadRuntimesModel model;
+	private IDownloadRuntimesModel model;
 	private IProgressMonitor monitor;
 
 	@Before
 	public void before() {
 		this.monitor = mock(IProgressMonitor.class);
-		this.model = spy(new TestableDownloadRuntimesModel());
+		model = RuntimeCoreActivator.createDownloadRuntimesModel();
 		model.addDownloadRuntimeProvider(provider1);
 		model.addDownloadRuntimeProvider(provider2);
 		model.addDownloadRuntimeProvider(provider3);
@@ -186,14 +187,6 @@ public class DownloadRuntimesModelTest {
 		doReturn(id).when(provider).getId();
 		doReturn(downloadRuntimes).when(provider).getDownloadableRuntimes(any(IProgressMonitor.class));
 		return provider;
-	}
-
-	public class TestableDownloadRuntimesModel extends DownloadRuntimesModel {
-
-		@Override
-		public IDownloadRuntimesProvider[] getDownloadRuntimeProviders() {
-			return super.getDownloadRuntimeProviders();
-		}
 	}
 }
 
