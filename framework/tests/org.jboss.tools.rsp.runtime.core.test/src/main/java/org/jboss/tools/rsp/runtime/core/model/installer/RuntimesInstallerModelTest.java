@@ -9,9 +9,7 @@
 package org.jboss.tools.rsp.runtime.core.model.installer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,25 +17,14 @@ import java.util.List;
 
 import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
 import org.jboss.tools.rsp.runtime.core.model.installer.RuntimesInstallerModel.RuntimeInstallerWrapper;
-import org.junit.Before;
 import org.junit.Test;
 
 public class RuntimesInstallerModelTest {
 
-	private RuntimesInstallerModel model;
-
-	@Before
-	public void before() {
-		this.model = spy(new TestableRuntimesInstallerModel());
-	}
-
 	@Test
 	public void shouldReturnNullIfTheresNoInstallerWithRequestedId() {
-		// given
-		doReturn(Collections.<RuntimeInstallerWrapper>emptyList()).when(model).loadInstallers();
-		// when
+		RuntimesInstallerModel model = new TestableRuntimesInstallerModel(Collections.<RuntimeInstallerWrapper>emptyList());
 		IRuntimeInstaller installer = model.getRuntimeInstaller("cheese");
-		// then
 		assertThat(installer).isNull();
 	}
 
@@ -46,24 +33,24 @@ public class RuntimesInstallerModelTest {
 		// given
 		IRuntimeInstaller cheddar = mock(IRuntimeInstaller.class);
 		IRuntimeInstaller emmental = mock(IRuntimeInstaller.class);
-		doReturn(Arrays.asList(
+		List<RuntimeInstallerWrapper> l = Arrays.asList(
 				new RuntimeInstallerWrapper("emmental", emmental),
-				new RuntimeInstallerWrapper("cheddar", cheddar)))
-		.when(model).loadInstallers();
-		// when
+				new RuntimeInstallerWrapper("cheddar", cheddar));
+		RuntimesInstallerModel model = new TestableRuntimesInstallerModel(l);
 		IRuntimeInstaller installer = model.getRuntimeInstaller("cheddar");
-		// then
 		assertThat(installer).isEqualTo(cheddar);
 	}
 
 	public class TestableRuntimesInstallerModel extends RuntimesInstallerModel {
+		private List<RuntimeInstallerWrapper> installers2;
 
-		public TestableRuntimesInstallerModel() {
+		public TestableRuntimesInstallerModel(List<RuntimeInstallerWrapper>  installers) {
+			this.installers2 = installers;
 		}
 
 		@Override
-		protected List<RuntimeInstallerWrapper> loadInstallers() {
-			return super.loadInstallers();
+		public List<RuntimeInstallerWrapper> loadInstallers() {
+			return installers2;
 		}
 	}
 }

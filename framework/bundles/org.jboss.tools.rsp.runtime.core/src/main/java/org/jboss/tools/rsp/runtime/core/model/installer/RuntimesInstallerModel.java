@@ -29,11 +29,11 @@ public class RuntimesInstallerModel {
 	}
 	
 	/** default for testing purposes **/
-	RuntimesInstallerModel() {
+	protected RuntimesInstallerModel() {
 	}
 
 	/** default for testing purposes **/
-	static class RuntimeInstallerWrapper {
+	protected static class RuntimeInstallerWrapper {
 
 		private String id;
 		private IRuntimeInstaller installer;
