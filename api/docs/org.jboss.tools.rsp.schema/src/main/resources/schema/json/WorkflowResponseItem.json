@@ -1,0 +1,26 @@
+{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "itemType" : {
+      "type" : "string"
+    },
+    "label" : {
+      "type" : "string"
+    },
+    "content" : {
+      "type" : "string"
+    },
+    "responseType" : {
+      "type" : "string"
+    },
+    "validResponses" : {
+      "type" : "array",
+      "items" : {
+        "type" : "string"
+      }
+    }
+  }
+}

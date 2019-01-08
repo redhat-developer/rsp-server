@@ -1,0 +1,63 @@
+{
+  "type" : "object",
+  "properties" : {
+    "status" : {
+      "type" : "object",
+      "properties" : {
+        "severity" : {
+          "type" : "integer"
+        },
+        "pluginId" : {
+          "type" : "string"
+        },
+        "code" : {
+          "type" : "integer"
+        },
+        "message" : {
+          "type" : "string"
+        },
+        "trace" : {
+          "type" : "string"
+        },
+        "ok" : {
+          "type" : "boolean"
+        },
+        "plugin" : {
+          "type" : "string"
+        }
+      }
+    },
+    "requestId" : {
+      "type" : "integer"
+    },
+    "items" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "itemType" : {
+            "type" : "string"
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "content" : {
+            "type" : "string"
+          },
+          "responseType" : {
+            "type" : "string"
+          },
+          "validResponses" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

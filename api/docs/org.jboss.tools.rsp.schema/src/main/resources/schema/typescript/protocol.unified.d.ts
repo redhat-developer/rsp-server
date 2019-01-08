@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2018-12-03 11:53:56.
+// Generated using typescript-generator version 2.2.413 on 2019-01-08 10:37:13.
 
 export interface Attribute {
     type: string;
@@ -55,8 +55,10 @@ export interface DownloadRuntimeDescription {
     installationMethod: string;
 }
 
-export interface DownloadRuntimeResponse {
-    runtimes: DownloadRuntimeDescription[];
+export interface DownloadSingleRuntimeRequest {
+    requestId: number;
+    downloadRuntimeId: string;
+    data: { [index: string]: any };
 }
 
 export interface LaunchAttributesRequest {
@@ -67,6 +69,10 @@ export interface LaunchAttributesRequest {
 export interface LaunchParameters {
     mode: string;
     params: ServerAttributes;
+}
+
+export interface ListDownloadRuntimeResponse {
+    runtimes: DownloadRuntimeDescription[];
 }
 
 export interface ModifyDeployableRequest {
@@ -173,4 +179,19 @@ export interface VMDescription {
 
 export interface VMHandle {
     id: string;
+}
+
+export interface WorkflowResponse {
+    status: Status;
+    requestId: number;
+    items: WorkflowResponseItem[];
+}
+
+export interface WorkflowResponseItem {
+    id: string;
+    itemType: string;
+    label: string;
+    content: string;
+    responseType: string;
+    validResponses: string[];
 }

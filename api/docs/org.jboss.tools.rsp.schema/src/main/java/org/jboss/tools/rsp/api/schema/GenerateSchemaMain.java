@@ -18,9 +18,10 @@ import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
-import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
+import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
+import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
 import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
@@ -39,6 +40,8 @@ import org.jboss.tools.rsp.api.dao.StopServerAttributes;
 import org.jboss.tools.rsp.api.dao.StringPrompt;
 import org.jboss.tools.rsp.api.dao.VMDescription;
 import org.jboss.tools.rsp.api.dao.VMHandle;
+import org.jboss.tools.rsp.api.dao.WorkflowResponse;
+import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
 
 public class GenerateSchemaMain {
 	public static void main(String[] args) throws Exception {
@@ -69,9 +72,10 @@ public class GenerateSchemaMain {
 				DeployableState.class,
 				DiscoveryPath.class,
 				DownloadRuntimeDescription.class,
-				ListDownloadRuntimeResponse.class,
+				DownloadSingleRuntimeRequest.class,
 				LaunchAttributesRequest.class,
 				LaunchParameters.class,
+				ListDownloadRuntimeResponse.class,
 				ModifyDeployableRequest.class,
 				PublishServerRequest.class,
 				ServerAttributes.class,
@@ -90,6 +94,8 @@ public class GenerateSchemaMain {
 				StringPrompt.class,
 				VMDescription.class,
 				VMHandle.class,
+				WorkflowResponse.class,
+				WorkflowResponseItem.class,		
 		};
 		return daoClasses;
 	}

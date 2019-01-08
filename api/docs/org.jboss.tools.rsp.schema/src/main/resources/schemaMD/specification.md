@@ -1960,7 +1960,7 @@ This endpoint returns the following schema as a return value:
       }
     }
   }
-}</pre></td><td><pre>export interface DownloadRuntimeResponse {
+}</pre></td><td><pre>export interface ListDownloadRuntimeResponse {
     runtimes: DownloadRuntimeDescription[];
 }
 
@@ -1975,6 +1975,125 @@ export interface DownloadRuntimeDescription {
     properties: { [index: string]: string };
     size: string;
     installationMethod: string;
+}</pre></td></tr></table>
+
+#### server/downloadRuntime
+
+ Initiate a request to download a runtime @return 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "requestId" : {
+      "type" : "integer"
+    },
+    "downloadRuntimeId" : {
+      "type" : "string"
+    },
+    "data" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "any"
+      }
+    }
+  }
+}</pre></td><td><pre>export interface DownloadSingleRuntimeRequest {
+    requestId: number;
+    downloadRuntimeId: string;
+    data: { [index: string]: any };
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "status" : {
+      "type" : "object",
+      "properties" : {
+        "severity" : {
+          "type" : "integer"
+        },
+        "pluginId" : {
+          "type" : "string"
+        },
+        "code" : {
+          "type" : "integer"
+        },
+        "message" : {
+          "type" : "string"
+        },
+        "trace" : {
+          "type" : "string"
+        },
+        "ok" : {
+          "type" : "boolean"
+        },
+        "plugin" : {
+          "type" : "string"
+        }
+      }
+    },
+    "requestId" : {
+      "type" : "integer"
+    },
+    "items" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "itemType" : {
+            "type" : "string"
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "content" : {
+            "type" : "string"
+          },
+          "responseType" : {
+            "type" : "string"
+          },
+          "validResponses" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface WorkflowResponse {
+    status: Status;
+    requestId: number;
+    items: WorkflowResponseItem[];
+}
+
+export interface Status {
+    severity: number;
+    pluginId: string;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+    plugin: string;
+}
+
+export interface WorkflowResponseItem {
+    id: string;
+    itemType: string;
+    label: string;
+    content: string;
+    responseType: string;
+    validResponses: string[];
 }</pre></td></tr></table>
 
 

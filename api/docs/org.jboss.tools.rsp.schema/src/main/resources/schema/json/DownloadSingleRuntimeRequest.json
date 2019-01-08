@@ -1,0 +1,17 @@
+{
+  "type" : "object",
+  "properties" : {
+    "requestId" : {
+      "type" : "integer"
+    },
+    "downloadRuntimeId" : {
+      "type" : "string"
+    },
+    "data" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "any"
+      }
+    }
+  }
+}

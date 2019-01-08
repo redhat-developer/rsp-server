@@ -1,4 +1,4 @@
-export interface DownloadRuntimeResponse {
+export interface ListDownloadRuntimeResponse {
     runtimes: DownloadRuntimeDescription[];
 }
 
