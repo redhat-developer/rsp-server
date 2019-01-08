@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.jboss.tools.rsp</groupId>
         <artifactId>org.jboss.tools.rsp.distribution.parent</artifactId>
-        <version>0.11.0-SNAPSHOT</version>
+        <version>0.11.0.Final</version>
     </parent>
     <artifactId>org.jboss.tools.rsp.distribution.itests</artifactId>
     <packaging>jar</packaging>
