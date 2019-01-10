@@ -9,7 +9,6 @@
 	  	<artifactId>bundles</artifactId>
 		<version>0.11.0.Final</version>
 	</parent>
-	<groupId>org.jboss.tools.rsp.framework</groupId>
 	<artifactId>org.jboss.tools.rsp.secure</artifactId>
 	<packaging>eclipse-plugin</packaging>
 

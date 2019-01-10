@@ -2,6 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %BundleName
 Bundle-SymbolicName: org.jboss.tools.rsp.runtime.core;singleton:=true
+Automatic-Module-Name: org.jboss.tools.rsp.runtime.core
 Bundle-Version: 0.11.0.Final
 Bundle-Activator: org.jboss.tools.rsp.runtime.core.RuntimeCoreActivator
 Bundle-ActivationPolicy: lazy

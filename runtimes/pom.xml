@@ -9,7 +9,6 @@
     <artifactId>parent</artifactId>
     <version>0.11.0.Final</version>
   </parent>
-  <groupId>org.jboss.tools.rsp</groupId>
   <artifactId>runtimes</artifactId>
   <packaging>pom</packaging>
 

@@ -9,7 +9,7 @@
 	<fileSets>
 		<fileSet>
 			<directory>${project.basedir}</directory>
-			<outputDirectory>/${rsp-distribution.folder}/conf/</outputDirectory>
+			<outputDirectory>${rsp-distribution.folder}/conf/</outputDirectory>
 			<fileMode>755</fileMode>
 			<includes>
 				<include>logback.xml</include>
@@ -17,7 +17,7 @@
 		</fileSet>
 		<fileSet>
 			<directory>${project.build.directory}/${felix.folder}</directory>
-			<outputDirectory>/${rsp-distribution.folder}/</outputDirectory>
+			<outputDirectory>${rsp-distribution.folder}/</outputDirectory>
 			<fileMode>755</fileMode>
             <!--
             Gogo bundles cause issues on windows. Excluding since provide no added value for us.
@@ -28,7 +28,7 @@
 		</fileSet>
         <fileSet>
 			<directory>${project.build.directory}/repository/plugins</directory>
-            <outputDirectory>/${rsp-distribution.folder}/bundle</outputDirectory>
+            <outputDirectory>${rsp-distribution.folder}/bundle</outputDirectory>
 	  </fileSet>
 	</fileSets>
 </assembly>
