@@ -10,7 +10,18 @@
 	<packaging>pom</packaging>
 	<name>Runtime Server Protocol</name>
 	<description>A runtime-server protocol based on LSP</description>
-
+	<url>https://github.com/redhat-developer/rsp-server</url>
+	<scm>
+		<url>https://github.com/redhat-developer/rsp-server</url>
+	</scm>
+	<organization>
+		<name>Red Hat, Inc</name>
+		<url>http://www.redhat.com</url>
+	</organization>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/redhat-developer/rsp-server/issues</url>
+	</issueManagement>
 	<licenses>
 		<license>
 			<name>Eclipse Public License 2.0</name>
@@ -18,6 +29,26 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
+	<developers>
+		<developer>
+			<name>Rob Stryker</name>
+			<email>rstryker@redhat.com</email>
+			<url>https://github.com/robstryker</url>
+			<id>robstryker</id>
+		</developer>
+		<developer>
+			<name>Andre Dietisheim</name>
+			<email>adietish@redhat.com</email>
+			<url>https://github.com/adietish</url>
+			<id>adietish</id>
+		</developer>
+		<developer>
+			<name>Jeff MAURY</name>
+			<email>jeffmaury.github@jeffmaury.com</email>
+			<url>https://github.com/jeffmaury</url>
+			<id>jeffmaury</id>
+		</developer>
+	</developers>
 
 	<properties>
 		<tycho-version>1.3.0</tycho-version>
