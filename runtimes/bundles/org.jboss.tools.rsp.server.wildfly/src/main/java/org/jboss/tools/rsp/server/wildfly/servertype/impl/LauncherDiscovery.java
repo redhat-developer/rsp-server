@@ -33,14 +33,11 @@ public class LauncherDiscovery {
 	}
 
 	private boolean isJBossModules(String typeId) {
-		if (typeId.equals(IServerConstants.SERVER_AS_32) || typeId.equals(IServerConstants.SERVER_AS_40)
+		return !(typeId.equals(IServerConstants.SERVER_AS_32) || typeId.equals(IServerConstants.SERVER_AS_40)
 				|| typeId.equals(IServerConstants.SERVER_AS_42) || typeId.equals(IServerConstants.SERVER_AS_50)
 				|| typeId.equals(IServerConstants.SERVER_AS_51) || typeId.equals(IServerConstants.SERVER_AS_60)
 				|| typeId.equals(IServerConstants.SERVER_EAP_43)
-				|| typeId.equals(IServerConstants.SERVER_EAP_50)) {
-			return false;
-		}
-		return true;
+				|| typeId.equals(IServerConstants.SERVER_EAP_50));
 	}
 	
 

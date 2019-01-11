@@ -73,9 +73,7 @@ public class JBossManifestUtility extends ManifestUtility {
 	
 	public static boolean scanManifestPropFromJBossModules(File[] moduleRoots, String moduleId, String slot, String property, String propPrefix) {
 		String value = getManifestPropFromJBossModules(moduleRoots, moduleId, slot, property);
-		if( value != null && value.trim().startsWith(propPrefix))
-			return true;
-		return false;
+		return value != null && value.trim().startsWith(propPrefix);
 	}
 	
 	public static String getManifestPropFromJBossModules(File[] moduleRoots, String moduleId, String slot, String property) {

@@ -263,10 +263,7 @@ public abstract class SecuredBase extends Base {
 	}
 	
 	private boolean canAccessSecureStorage(boolean prompt) {
-		if( secureStorage != null && secureStorage.getSecureStorage(prompt) != null ) {
-			return true;
-		}
-		return false;
+		return secureStorage != null && secureStorage.getSecureStorage(prompt) != null;
 	}
 	
 }
