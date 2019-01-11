@@ -54,9 +54,7 @@ public class JBossVMRegistryDiscovery {
 		File fVMI = vmPath == null ? null : new File(vmPath);
 		if( fVMI == null ) {
 			IVMInstall vmi = reg.getDefaultVMInstall();
-			if( vmi == null )
-				return false;
-			return true;
+			return vmi != null;
 		}
 		
 		if( !fVMI.exists() || !fVMI.isDirectory()) {

@@ -20,10 +20,8 @@ public class MinishiftVersionUtil {
 	}
 	
 	public static boolean matchesAny(MinishiftVersions versions) {
-		if( matchesCDK30(versions) == null || matchesCDK32(versions) == null 
-				|| matchesMinishift17(versions) == null )
-			return true;
-		return false;
+		return matchesCDK30(versions) == null || matchesCDK32(versions) == null 
+				|| matchesMinishift17(versions) == null;
 	}
 	
 	
