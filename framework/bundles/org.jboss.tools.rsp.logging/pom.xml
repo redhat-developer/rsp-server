@@ -9,7 +9,7 @@
 	  	<artifactId>bundles</artifactId>
 		<version>0.12.0-SNAPSHOT</version>
 	</parent>
-	<groupId>org.jboss.tools.rsp.framework</groupId>
+	<groupId>org.jboss.tools.rsp.framework.bundles</groupId>
 	<artifactId>org.jboss.tools.rsp.logging</artifactId>
 	<packaging>eclipse-plugin</packaging>
 

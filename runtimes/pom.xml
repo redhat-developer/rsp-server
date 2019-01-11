@@ -9,8 +9,8 @@
     <artifactId>parent</artifactId>
     <version>0.12.0-SNAPSHOT</version>
   </parent>
-  <groupId>org.jboss.tools.rsp</groupId>
   <artifactId>runtimes</artifactId>
+  <groupId>org.jboss.tools.rsp</groupId>
   <packaging>pom</packaging>
 
   <modules>

@@ -9,6 +9,7 @@
     <artifactId>parent</artifactId>
     <version>0.12.0-SNAPSHOT</version>
   </parent>
+  <groupId>org.jboss.tools.rsp</groupId>
   <artifactId>client</artifactId>
   <packaging>pom</packaging>
 
