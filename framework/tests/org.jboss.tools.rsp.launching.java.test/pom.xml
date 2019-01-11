@@ -9,6 +9,7 @@
 	  	<artifactId>tests</artifactId>
 		<version>0.12.0-SNAPSHOT</version>
 	</parent>
+	<groupId>org.jboss.tools.rsp.framework.tests</groupId>
 	<artifactId>org.jboss.tools.rsp.launching.java.test</artifactId>
 	<packaging>eclipse-test-plugin</packaging>
 </project>

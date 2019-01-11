@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.jboss.tools.rsp</groupId>
-        <artifactId>org.jboss.tools.rsp.distribution.parent</artifactId>
+        <artifactId>distribution</artifactId>
         <version>0.12.0-SNAPSHOT</version>
     </parent>
 	<groupId>org.jboss.tools.rsp.distribution</groupId>
@@ -104,32 +104,32 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jboss.tools.rsp.framework</groupId>
+            <groupId>org.jboss.tools.rsp.framework.bundles</groupId>
             <artifactId>org.jboss.tools.rsp.secure</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jboss.tools.rsp.framework</groupId>
+            <groupId>org.jboss.tools.rsp.framework.bundles</groupId>
             <artifactId>org.jboss.tools.rsp.logging</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jboss.tools.rsp.framework</groupId>
+            <groupId>org.jboss.tools.rsp.framework.bundles</groupId>
             <artifactId>org.jboss.tools.rsp.launching</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jboss.tools.rsp.framework</groupId>
+            <groupId>org.jboss.tools.rsp.framework.bundles</groupId>
             <artifactId>org.jboss.tools.rsp.launching.java</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jboss.tools.rsp.framework</groupId>
+            <groupId>org.jboss.tools.rsp.framework.bundles</groupId>
             <artifactId>org.jboss.tools.rsp.server.spi</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jboss.tools.rsp.framework</groupId>
+            <groupId>org.jboss.tools.rsp.framework.bundles</groupId>
             <artifactId>org.jboss.tools.rsp.server</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -144,13 +144,13 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jboss.tools.rsp.framework</groupId>
+            <groupId>org.jboss.tools.rsp.framework.tests</groupId>
             <artifactId>org.jboss.tools.rsp.launching.java.test</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.tools.rsp.framework</groupId>
+            <groupId>org.jboss.tools.rsp.framework.tests</groupId>
             <artifactId>org.jboss.tools.rsp.server.test</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
@@ -162,7 +162,7 @@
             <scope>test</scope>
         </dependency>
 		<dependency>
-            <groupId>org.jboss.tools.rsp.framework</groupId>
+            <groupId>org.jboss.tools.rsp.framework.tests</groupId>
             <artifactId>org.jboss.tools.rsp.server.spi.test</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
