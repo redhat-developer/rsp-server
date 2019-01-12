@@ -24,7 +24,7 @@
                         <testFailureIgnore>true</testFailureIgnore>
                         <systemPropertyVariables>
                             <rspVersion>${project.version}</rspVersion>
-                            <groupid>${project.groupId}</groupid>
+                            <artifactId>${project.artifactId}</artifactId>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>

@@ -22,18 +22,19 @@ import net.lingala.zip4j.exception.ZipException;
  */
 public class RSPServerHandler {
 
-    private static final String GROUP_ID = System.getProperty("groupid");
+    private static final String ARTIFACT_ID = System.getProperty("artifactId");
     private static final String VERSION = System.getProperty("rspVersion");
-    private static final String DISTRIBUTION_FILE = GROUP_ID + ".distribution-" + VERSION + ".zip";
+    private static final String DISTRIBUTION_FILE = ARTIFACT_ID + "-" + VERSION + ".zip";
     private static final String DISTRIBUTION_PATH = "../distribution/target/";
     private static final String SERVER_ROOT = DISTRIBUTION_PATH + "/rsp-distribution";
-    private static final String SERVER_DATA = System.getProperty("user.home") + "/." + GROUP_ID + ".data";
+    private static final String SERVER_DATA = System.getProperty("user.home") + "/." + ARTIFACT_ID + ".data";
     private static final String DATA_BACKUP = SERVER_DATA + ".backup";
 
     private static Process serverProcess;
 
     public static void prepareServer() throws ZipException {
-        ZipFile zipFile = new ZipFile(new File(DISTRIBUTION_PATH + DISTRIBUTION_FILE));
+System.err.println("ARTIFACT_ID = " + ARTIFACT_ID + " VERSION = " + VERSION + " ========================================>");
+    	ZipFile zipFile = new ZipFile(new File(DISTRIBUTION_PATH + DISTRIBUTION_FILE));
         zipFile.extractAll(DISTRIBUTION_PATH);
     }
 
