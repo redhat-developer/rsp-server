@@ -48,7 +48,9 @@ public class RSPCase {
     
     @AfterClass
     public static void dispose() throws Exception {
-        launcher.closeConnection();
+    	if (launcher != null) {
+    		launcher.closeConnection();
+    	}
         RSPServerHandler.stopServer();
         RSPServerHandler.restoreBackupData(true);
     }
