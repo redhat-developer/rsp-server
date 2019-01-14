@@ -13,6 +13,10 @@
   <name>Runtime Server Protocol : Distribution Parent</name>
   <packaging>pom</packaging>
 
+  <properties>
+    <rsp-distribution.filename>${project.groupId}-${project.version}</rsp-distribution.filename>
+  </properties>
+
   <modules>
     <module>distribution</module>
     <module>integration-tests</module>

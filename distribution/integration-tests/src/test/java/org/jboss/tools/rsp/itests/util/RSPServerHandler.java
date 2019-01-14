@@ -22,19 +22,17 @@ import net.lingala.zip4j.exception.ZipException;
  */
 public class RSPServerHandler {
 
-    private static final String ARTIFACT_ID = System.getProperty("artifactId");
-    private static final String VERSION = System.getProperty("rspVersion");
-    private static final String DISTRIBUTION_FILE = ARTIFACT_ID + "-" + VERSION + ".zip";
+    private static final String GROUP_ID = System.getProperty("groupId");
+    private static final String DISTRIBUTION_FILENAME = System.getProperty("rsp-distribution.filename") + ".zip";
     private static final String DISTRIBUTION_PATH = "../distribution/target/";
     private static final String SERVER_ROOT = DISTRIBUTION_PATH + "/rsp-distribution";
-    private static final String SERVER_DATA = System.getProperty("user.home") + "/." + ARTIFACT_ID + ".data";
+    private static final String SERVER_DATA = System.getProperty("user.home") + "/." + GROUP_ID + ".data";
     private static final String DATA_BACKUP = SERVER_DATA + ".backup";
 
     private static Process serverProcess;
 
     public static void prepareServer() throws ZipException {
-System.err.println("ARTIFACT_ID = " + ARTIFACT_ID + " VERSION = " + VERSION + " ========================================>");
-    	ZipFile zipFile = new ZipFile(new File(DISTRIBUTION_PATH + DISTRIBUTION_FILE));
+    	ZipFile zipFile = new ZipFile(new File(DISTRIBUTION_PATH, DISTRIBUTION_FILENAME));
         zipFile.extractAll(DISTRIBUTION_PATH);
     }
 
@@ -46,7 +44,9 @@ System.err.println("ARTIFACT_ID = " + ARTIFACT_ID + " VERSION = " + VERSION + " 
     }
 
     public static void stopServer() {
-        serverProcess.destroy();
+    	if (serverProcess != null) {
+    		serverProcess.destroy();
+    	}
     }
 
     public static void clearServerData(boolean backup) throws IOException {
