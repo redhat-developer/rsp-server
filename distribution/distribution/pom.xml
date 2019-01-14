@@ -9,14 +9,15 @@
 		<artifactId>org.jboss.tools.rsp.distribution.parent</artifactId>
 		<version>0.11.0.Final</version>
 	</parent>
+	<groupId>org.jboss.tools.rsp.distribution</groupId>
 	<artifactId>org.jboss.tools.rsp.distribution</artifactId>
 	<name>Runtime Server Protocol : Distribution</name>
 	<packaging>eclipse-repository</packaging>
 
 	<properties>
-        	<felix.version>6.0.1</felix.version>
-        	<felix.folder>felix-framework-${felix.version}</felix.folder>
-        	<rsp-distribution.folder>rsp-distribution</rsp-distribution.folder>
+        <felix.version>6.0.1</felix.version>
+        <felix.folder>felix-framework-${felix.version}</felix.folder>
+        <rsp-distribution.folder>rsp-distribution</rsp-distribution.folder>
 	</properties>
 	
 	<build>
@@ -99,6 +100,7 @@
 							<goal>single</goal>
 						</goals>
 						<configuration>
+							<finalName>${rsp-distribution.filename}</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 							<descriptors>
 								<descriptor>publish-assembly.xml</descriptor>
