@@ -35,8 +35,9 @@ public class WildFlyStartLauncher extends AbstractLauncher {
 	protected String[] getClasspath() {
 		String serverHome = getDelegate().getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String) null);
 		String jbModules = serverHome + "/jboss-modules.jar";
-		return addJreClasspathEntries(Arrays.asList(new String[] {jbModules}));
+		return addJreClasspathEntries(Arrays.asList(jbModules));
 	}
+
 	protected String getVMArguments() {
 		IDefaultLaunchArguments largs = getLaunchArgs();
 		if( largs != null ) {

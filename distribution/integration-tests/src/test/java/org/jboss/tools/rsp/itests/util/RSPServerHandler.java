@@ -22,7 +22,8 @@ import net.lingala.zip4j.exception.ZipException;
  */
 public class RSPServerHandler {
 
-    private static final String GROUP_ID = System.getProperty("groupId");
+    private static final int WAIT_SERVER_STARTED = 1000;
+	private static final String GROUP_ID = System.getProperty("groupId");
     private static final String DISTRIBUTION_FILENAME = System.getProperty("rsp-distribution.filename") + ".zip";
     private static final String DISTRIBUTION_PATH = "../distribution/target/";
     private static final String SERVER_ROOT = DISTRIBUTION_PATH + "/rsp-distribution";
@@ -40,7 +41,7 @@ public class RSPServerHandler {
         ProcessBuilder builder = new ProcessBuilder("java", "-jar", "bin/felix.jar");
         builder.directory(new File(SERVER_ROOT));
         serverProcess = builder.start();
-        Thread.sleep(1000);
+        Thread.sleep(WAIT_SERVER_STARTED);
     }
 
     public static void stopServer() {
