@@ -43,6 +43,7 @@
 								<skipTests>false</skipTests>
 		                        <systemPropertyVariables>
 									<rsp-distribution.filename>${rsp-distribution.filename}</rsp-distribution.filename>
+									<groupId>${project.groupId}</groupId>
 		                        </systemPropertyVariables>
 		                    </configuration>
 		                </plugin>
