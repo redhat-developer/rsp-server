@@ -14,43 +14,47 @@ import static org.junit.Assert.assertNotEquals;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
+import org.jboss.tools.rsp.api.dao.ServerHandle;
+import org.jboss.tools.rsp.api.dao.ServerType;
 import org.junit.Before;
 import org.junit.Test;
 
 public class DeployableStateTest {
 
 	private DeployableState state;
-
+	private ServerHandle serverRef;
+	
 	private static final String LABEL = "papa-smurf";
 	private static final String PATH = "/in/da/house";
 
 	@Before	
 	public void before() {
+		this.serverRef = new ServerHandle("id", new ServerType("typeId", "name", "Desc"));
 		DeployableReference reference = new DeployableReference(LABEL, PATH);
-		this.state = new DeployableState(reference, 
+		this.state = new DeployableState(serverRef, reference, 
 				ServerManagementAPIConstants.STATE_UNKNOWN, ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN); 
 	}
 
 	@Test
 	public void equalIfAllAreEqual() {
-		assertEquals(state, new DeployableState(state.getReference(), state.getState(), state.getPublishState()));
+		assertEquals(state, new DeployableState(serverRef,state.getReference(), state.getState(), state.getPublishState()));
 	}
 
 	@Test
 	public void notEqualIfReferenceDiffers() {
-		assertNotEquals(state, new DeployableState(new DeployableReference("some-label", "some-path"),
+		assertNotEquals(state, new DeployableState(serverRef, new DeployableReference("some-label", "some-path"),
 				state.getState(), state.getPublishState()));
 	}
 
 	@Test
 	public void notEqualIfStateDiffers() {
-		assertNotEquals(state, new DeployableState(state.getReference(), 
+		assertNotEquals(state, new DeployableState(serverRef, state.getReference(), 
 				ServerManagementAPIConstants.STATE_STOPPING, state.getPublishState()));
 	}
 
 	@Test
 	public void notEqualIfPublishStateDiffers() {
-		assertNotEquals(state, new DeployableState(state.getReference(), 
+		assertNotEquals(state, new DeployableState(serverRef, state.getReference(), 
 				state.getState(), ServerManagementAPIConstants.PUBLISH_STATE_ADD));
 	}
 }

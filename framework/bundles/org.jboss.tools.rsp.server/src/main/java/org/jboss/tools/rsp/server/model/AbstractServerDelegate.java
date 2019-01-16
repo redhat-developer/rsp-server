@@ -132,7 +132,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		return publishState;
 	}
 
-	protected ServerHandle getServerHandle() {
+	public ServerHandle getServerHandle() {
 		IServerType ist = getServer().getServerType();
 		ServerType st = new ServerType(ist.getId(), ist.getName(), ist.getDescription());
 		ServerHandle sh = new ServerHandle(getServer().getId(), st);
