@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.api.dao;
 
 public class DeployableState {
+	private ServerHandle server;
 	private DeployableReference reference;
 	private int state;
 	private int publishState;
@@ -17,7 +18,8 @@ public class DeployableState {
 	public DeployableState() {
 	}
 
-	public DeployableState(DeployableReference reference, int state, int publishState) {
+	public DeployableState(ServerHandle server, DeployableReference reference, int state, int publishState) {
+		this.setServer(server);
 		this.reference = reference;
 		this.state = state;
 		this.publishState = publishState;
@@ -45,6 +47,14 @@ public class DeployableState {
 
 	public void setReference(DeployableReference reference) {
 		this.reference = reference;
+	}
+
+	public ServerHandle getServer() {
+		return server;
+	}
+
+	public void setServer(ServerHandle server) {
+		this.server = server;
 	}
 
 	@Override

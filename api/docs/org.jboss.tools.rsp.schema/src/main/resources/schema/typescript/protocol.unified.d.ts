@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2019-01-08 10:37:13.
+// Generated using typescript-generator version 2.2.413 on 2019-01-16 13:11:12.
 
 export interface Attribute {
     type: string;
@@ -33,6 +33,7 @@ export interface DeployableReference {
 }
 
 export interface DeployableState {
+    server: ServerHandle;
     reference: DeployableReference;
     state: number;
     publishState: number;

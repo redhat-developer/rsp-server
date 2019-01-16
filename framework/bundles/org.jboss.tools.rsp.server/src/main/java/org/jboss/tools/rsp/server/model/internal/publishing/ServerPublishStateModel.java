@@ -53,6 +53,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		sActual.setReference(reference);
 		sActual.setState(ServerManagementAPIConstants.STATE_UNKNOWN);
 		sActual.setPublishState(publishState);
+		sActual.setServer(server.getServerHandle());
 		state.put(getKey(reference), sActual);
 		
 		// TODO Maybe make this recursive if we support exploded deployments
@@ -131,6 +132,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		ret.setPublishState(ds.getPublishState());
 		ret.setState(ds.getState());
 		ret.setReference(reference);
+		ret.setServer(server.getServerHandle());
 		return ret;
 	}
 
@@ -141,6 +143,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		next.setReference(reference);
 		next.setState(ds.getState());
 		next.setPublishState(publishState);
+		next.setServer(server.getServerHandle());
 		state.put(getKey(reference), next);
 	}
 
@@ -151,6 +154,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		next.setReference(reference);
 		next.setState(runState);
 		next.setPublishState(ds.getPublishState());
+		next.setServer(server.getServerHandle());
 		state.put(getKey(reference), next);
 	}
 

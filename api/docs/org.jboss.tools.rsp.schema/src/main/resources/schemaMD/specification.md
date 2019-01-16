@@ -1303,6 +1303,28 @@ This endpoint returns the following schema as a return value:
       "items" : {
         "type" : "object",
         "properties" : {
+          "server" : {
+            "type" : "object",
+            "properties" : {
+              "id" : {
+                "type" : "string"
+              },
+              "type" : {
+                "type" : "object",
+                "properties" : {
+                  "id" : {
+                    "type" : "string"
+                  },
+                  "visibleName" : {
+                    "type" : "string"
+                  },
+                  "description" : {
+                    "type" : "string"
+                  }
+                }
+              }
+            }
+          },
           "reference" : {
             "type" : "object",
             "properties" : {
@@ -1337,6 +1359,7 @@ export interface ServerHandle {
 }
 
 export interface DeployableState {
+    server: ServerHandle;
     reference: DeployableReference;
     state: number;
     publishState: number;
@@ -1581,6 +1604,28 @@ This endpoint returns a list of the following schema as a return value:
 <tr><td><pre>{
   "type" : "object",
   "properties" : {
+    "server" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "visibleName" : {
+              "type" : "string"
+            },
+            "description" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    },
     "reference" : {
       "type" : "object",
       "properties" : {
@@ -1600,14 +1645,26 @@ This endpoint returns a list of the following schema as a return value:
     }
   }
 }</pre></td><td><pre>export interface DeployableState {
+    server: ServerHandle;
     reference: DeployableReference;
     state: number;
     publishState: number;
 }
 
+export interface ServerHandle {
+    id: string;
+    type: ServerType;
+}
+
 export interface DeployableReference {
     label: string;
     path: string;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
+    description: string;
 }</pre></td></tr></table>
 
 #### server/addDeployable
@@ -2333,6 +2390,28 @@ This endpoint takes the following json schemas as parameters:
       "items" : {
         "type" : "object",
         "properties" : {
+          "server" : {
+            "type" : "object",
+            "properties" : {
+              "id" : {
+                "type" : "string"
+              },
+              "type" : {
+                "type" : "object",
+                "properties" : {
+                  "id" : {
+                    "type" : "string"
+                  },
+                  "visibleName" : {
+                    "type" : "string"
+                  },
+                  "description" : {
+                    "type" : "string"
+                  }
+                }
+              }
+            }
+          },
           "reference" : {
             "type" : "object",
             "properties" : {
@@ -2367,6 +2446,7 @@ export interface ServerHandle {
 }
 
 export interface DeployableState {
+    server: ServerHandle;
     reference: DeployableReference;
     state: number;
     publishState: number;
