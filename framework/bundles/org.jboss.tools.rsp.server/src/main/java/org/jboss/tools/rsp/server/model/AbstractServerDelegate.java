@@ -467,7 +467,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	
 	protected void updatePublishStateFromModules() throws CoreException {
 		// Clients override
-		int maxState = 0;
+		int maxState = ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 		List<DeployableState> states = getServerPublishModel().getDeployableStates();
 		for( DeployableState s : states ) {
 			maxState = (s.getPublishState() > maxState ? s.getPublishState() : maxState);
