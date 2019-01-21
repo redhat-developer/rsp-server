@@ -433,6 +433,34 @@ public class ServerDeployableTest {
 		assertNotNull(oneState);
 		assertEquals(ServerManagementAPIConstants.PUBLISH_STATE_NONE, oneState.getPublishState());
 		assertEquals(ServerManagementAPIConstants.STATE_STARTED, oneState.getState());
+		
+		// Test remove
+		
+		IStatus removed = sm.removeDeployable(server, reference);
+		assertNotNull(added);
+		assertTrue(added.isOK());
+		
+		ss = server.getDelegate().getServerState();
+		dState = ss.getDeployableStates();
+		assertNotNull(dState);
+		assertEquals(1, dState.size());
+		oneState = dState.get(0);
+		assertNotNull(oneState);
+		assertEquals(ServerManagementAPIConstants.PUBLISH_STATE_REMOVE, oneState.getPublishState());
+		assertEquals(ServerManagementAPIConstants.STATE_STARTED, oneState.getState());
+			
+		// Now do the publish
+		try {
+			sm.publish(server, ServerManagementAPIConstants.PUBLISH_FULL);
+		} catch(CoreException ce) {
+			fail(ce.getMessage());
+		}
+		
+		ss = server.getDelegate().getServerState();
+		dState = ss.getDeployableStates();
+		assertNotNull(dState);
+		assertEquals(0, dState.size());
+		assertEquals(ServerManagementAPIConstants.PUBLISH_STATE_NONE, ss.getPublishState());
 	}
 	
 	private CountDownLatch[] startSignal1 = new CountDownLatch[1];
@@ -467,6 +495,10 @@ public class ServerDeployableTest {
 		assertEquals(ServerManagementAPIConstants.PUBLISH_STATE_ADD, oneState.getPublishState());
 		assertEquals(ServerManagementAPIConstants.STATE_UNKNOWN, oneState.getState());
 
+		// And verify the server state
+		assertEquals(ServerManagementAPIConstants.PUBLISH_STATE_FULL, ss.getPublishState());
+		
+		
 		// Now do the publish
 		startSignal1[0] = new CountDownLatch(1);
 		doneSignal1[0] = new CountDownLatch(1);
@@ -503,6 +535,8 @@ public class ServerDeployableTest {
 		assertNotNull(oneState);
 		assertEquals(ServerManagementAPIConstants.PUBLISH_STATE_NONE, oneState.getPublishState());
 		assertEquals(ServerManagementAPIConstants.STATE_UNKNOWN, oneState.getState());
+		assertEquals(ServerManagementAPIConstants.PUBLISH_STATE_NONE, ss.getPublishState());
+
 		
 		// countdown once
 		startSignal2[0].countDown();
