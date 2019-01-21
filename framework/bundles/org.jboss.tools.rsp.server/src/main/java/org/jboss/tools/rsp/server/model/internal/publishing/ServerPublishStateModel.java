@@ -33,7 +33,8 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	private final Map<String, DeployableState> state;
 	private AbstractServerDelegate server;
 	private IFileWatcherService fileWatcher;
-
+	private int publishState = AbstractServerDelegate.PUBLISH_STATE_UNKNOWN;
+	
 	public ServerPublishStateModel(AbstractServerDelegate delegate, IFileWatcherService fileWatcher) {
 		this.server = delegate;
 		this.fileWatcher = fileWatcher;
@@ -186,19 +187,24 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	public void fileChanged(FileWatcherEvent event) {
 		Path affected = event.getPath();
 		List<DeployableState> ds = new ArrayList<>(state.values());
+		boolean changed = false;
 		for( DeployableState d : ds ) {
 			Path deploymentPath = new File(d.getReference().getPath()).toPath();
 			if( affected.startsWith(deploymentPath)) {
 				int currentPubState = d.getPublishState();
 				if( currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_NONE) {
 					d.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL);
-					fireState();
+					changed = true;
 				}
 			}
 		}
+		if( changed ) 
+			fireState();
 	}
 	
 	private void fireState() {
+		ensureServerStateAccurate();
+		
 		// Feels strange to allow this class to fire the event
 		// but whatever. This feels so dirty. 
 		if( server != null && server.getServer() != null && server.getServer().getServerManagementModel() != null 
@@ -207,4 +213,43 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		}
 	}
 	
+	private void ensureServerStateAccurate() {
+		ArrayList<DeployableState> vals = new ArrayList<>(state.values());
+		int newState = ServerManagementAPIConstants.PUBLISH_STATE_NONE;
+		
+		if( deployableExists(ServerManagementAPIConstants.PUBLISH_STATE_ADD, vals) || 
+				 deployableExists(ServerManagementAPIConstants.PUBLISH_STATE_REMOVE, vals) ||
+				deployableExists(ServerManagementAPIConstants.PUBLISH_STATE_FULL, vals)) {
+			newState = ServerManagementAPIConstants.PUBLISH_STATE_FULL;
+		} else {
+			if( deployableExists(ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN, vals)) {
+				newState = ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN;
+			} else if( deployableExists(ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL, vals)) {
+				newState = ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL;
+			} else {
+				newState = ServerManagementAPIConstants.PUBLISH_STATE_NONE;
+			}
+		}
+		setServerPublishState(newState, false);
+	}
+	
+	private boolean deployableExists(int publishState, List<DeployableState> list) {
+		for( DeployableState i : list ) {
+			if( i.getPublishState() == publishState ) 
+				return true;
+		}
+		return false;
+	}
+	
+	public int getServerPublishState() {
+		return this.publishState;
+	}
+	public void setServerPublishState(int state, boolean fire) {
+		if( state != this.publishState) {
+			this.publishState = state;
+			if( fire ) 
+				fireState();
+		}
+	}
+
 }

@@ -94,4 +94,8 @@ public interface IServerPublishModel {
 	 * @param reference
 	 */
 	public void deployableRemoved(DeployableReference reference);
+
+	public void setServerPublishState(int state, boolean fire);
+
+	public int getServerPublishState();
 }
