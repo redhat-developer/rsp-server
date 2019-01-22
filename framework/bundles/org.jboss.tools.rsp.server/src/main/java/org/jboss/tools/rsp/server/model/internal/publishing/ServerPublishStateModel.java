@@ -146,6 +146,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		next.setPublishState(publishState);
 		next.setServer(server.getServerHandle());
 		state.put(getKey(reference), next);
+		updateServerPublishStateFromDeployments();
 	}
 
 	@Override
@@ -203,7 +204,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 	
 	private void fireState() {
-		ensureServerStateAccurate();
+		updateServerPublishStateFromDeployments();
 		
 		// Feels strange to allow this class to fire the event
 		// but whatever. This feels so dirty. 
@@ -213,7 +214,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		}
 	}
 	
-	private void ensureServerStateAccurate() {
+	private void updateServerPublishStateFromDeployments() {
 		ArrayList<DeployableState> vals = new ArrayList<>(state.values());
 		int newState = ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 		
