@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: org.jboss.tools.rsp.api
 Bundle-SymbolicName: org.jboss.tools.rsp.api
-Bundle-Version: 0.12.0.qualifier
+Bundle-Version: 0.12.0.Final
 Automatic-Module-Name: org.jboss.tools.rsp.api
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .,
