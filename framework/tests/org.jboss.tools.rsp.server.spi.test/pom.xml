@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.jboss.tools.rsp.framework</groupId>
 	  	<artifactId>tests</artifactId>
-		<version>0.12.0.Final</version>
+		<version>0.12.1.Final</version>
 	</parent>
         <groupId>org.jboss.tools.rsp.framework.tests</groupId>
 	<artifactId>org.jboss.tools.rsp.server.spi.test</artifactId>
