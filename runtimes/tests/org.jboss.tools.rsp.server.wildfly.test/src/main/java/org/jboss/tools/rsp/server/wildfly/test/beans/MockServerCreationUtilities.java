@@ -34,7 +34,6 @@ import org.junit.Assert;
 public class MockServerCreationUtilities extends Assert {
 	
 	private static HashMap<String, String> asSystemJar = new HashMap<String, String>();
-	private static HashMap<String, String> serverRuntimeMap = new HashMap<String, String>();
 	private static final String twiddle_suffix = ".mf.twiddle.jar";
 	private static final String twiddle_3_2_8 = "3.2.8" + twiddle_suffix;
 	private static final String twiddle_4_0_5 = "4.0.5" + twiddle_suffix;
@@ -53,6 +52,7 @@ public class MockServerCreationUtilities extends Assert {
 	private static final String wildfly_12_0_jar = "wf12.0.0.mf.jboss-as-server.jar";
 	private static final String wildfly_13_0_jar = "wf13.0.0.mf.jboss-as-server.jar";
 	private static final String wildfly_14_0_jar = "wf14.0.0.mf.jboss-as-server.jar";
+	private static final String wildfly_15_0_jar = "wf15.0.0.mf.jboss-as-server.jar";
 	private static final String twiddle_eap_4_3 = "eap4.3" + twiddle_suffix;
 	private static final String twiddle_eap_5_0 = "eap5.0" + twiddle_suffix;
 	private static final String twiddle_eap_5_1 = "eap5.1" + twiddle_suffix;
@@ -106,6 +106,7 @@ public class MockServerCreationUtilities extends Assert {
 		asSystemJar.put(IServerConstants.SERVER_WILDFLY_120, wildfly_12_0_jar);
 		asSystemJar.put(IServerConstants.SERVER_WILDFLY_130, wildfly_13_0_jar);
 		asSystemJar.put(IServerConstants.SERVER_WILDFLY_140, wildfly_14_0_jar);
+		asSystemJar.put(IServerConstants.SERVER_WILDFLY_150, wildfly_15_0_jar);
 		asSystemJar.put(IServerConstants.SERVER_EAP_43, twiddle_eap_4_3);
 		asSystemJar.put(IServerConstants.SERVER_EAP_50, twiddle_eap_5_1);
 		asSystemJar.put(IServerConstants.SERVER_EAP_60, eap_server_6_0_jar);
@@ -175,6 +176,8 @@ public class MockServerCreationUtilities extends Assert {
 			serverDir = createWildfly130MockServerDirectory(name, serverType, asSystemJar.get(serverType));
 		} else if (IServerConstants.SERVER_WILDFLY_140.equals(serverType)) {
 			serverDir = createWildfly140MockServerDirectory(name, serverType, asSystemJar.get(serverType));
+		} else if (IServerConstants.SERVER_WILDFLY_150.equals(serverType)) {
+			serverDir = createWildfly150MockServerDirectory(name, serverType, asSystemJar.get(serverType));
 		} else if (TEST_SERVER_TYPE_GATEIN_34.equals(serverType)) {
 			serverDir = createGateIn34MockServerDirectory(name);
 		} else if (TEST_SERVER_TYPE_GATEIN_35.equals(serverType)) {
@@ -293,6 +296,11 @@ public class MockServerCreationUtilities extends Assert {
 	private static File createWildfly140MockServerDirectory(String name, String serverTypeId, String serverJar) {
 		return createWildflyServerDirectory(name, serverTypeId, serverJar, 
 				"JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 14.0.0.Final\n"); 
+	}
+
+	private static File createWildfly150MockServerDirectory(String name, String serverTypeId, String serverJar) {
+		return createWildflyServerDirectory(name, serverTypeId, serverJar, 
+				"JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 15.0.0.Final\n"); 
 	}
 
 	private static File createWildflyServerDirectory(String name, String serverTypeId, String serverJar, String manString) {
