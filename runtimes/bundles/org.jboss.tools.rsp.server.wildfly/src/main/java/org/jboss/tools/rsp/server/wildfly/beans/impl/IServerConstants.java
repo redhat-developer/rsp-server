@@ -33,6 +33,7 @@ public interface IServerConstants {
 	public static final String SERVER_WILDFLY_120 = "org.jboss.ide.eclipse.as.wildfly.120"; //$NON-NLS-1$
 	public static final String SERVER_WILDFLY_130 = "org.jboss.ide.eclipse.as.wildfly.130"; //$NON-NLS-1$
 	public static final String SERVER_WILDFLY_140 = "org.jboss.ide.eclipse.as.wildfly.140"; //$NON-NLS-1$
+	public static final String SERVER_WILDFLY_150 = "org.jboss.ide.eclipse.as.wildfly.150"; //$NON-NLS-1$
 
 	public static final String SERVER_EAP_43 = "org.jboss.ide.eclipse.as.eap.43"; //$NON-NLS-1$
 	public static final String SERVER_EAP_50 = "org.jboss.ide.eclipse.as.eap.50"; //$NON-NLS-1$
@@ -45,7 +46,7 @@ public interface IServerConstants {
 			SERVER_AS_32,SERVER_AS_40,SERVER_AS_42,SERVER_AS_50,SERVER_AS_51,
 			SERVER_AS_60,SERVER_AS_70,SERVER_AS_71,
 			SERVER_WILDFLY_80,SERVER_WILDFLY_90,SERVER_WILDFLY_100,
-			SERVER_WILDFLY_110,SERVER_WILDFLY_120,SERVER_WILDFLY_130,SERVER_WILDFLY_140,
+			SERVER_WILDFLY_110,SERVER_WILDFLY_120,SERVER_WILDFLY_130,SERVER_WILDFLY_140, SERVER_WILDFLY_150, 
 			SERVER_EAP_43,SERVER_EAP_50,SERVER_EAP_60, SERVER_EAP_61, SERVER_EAP_70, SERVER_EAP_71
 		};
 		// NEW_SERVER_ADAPTER Add the new server id above this line
@@ -74,6 +75,7 @@ public interface IServerConstants {
 	public static final String RUNTIME_WILDFLY_120 = "org.jboss.ide.eclipse.as.runtime.wildfly.120"; //$NON-NLS-1$
 	public static final String RUNTIME_WILDFLY_130 = "org.jboss.ide.eclipse.as.runtime.wildfly.130"; //$NON-NLS-1$
 	public static final String RUNTIME_WILDFLY_140 = "org.jboss.ide.eclipse.as.runtime.wildfly.140"; //$NON-NLS-1$
+	public static final String RUNTIME_WILDFLY_150 = "org.jboss.ide.eclipse.as.runtime.wildfly.150"; //$NON-NLS-1$
 
 	public static final String RUNTIME_EAP_43 = "org.jboss.ide.eclipse.as.runtime.eap.43"; //$NON-NLS-1$
 	public static final String RUNTIME_EAP_50 = "org.jboss.ide.eclipse.as.runtime.eap.50"; //$NON-NLS-1$
@@ -98,14 +100,14 @@ public interface IServerConstants {
 		put(RUNTIME_WILDFLY_120, SERVER_WILDFLY_120);
 		put(RUNTIME_WILDFLY_130, SERVER_WILDFLY_130);
 		put(RUNTIME_WILDFLY_140, SERVER_WILDFLY_140);
-    	
+		put(RUNTIME_WILDFLY_150, SERVER_WILDFLY_150);
+
 		put(RUNTIME_EAP_43, SERVER_EAP_43);
 		put(RUNTIME_EAP_50, SERVER_EAP_50);
 		put(RUNTIME_EAP_60, SERVER_EAP_60);
 		put(RUNTIME_EAP_61, SERVER_EAP_61);
 		put(RUNTIME_EAP_70, SERVER_EAP_70);
 		put(RUNTIME_EAP_71, SERVER_EAP_71);
-    	
     }};
 	
 	

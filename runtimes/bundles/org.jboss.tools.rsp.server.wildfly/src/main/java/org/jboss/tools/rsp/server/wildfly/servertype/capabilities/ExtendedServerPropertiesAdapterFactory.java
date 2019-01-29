@@ -57,6 +57,8 @@ public class ExtendedServerPropertiesAdapterFactory implements IServerConstants 
 			return new Wildfly130ExtendedProperties(s);
 		case SERVER_WILDFLY_140:
 			return new Wildfly140ExtendedProperties(s);
+		case SERVER_WILDFLY_150:
+			return new Wildfly150ExtendedProperties(s);
 		default:
 			return null;
 		}
