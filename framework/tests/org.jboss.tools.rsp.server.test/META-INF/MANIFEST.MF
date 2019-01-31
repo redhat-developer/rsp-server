@@ -18,7 +18,8 @@ Import-Package: org.jboss.tools.rsp.api,
  org.jboss.tools.rsp.launching.utils,
  org.jboss.tools.rsp.secure.model,
  org.osgi.framework,
- org.osgi.service.log
+ org.osgi.service.log,
+ org.eclipse.lsp4j.jsonrpc
 Require-Bundle: org.jboss.tools.rsp.api,
  org.jboss.tools.rsp.launching,
  org.jboss.tools.rsp.launching.java,
