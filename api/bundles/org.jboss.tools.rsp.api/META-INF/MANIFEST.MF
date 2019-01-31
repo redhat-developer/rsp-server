@@ -6,8 +6,8 @@ Bundle-Version: 0.13.1.qualifier
 Automatic-Module-Name: org.jboss.tools.rsp.api
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .,
- lib/gson-2.8.2.jar,
- lib/org.eclipse.lsp4j.jsonrpc-0.4.1.jar
+ lib/gson-2.8.5.jar,
+ lib/org.eclipse.lsp4j.jsonrpc-0.6.0.jar
 Import-Package: org.osgi.framework
 Export-Package: com.google.gson,
  com.google.gson.annotations,
