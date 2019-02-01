@@ -39,7 +39,7 @@ public class WildFlyLaunchingTest extends RSPCase {
 	private static final String STATUS_MESSAGE_OK = "ok";
 	private static final String STATE_STOPPED = "stopped";
 	private static final String STATE_STARTED = "started";
-	private static final long WAIT_FOR_SERVERSTATE = 1000;
+	private static final long WAIT_FOR_SERVERSTATE = 3000;
 
 	private final DummyClient client = launcher.getClient();
 

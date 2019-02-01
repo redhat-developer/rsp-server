@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+
+import org.jboss.tools.rsp.launching.LaunchingCore;
+
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
@@ -22,12 +25,11 @@ import net.lingala.zip4j.exception.ZipException;
  */
 public class RSPServerHandler {
 
-    private static final int WAIT_SERVER_STARTED = 1000;
-	private static final String GROUP_ID = System.getProperty("groupId");
+    private static final int WAIT_SERVER_STARTED = 3000;
     private static final String DISTRIBUTION_FILENAME = System.getProperty("rsp-distribution.filename") + ".zip";
     private static final String DISTRIBUTION_PATH = "../distribution/target/";
     private static final String SERVER_ROOT = DISTRIBUTION_PATH + "/rsp-distribution";
-    private static final String SERVER_DATA = System.getProperty("user.home") + "/." + GROUP_ID + ".data";
+    private static final File SERVER_DATA = LaunchingCore.getDataLocation();
     private static final String DATA_BACKUP = SERVER_DATA + ".backup";
 
     private static Process serverProcess;
@@ -51,7 +53,7 @@ public class RSPServerHandler {
     }
 
     public static void clearServerData(boolean backup) throws IOException {
-        File dataFolder = new File(SERVER_DATA);
+        File dataFolder = SERVER_DATA.getAbsoluteFile();
         if (dataFolder.exists()) {
             if (backup) {
                 dataFolder.renameTo(new File(DATA_BACKUP));
@@ -68,10 +70,10 @@ public class RSPServerHandler {
     public static void restoreBackupData(boolean force) throws IOException {        
         File backupFolder = new File(DATA_BACKUP);
         if (backupFolder.exists()) {
-            if (force && new File(SERVER_DATA).exists()) {
+            if (force && SERVER_DATA.exists()) {
                 clearServerData(false);
             }
-            backupFolder.renameTo(new File(SERVER_DATA));
+            backupFolder.renameTo(SERVER_DATA);
         }
     }
 }
