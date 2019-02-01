@@ -10,7 +10,7 @@ node('rhel7') {
 		def mvnHome = tool 'maven3-latest'
 		env.PATH="${env.PATH}:${mvnHome}/bin"
 
-		sh 'mvn clean install'
+		sh 'mvn clean install -Pintegration-tests'
 		sh 'mvn clean package -f distribution/distribution/pom.xml'
 		sh 'mvn clean compile exec:java package -f api/docs/org.jboss.tools.rsp.schema/pom.xml'
 
