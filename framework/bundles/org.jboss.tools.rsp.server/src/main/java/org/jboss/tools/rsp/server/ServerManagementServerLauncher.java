@@ -133,8 +133,7 @@ public class ServerManagementServerLauncher {
 			// now that we are actually listening to their responses
 			server.clientAdded(launcher);
 			
-			System.out.println(
-					"Client " + socket.getInetAddress().getCanonicalHostName() +
+			LOG.info("Client " + socket.getInetAddress().getCanonicalHostName() +
 							":"+ socket.getPort() + " is connected");
 		} catch(IOException ioe) {
 			// We shouldn't fail if we're still supposed to be listening
