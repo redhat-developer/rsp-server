@@ -9,6 +9,8 @@
 package org.jboss.tools.rsp.api;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.CompletableFuture;
@@ -32,8 +34,9 @@ public class SocketLauncher<T> implements Launcher<T> {
 
 	public SocketLauncher(Object localService, Class<T> remoteInterface, Socket socket, PrintWriter tracing)
 			throws IOException {
-		Launcher<T> launcherTmp = createBuilder(remoteInterface).setLocalService(localService).setRemoteInterface(remoteInterface)
-				.setInput(socket.getInputStream()).setOutput(socket.getOutputStream()).traceMessages(tracing).create();
+		Builder<T> b = createBuilder(remoteInterface);
+		Launcher<T> launcherTmp = createLauncher(b, localService,remoteInterface,
+				socket.getInputStream(),socket.getOutputStream(), tracing);
 		this.launcher = launcherTmp;
 		this.socket = socket;
 	}
@@ -42,6 +45,14 @@ public class SocketLauncher<T> implements Launcher<T> {
 		return new Builder<T>();
 	}
 	
+	protected Launcher<T> createLauncher(Builder<T> builder, Object localService, 
+			Class<T> remoteInterface, InputStream in, OutputStream out, PrintWriter tracing) {
+		return builder.setLocalService(localService)
+				.setRemoteInterface(remoteInterface)
+				.setInput(in).setOutput(out)
+				.traceMessages(tracing)
+				.create();
+	}
 	
 	public CompletableFuture<Void> startListening() {
 		return CompletableFuture.runAsync(() -> {

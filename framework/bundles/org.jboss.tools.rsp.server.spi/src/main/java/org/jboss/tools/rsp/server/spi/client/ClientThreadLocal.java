@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.server.spi.client;
 
 import org.jboss.tools.rsp.api.RSPClient;
+import org.jboss.tools.rsp.server.spi.client.MessageContextStore.MessageContext;
 
 
 /**
@@ -31,13 +32,13 @@ import org.jboss.tools.rsp.api.RSPClient;
  *
  */
 public class ClientThreadLocal {
-	 private static ThreadLocal<RSPClient> activeClient = new ThreadLocal<>();
+	 private static MessageContextStore<RSPClient> activeClient = new MessageContextStore<>();
 	 
 	 public static RSPClient getActiveClient() {
-		 return activeClient.get();
+		 return activeClient.getContext().getRemoteProxy();
 	 }
 	 
 	 public static void setActiveClient(RSPClient client) {
-		 activeClient.set(client);
+		 activeClient.setContext(new MessageContext<RSPClient>(client));
 	 }
 }

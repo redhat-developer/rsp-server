@@ -16,113 +16,66 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.eclipse.lsp4j.jsonrpc.MessageConsumer;
 import org.eclipse.lsp4j.jsonrpc.MessageProducer;
 import org.eclipse.lsp4j.jsonrpc.RemoteEndpoint;
+import org.eclipse.lsp4j.jsonrpc.Launcher.Builder;
 import org.eclipse.lsp4j.jsonrpc.json.ConcurrentMessageProcessor;
 import org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer;
-import org.jboss.tools.rsp.api.RSPClient;
-import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
+import org.jboss.tools.rsp.api.SocketLauncher;
+import org.jboss.tools.rsp.server.spi.client.MessageContextStore;
+import org.jboss.tools.rsp.server.spi.client.MessageContextStore.MessageContext;
 
-class RSPServerSocketLauncher<T> extends ServerSocketLauncher<T> {
+class RSPServerSocketLauncher<T> extends SocketLauncher<T> {
 
 	public RSPServerSocketLauncher(Object localService, Class<T> remoteInterface, Socket socket,
 			PrintWriter tracing) throws IOException {
 		super(localService, remoteInterface, socket, tracing);
 	}
-
-	/**
-	 * Start a thread that listens for messages in the message producer and forwards them to the message consumer.
-	 * 
-	 * @param messageProducer - produces messages, e.g. by reading from an input channel
-	 * @param messageConsumer - processes messages and potentially forwards them to other consumers
-	 * @param executorService - the thread is started using this service
-	 * @return a future that is resolved when the started thread is terminated, e.g. by closing a stream
-	 */
-
-	@Override
-	protected Future<Void> startListeningCalled(StreamMessageProducer messageProducer, MessageConsumer messageConsumer,
-			ExecutorService execService, Object remoteProxy, RemoteEndpoint remoteEndpoint) {
-		
-		CustomMessageProcessor reader = new CustomMessageProcessor(messageProducer, messageConsumer, remoteProxy);
-		final Future<?> result = execService.submit(reader);
-		return toFutureVoid(result, messageProducer);
+	protected Builder<T> createBuilder(Class<T> remoteInterface) {
+		MessageContextStore<T> contextStore = new MessageContextStore<T>();
+		return createBuilder(contextStore);
 	}
 	
-	private Future<Void> toFutureVoid(Future<?> result, StreamMessageProducer messageProducer) {
-		return new Future<Void>() {
-			@Override
-			public Void get() throws InterruptedException, ExecutionException {
-				return (Void) result.get();
-			}
-
-			@Override
-			public Void get(long timeout, TimeUnit unit)
-					throws InterruptedException, ExecutionException, TimeoutException {
-				return (Void) result.get(timeout, unit);
-			}
-
-			@Override
-			public boolean isDone() {
-				return result.isDone();
-			}
-
-			@Override
-			public boolean cancel(boolean mayInterruptIfRunning) {
-				if (mayInterruptIfRunning) {
-					messageProducer.close();
-				}
-				return result.cancel(mayInterruptIfRunning);
-			}
-
-			@Override
-			public boolean isCancelled() {
-				return result.isCancelled();
+	protected Builder<T> createBuilder(MessageContextStore<T> store) {
+		return new Builder<T>() {
+			protected ConcurrentMessageProcessor createMessageProcessor(MessageProducer reader, 
+					MessageConsumer messageConsumer, T remoteProxy) {
+				return new CustomConcurrentMessageProcessor<T>(reader, messageConsumer, remoteProxy, store);
 			}
 		};
 	}
-	
-	public static class CustomMessageProcessor implements Runnable {
-		private static final Logger LOG = Logger.getLogger(ConcurrentMessageProcessor.class.getName());
 
-		private boolean isRunning;
+	/*
+	 * The custom message processor, which can make sure to persist which clients are 
+	 * making a given request before propagating those requests to the server implementation. 
+	 */
+	public static class CustomConcurrentMessageProcessor<T> extends ConcurrentMessageProcessor {
 
-		private final MessageProducer messageProducer;
-		private final MessageConsumer messageConsumer;
-		private final Object remoteProxy;
-		
-		public CustomMessageProcessor(MessageProducer messageProducer, MessageConsumer messageConsumer, Object remoteProxy) {
-			this.messageProducer = messageProducer;
-			this.messageConsumer = messageConsumer;
+		private T remoteProxy;
+		private final MessageContextStore<T> threadMap;
+		public CustomConcurrentMessageProcessor(MessageProducer reader, MessageConsumer messageConsumer,
+				T remoteProxy, MessageContextStore<T> threadMap) {
+			super(reader, messageConsumer);
 			this.remoteProxy = remoteProxy;
+			this.threadMap = threadMap;
 		}
 
-		public void run() {
-			if (isRunning()) {
-				throw new IllegalStateException("The message processor is already running.");
+		protected void processingStarted() {
+			super.processingStarted();
+			if (threadMap != null) {
+				threadMap.setContext(new MessageContext<T>(remoteProxy));
 			}
-			setRunning(true);
-			try {
-				ClientThreadLocal.setActiveClient((RSPClient)remoteProxy);
-				messageProducer.listen(messageConsumer);
-			} catch (Exception e) {
-				LOG.log(Level.SEVERE, e.getMessage(), e);
-			} finally {
-				setRunning(false);
-			}
-		}
-		
-		private synchronized boolean isRunning() {
-			return isRunning;
-		}
-		
-		private synchronized void setRunning(boolean val) {
-			isRunning = val;
 		}
 
+		protected void processingEnded() {
+			super.processingEnded();
+			if (threadMap != null)
+				threadMap.clear();
+
+		}
 	}
+
 
 }

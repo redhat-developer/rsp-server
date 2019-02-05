@@ -118,7 +118,7 @@ public class ServerManagementServerLauncher {
 			// wait for clients to connect
 			Socket socket = serverSocket.accept();
 			// create a JSON-RPC connection for the accepted socket
-			ServerSocketLauncher<RSPClient> launcher = createSocketLauncher(server,
+			RSPServerSocketLauncher<RSPClient> launcher = createSocketLauncher(server,
 					RSPClient.class, socket, createLoggingPrintWriter());
 
 			// Alert the models a new client has been added before they start making requests
