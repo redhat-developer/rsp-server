@@ -105,17 +105,9 @@ public class DownloadRuntimesModel implements IDownloadRuntimesModel {
 
 	private boolean matchesInAlternativeId(String id, DownloadRuntime runtime) {
 		Object alternativeId = runtime.getProperty(DownloadRuntime.PROPERTY_ALTERNATE_ID);
-		if( alternativeId != null ) {
-			if( alternativeId instanceof String[]) {
-				String[] propVal2 = (String[]) alternativeId;
-				for( int it = 0; it < propVal2.length; it++ ) {
-					if( id.equals(propVal2[it]))
-						return true;
-				}
-			} else if( alternativeId instanceof String 
-						&& id.equals(alternativeId)) {
-					return true;
-			}
+		if( alternativeId instanceof String 
+				&& id.equals(alternativeId)) {
+			return true;
 		}
 		return false;
 	}
