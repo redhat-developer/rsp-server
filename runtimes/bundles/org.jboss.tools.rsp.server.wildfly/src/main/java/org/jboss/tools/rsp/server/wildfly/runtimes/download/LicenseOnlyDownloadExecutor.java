@@ -162,8 +162,16 @@ public class LicenseOnlyDownloadExecutor implements IDownloadRuntimeRunner {
 		WorkflowResponseItem item1 = new WorkflowResponseItem();
 		item1.setId(ServerManagementAPIConstants.WORKFLOW_LICENSE_TEXT_ID);
 		item1.setLabel("Please approve the following license:");
+
 		item1.setResponseType(ServerManagementAPIConstants.ATTR_TYPE_NONE);
 		item1.setContent(dlrt.getLicense(new NullProgressMonitor()));
+
+		WorkflowResponseItem item1a = new WorkflowResponseItem();
+		item1a.setId(ServerManagementAPIConstants.WORKFLOW_LICENSE_URL_ID);
+		item1a.setLabel("License URL: ");
+
+		item1a.setResponseType(ServerManagementAPIConstants.ATTR_TYPE_NONE);
+		item1a.setContent(dlrt.getLicenseURL());
 
 		WorkflowResponseItem item2 = new WorkflowResponseItem();
 		item2.setId(ServerManagementAPIConstants.WORKFLOW_LICENSE_SIGN_ID);
@@ -171,6 +179,7 @@ public class LicenseOnlyDownloadExecutor implements IDownloadRuntimeRunner {
 		item2.setResponseType(ServerManagementAPIConstants.ATTR_TYPE_BOOL);
 
 		items.add(item1);
+		items.add(item1a);
 		items.add(item2);
 		resp.setItems(items);
 		resp.setRequestId(id);

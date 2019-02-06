@@ -133,6 +133,7 @@ public interface ServerManagementAPIConstants {
 	
 	
 	public static final String WORKFLOW_LICENSE_TEXT_ID = "workflow.license";
+	public static final String WORKFLOW_LICENSE_URL_ID = "workflow.license.url";
 	public static final String WORKFLOW_LICENSE_SIGN_ID = "workflow.license.sign";
 	
 	public static final String WORKFLOW_USERNAME_ID = "workflow.username";
