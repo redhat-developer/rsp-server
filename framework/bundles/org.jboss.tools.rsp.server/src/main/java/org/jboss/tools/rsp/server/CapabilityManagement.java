@@ -85,6 +85,7 @@ public class CapabilityManagement implements ICapabilityManagement, ICapabilityK
         Map<String,String> ret = new HashMap<String,String>();
         ret.put(ICapabilityKeys.STRING_PROTOCOL_VERSION, ICapabilityKeys.PROTOCOL_VERSION_CURRENT);
         ret.put(ICapabilityKeys.BOOLEAN_STRING_PROMPT, Boolean.toString(true));
+        ret.put(ICapabilityKeys.BOOLEAN_PUBLISH_ARCHIVE, Boolean.toString(true));
         return ret;
 	}
 }
