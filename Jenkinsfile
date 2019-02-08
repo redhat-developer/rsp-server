@@ -14,7 +14,8 @@ node('rhel7') {
 		sh 'mvn clean package -f distribution/distribution/pom.xml'
 		sh 'mvn clean compile exec:java package -f api/docs/org.jboss.tools.rsp.schema/pom.xml'
 
-		archiveArtifacts artifacts: 'distribution/distribution/target/org.jboss.tools.rsp.distribution-*.zip,api/docs/org.jboss.tools.rsp.schema/target/*.jar'
+		junit '**/integration-tests/target/surefire-reports/*.xml,**/tests/**/target/surefire-reports/*.xml'
+		archiveArtifacts artifacts: 'distribution/distribution/target/org.jboss.tools.rsp.distribution-*.zip,api/docs/org.jboss.tools.rsp.schema/target/*.jar,**/integration-tests/target/surefire-reports/*,**/tests/**/target/surefire-reports/*'
 	}
 	
 	stage('SonarCloud Report') {
