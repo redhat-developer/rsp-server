@@ -59,6 +59,7 @@
 		<jboss.releases.repo.url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2/</jboss.releases.repo.url>
 		<jboss.snapshots.repo.id>jboss-snapshots-repository</jboss.snapshots.repo.id>
 		<jboss.snapshots.repo.url>https://repository.jboss.org/nexus/content/repositories/snapshots/</jboss.snapshots.repo.url>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<modules>
@@ -103,33 +104,33 @@
 							<version>${project.version}</version>
 						</artifact>
 					</target>
-                                        <environments>
-                                                <environment>
-                                                        <os>macosx</os>
-                                                        <ws>cocoa</ws>
-                                                        <arch>x86_64</arch>
-                                                </environment>
-                                                <environment>
-                                                        <os>win32</os>
-                                                        <ws>win32</ws>
-                                                        <arch>x86</arch>
-                                                </environment>
-                                                <environment>
-                                                        <os>win32</os>
-                                                        <ws>win32</ws>
-                                                        <arch>x86_64</arch>
-                                                </environment>
-                                                <environment>
-                                                        <os>linux</os>
-                                                        <ws>gtk</ws>
-                                                        <arch>x86</arch>
-                                                </environment>
-                                                <environment>
-                                                        <os>linux</os>
-                                                        <ws>gtk</ws>
-                                                        <arch>x86_64</arch>
-                                                </environment>
-                                        </environments>
+					<environments>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -164,8 +165,52 @@
 			</activation>
 			<properties>
 				<moduleProperties>--add-modules=ALL-SYSTEM</moduleProperties>
-                        </properties>
-                </profile>
+            </properties>
+         </profile>
+         <profile>
+			<id>sonar</id>
+			<properties>
+  				<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    			<sonar.organization>redhat-developer</sonar.organization>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>${jacoco.version}</version>
+						<configuration>
+        					<append>true</append>
+      					</configuration>
+						<executions>
+							<execution>
+								<id>prepare-agent</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+							</execution>
+							<execution>
+						         <id>prepare-agent-integration</id>
+						         <goals>
+						           <goal>prepare-agent-integration</goal>
+						         </goals>
+        					</execution>
+							<execution>
+								<id>jacoco-site</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>report</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+        				<groupId>org.sonarsource.scanner.maven</groupId>
+        				<artifactId>sonar-maven-plugin</artifactId>
+      				</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 
 	<pluginRepositories>
