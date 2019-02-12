@@ -16,6 +16,13 @@ node('rhel7') {
 
 		archiveArtifacts artifacts: 'distribution/distribution/target/org.jboss.tools.rsp.distribution-*.zip,api/docs/org.jboss.tools.rsp.schema/target/*.jar'
 	}
+	
+	stage('SonarCloud Report') {
+		def mvnHome = tool 'maven3-latest'
+		env.PATH="${env.PATH}:${mvnHome}/bin"
+
+		sh 'mvn -P sonar sonar:sonar -Dsonar.login=${SONAR_TOKEN}'
+	}
 
 	stage('Coverage Report') {
 		sh '''#!/bin/bash
