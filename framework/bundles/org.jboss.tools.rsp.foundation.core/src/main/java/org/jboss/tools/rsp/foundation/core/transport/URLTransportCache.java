@@ -368,7 +368,6 @@ public class URLTransportCache {
 				fileOutputStream, timeout, monitor);
 	}
 
-
 	public IStatus download(String name, InputStream istream,
 			FileOutputStream out, int timeout,
 			IProgressMonitor monitor) throws IOException {
@@ -394,7 +393,7 @@ public class URLTransportCache {
 		return new URL(url).openStream();
 	}
 
-	private InputStream createStream(String webPage, String user, String pass) throws IOException {
+	protected InputStream createStream(String webPage, String user, String pass) throws IOException {
 		return getURLConnection(webPage, user, pass).getInputStream();
 	}
 	
@@ -410,6 +409,7 @@ public class URLTransportCache {
 			byte[] authEncBytes = Base64.getEncoder().encode(authString.getBytes());
 			String authStringEnc = new String(authEncBytes);
 			urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
+			urlConnection.setFollowRedirects(true);
 		}
 		return urlConnection;
 	}

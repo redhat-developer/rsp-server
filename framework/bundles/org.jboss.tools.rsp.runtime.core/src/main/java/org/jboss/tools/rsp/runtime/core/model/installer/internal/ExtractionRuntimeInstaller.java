@@ -10,11 +10,15 @@
  *******************************************************************************/
 package org.jboss.tools.rsp.runtime.core.model.installer.internal;
 
+import java.io.InputStream;
+import java.net.URL;
+
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.SubProgressMonitor;
 import org.jboss.tools.rsp.foundation.core.tasks.TaskModel;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
+import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeConnectionFactory;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
 import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
 import org.jboss.tools.rsp.runtime.core.util.internal.DownloadRuntimeOperationUtility;
@@ -33,10 +37,22 @@ public class ExtractionRuntimeInstaller implements IRuntimeInstaller {
 		
 		monitor.beginTask("Download '" + downloadRuntime.getName() + "' ...", 100);//$NON-NLS-1$ //$NON-NLS-2$
 		monitor.worked(1);
-		return new DownloadRuntimeOperationUtility().downloadAndUnzip(unzipDirectory, downloadDirectory, 
+		return createDownloadRuntimeOperationUtility(taskModel).downloadAndUnzip(unzipDirectory, downloadDirectory, 
 				getDownloadUrl(downloadRuntime, taskModel), deleteOnExit, user, pass, taskModel, new SubProgressMonitor(monitor, 99));
 	}
 
+	protected DownloadRuntimeOperationUtility createDownloadRuntimeOperationUtility(TaskModel tm) {
+		IDownloadRuntimeConnectionFactory fact = (IDownloadRuntimeConnectionFactory)tm.getObject(
+				IDownloadRuntimeWorkflowConstants.CONNECTION_FACTORY);
+		if( fact == null )
+			return new DownloadRuntimeOperationUtility();
+		return new DownloadRuntimeOperationUtility() {
+			protected InputStream createDownloadInputStream(URL url, String user, String pass) {
+				return fact.createConnection(url, user, pass);
+			}
+		};
+	}
+	
 	private String getDownloadUrl(DownloadRuntime downloadRuntime, TaskModel taskModel) {
 		if( downloadRuntime != null ) {
 			String dlUrl = downloadRuntime.getUrl();
