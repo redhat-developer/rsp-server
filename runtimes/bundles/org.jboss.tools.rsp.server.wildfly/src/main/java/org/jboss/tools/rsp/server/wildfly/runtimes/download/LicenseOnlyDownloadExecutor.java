@@ -130,8 +130,7 @@ public class LicenseOnlyDownloadExecutor implements IDownloadRuntimeRunner {
 		
 		Map<String,Object> attributes = new HashMap<>();
 		attributes.put(IJBossServerAttributes.SERVER_HOME, newHome);
-		CreateServerResponse resp = model.getServerModel().createServer(serverType, chosenId, attributes);
-		System.out.println(resp);
+		model.getServerModel().createServer(serverType, chosenId, attributes);
 	}
 
 	private String getUniqueServerId(String desired, Set<String> existing) {
