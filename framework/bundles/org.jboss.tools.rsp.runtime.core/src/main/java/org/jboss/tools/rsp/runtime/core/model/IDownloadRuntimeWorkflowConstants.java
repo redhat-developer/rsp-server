@@ -79,7 +79,11 @@ public interface IDownloadRuntimeWorkflowConstants {
 	 */
 	public static final String UNZIPPED_SERVER_BIN = "dl.runtime.unzipped.home.dir.bin"; //$NON-NLS-1$
 	
-
+	/**
+	 * A field to be added to the task model to override the default creation of a connection to a url.
+	 * The resulting value should be an instance of IDownloadRuntimeConnectionFactory
+	 */
+	public static final String CONNECTION_FACTORY = "dl.runtime.connection.factory";
 	/**
 	 * A constant representing an IOverwrite object to be queried for questions on overwriting files
 	 */

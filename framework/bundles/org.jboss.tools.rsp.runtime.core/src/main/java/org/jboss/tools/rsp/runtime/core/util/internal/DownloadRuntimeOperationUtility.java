@@ -13,6 +13,7 @@ package org.jboss.tools.rsp.runtime.core.util.internal;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
@@ -242,8 +243,13 @@ public class DownloadRuntimeOperationUtility {
 	
 	private IStatus downloadFileFromRemoteUrl(File toFile, URL url, long remoteUrlModified, String user, String pass, IProgressMonitor monitor) throws IOException {
 		try (FileOutputStream out = new FileOutputStream(toFile)) {
-			IStatus result = getCache().download(
-					toFile.getName(), url.toExternalForm(), user, pass, out, -1, monitor);
+			IStatus result = null;
+			InputStream override = createDownloadInputStream(url, user, pass);
+			if( override == null ) {
+				result = getCache().download(toFile.getName(), url.toExternalForm(), user, pass, out, -1, monitor);	
+			} else {
+				result = getCache().download(toFile.getName(), override, out, -1, monitor);
+			}
 			out.flush();
 			if (remoteUrlModified > 0) {
 				toFile.setLastModified(remoteUrlModified);
@@ -252,6 +258,11 @@ public class DownloadRuntimeOperationUtility {
 		}
 	}
 
+	// Provide an opportunity to override the default input stream connection
+	protected InputStream createDownloadInputStream(URL url, String user, String pass) {
+		return null;
+	}
+	
 	
 	private URLTransportCache cache;
 

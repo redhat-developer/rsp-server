@@ -12,6 +12,8 @@ package org.jboss.tools.rsp.runtime.core.model.installer.internal;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
@@ -23,6 +25,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.SubProgressMonitor;
 import org.jboss.tools.rsp.foundation.core.tasks.TaskModel;
 import org.jboss.tools.rsp.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
+import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeConnectionFactory;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
 import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
 import org.jboss.tools.rsp.runtime.core.util.internal.DownloadRuntimeOperationUtility;
@@ -38,7 +41,7 @@ public class BinaryInstaller implements IRuntimeInstaller {
 		monitor.beginTask("Install Runtime '" + downloadRuntime.getName() + "' ...", 100);//$NON-NLS-1$ //$NON-NLS-2$
 		monitor.worked(1);
 		try {
-			File f = new DownloadRuntimeOperationUtility().download(unzipDirectory, downloadDirectory, 
+			File f = createDownloadRuntimeOperationUtility(taskModel).download(unzipDirectory, downloadDirectory, 
 					getDownloadUrl(downloadRuntime, taskModel), deleteOnExit, user, pass, new SubProgressMonitor(monitor, 80));
 			File dest = new File(unzipDirectory, f.getName());
 			boolean renamed = f.renameTo(dest);
@@ -60,6 +63,17 @@ public class BinaryInstaller implements IRuntimeInstaller {
 		return Status.OK_STATUS;
 	}
 
+	protected DownloadRuntimeOperationUtility createDownloadRuntimeOperationUtility(TaskModel tm) {
+		IDownloadRuntimeConnectionFactory fact = (IDownloadRuntimeConnectionFactory)tm.getObject(
+				IDownloadRuntimeWorkflowConstants.CONNECTION_FACTORY);
+		if( fact == null )
+			return new DownloadRuntimeOperationUtility();
+		return new DownloadRuntimeOperationUtility() {
+			protected InputStream createDownloadInputStream(URL url, String user, String pass) {
+				return fact.createConnection(url, user, pass);
+			}
+		};
+	}
 	private String getDownloadUrl(DownloadRuntime downloadRuntime, TaskModel taskModel) {
 		if (downloadRuntime != null) {
 			String dlUrl = downloadRuntime.getUrl();
