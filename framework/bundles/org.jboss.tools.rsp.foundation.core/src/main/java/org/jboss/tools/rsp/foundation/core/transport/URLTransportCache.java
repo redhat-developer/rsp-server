@@ -404,12 +404,13 @@ public class URLTransportCache {
 	}
 
 	private HttpURLConnection getURLConnection(URL url, String user, String pass) throws IOException {
-		String authString = user + ":" + pass;
-		byte[] authEncBytes = Base64.getEncoder().encode(authString.getBytes());
-		String authStringEnc = new String(authEncBytes);
-
 		HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
-		urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
+		if( user != null && pass != null ) {
+			String authString = user + ":" + pass;
+			byte[] authEncBytes = Base64.getEncoder().encode(authString.getBytes());
+			String authStringEnc = new String(authEncBytes);
+			urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
+		}
 		return urlConnection;
 	}
 
