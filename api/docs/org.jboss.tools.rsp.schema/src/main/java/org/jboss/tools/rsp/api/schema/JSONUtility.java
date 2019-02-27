@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * Copyright (c) 2018-2019 Red Hat, Inc. Distributed under license by Red Hat, Inc.
  * All rights reserved. This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v20.html
@@ -9,9 +9,11 @@
 package org.jboss.tools.rsp.api.schema;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -36,8 +38,8 @@ public class JSONUtility {
 			jsons[i].delete();
 		}
 	}
-	
-	public void writeJsonDAOSchemas(Class[] daoClasses) throws Exception {
+
+	public void writeJsonDAOSchemas(Class<?>[] daoClasses) throws IOException {
 		File daoFolder = getDaoJsonFolder().toFile();
 		daoFolder.mkdirs();
 		System.out.println("Writing schemas to " + daoFolder.getAbsolutePath());
@@ -49,22 +51,16 @@ public class JSONUtility {
 		System.out.println("Done.");
 	}
 
-    public static final String printJSONSchema(Class c) {
-    	try {
-            ObjectMapper mapper = new ObjectMapper();
-            IgnoreURNSchemaFactoryWrapper visitor = new IgnoreURNSchemaFactoryWrapper();
-            mapper.acceptJsonFormatVisitor(c, visitor);
-            JsonSchema schema = visitor.finalSchema();
-            schema.setId(null);
-            ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
-            String asString = writer.writeValueAsString(schema);
-            return asString;
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    		return null;
-    	}
+    public static final String printJSONSchema(Class<?> c) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        IgnoreURNSchemaFactoryWrapper visitor = new IgnoreURNSchemaFactoryWrapper();
+        mapper.acceptJsonFormatVisitor(c, visitor);
+        JsonSchema schema = visitor.finalSchema();
+        schema.setId(null);
+        ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
+        String asString = writer.writeValueAsString(schema);
+        return asString;
     }
-    
 
     public static class IgnoreURNSchemaFactoryWrapper extends SchemaFactoryWrapper {
         public IgnoreURNSchemaFactoryWrapper() {
@@ -81,18 +77,19 @@ public class JSONUtility {
     
     	public IgnoreURNSchemaFactoryWrapper(SerializerProvider p, WrapperFactory wrapperFactory) {
     		super(p, wrapperFactory);
-           	visitorContext = new VisitorContext() {
+           	this.visitorContext = new VisitorContext() {
+           		
+           		@Override
            		public String javaTypeToUrn(JavaType jt) {
            			return null;
            		}
            	};
     	}
     }
-    	
 
-	public Path getDaoJsonFolder() {
-		return new File(baseDir).toPath().resolve("src").resolve("main")
-				.resolve("resources").resolve("schema").resolve("json");
+    public Path getDaoJsonFolder() {
+		return new File(baseDir).toPath()
+				.resolve("src").resolve("main").resolve("resources").resolve("schema").resolve("json");
 	}
 
 	public Path getDaoJsonFile(String simpleClassName) {
@@ -100,6 +97,4 @@ public class JSONUtility {
 		Path out = folder.resolve(simpleClassName + ".json");
 		return out;
 	}
-	
-	
 }

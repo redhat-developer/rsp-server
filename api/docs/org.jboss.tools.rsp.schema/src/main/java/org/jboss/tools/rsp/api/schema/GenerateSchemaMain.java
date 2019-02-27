@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * Copyright (c) 2018-2019 Red Hat, Inc. Distributed under license by Red Hat, Inc.
  * All rights reserved. This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v20.html
@@ -9,97 +9,36 @@
 package org.jboss.tools.rsp.api.schema;
 
 
-import org.jboss.tools.rsp.api.dao.Attribute;
-import org.jboss.tools.rsp.api.dao.Attributes;
-import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
-import org.jboss.tools.rsp.api.dao.CommandLineDetails;
-import org.jboss.tools.rsp.api.dao.CreateServerResponse;
-import org.jboss.tools.rsp.api.dao.DeployableReference;
-import org.jboss.tools.rsp.api.dao.DeployableState;
-import org.jboss.tools.rsp.api.dao.DiscoveryPath;
-import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
-import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
-import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
-import org.jboss.tools.rsp.api.dao.LaunchParameters;
-import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
-import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
-import org.jboss.tools.rsp.api.dao.PublishServerRequest;
-import org.jboss.tools.rsp.api.dao.ServerAttributes;
-import org.jboss.tools.rsp.api.dao.ServerBean;
-import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
-import org.jboss.tools.rsp.api.dao.ServerHandle;
-import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
-import org.jboss.tools.rsp.api.dao.ServerProcess;
-import org.jboss.tools.rsp.api.dao.ServerProcessOutput;
-import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
-import org.jboss.tools.rsp.api.dao.ServerState;
-import org.jboss.tools.rsp.api.dao.ServerType;
-import org.jboss.tools.rsp.api.dao.StartServerResponse;
-import org.jboss.tools.rsp.api.dao.Status;
-import org.jboss.tools.rsp.api.dao.StopServerAttributes;
-import org.jboss.tools.rsp.api.dao.StringPrompt;
-import org.jboss.tools.rsp.api.dao.VMDescription;
-import org.jboss.tools.rsp.api.dao.VMHandle;
-import org.jboss.tools.rsp.api.dao.WorkflowResponse;
-import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
+import java.io.IOException;
 
 public class GenerateSchemaMain {
+
 	public static void main(String[] args) throws Exception {
 		String baseDir = args.length > 0 ? args[0] : ".";
-		Class[] daos = getDAOClasses();
-		JSONUtility json = new JSONUtility(baseDir);
-		json.cleanFolder();
-		json.writeJsonDAOSchemas(daos);
-		
+		Class<?>[] daos = new DaoClasses().getAll();
+		JSONUtility json = generateJson(baseDir, daos);
+		TypescriptUtility ts = generateTypescript(baseDir, daos);
+		generateSpecifications(baseDir, json, ts);
+	}
+
+	private static void generateSpecifications(String baseDir, JSONUtility json, TypescriptUtility ts)
+			throws IOException {
+		SpecificationGenerator generator = new SpecificationGenerator(json, ts, baseDir);
+		generator.generate();
+	}
+
+	private static TypescriptUtility generateTypescript(String baseDir, Class<?>[] daos) throws Exception {
 		TypescriptUtility ts = new TypescriptUtility(baseDir);
 		ts.cleanFolder();
 		ts.writeTypescriptSchemas(daos);
-
-		SpecificationGenerator generator = new SpecificationGenerator(json, ts, baseDir);
-		generator.generate();
-		// Write MD docs
-	}
-	
-	private static Class[] getDAOClasses() {
-
-		Class[] daoClasses = new Class[] {
-				Attribute.class,
-				Attributes.class,
-				ClientCapabilitiesRequest.class,
-				CommandLineDetails.class,
-				CreateServerResponse.class,
-				DeployableReference.class,
-				DeployableState.class,
-				DiscoveryPath.class,
-				DownloadRuntimeDescription.class,
-				DownloadSingleRuntimeRequest.class,
-				LaunchAttributesRequest.class,
-				LaunchParameters.class,
-				ListDownloadRuntimeResponse.class,
-				ModifyDeployableRequest.class,
-				PublishServerRequest.class,
-				ServerAttributes.class,
-				ServerBean.class,
-				ServerCapabilitiesResponse.class,
-				ServerHandle.class,
-				ServerLaunchMode.class,
-				ServerProcess.class,
-				ServerProcessOutput.class,
-				ServerStartingAttributes.class,
-				ServerState.class,
-				ServerType.class,
-				StartServerResponse.class,
-				Status.class,
-				StopServerAttributes.class,
-				StringPrompt.class,
-				VMDescription.class,
-				VMHandle.class,
-				WorkflowResponse.class,
-				WorkflowResponseItem.class,		
-		};
-		return daoClasses;
+		return ts;
 	}
 
-	
+	private static JSONUtility generateJson(String baseDir, Class<?>[] daos) throws Exception {
+		JSONUtility json = new JSONUtility(baseDir);
+		json.cleanFolder();
+		json.writeJsonDAOSchemas(daos);
+		return json;
+	}
 
 }
