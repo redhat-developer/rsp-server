@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -127,8 +128,12 @@ public class DaoClasses {
 	    	    		new Iterator<URL>() {
 
 	    	    			@Override
-	    	    			public URL next() {
-	    	                    return enumeration.nextElement();
+	    	    			public URL next() throws NoSuchElementException {
+	    	    				try {
+	    	    					return enumeration.nextElement();
+	    	    				} catch(NoSuchElementException nsee) {
+	    	    					throw nsee;
+	    	    				}
 	    	    	        }
 
 	    	    			@Override
