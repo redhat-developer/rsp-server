@@ -32,6 +32,7 @@ public class PollThread extends Thread {
 	private IPollResultListener listener;
 	private IServer server;
 	private int timeout;
+	private boolean listenerAlerted = false;
 
 	public PollThread(SERVER_STATE expectedState, IServerStatePoller poller, IPollResultListener listener, IServer server, int timeout) {
 		super(NLS.bind("{0} - Server Poller", server.getName()));
@@ -165,10 +166,13 @@ public class PollThread extends Thread {
 	}
 
 	protected void cancel(String message, IServerStatePoller.CANCELATION_CAUSE cause) {
-		this.abort = true;
-		cancelPoller(cause);
-		log(message, cause);
-		alertListener(getOpposite(expectedState));
+		// If we haven't aborted already
+		if( this.abort == false ) {
+			this.abort = true;
+			cancelPoller(cause);
+			log(message, cause);
+			alertListener(getOpposite(expectedState));
+		}
 	}
 
 	private void cancelPoller(IServerStatePoller.CANCELATION_CAUSE cause) {
@@ -189,10 +193,13 @@ public class PollThread extends Thread {
 		if (listener == null) {
 			return;
 		}
-		if (currentState != expectedState) {
-			listener.stateNotAsserted(expectedState, currentState);
-		} else {
-			listener.stateAsserted(expectedState, currentState);
+		if( listenerAlerted == false ) {
+			listenerAlerted = true;
+			if (currentState != expectedState) {
+				listener.stateNotAsserted(expectedState, currentState);
+			} else {
+				listener.stateAsserted(expectedState, currentState);
+			}
 		}
 	}
 	

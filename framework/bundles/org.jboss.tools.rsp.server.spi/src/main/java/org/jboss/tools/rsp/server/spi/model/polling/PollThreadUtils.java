@@ -94,8 +94,8 @@ public class PollThreadUtils {
 			IPollResultListener listener, int timeout) {
 		stopPolling(currentPollThread);
 		PollThread newPollThread = new PollThread(expectedState, poller, listener, server, timeout);
-		newPollThread.start();
 		savePollThread(newPollThread, server.getDelegate());
+		newPollThread.start();
 		return newPollThread;
 	}
 
