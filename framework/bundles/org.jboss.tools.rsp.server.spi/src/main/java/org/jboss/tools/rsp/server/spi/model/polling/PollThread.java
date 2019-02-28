@@ -26,7 +26,7 @@ public class PollThread extends Thread {
 
 	private static final int POLL_DELAY = 100;
 	
-	private boolean abort;
+	private boolean aborted;
 	private SERVER_STATE expectedState;
 	private IServerStatePoller poller;
 	private IPollResultListener listener;
@@ -40,7 +40,7 @@ public class PollThread extends Thread {
 		this.poller = poller;
 		this.server = server;
 		this.listener = listener;
-		this.abort = false;
+		this.aborted = false;
 		this.timeout = timeout;
 	}
 
@@ -64,7 +64,7 @@ public class PollThread extends Thread {
 	
 			// begin the loop; ask the poller every so often
 			while (!serverStartedOrStopped
-					&& !abort 
+					&& !isAborted()
 					&& !done
 					&& !timeoutReached(startTime, maxWait)) {
 				try {
@@ -165,10 +165,26 @@ public class PollThread extends Thread {
 		cancel(null, IServerStatePoller.CANCELATION_CAUSE.CANCEL);
 	}
 
+	private synchronized boolean isAborted() {
+		return aborted;
+	}
+	
+	private synchronized void setAborted() {
+		this.aborted = true;
+	}
+	
+	private synchronized boolean isListenerAlerted() {
+		return listenerAlerted;
+	}
+	
+	private synchronized void setListenerAlerted() {
+		this.listenerAlerted = true;
+	}
+	
 	protected void cancel(String message, IServerStatePoller.CANCELATION_CAUSE cause) {
 		// If we haven't aborted already
-		if( this.abort == false ) {
-			this.abort = true;
+		if( !isAborted() && !isListenerAlerted()) {
+			setAborted();
 			cancelPoller(cause);
 			log(message, cause);
 			alertListener(getOpposite(expectedState));
@@ -193,8 +209,8 @@ public class PollThread extends Thread {
 		if (listener == null) {
 			return;
 		}
-		if( listenerAlerted == false ) {
-			listenerAlerted = true;
+		if( !isListenerAlerted()) {
+			setListenerAlerted();
 			if (currentState != expectedState) {
 				listener.stateNotAsserted(expectedState, currentState);
 			} else {
