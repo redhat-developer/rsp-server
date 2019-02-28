@@ -10,13 +10,15 @@ package org.jboss.tools.rsp.api.schema;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.Collator;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -28,6 +30,8 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class DaoClasses {
 	
@@ -66,17 +70,66 @@ public class DaoClasses {
 	    }
 	    String path = getPath(packageName);
 	    Enumeration<URL> resources = classLoader.getResources(path);
-		return toStream(resources)
-	    	.map(url -> new File(url.getFile()))
-	    	.flatMap(file -> {
-				try {
-					return findClasses(file, packageName).stream();
-				} catch (ClassNotFoundException | IOException e) {
-					return Collections.<Class<?>>emptyList().stream();
-				}
-			})
-	    	.collect(Collectors.toList());
+	    ArrayList<Class<?>> ret = new ArrayList<>();
+	    while(resources.hasMoreElements()) {
+	    	URL url = resources.nextElement();
+	    	String filePath = url.getFile();
+	    	String protocol = url.getProtocol();
+    		try {
+    			if( protocol.equals("file")) {
+	    			if( new File(filePath).isDirectory()) {
+		    			List<Class<?>> tmp = findClassesInDirectory(new File(filePath), packageName);
+		    			if( tmp != null ) {
+		    				ret.addAll(tmp);
+		    			}
+	    			}
+		    	} else if( protocol.equals("jar")) {
+		    		List<Class<?>> tmp = findClassesInJar(url, packageName);
+	    			if( tmp != null ) {
+	    				ret.addAll(tmp);
+	    			}
+		    	} 
+    		} catch(ClassNotFoundException cnfe) {
+    			cnfe.printStackTrace();
+    			throw new IOException(cnfe);
+    		}
+	    }
+	    return ret;
 	}
+	private List<Class<?>> findClassesInJar(URL url, String packageName) throws ClassNotFoundException, IOException {
+		URI uri = null;
+		try {
+			uri = url.toURI();
+		} catch(URISyntaxException urise) {
+			throw new IOException(urise);
+		}
+		int exclamation = uri.toString().indexOf("!");
+		String substr = uri.toString().substring(0, exclamation);
+		String fileLoc = substr.substring("jar:file:".length());
+		String nestedPath = uri.toString().substring(exclamation+2);
+		List<String> classnames = new ArrayList<>();
+		try (ZipFile zipFile = new ZipFile(fileLoc)) {
+		    Enumeration zipEntries = zipFile.entries();
+		    while (zipEntries.hasMoreElements()) {
+		        String entryName = ((ZipEntry) zipEntries.nextElement()).getName();
+		        if( entryName.startsWith(nestedPath) && entryName.endsWith(".class")) {
+		        	String className = entryName.substring(nestedPath.length()+1);
+		        	String className2 = getClassName(className, packageName);
+		        	if( !className2.contains("/")) {
+		        		classnames.add(className2);
+		        	}
+		        }
+		    }
+		}
+		java.util.Collections.sort(classnames);
+		Iterator<String> it = classnames.iterator();
+		List<Class<?>> ret = new ArrayList<>();
+		while(it.hasNext()) {
+			ret.add( Class.forName(it.next()));
+		}
+		return ret;
+	}
+
 
 	/**
 	 * Returns the classes that exist in the given package.
@@ -87,7 +140,7 @@ public class DaoClasses {
 	 * @throws ClassNotFoundException
 	 * @throws IOException 
 	 */
-	private List<Class<?>> findClasses(File directory, String packageName) throws ClassNotFoundException, IOException {
+	private List<Class<?>> findClassesInDirectory(File directory, String packageName) throws ClassNotFoundException, IOException {
 	    try(Stream<Path> files = Files.walk(directory.toPath(), FileVisitOption.FOLLOW_LINKS)) {
 	    	// no sub-packages
 	    	return files

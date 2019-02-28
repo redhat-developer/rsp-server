@@ -35,6 +35,13 @@ public class TypescriptUtility {
 	}
 
 	public void writeTypescriptSchemas(Class<?>[] daoClasses) throws IOException {
+		if( daoClasses == null || daoClasses.length == 0 ) {
+			// TODO error somehow? 
+			return;
+		}
+		
+		URLClassLoader cl = (URLClassLoader) daoClasses[0].getClassLoader();
+		
 		File daoFolder = getDaoTypescriptFolder().toFile();
 		if (!daoFolder.exists()) {
 			daoFolder.mkdirs();
@@ -52,7 +59,7 @@ public class TypescriptUtility {
 		File output = getDaoTypescriptFolder().resolve(PROTOCOL_TYPE_FILE).toFile();
 		new TypeScriptGenerator(settings).generateTypeScript(
 				Input.fromClassNamesAndJaxrsApplication(
-						Arrays.asList(clazNames), null, null, false, null, (URLClassLoader) daoClasses[0].getClassLoader(), true), 
+						Arrays.asList(clazNames), null, null, false, null, cl, true), 
 				Output.to(output));
 	}
 
