@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * Copyright (c) 2018-2019 Red Hat, Inc. Distributed under license by Red Hat, Inc.
  * All rights reserved. This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v20.html
@@ -16,6 +16,7 @@ import org.jboss.tools.rsp.server.wildfly.servertype.impl.WildFlyServerTypes;
 public class ExtensionHandler {
 
 	private static final IServerType[] TYPES = {
+			WildFlyServerTypes.WF16_SERVER_TYPE,
 			WildFlyServerTypes.WF15_SERVER_TYPE,
 			WildFlyServerTypes.WF14_SERVER_TYPE,
 			WildFlyServerTypes.WF13_SERVER_TYPE,

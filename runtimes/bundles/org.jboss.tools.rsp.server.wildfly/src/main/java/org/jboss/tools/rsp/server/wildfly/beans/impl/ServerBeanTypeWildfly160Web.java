@@ -1,19 +1,19 @@
 /******************************************************************************* 
- * Copyright (c) 2018 Red Hat, Inc. 
- * Distributed under license by Red Hat, Inc. All rights reserved. 
- * This program is made available under the terms of the 
- * Eclipse Public License v2.0 which accompanies this distribution, 
- * and is available at http://www.eclipse.org/legal/epl-v20.html 
+ * Copyright (c) 2019 Red Hat, Inc.
+ * Distributed under license by Red Hat, Inc. All rights reserved.
+ * This program is made available under the terms of the
+ * Eclipse Public License v2.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v20.html
  * 
- * Contributors: 
+ * Contributors:
  * Red Hat, Inc. - initial API and implementation 
  ******************************************************************************/ 
 package org.jboss.tools.rsp.server.wildfly.beans.impl;
 
 import java.io.File;
 
-public class ServerBeanTypeWildfly150Web extends JBossServerBeanType {
-	public ServerBeanTypeWildfly150Web() {
+public class ServerBeanTypeWildfly160Web extends JBossServerBeanType {
+	public ServerBeanTypeWildfly160Web() {
 		super(ID_WILDFLY_WEB, NAME_WILDFLY,
 				AS7_MODULE_LAYERED_SERVER_MAIN);
 	}
@@ -24,7 +24,7 @@ public class ServerBeanTypeWildfly150Web extends JBossServerBeanType {
 
 	@Override
 	public String getFullVersion(File location, File systemFile) {
-		return ServerBeanTypeWildfly90Web.getFullVersion(location, systemFile, "15.");
+		return ServerBeanTypeWildfly90Web.getFullVersion(location, systemFile, "16.");
 	}
 
 	
@@ -33,6 +33,6 @@ public class ServerBeanTypeWildfly150Web extends JBossServerBeanType {
 	}
 	
 	public String getServerAdapterTypeId(String version) {	
-		return IServerConstants.SERVER_WILDFLY_150;
+		return IServerConstants.SERVER_WILDFLY_160;
 	}
 }

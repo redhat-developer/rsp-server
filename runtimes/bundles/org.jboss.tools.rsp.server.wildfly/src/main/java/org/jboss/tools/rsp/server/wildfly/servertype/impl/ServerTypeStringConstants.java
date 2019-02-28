@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * Copyright (c) 2018-2019 Red Hat, Inc. Distributed under license by Red Hat, Inc.
  * All rights reserved. This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v20.html
@@ -11,6 +11,10 @@ package org.jboss.tools.rsp.server.wildfly.servertype.impl;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
 
 public interface ServerTypeStringConstants {
+
+	public static final String WF16_ID = IServerConstants.SERVER_WILDFLY_160;
+	public static final String WF16_NAME = "WildFly 16.x";
+	public static final String WF16_DESC = "A server adapter capable of discovering and controlling a WildFly 16.x runtime instance.";
 
 	public static final String WF15_ID = IServerConstants.SERVER_WILDFLY_150;
 	public static final String WF15_NAME = "WildFly 15.x";
