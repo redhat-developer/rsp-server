@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * Copyright (c) 2018-2019 Red Hat, Inc. Distributed under license by Red Hat, Inc.
  * All rights reserved. This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v20.html
@@ -11,6 +11,9 @@ package org.jboss.tools.rsp.server.wildfly.servertype.impl;
 import org.jboss.tools.rsp.server.wildfly.servertype.BaseJBossServerType;
 
 public class WildFlyServerTypes implements ServerTypeStringConstants{
+
+	public static final BaseJBossServerType WF16_SERVER_TYPE = 
+			new WildFlyServerType(WF16_ID, WF16_NAME, WF16_DESC);
 	public static final BaseJBossServerType WF15_SERVER_TYPE = 
 			new WildFlyServerType(WF15_ID, WF15_NAME, WF15_DESC);
 	public static final BaseJBossServerType WF14_SERVER_TYPE = 

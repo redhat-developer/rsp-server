@@ -1,5 +1,5 @@
 /******************************************************************************* 
- * Copyright (c) 2012 Red Hat, Inc. 
+ * Copyright (c) 2012-2019 Red Hat, Inc. 
  * Distributed under license by Red Hat, Inc. All rights reserved. 
  * This program is made available under the terms of the 
  * Eclipse Public License v2.0 which accompanies this distribution, 
@@ -59,6 +59,8 @@ public class ExtendedServerPropertiesAdapterFactory implements IServerConstants 
 			return new Wildfly140ExtendedProperties(s);
 		case SERVER_WILDFLY_150:
 			return new Wildfly150ExtendedProperties(s);
+		case SERVER_WILDFLY_160:
+			return new Wildfly160ExtendedProperties(s);
 		default:
 			return null;
 		}
