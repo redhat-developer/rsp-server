@@ -27,14 +27,14 @@ public class GenerateSchemaMain {
 		generator.generate();
 	}
 
-	private static TypescriptUtility generateTypescript(String baseDir, Class<?>[] daos) throws Exception {
+	private static TypescriptUtility generateTypescript(String baseDir, Class<?>[] daos) throws IOException {
 		TypescriptUtility ts = new TypescriptUtility(baseDir);
 		ts.cleanFolder();
 		ts.writeTypescriptSchemas(daos);
 		return ts;
 	}
 
-	private static JSONUtility generateJson(String baseDir, Class<?>[] daos) throws Exception {
+	private static JSONUtility generateJson(String baseDir, Class<?>[] daos) throws IOException {
 		JSONUtility json = new JSONUtility(baseDir);
 		json.cleanFolder();
 		json.writeJsonDAOSchemas(daos);

@@ -17,24 +17,34 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.Collator;
-import java.util.ArrayList;
+import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.log4j.Logger;
+
+/**
+ * Scans for (dao) classes that match the package "org.jboss.tools.rsp.api.dao".
+ * 
+ * @author Andre Dietisheim
+ * @author Rob Stryker
+ */
 public class DaoClasses {
-	
+
+	private static final Logger LOG = Logger.getLogger(DaoClasses.class);
+
+	private static final String PROTOCOL_JAR = "jar";
+	private static final String PROTOCOL_FILE = "file";
 	private static final String DAO_PACKAGE = "org.jboss.tools.rsp.api.dao";
 	private static final char SUBPACKAGE_SEPARATOR = '.';
 	private static final String CLASSFILE_SUFFIX = ".class";
@@ -70,64 +80,72 @@ public class DaoClasses {
 	    }
 	    String path = getPath(packageName);
 	    Enumeration<URL> resources = classLoader.getResources(path);
-	    ArrayList<Class<?>> ret = new ArrayList<>();
-	    while(resources.hasMoreElements()) {
-	    	URL url = resources.nextElement();
-	    	String filePath = url.getFile();
-	    	String protocol = url.getProtocol();
-    		try {
-    			if( protocol.equals("file")) {
-	    			if( new File(filePath).isDirectory()) {
-		    			List<Class<?>> tmp = findClassesInDirectory(new File(filePath), packageName);
-		    			if( tmp != null ) {
-		    				ret.addAll(tmp);
-		    			}
-	    			}
-		    	} else if( protocol.equals("jar")) {
-		    		List<Class<?>> tmp = findClassesInJar(url, packageName);
-	    			if( tmp != null ) {
-	    				ret.addAll(tmp);
-	    			}
-		    	} 
-    		} catch(ClassNotFoundException cnfe) {
-    			cnfe.printStackTrace();
-    			throw new IOException(cnfe);
-    		}
-	    }
-	    return ret;
+	    return toStream(resources)
+	    	.flatMap(url -> 
+		    	(Stream<Class<?>>) findClasses(packageName, url).stream())
+		    .filter(Objects::nonNull)
+		    .collect(Collectors.toList());
 	}
-	private List<Class<?>> findClassesInJar(URL url, String packageName) throws ClassNotFoundException, IOException {
+
+	private List<Class<?>> findClasses(final String packageName, URL url) {
+		String filePath = url.getFile();
+		String protocol = url.getProtocol();
+		try {
+			if (PROTOCOL_FILE.equals(protocol)) {
+				File directory = new File(filePath);
+				if (directory.isDirectory()) {
+					return findClassesInDirectory(directory, packageName);
+				}
+			} else if (PROTOCOL_JAR.equals(protocol)) {
+				return findClassesInJar(toURI(url), packageName);
+			}
+		} catch(IOException e) {
+			LOG.error(MessageFormat.format("Could not scan dao classes in package {0}", packageName), e);
+		}
+		return Collections.<Class<?>>emptyList();
+	}
+
+	private List<Class<?>> findClassesInJar(URI uri, String packageName) throws IOException {
+		int exclamation = uri.toString().indexOf('!');
+		String substr = uri.toString().substring(0, exclamation);
+		String fileLoc = substr.substring("jar:file:".length());
+		String nestedPath = uri.toString().substring(exclamation + 2);
+		try (ZipFile zipFile = new ZipFile(fileLoc)) {
+			return toStream(zipFile.entries())
+					.map(zipEntry -> {
+						String entryName = zipEntry.getName();
+						if (entryName.startsWith(nestedPath) 
+								&& entryName.endsWith(CLASSFILE_SUFFIX)) {
+							String entryClassName = entryName.substring(nestedPath.length() + 1);
+							String className = getClassName(entryClassName, packageName);
+							if (!className.contains("/")) {
+								return className;
+							}
+						}
+						return null;
+					})
+					.filter(Objects::nonNull)
+					.sorted()
+					.map(className -> {
+						try {
+							return Class.forName(className);
+						} catch (ClassNotFoundException e) {
+							LOG.error("Could not instantiate class " + className + " that we found in jar " + uri.toString());
+							return null;
+						}
+					})
+					.filter(Objects::nonNull).collect(Collectors.toList());
+		}
+	}
+
+	private URI toURI(URL url) throws IOException {
 		URI uri = null;
 		try {
 			uri = url.toURI();
 		} catch(URISyntaxException urise) {
 			throw new IOException(urise);
 		}
-		int exclamation = uri.toString().indexOf("!");
-		String substr = uri.toString().substring(0, exclamation);
-		String fileLoc = substr.substring("jar:file:".length());
-		String nestedPath = uri.toString().substring(exclamation+2);
-		List<String> classnames = new ArrayList<>();
-		try (ZipFile zipFile = new ZipFile(fileLoc)) {
-		    Enumeration zipEntries = zipFile.entries();
-		    while (zipEntries.hasMoreElements()) {
-		        String entryName = ((ZipEntry) zipEntries.nextElement()).getName();
-		        if( entryName.startsWith(nestedPath) && entryName.endsWith(".class")) {
-		        	String className = entryName.substring(nestedPath.length()+1);
-		        	String className2 = getClassName(className, packageName);
-		        	if( !className2.contains("/")) {
-		        		classnames.add(className2);
-		        	}
-		        }
-		    }
-		}
-		java.util.Collections.sort(classnames);
-		Iterator<String> it = classnames.iterator();
-		List<Class<?>> ret = new ArrayList<>();
-		while(it.hasNext()) {
-			ret.add( Class.forName(it.next()));
-		}
-		return ret;
+		return uri;
 	}
 
 
@@ -140,7 +158,7 @@ public class DaoClasses {
 	 * @throws ClassNotFoundException
 	 * @throws IOException 
 	 */
-	private List<Class<?>> findClassesInDirectory(File directory, String packageName) throws ClassNotFoundException, IOException {
+	private List<Class<?>> findClassesInDirectory(File directory, String packageName) throws IOException {
 	    try(Stream<Path> files = Files.walk(directory.toPath(), FileVisitOption.FOLLOW_LINKS)) {
 	    	// no sub-packages
 	    	return files
@@ -151,10 +169,13 @@ public class DaoClasses {
 			    		})
 	    			.filter(path -> path.toFile().getName().endsWith(CLASSFILE_SUFFIX))
 			    	.map(path -> {
+			    		String className = getClassName(path.getFileName().toString(), packageName);
 						try {
-							String className = getClassName(path.getFileName().toString(), packageName);
 							return Class.forName(className);
 						} catch (ClassNotFoundException e) {
+							LOG.error(MessageFormat.format(
+									"Could not instantiate class {0} in file {1}", 
+									className, path.getFileName()));
 							return null;
 						}
 					})
@@ -163,7 +184,7 @@ public class DaoClasses {
 		}
 	}
 
-	private ClassLoader getClassloader() {
+	protected ClassLoader getClassloader() {
 		return Thread.currentThread().getContextClassLoader();
 	}
 
@@ -175,30 +196,19 @@ public class DaoClasses {
 		return packageName + SUBPACKAGE_SEPARATOR + filename.substring(0, filename.length() - 6);
 	}
 
-	private Stream<URL> toStream(final Enumeration<URL> enumeration) {
+	private <T> Stream<T> toStream(final Enumeration<T> enumeration) {
 		return StreamSupport.stream(
 	    	    Spliterators.spliteratorUnknownSize(
-	    	    		new Iterator<URL>() {
+	    	    		new Iterator<T>() {
 
 	    	    			@Override
-	    	    			public URL next() throws NoSuchElementException {
-	    	    				try {
-	    	    					return enumeration.nextElement();
-	    	    				} catch(NoSuchElementException nsee) {
-	    	    					throw nsee;
-	    	    				}
+	    	    			public T next() {
+    	    					return enumeration.nextElement();
 	    	    	        }
 
 	    	    			@Override
 	    	    			public boolean hasNext() {
 	    	                    return enumeration.hasMoreElements();
-	    	                }
-
-	    	    			@Override
-	    	    			public void forEachRemaining(Consumer<? super URL> action) {
-	    	                    while(enumeration.hasMoreElements()) {
-	    	                    	action.accept(enumeration.nextElement());
-	    	                    }
 	    	                }
 	    	    		}, 
 	    	    		Spliterator.ORDERED), false);

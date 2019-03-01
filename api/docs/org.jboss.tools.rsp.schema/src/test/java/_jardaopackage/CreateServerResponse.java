@@ -6,7 +6,14 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package daopackage.subpackage1;
+package _jardaopackage;
 
-public class DiscoveryPath {
+import org.jboss.tools.rsp.api.dao.Status;
+
+public class CreateServerResponse {
+
+	public Status getStatus() {
+		return null;
+	}
+
 }
