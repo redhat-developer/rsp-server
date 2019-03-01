@@ -54,6 +54,20 @@ public class DaoClassesTest {
 				DiscoveryPath.class);
 	}
 
+	@Test
+	public void shouldDiscoverAllInPackageInJar() throws IOException {
+		// given
+		DaoClasses daoClasses = new TestableDaoClasses("jardaopackage");
+		// when
+		Class<?>[] classes = daoClasses.getAll();
+		// then
+		assertThat(classes).containsExactlyInAnyOrder(
+				jardaopackage.Attribute.class,
+				jardaopackage.ClientCapabilitiesRequest.class,
+				jardaopackage.CreateServerResponse.class,
+				jardaopackage.Status.class);
+	}
+
 	private class TestableDaoClasses extends DaoClasses {
 
 		public TestableDaoClasses(String daoPackage) {
@@ -61,5 +75,4 @@ public class DaoClassesTest {
 		}
 
 	}
-
 }

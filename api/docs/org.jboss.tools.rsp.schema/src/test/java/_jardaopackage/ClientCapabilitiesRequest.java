@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package daopackage.subpackage1;
+package _jardaopackage;
 
-public class DiscoveryPath {
+public class ClientCapabilitiesRequest {
 }
