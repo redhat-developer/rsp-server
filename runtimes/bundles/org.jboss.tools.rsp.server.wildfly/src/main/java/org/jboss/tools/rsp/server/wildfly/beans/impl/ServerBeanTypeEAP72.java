@@ -12,8 +12,8 @@ package org.jboss.tools.rsp.server.wildfly.beans.impl;
 
 import java.io.File;
 
-public class ServerBeanTypeEAP71 extends ServerBeanTypeEnterprise {
-	public ServerBeanTypeEAP71() {
+public class ServerBeanTypeEAP72 extends ServerBeanTypeEnterprise {
+	public ServerBeanTypeEAP72() {
 		super(ID_EAP, NAME_EAP, AS7_MODULE_LAYERED_SERVER_MAIN);
 	}
 	@Override
@@ -21,9 +21,9 @@ public class ServerBeanTypeEAP71 extends ServerBeanTypeEnterprise {
 		return IServerConstants.SERVER_EAP_71;
 	}
 	public boolean isServerRoot(File location) {
-		return getEAP6xVersion(location, EAP_LAYERED_PRODUCT_META_INF, "7.1", "eap", RELEASE_NAME_JBOSS_EAP) != null; //$NON-NLS-1$
+		return getEAP6xVersion(location, EAP_LAYERED_PRODUCT_META_INF, "7.2", "eap", RELEASE_NAME_JBOSS_EAP) != null; //$NON-NLS-1$
 	}
 	public String getFullVersion(File location, File systemJarFile) {
-		return getEAP6xVersion(location, EAP_LAYERED_PRODUCT_META_INF, "7.1", "eap", RELEASE_NAME_JBOSS_EAP); //$NON-NLS-1$
+		return getEAP6xVersion(location, EAP_LAYERED_PRODUCT_META_INF, "7.2", "eap", RELEASE_NAME_JBOSS_EAP); //$NON-NLS-1$
 	}
 }
