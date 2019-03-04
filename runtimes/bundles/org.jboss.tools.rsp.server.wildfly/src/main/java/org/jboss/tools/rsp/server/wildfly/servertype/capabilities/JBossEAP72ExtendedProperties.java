@@ -14,13 +14,13 @@ import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.wildfly.servertype.launch.IDefaultLaunchArguments;
 import org.jboss.tools.rsp.server.wildfly.servertype.launch.JBossEAP70DefaultLaunchArguments;
 
-public class JBossEAP71ExtendedProperties extends JBossAS710ExtendedProperties {
-	public JBossEAP71ExtendedProperties(IServer obj) {
+public class JBossEAP72ExtendedProperties extends JBossAS710ExtendedProperties {
+	public JBossEAP72ExtendedProperties(IServer obj) {
 		super(obj);
 	}
 	@Override
 	public String getRuntimeTypeVersionString() {
-		return "7.1"; //$NON-NLS-1$
+		return "7.2"; //$NON-NLS-1$
 	}
 	
 	@Override

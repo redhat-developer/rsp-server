@@ -106,5 +106,9 @@ public interface ServerTypeStringConstants {
 	public static final String EAP71_NAME = "JBoss EAP 7.1";
 	public static final String EAP71_DESC = "A server adapter capable of discovering and controlling a JBoss EAP 7.1 runtime instance.";
 
+	public static final String EAP72_ID = IServerConstants.SERVER_EAP_72;
+	public static final String EAP72_NAME = "JBoss EAP 7.2";
+	public static final String EAP72_DESC = "A server adapter capable of discovering and controlling a JBoss EAP 7.2 runtime instance.";
+
 	
 }
