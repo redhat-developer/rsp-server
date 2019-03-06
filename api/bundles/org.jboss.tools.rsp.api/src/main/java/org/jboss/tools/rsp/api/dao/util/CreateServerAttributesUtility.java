@@ -44,6 +44,13 @@ public class CreateServerAttributesUtility {
 		return null;
 	}
 	
+	public boolean isAttributeSecret(String key) {
+		Attribute a = attrs.get(key);
+		if( a != null )
+			return a.isSecret();
+		return false;
+	}
+	
 	public Object getAttributeDefaultValue(String key) {
 		Attribute a = attrs.get(key);
 		if( a != null )

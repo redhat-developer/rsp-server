@@ -475,7 +475,8 @@ public class StandardCommandHandler implements InputHandler {
 					String type = item.getResponseType();
 					if( type != null && !ServerManagementAPIConstants.ATTR_TYPE_NONE.equals(type)) {
 						// Prompt for input
-						asst.promptForAttributeSingleKey(type, null, null, item.getId(), true, toSend);
+						asst.promptForAttributeSingleKey(type, null, null, 
+								item.getId(), item.isResponseSecret(), true, toSend);
 					}
 				}
 				return toSend;

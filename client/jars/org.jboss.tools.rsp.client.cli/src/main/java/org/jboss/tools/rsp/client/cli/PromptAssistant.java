@@ -146,12 +146,14 @@ public class PromptAssistant {
 		String attrType = attrsUtil.getAttributeType(k);
 		String reqDesc = attrsUtil.getAttributeDescription(k);
 		Object defVal = attrsUtil.getAttributeDefaultValue(k);
-		promptForAttributeSingleKey(attrType, reqDesc, defVal, k, required2, toSend);
+		boolean secret = attrsUtil.isAttributeSecret(k);
+		promptForAttributeSingleKey(attrType, reqDesc, defVal, k, secret, required2, toSend);
 	}
 		
 	public void promptForAttributeSingleKey(
 			String attrType, String reqDesc, Object defVal,
-			String k, boolean required2, Map<String, Object> toSend) {
+			String k, boolean secret, boolean required2, 
+			Map<String, Object> toSend) {
 		Class<?> c = getAttributeTypeAsClass(attrType);
 		if (c == null) {
 			System.out.println("unknown attribute type " + attrType + ". Aborting.");
@@ -177,7 +179,7 @@ public class PromptAssistant {
 		
         Object value = null;
 		if (Integer.class.equals(c) || Boolean.class.equals(c) || String.class.equals(c)) {
-			value = promptPrimitiveValue(attrType);
+			value = promptPrimitiveValue(attrType, secret);
 		} else if (List.class.equals(c)) {
 			value = promptListValue();
 		} else if (Map.class.equals(c)) {
@@ -215,9 +217,9 @@ public class PromptAssistant {
 		return arr;
 	}
 
-	public Object promptPrimitiveValue(String type) {
+	public Object promptPrimitiveValue(String type, boolean secret) {
 		System.out.println("Please enter a value: ");
-		String val = nextLine();
+		String val = nextLine(secret);
 		return convertType(val, type);
 	}
 
