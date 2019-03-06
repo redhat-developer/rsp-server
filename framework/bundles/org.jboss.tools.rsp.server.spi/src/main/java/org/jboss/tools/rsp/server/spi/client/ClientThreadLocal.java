@@ -32,13 +32,20 @@ import org.jboss.tools.rsp.server.spi.client.MessageContextStore.MessageContext;
  *
  */
 public class ClientThreadLocal {
-	 private static MessageContextStore<RSPClient> activeClient = new MessageContextStore<>();
+	 private static MessageContextStore<RSPClient> activeClient;
 	 
-	 public static RSPClient getActiveClient() {
-		 return activeClient.getContext().getRemoteProxy();
+	 public synchronized static MessageContextStore<RSPClient> getStore() {
+		 if( activeClient == null ) {
+			 activeClient = new MessageContextStore<>();
+		 }
+		 return activeClient;
 	 }
 	 
-	 public static void setActiveClient(RSPClient client) {
-		 activeClient.setContext(new MessageContext<RSPClient>(client));
+	 public synchronized static RSPClient getActiveClient() {
+		 return getStore().getContext().getRemoteProxy();
+	 }
+	 
+	 public synchronized static void setActiveClient(RSPClient client) {
+		 getStore().setContext(new MessageContext<RSPClient>(client));
 	 }
 }

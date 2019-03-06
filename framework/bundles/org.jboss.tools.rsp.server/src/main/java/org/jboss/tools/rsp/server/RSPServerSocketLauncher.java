@@ -11,34 +11,23 @@ package org.jboss.tools.rsp.server;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.eclipse.lsp4j.jsonrpc.MessageConsumer;
 import org.eclipse.lsp4j.jsonrpc.MessageProducer;
-import org.eclipse.lsp4j.jsonrpc.RemoteEndpoint;
-import org.eclipse.lsp4j.jsonrpc.Launcher.Builder;
 import org.eclipse.lsp4j.jsonrpc.json.ConcurrentMessageProcessor;
-import org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer;
 import org.jboss.tools.rsp.api.SocketLauncher;
 import org.jboss.tools.rsp.server.spi.client.MessageContextStore;
 import org.jboss.tools.rsp.server.spi.client.MessageContextStore.MessageContext;
 
 class RSPServerSocketLauncher<T> extends SocketLauncher<T> {
-
-	public RSPServerSocketLauncher(Object localService, Class<T> remoteInterface, Socket socket,
+	public RSPServerSocketLauncher(Object localService, 
+			Class<T> remoteInterface, Socket socket,
+			MessageContextStore<T> contextStore,
 			PrintWriter tracing) throws IOException {
-		super(localService, remoteInterface, socket, tracing);
+		super(localService, remoteInterface, socket, createBuilder(contextStore), tracing);
 	}
-	protected Builder<T> createBuilder(Class<T> remoteInterface) {
-		MessageContextStore<T> contextStore = new MessageContextStore<T>();
-		return createBuilder(contextStore);
-	}
-	
-	protected Builder<T> createBuilder(MessageContextStore<T> store) {
+
+	static <T> Builder<T> createBuilder(MessageContextStore<T> store) {
 		return new Builder<T>() {
 			protected ConcurrentMessageProcessor createMessageProcessor(MessageProducer reader, 
 					MessageConsumer messageConsumer, T remoteProxy) {
@@ -76,6 +65,4 @@ class RSPServerSocketLauncher<T> extends SocketLauncher<T> {
 
 		}
 	}
-
-
 }

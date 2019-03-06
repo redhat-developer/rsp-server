@@ -34,7 +34,15 @@ public class SocketLauncher<T> implements Launcher<T> {
 
 	public SocketLauncher(Object localService, Class<T> remoteInterface, Socket socket, PrintWriter tracing)
 			throws IOException {
-		Builder<T> b = createBuilder(remoteInterface);
+		Launcher<T> launcherTmp = createLauncher(createBuilder(remoteInterface), localService,remoteInterface,
+				socket.getInputStream(),socket.getOutputStream(), tracing);
+		this.launcher = launcherTmp;
+		this.socket = socket;
+	}
+
+	public SocketLauncher(Object localService, Class<T> remoteInterface, 
+			Socket socket, Builder<T> b, PrintWriter tracing)
+			throws IOException {
 		Launcher<T> launcherTmp = createLauncher(b, localService,remoteInterface,
 				socket.getInputStream(),socket.getOutputStream(), tracing);
 		this.launcher = launcherTmp;
