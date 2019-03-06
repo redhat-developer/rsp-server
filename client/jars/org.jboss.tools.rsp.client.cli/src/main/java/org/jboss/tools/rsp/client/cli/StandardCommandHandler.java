@@ -301,7 +301,13 @@ public class StandardCommandHandler implements InputHandler {
 			@Override
 			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
 				String suffix = command.substring(this.command.length());
-				ServerHandle sh = findServer(suffix.trim(), launcher);
+				ServerHandle sh = null;
+				if( suffix.trim().isEmpty()) {
+					sh = assistant.selectServer();
+				} else {
+					sh = findServer(suffix.trim(), launcher);
+				}
+				
 				if (sh != null)
 					launcher.getServerProxy().deleteServer(sh);
 				else
