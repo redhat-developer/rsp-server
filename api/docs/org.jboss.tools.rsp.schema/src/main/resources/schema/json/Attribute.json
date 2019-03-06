@@ -9,6 +9,9 @@
     },
     "defaultVal" : {
       "type" : "any"
+    },
+    "secret" : {
+      "type" : "boolean"
     }
   }
 }

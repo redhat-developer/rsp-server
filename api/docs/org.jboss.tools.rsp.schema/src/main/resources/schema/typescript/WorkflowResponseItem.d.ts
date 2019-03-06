@@ -4,5 +4,6 @@ export interface WorkflowResponseItem {
     label: string;
     content: string;
     responseType: string;
+    responseSecret: boolean;
     validResponses: string[];
 }
