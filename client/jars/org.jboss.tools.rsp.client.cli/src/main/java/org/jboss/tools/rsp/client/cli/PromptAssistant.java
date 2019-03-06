@@ -316,12 +316,16 @@ public class PromptAssistant {
 	}
 	
 	public String nextLine() {
-		return nextLine(null, provider);
+		return nextLine(null, provider, false);
 	}
 
-	public static String nextLine(String prompt, InputProvider provider) {
+	public String nextLine(boolean secret) {
+		return nextLine(null, provider, secret);
+	}
+
+	public static String nextLine(String prompt, InputProvider provider, boolean secret) {
 		String p = (prompt == null ? "" : prompt);
-		StandardPrompt sp = new StandardPrompt(p);
+		StandardPrompt sp = new StandardPrompt(p, secret);
 		provider.addInputRequest(sp);
 		sp.await();
 		return sp.ret;
@@ -331,14 +335,22 @@ public class PromptAssistant {
 
 		public final String prompt;
 		public String ret;
+		private boolean secret;
 		public final CountDownLatch doneSignal = new CountDownLatch(1);
 
-		public StandardPrompt(String prompt) {
+		public StandardPrompt(String prompt, boolean isSecret) {
 			this.prompt = prompt;
+			this.secret = isSecret;
 		}
+		
 		@Override
 		public String getPrompt() {
 			return prompt;
+		}
+		
+		@Override 
+		public boolean isSecret() {
+			return secret;
 		}
 
 		@Override

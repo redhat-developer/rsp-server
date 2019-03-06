@@ -80,7 +80,7 @@ public class SecureStorageGuardian implements ISecureStorageProvider {
 	private void authenticateClient(RSPClient client, int maxTries) throws InterruptedException, ExecutionException {
 		if( canPromptClient(client, capabilities)) {
 			String msg = "Please provide a secure-storage password to either create a new, or load an existing, secure storage."; 
-			StringPrompt prompt = new StringPrompt(100, msg);
+			StringPrompt prompt = new StringPrompt(100, msg, true);
 			int tries = 0;
 			while(tries < maxTries) {
 				String secureKey = client.promptString(prompt).get();

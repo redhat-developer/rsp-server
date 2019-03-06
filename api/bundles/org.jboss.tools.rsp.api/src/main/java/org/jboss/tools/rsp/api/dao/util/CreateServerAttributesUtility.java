@@ -56,6 +56,11 @@ public class CreateServerAttributesUtility {
 		attrs.put(key,  a);
 	}
 
+	public void addAttribute(String key, String type, String d, Object defaultVal, boolean secret) {
+		Attribute a = new Attribute(type, d, defaultVal, secret);
+		attrs.put(key,  a);
+	}
+
 	public void removeAttribute(String key) {
 		attrs.remove(key);
 	}

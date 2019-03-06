@@ -11,14 +11,20 @@ package org.jboss.tools.rsp.api.dao;
 public class StringPrompt {
 	private int code;
 	private String prompt;
+	private boolean secret;
 
 	public StringPrompt() {
 		
 	}
 	
 	public StringPrompt(int code, String prompt) {
+		this(code, prompt, false);
+	}
+
+	public StringPrompt(int code, String prompt, boolean secret) {
 		this.code = code;
 		this.prompt = prompt;
+		this.secret = secret;
 	}
 
 	public int getCode() {
@@ -35,5 +41,13 @@ public class StringPrompt {
 
 	public void setPrompt(String prompt) {
 		this.prompt = prompt;
+	}
+
+	public boolean isSecret() {
+		return secret;
+	}
+
+	public void setSecret(boolean secret) {
+		this.secret = secret;
 	}
 }

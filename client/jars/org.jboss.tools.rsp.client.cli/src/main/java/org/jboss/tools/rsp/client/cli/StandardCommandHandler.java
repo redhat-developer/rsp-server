@@ -607,6 +607,11 @@ public class StandardCommandHandler implements InputHandler {
 	public void handleInput(String line) throws Exception {
 		processCommand(line);
 	}
+	
+	@Override
+	public boolean isSecret() {
+		return false; // ?? 
+	}
 
 	private void processCommand(String s) throws Exception {
 		if (s == null

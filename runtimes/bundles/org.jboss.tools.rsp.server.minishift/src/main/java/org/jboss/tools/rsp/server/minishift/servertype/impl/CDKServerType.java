@@ -37,7 +37,7 @@ public class CDKServerType extends BaseMinishiftServerType {
 
 			attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_REG_PASSWORD, 
 					ServerManagementAPIConstants.ATTR_TYPE_STRING,
-					"A registration password", null);
+					"A registration password", null, true);
 			this.required = attrs.toPojo();
 		}
 		return this.required;

@@ -39,6 +39,11 @@ public class WorkflowResponseItem {
 	 */
 	private String responseType;
 	
+	/*
+	 * Is the response a secret / should it be hidden in the UI when typing it?
+	 */
+	private boolean responseSecret = false;
+	
 	// A list of valid responses or null if any conforming type is acceptable
 	private List<String> validResponses;
 
@@ -94,6 +99,14 @@ public class WorkflowResponseItem {
 
 	public void setValidResponses(List<String> validResponses) {
 		this.validResponses = validResponses;
+	}
+
+	public boolean isResponseSecret() {
+		return responseSecret;
+	}
+
+	public void setResponseSecret(boolean responseSecret) {
+		this.responseSecret = responseSecret;
 	}
 	
 	
