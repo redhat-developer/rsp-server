@@ -21,6 +21,7 @@ import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.SocketLauncher;
 import org.jboss.tools.rsp.server.model.ServerManagementModel;
 import org.jboss.tools.rsp.server.model.ServerPersistenceManager;
+import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,7 +119,7 @@ public class ServerManagementServerLauncher {
 			// wait for clients to connect
 			Socket socket = serverSocket.accept();
 			// create a JSON-RPC connection for the accepted socket
-			ServerSocketLauncher<RSPClient> launcher = createSocketLauncher(server,
+			RSPServerSocketLauncher<RSPClient> launcher = createSocketLauncher(server,
 					RSPClient.class, socket, createLoggingPrintWriter());
 
 			// Alert the models a new client has been added before they start making requests
@@ -142,9 +143,13 @@ public class ServerManagementServerLauncher {
 		}
 	}
 	
-	protected RSPServerSocketLauncher<RSPClient> createSocketLauncher(ServerManagementServerImpl server, Class<RSPClient> class1, Socket socket, LoggingPrintWriter loggingPrintWriter) throws IOException {
-		 return new RSPServerSocketLauncher<>(server,
-					RSPClient.class, socket, createLoggingPrintWriter());
+	protected RSPServerSocketLauncher<RSPClient> createSocketLauncher(
+			ServerManagementServerImpl server, Class<RSPClient> class1, 
+			Socket socket,
+			LoggingPrintWriter loggingPrintWriter) throws IOException {
+		 return new RSPServerSocketLauncher<RSPClient>(server,
+					RSPClient.class, socket, ClientThreadLocal.getStore(), 
+					createLoggingPrintWriter());
 	}
 	
 	private class LoggingStringWriter extends StringWriter {
