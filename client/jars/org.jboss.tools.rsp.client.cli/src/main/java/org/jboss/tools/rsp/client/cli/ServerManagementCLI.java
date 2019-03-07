@@ -10,7 +10,6 @@ package org.jboss.tools.rsp.client.cli;
 
 import java.io.Console;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -37,15 +36,12 @@ public class ServerManagementCLI implements InputProvider, IClientConnectionClos
 		cli.readInputs();
 	}
 	
-	private Thread inputThread = null;
 	private Console console = System.console();
 	private Scanner scanner = null;
 	private ServerManagementClientLauncher launcher;
 	private ConcurrentLinkedQueue<InputHandler> queue = new ConcurrentLinkedQueue<>();
 	private StandardCommandHandler defaultHandler;
 	
-	private boolean secretMode = false;
-
 	private void connect(String host, String port) throws Exception {
 		if (host == null) {
 			System.out.print("Enter server host: ");
@@ -105,7 +101,7 @@ public class ServerManagementCLI implements InputProvider, IClientConnectionClos
 			ioe.printStackTrace();
 		}
 	}
-	protected String getUserInput() throws InterruptedException {
+	protected String getUserInput() {
 		if( console != null ) {
 			waitForReadyConsole();
 			boolean queueHasSecret = queue.peek() != null && queue.peek().isSecret();
@@ -123,20 +119,13 @@ public class ServerManagementCLI implements InputProvider, IClientConnectionClos
 	}
 	
 	private void readInputs() {
-		inputThread = Thread.currentThread();
 		while (true) {
 			if (queue.peek() != null) {
 				printUserPrompt(queue.peek());
 			}
-			String content = null;
-			InterruptedException caught = null;
-			try {
-				content = getUserInput();
-			} catch(InterruptedException ie) {
-				caught = ie;
-			}
+			String content = getUserInput();
 			InputHandler handler = getInputHandler();
-			if (handler != null && caught == null) {
+			if (handler != null ) {
 				final String content2 = content;
 				if (!launcher.isConnectionActive()) {
 					close();
