@@ -238,7 +238,7 @@ This endpoint returns the following schema as a return value:
         "severity" : {
           "type" : "integer"
         },
-        "pluginId" : {
+        "plugin" : {
           "type" : "string"
         },
         "code" : {
@@ -252,9 +252,6 @@ This endpoint returns the following schema as a return value:
         },
         "ok" : {
           "type" : "boolean"
-        },
-        "plugin" : {
-          "type" : "string"
         }
       }
     }
@@ -266,12 +263,11 @@ This endpoint returns the following schema as a return value:
 
 export interface Status {
     severity: number;
-    pluginId: string;
+    plugin: string;
     code: number;
     message: string;
     trace: string;
     ok: boolean;
-    plugin: string;
 }</pre></td></tr></table>
 
 #### server/shutdown
@@ -385,7 +381,7 @@ This endpoint returns the following schema as a return value:
     "severity" : {
       "type" : "integer"
     },
-    "pluginId" : {
+    "plugin" : {
       "type" : "string"
     },
     "code" : {
@@ -399,19 +395,15 @@ This endpoint returns the following schema as a return value:
     },
     "ok" : {
       "type" : "boolean"
-    },
-    "plugin" : {
-      "type" : "string"
     }
   }
 }</pre></td><td><pre>export interface Status {
     severity: number;
-    pluginId: string;
+    plugin: string;
     code: number;
     message: string;
     trace: string;
     ok: boolean;
-    plugin: string;
 }</pre></td></tr></table>
 
 #### server/removeDiscoveryPath
@@ -441,7 +433,7 @@ This endpoint returns the following schema as a return value:
     "severity" : {
       "type" : "integer"
     },
-    "pluginId" : {
+    "plugin" : {
       "type" : "string"
     },
     "code" : {
@@ -455,19 +447,15 @@ This endpoint returns the following schema as a return value:
     },
     "ok" : {
       "type" : "boolean"
-    },
-    "plugin" : {
-      "type" : "string"
     }
   }
 }</pre></td><td><pre>export interface Status {
     severity: number;
-    pluginId: string;
+    plugin: string;
     code: number;
     message: string;
     trace: string;
     ok: boolean;
-    plugin: string;
 }</pre></td></tr></table>
 
 #### server/getServerHandles
@@ -587,7 +575,7 @@ This endpoint returns the following schema as a return value:
     "severity" : {
       "type" : "integer"
     },
-    "pluginId" : {
+    "plugin" : {
       "type" : "string"
     },
     "code" : {
@@ -601,19 +589,15 @@ This endpoint returns the following schema as a return value:
     },
     "ok" : {
       "type" : "boolean"
-    },
-    "plugin" : {
-      "type" : "string"
     }
   }
 }</pre></td><td><pre>export interface Status {
     severity: number;
-    pluginId: string;
+    plugin: string;
     code: number;
     message: string;
     trace: string;
     ok: boolean;
-    plugin: string;
 }</pre></td></tr></table>
 
 #### server/getRequiredAttributes
@@ -785,7 +769,7 @@ This endpoint returns the following schema as a return value:
         "severity" : {
           "type" : "integer"
         },
-        "pluginId" : {
+        "plugin" : {
           "type" : "string"
         },
         "code" : {
@@ -799,9 +783,6 @@ This endpoint returns the following schema as a return value:
         },
         "ok" : {
           "type" : "boolean"
-        },
-        "plugin" : {
-          "type" : "string"
         }
       }
     },
@@ -819,12 +800,11 @@ This endpoint returns the following schema as a return value:
 
 export interface Status {
     severity: number;
-    pluginId: string;
+    plugin: string;
     code: number;
     message: string;
     trace: string;
     ok: boolean;
-    plugin: string;
 }</pre></td></tr></table>
 
 #### server/getLaunchModes
@@ -1132,7 +1112,7 @@ This endpoint returns the following schema as a return value:
     "severity" : {
       "type" : "integer"
     },
-    "pluginId" : {
+    "plugin" : {
       "type" : "string"
     },
     "code" : {
@@ -1146,19 +1126,15 @@ This endpoint returns the following schema as a return value:
     },
     "ok" : {
       "type" : "boolean"
-    },
-    "plugin" : {
-      "type" : "string"
     }
   }
 }</pre></td><td><pre>export interface Status {
     severity: number;
-    pluginId: string;
+    plugin: string;
     code: number;
     message: string;
     trace: string;
     ok: boolean;
-    plugin: string;
 }</pre></td></tr></table>
 
 #### server/serverStartedByClient
@@ -1212,7 +1188,7 @@ This endpoint returns the following schema as a return value:
     "severity" : {
       "type" : "integer"
     },
-    "pluginId" : {
+    "plugin" : {
       "type" : "string"
     },
     "code" : {
@@ -1226,19 +1202,15 @@ This endpoint returns the following schema as a return value:
     },
     "ok" : {
       "type" : "boolean"
-    },
-    "plugin" : {
-      "type" : "string"
     }
   }
 }</pre></td><td><pre>export interface Status {
     severity: number;
-    pluginId: string;
+    plugin: string;
     code: number;
     message: string;
     trace: string;
     ok: boolean;
-    plugin: string;
 }</pre></td></tr></table>
 
 #### server/getServerState
@@ -1446,7 +1418,7 @@ This endpoint returns the following schema as a return value:
         "severity" : {
           "type" : "integer"
         },
-        "pluginId" : {
+        "plugin" : {
           "type" : "string"
         },
         "code" : {
@@ -1460,9 +1432,6 @@ This endpoint returns the following schema as a return value:
         },
         "ok" : {
           "type" : "boolean"
-        },
-        "plugin" : {
-          "type" : "string"
         }
       }
     },
@@ -1500,12 +1469,11 @@ This endpoint returns the following schema as a return value:
 
 export interface Status {
     severity: number;
-    pluginId: string;
+    plugin: string;
     code: number;
     message: string;
     trace: string;
     ok: boolean;
-    plugin: string;
 }
 
 export interface CommandLineDetails {
@@ -1546,7 +1514,7 @@ This endpoint returns the following schema as a return value:
     "severity" : {
       "type" : "integer"
     },
-    "pluginId" : {
+    "plugin" : {
       "type" : "string"
     },
     "code" : {
@@ -1560,19 +1528,15 @@ This endpoint returns the following schema as a return value:
     },
     "ok" : {
       "type" : "boolean"
-    },
-    "plugin" : {
-      "type" : "string"
     }
   }
 }</pre></td><td><pre>export interface Status {
     severity: number;
-    pluginId: string;
+    plugin: string;
     code: number;
     message: string;
     trace: string;
     ok: boolean;
-    plugin: string;
 }</pre></td></tr></table>
 
 #### server/getDeployables
@@ -1757,7 +1721,7 @@ This endpoint returns the following schema as a return value:
     "severity" : {
       "type" : "integer"
     },
-    "pluginId" : {
+    "plugin" : {
       "type" : "string"
     },
     "code" : {
@@ -1771,19 +1735,15 @@ This endpoint returns the following schema as a return value:
     },
     "ok" : {
       "type" : "boolean"
-    },
-    "plugin" : {
-      "type" : "string"
     }
   }
 }</pre></td><td><pre>export interface Status {
     severity: number;
-    pluginId: string;
+    plugin: string;
     code: number;
     message: string;
     trace: string;
     ok: boolean;
-    plugin: string;
 }</pre></td></tr></table>
 
 #### server/removeDeployable
@@ -1860,7 +1820,7 @@ This endpoint returns the following schema as a return value:
     "severity" : {
       "type" : "integer"
     },
-    "pluginId" : {
+    "plugin" : {
       "type" : "string"
     },
     "code" : {
@@ -1874,19 +1834,15 @@ This endpoint returns the following schema as a return value:
     },
     "ok" : {
       "type" : "boolean"
-    },
-    "plugin" : {
-      "type" : "string"
     }
   }
 }</pre></td><td><pre>export interface Status {
     severity: number;
-    pluginId: string;
+    plugin: string;
     code: number;
     message: string;
     trace: string;
     ok: boolean;
-    plugin: string;
 }</pre></td></tr></table>
 
 #### server/publish
@@ -1950,7 +1906,7 @@ This endpoint returns the following schema as a return value:
     "severity" : {
       "type" : "integer"
     },
-    "pluginId" : {
+    "plugin" : {
       "type" : "string"
     },
     "code" : {
@@ -1964,19 +1920,15 @@ This endpoint returns the following schema as a return value:
     },
     "ok" : {
       "type" : "boolean"
-    },
-    "plugin" : {
-      "type" : "string"
     }
   }
 }</pre></td><td><pre>export interface Status {
     severity: number;
-    pluginId: string;
+    plugin: string;
     code: number;
     message: string;
     trace: string;
     ok: boolean;
-    plugin: string;
 }</pre></td></tr></table>
 
 #### server/listDownloadableRuntimes
@@ -2091,7 +2043,7 @@ This endpoint returns the following schema as a return value:
         "severity" : {
           "type" : "integer"
         },
-        "pluginId" : {
+        "plugin" : {
           "type" : "string"
         },
         "code" : {
@@ -2105,9 +2057,6 @@ This endpoint returns the following schema as a return value:
         },
         "ok" : {
           "type" : "boolean"
-        },
-        "plugin" : {
-          "type" : "string"
         }
       }
     },
@@ -2155,12 +2104,11 @@ This endpoint returns the following schema as a return value:
 
 export interface Status {
     severity: number;
-    pluginId: string;
+    plugin: string;
     code: number;
     message: string;
     trace: string;
     ok: boolean;
-    plugin: string;
 }
 
 export interface WorkflowResponseItem {

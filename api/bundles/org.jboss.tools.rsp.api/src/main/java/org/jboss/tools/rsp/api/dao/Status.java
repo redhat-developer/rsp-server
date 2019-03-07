@@ -74,7 +74,7 @@ public class Status {
 	/**
 	 * Unique identifier of plug-in.
 	 */
-	private String pluginId;
+	private String plugin;
 
 	/**
 	 * Plug-in-specific status code.
@@ -100,15 +100,15 @@ public class Status {
 	 * @param severity  the severity; one of <code>OK</code>, <code>ERROR</code>,
 	 *                  <code>INFO</code>, <code>WARNING</code>, or
 	 *                  <code>CANCEL</code>
-	 * @param pluginId  the unique identifier of the relevant plug-in
+	 * @param plugin    the unique identifier of the relevant plug-in
 	 * @param code      the plug-in-specific status code, or <code>OK</code>
 	 * @param message   a human-readable message, localized to the current locale
 	 * @param exception a low-level exception, or <code>null</code> if not
 	 *                  applicable
 	 */
-	public Status(int severity, String pluginId, int code, String message, String trace) {
+	public Status(int severity, String plugin, int code, String message, String trace) {
 		setSeverity(severity);
-		setPlugin(pluginId);
+		setPlugin(plugin);
 		setCode(code);
 		setMessage(message);
 		setTrace(trace);
@@ -121,16 +121,16 @@ public class Status {
 	 * @param severity  the severity; one of <code>OK</code>, <code>ERROR</code>,
 	 *                  <code>INFO</code>, <code>WARNING</code>, or
 	 *                  <code>CANCEL</code>
-	 * @param pluginId  the unique identifier of the relevant plug-in
+	 * @param plugin  the unique identifier of the relevant plug-in
 	 * @param message   a human-readable message, localized to the current locale
 	 * @param exception a low-level exception, or <code>null</code> if not
 	 *                  applicable
 	 * 
 	 * @since org.eclipse.equinox.common 3.3
 	 */
-	public Status(int severity, String pluginId, String message, String trace) {
+	public Status(int severity, String plugin, String message, String trace) {
 		setSeverity(severity);
-		setPlugin(pluginId);
+		setPlugin(plugin);
 		setMessage(message);
 		setTrace(trace);
 		setCode(OK);
@@ -144,14 +144,14 @@ public class Status {
 	 * @param severity the severity; one of <code>OK</code>, <code>ERROR</code>,
 	 *                 <code>INFO</code>, <code>WARNING</code>, or
 	 *                 <code>CANCEL</code>
-	 * @param pluginId the unique identifier of the relevant plug-in
+	 * @param plugin the unique identifier of the relevant plug-in
 	 * @param message  a human-readable message, localized to the current locale
 	 * 
 	 * @since org.eclipse.equinox.common 3.3
 	 */
-	public Status(int severity, String pluginId, String message) {
+	public Status(int severity, String plugin, String message) {
 		setSeverity(severity);
-		setPlugin(pluginId);
+		setPlugin(plugin);
 		setMessage(message);
 		setCode(OK);
 		setTrace(null);
@@ -167,10 +167,6 @@ public class Status {
 
 	public String getMessage() {
 		return message;
-	}
-
-	public String getPlugin() {
-		return pluginId;
 	}
 
 	public int getSeverity() {
@@ -217,15 +213,6 @@ public class Status {
 	}
 
 	/**
-	 * Sets the plug-in id.
-	 *
-	 * @param pluginId the unique identifier of the relevant plug-in
-	 */
-	public void setPlugin(String pluginId) {
-		this.pluginId = pluginId;
-	}
-
-	/**
 	 * Sets the severity.
 	 *
 	 * @param severity the severity; one of <code>OK</code>, <code>ERROR</code>,
@@ -259,7 +246,7 @@ public class Status {
 			buf.append(severity);
 		}
 		buf.append(": "); //$NON-NLS-1$
-		buf.append(pluginId);
+		buf.append(plugin);
 		buf.append(" code="); //$NON-NLS-1$
 		buf.append(code);
 		buf.append(' ');
@@ -269,12 +256,12 @@ public class Status {
 		return buf.toString();
 	}
 
-	public String getPluginId() {
-		return pluginId;
+	public String getPlugin() {
+		return plugin;
 	}
 
-	public void setPluginId(String pluginId) {
-		this.pluginId = pluginId;
+	public void setPlugin(String plugin) {
+		this.plugin = plugin;
 	}
 
 }
