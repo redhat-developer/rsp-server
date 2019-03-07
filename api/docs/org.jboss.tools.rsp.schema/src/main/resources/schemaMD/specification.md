@@ -661,6 +661,9 @@ This endpoint returns the following schema as a return value:
           },
           "defaultVal" : {
             "type" : "any"
+          },
+          "secret" : {
+            "type" : "boolean"
           }
         }
       }
@@ -674,6 +677,7 @@ export interface Attribute {
     type: string;
     description: string;
     defaultVal: any;
+    secret: boolean;
 }</pre></td></tr></table>
 
 #### server/getOptionalAttributes
@@ -721,6 +725,9 @@ This endpoint returns the following schema as a return value:
           },
           "defaultVal" : {
             "type" : "any"
+          },
+          "secret" : {
+            "type" : "boolean"
           }
         }
       }
@@ -734,6 +741,7 @@ export interface Attribute {
     type: string;
     description: string;
     defaultVal: any;
+    secret: boolean;
 }</pre></td></tr></table>
 
 #### server/createServer
@@ -904,6 +912,9 @@ This endpoint returns the following schema as a return value:
           },
           "defaultVal" : {
             "type" : "any"
+          },
+          "secret" : {
+            "type" : "boolean"
           }
         }
       }
@@ -917,6 +928,7 @@ export interface Attribute {
     type: string;
     description: string;
     defaultVal: any;
+    secret: boolean;
 }</pre></td></tr></table>
 
 #### server/getOptionalLaunchAttributes
@@ -960,6 +972,9 @@ This endpoint returns the following schema as a return value:
           },
           "defaultVal" : {
             "type" : "any"
+          },
+          "secret" : {
+            "type" : "boolean"
           }
         }
       }
@@ -973,6 +988,7 @@ export interface Attribute {
     type: string;
     description: string;
     defaultVal: any;
+    secret: boolean;
 }</pre></td></tr></table>
 
 #### server/getLaunchCommand
@@ -2118,6 +2134,9 @@ This endpoint returns the following schema as a return value:
           "responseType" : {
             "type" : "string"
           },
+          "responseSecret" : {
+            "type" : "boolean"
+          },
           "validResponses" : {
             "type" : "array",
             "items" : {
@@ -2150,6 +2169,7 @@ export interface WorkflowResponseItem {
     label: string;
     content: string;
     responseType: string;
+    responseSecret: boolean;
     validResponses: string[];
 }</pre></td></tr></table>
 
@@ -2172,11 +2192,15 @@ This endpoint takes the following json schemas as parameters:
     },
     "prompt" : {
       "type" : "string"
+    },
+    "secret" : {
+      "type" : "boolean"
     }
   }
 }</pre></td><td><pre>export interface StringPrompt {
     code: number;
     prompt: string;
+    secret: boolean;
 }</pre></td></tr></table>
 
 This endpoint returns the following schema as a return value: 

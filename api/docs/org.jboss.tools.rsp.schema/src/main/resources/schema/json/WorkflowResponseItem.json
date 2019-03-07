@@ -16,6 +16,9 @@
     "responseType" : {
       "type" : "string"
     },
+    "responseSecret" : {
+      "type" : "boolean"
+    },
     "validResponses" : {
       "type" : "array",
       "items" : {

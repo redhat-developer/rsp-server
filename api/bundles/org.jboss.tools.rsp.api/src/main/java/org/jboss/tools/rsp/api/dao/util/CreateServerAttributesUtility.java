@@ -44,6 +44,13 @@ public class CreateServerAttributesUtility {
 		return null;
 	}
 	
+	public boolean isAttributeSecret(String key) {
+		Attribute a = attrs.get(key);
+		if( a != null )
+			return a.isSecret();
+		return false;
+	}
+	
 	public Object getAttributeDefaultValue(String key) {
 		Attribute a = attrs.get(key);
 		if( a != null )
@@ -53,6 +60,11 @@ public class CreateServerAttributesUtility {
 	
 	public void addAttribute(String key, String type, String d, Object defaultVal) {
 		Attribute a = new Attribute(type, d, defaultVal);
+		attrs.put(key,  a);
+	}
+
+	public void addAttribute(String key, String type, String d, Object defaultVal, boolean secret) {
+		Attribute a = new Attribute(type, d, defaultVal, secret);
 		attrs.put(key,  a);
 	}
 

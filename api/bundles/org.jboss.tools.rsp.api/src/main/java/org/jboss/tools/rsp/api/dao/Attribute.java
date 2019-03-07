@@ -15,15 +15,21 @@ public class Attribute {
 	private String type;
 	private String description;
 	private Object defaultVal;
+	private boolean secret = false;
 
 	public Attribute() {
 
 	}
 
 	public Attribute(String type, String desc, Object def) {
+		this(type, desc, def, false);
+	}
+	
+	public Attribute(String type, String desc, Object def, boolean secret) {
 		this.type = type;
 		this.description = desc;
 		this.defaultVal = def;
+		this.secret = secret;
 	}
 
 	public String getType() {
@@ -70,5 +76,13 @@ public class Attribute {
 	@Override
 	public int hashCode() {
 		return Objects.hash(defaultVal, description, type);
+	}
+
+	public boolean isSecret() {
+		return secret;
+	}
+
+	public void setSecret(boolean secret) {
+		this.secret = secret;
 	}
 }

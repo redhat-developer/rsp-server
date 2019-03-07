@@ -11,4 +11,5 @@ package org.jboss.tools.rsp.client.cli;
 public interface InputHandler {
 	public String getPrompt();
 	public void handleInput(String line) throws Exception;
+	public boolean isSecret();
 }

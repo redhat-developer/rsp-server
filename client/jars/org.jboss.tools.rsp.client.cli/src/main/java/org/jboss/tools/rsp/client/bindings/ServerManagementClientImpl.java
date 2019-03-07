@@ -164,7 +164,7 @@ public class ServerManagementClientImpl implements RSPClient {
 		final CompletableFuture<String>[] ret = new CompletableFuture[1];
 		ret[0] = null;
 		
-		PromptStringHandler h2 = new PromptStringHandler(prompt.getPrompt()) {
+		PromptStringHandler h2 = new PromptStringHandler(prompt.getPrompt(), prompt.isSecret()) {
 			public void handleInput(String line) throws Exception {
 				ret[0] = CompletableFuture.completedFuture(line);
 			}
@@ -187,13 +187,23 @@ public class ServerManagementClientImpl implements RSPClient {
 	
 	private abstract class PromptStringHandler implements InputHandler {
 		private String prompt;
+		private boolean isSecret;
 		public PromptStringHandler(String prompt) {
+			this(prompt, false);
+		}
+		public PromptStringHandler(String prompt, boolean secret) {
 			this.prompt = prompt;
+			this.isSecret = secret;
 		}
 
 		@Override
 		public String getPrompt() {
 			return prompt;
+		}
+		
+		@Override
+		public boolean isSecret() {
+			return isSecret;
 		}
 
 		public abstract void handleInput(String line) throws Exception;

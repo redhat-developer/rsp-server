@@ -301,7 +301,13 @@ public class StandardCommandHandler implements InputHandler {
 			@Override
 			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
 				String suffix = command.substring(this.command.length());
-				ServerHandle sh = findServer(suffix.trim(), launcher);
+				ServerHandle sh = null;
+				if( suffix.trim().isEmpty()) {
+					sh = assistant.selectServer();
+				} else {
+					sh = findServer(suffix.trim(), launcher);
+				}
+				
 				if (sh != null)
 					launcher.getServerProxy().deleteServer(sh);
 				else
@@ -475,7 +481,8 @@ public class StandardCommandHandler implements InputHandler {
 					String type = item.getResponseType();
 					if( type != null && !ServerManagementAPIConstants.ATTR_TYPE_NONE.equals(type)) {
 						// Prompt for input
-						asst.promptForAttributeSingleKey(type, null, null, item.getId(), true, toSend);
+						asst.promptForAttributeSingleKey(type, null, null, 
+								item.getId(), item.isResponseSecret(), true, toSend);
 					}
 				}
 				return toSend;
@@ -606,6 +613,11 @@ public class StandardCommandHandler implements InputHandler {
 	@Override
 	public void handleInput(String line) throws Exception {
 		processCommand(line);
+	}
+	
+	@Override
+	public boolean isSecret() {
+		return false; // ?? 
 	}
 
 	private void processCommand(String s) throws Exception {

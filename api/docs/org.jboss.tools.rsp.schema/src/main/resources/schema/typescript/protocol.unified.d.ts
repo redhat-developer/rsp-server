@@ -1,10 +1,11 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2019-02-28 18:10:59.
+// Generated using typescript-generator version 2.2.413 on 2019-03-06 01:52:31.
 
 export interface Attribute {
     type: string;
     description: string;
     defaultVal: any;
+    secret: boolean;
 }
 
 export interface Attributes {
@@ -170,6 +171,7 @@ export interface StopServerAttributes {
 export interface StringPrompt {
     code: number;
     prompt: string;
+    secret: boolean;
 }
 
 export interface VMDescription {
@@ -194,5 +196,6 @@ export interface WorkflowResponseItem {
     label: string;
     content: string;
     responseType: string;
+    responseSecret: boolean;
     validResponses: string[];
 }

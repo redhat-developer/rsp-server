@@ -6,6 +6,9 @@
     },
     "prompt" : {
       "type" : "string"
+    },
+    "secret" : {
+      "type" : "boolean"
     }
   }
 }
