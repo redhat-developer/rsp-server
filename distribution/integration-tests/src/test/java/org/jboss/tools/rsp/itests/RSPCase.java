@@ -8,58 +8,81 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.itests;
 
+import static org.junit.Assert.fail;
+
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.jboss.tools.rsp.api.RSPServer;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerBean;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.Status;
-import org.jboss.tools.rsp.itests.util.RSPServerHandler;
 import org.jboss.tools.rsp.itests.util.DummyClientLauncher;
+import org.jboss.tools.rsp.itests.util.RSPServerHandler;
+import org.jboss.tools.rsp.itests.util.RSPServerUtility;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 /**
  *
- * @author jrichter
+ * @author jrichter, odockal
  */
-public class RSPCase {
-    protected static final String WILDFLY13_ROOT = Paths.get("target/wildfly-13.0.0.Final").toAbsolutePath().toString();    
-    protected static final ServerType wfly13Type = new ServerType("org.jboss.ide.eclipse.as.wildfly.130",
-            "WildFly 13.x", "A server adapter capable of discovering and controlling a WildFly 13.x runtime instance.");
-    protected static final String INVALID_PARAM =
-            "Parameter is invalid. It may be null, missing required fields, or unacceptable values.";
-    
-    protected static DummyClientLauncher launcher;
-    protected static RSPServer serverProxy;
-    
-    @BeforeClass
-    public static void prepare() throws Exception {
-        RSPServerHandler.clearServerData(true);
-        RSPServerHandler.prepareServer();
-        RSPServerHandler.startServer();
-        launcher = new DummyClientLauncher("localhost", 27511);
-        launcher.launch();
-        serverProxy = launcher.getServerProxy();
-    }
-    
-    @AfterClass
-    public static void dispose() throws Exception {
-    	if (launcher != null) {
-    		launcher.closeConnection();
-    	}
-        RSPServerHandler.stopServer();
-        RSPServerHandler.restoreBackupData(true);
-    }
-    
-    protected Status createServer(String location, String id) throws Exception {
-        ServerBean bean = serverProxy.findServerBeans(new DiscoveryPath(location)).get().get(0);
-        Map<String, Object> attr = new HashMap<>();
-        attr.put("server.home.dir", bean.getLocation());
-        ServerAttributes serverAttr = new ServerAttributes(bean.getServerAdapterTypeId(), id, attr);
-        return serverProxy.createServer(serverAttr).get().getStatus();
-    }
+public abstract class RSPCase {
+
+	protected static String WILDFLY_SERVER_ID;
+	protected static String WILDFLY_PATH;
+	protected static String WILDFLY_VERSION;
+	protected static String WILDFLY_ROOT;
+	protected static ServerType wildflyType;
+	protected static final String INVALID_PARAM = "Parameter is invalid. It may be null, missing required fields, or unacceptable values.";
+
+	protected static DummyClientLauncher launcher;
+	protected static RSPServer serverProxy;
+
+	public static void initializeProperties() {
+		WILDFLY_SERVER_ID = getProperty("server.type.id");
+		WILDFLY_PATH = getProperty("server.path");
+		WILDFLY_VERSION = getProperty("server.version");
+		WILDFLY_ROOT = Paths.get(WILDFLY_PATH).toAbsolutePath().toString();
+		wildflyType = RSPServerUtility.getServerType(WILDFLY_SERVER_ID);
+	}
+
+	public static String getProperty(String property) {
+		String val = System.getProperty(property);
+		if (val == null) {
+			fail("System property " + property + " value is not defined");
+		}
+		return val;
+	}
+
+	@BeforeClass
+	public static void prepare() throws Exception {
+		initializeProperties();
+		RSPServerHandler.clearServerData(true);
+		RSPServerHandler.prepareServer();
+		RSPServerHandler.startServer();
+		launcher = new DummyClientLauncher("localhost", 27511);
+		launcher.launch();
+		serverProxy = launcher.getServerProxy();
+	}
+
+	@AfterClass
+	public static void dispose() throws Exception {
+		if (launcher != null) {
+			launcher.closeConnection();
+		}
+		RSPServerHandler.stopServer();
+		RSPServerHandler.restoreBackupData(true);
+	}
+
+	protected Status createServer(String location, String id) throws Exception {
+		ServerBean bean = serverProxy.findServerBeans(new DiscoveryPath(location)).get().get(0);
+		Map<String, Object> attr = new HashMap<>();
+		attr.put("server.home.dir", bean.getLocation());
+		ServerAttributes serverAttr = new ServerAttributes(bean.getServerAdapterTypeId(), id, attr);
+		return serverProxy.createServer(serverAttr).get().getStatus();
+	}
 }

@@ -42,7 +42,7 @@ public class WildFlyServerModelTest extends RSPCase {
         assertTrue(types.contains(wfly10));
         assertTrue(types.contains(wfly11));
         assertTrue(types.contains(wfly12));
-        assertTrue(types.contains(wfly13Type));
+        assertTrue(types.contains(wildflyType));
     }
     
     @Test
@@ -76,7 +76,7 @@ public class WildFlyServerModelTest extends RSPCase {
     
     @Test
     public void testGetRequiredAttributes() throws Exception {
-        Attributes attr = serverProxy.getRequiredAttributes(wfly13Type).get();
+        Attributes attr = serverProxy.getRequiredAttributes(wildflyType).get();
         
         Map<String, Attribute> expected = new HashMap<>();
         expected.put("server.home.dir", new Attribute("string", "A filesystem path pointing to a server installation's root directory", null));
@@ -101,7 +101,7 @@ public class WildFlyServerModelTest extends RSPCase {
     
     @Test
     public void testGetOptionalAttributes() throws Exception {
-        Attributes attr = serverProxy.getOptionalAttributes(wfly13Type).get();
+        Attributes attr = serverProxy.getOptionalAttributes(wildflyType).get();
         
         Map<String, Attribute> expected = new HashMap<>();
         expected.put("vm.install.path", new Attribute("string",
@@ -128,13 +128,13 @@ public class WildFlyServerModelTest extends RSPCase {
     
     @Test
     public void testCreateServer() throws Exception {
-        Status status = createServer(WILDFLY13_ROOT, "wfly");
+        Status status = createServer(WILDFLY_ROOT, "wfly");
                 
         assertEquals(0, status.getSeverity());
         assertEquals("ok", status.getMessage());
         
         List<ServerHandle> handles = serverProxy.getServerHandles().get();
-        ServerHandle expected = new ServerHandle("wfly", wfly13Type);
+        ServerHandle expected = new ServerHandle("wfly", wildflyType);
         assertTrue(handles.contains(expected));
     }
     
@@ -157,8 +157,8 @@ public class WildFlyServerModelTest extends RSPCase {
     
     @Test
     public void testCreateServerTwice() throws Exception {
-        Status status1 = createServer(WILDFLY13_ROOT, "wfly1");
-        Status status2 = createServer(WILDFLY13_ROOT, "wfly1");
+        Status status1 = createServer(WILDFLY_ROOT, "wfly1");
+        Status status2 = createServer(WILDFLY_ROOT, "wfly1");
         
         assertEquals(0, status1.getSeverity());
         assertEquals("ok", status1.getMessage());
@@ -168,9 +168,9 @@ public class WildFlyServerModelTest extends RSPCase {
     
     @Test
     public void testDeleteServer() throws Exception {
-        createServer(WILDFLY13_ROOT, "wfly2");
+        createServer(WILDFLY_ROOT, "wfly2");
         
-        ServerHandle handle = new ServerHandle("wfly2", wfly13Type);
+        ServerHandle handle = new ServerHandle("wfly2", wildflyType);
         Status status = serverProxy.deleteServer(handle).get();
         
         assertEquals(0, status.getSeverity());
@@ -179,7 +179,7 @@ public class WildFlyServerModelTest extends RSPCase {
     
     @Test
     public void testDeleteNonexistentServer() throws Exception {
-        ServerHandle handle = new ServerHandle("wfly3", wfly13Type);
+        ServerHandle handle = new ServerHandle("wfly3", wildflyType);
         Status status = serverProxy.deleteServer(handle).get();
         
         assertEquals(Status.ERROR, status.getSeverity());
@@ -205,12 +205,12 @@ public class WildFlyServerModelTest extends RSPCase {
     
     @Test
     public void testGetServerHandles() throws Exception {
-        createServer(WILDFLY13_ROOT, "wfly5");
-        createServer(WILDFLY13_ROOT, "wfly6");
+        createServer(WILDFLY_ROOT, "wfly5");
+        createServer(WILDFLY_ROOT, "wfly6");
         
         List<ServerHandle> handles = serverProxy.getServerHandles().get();
         
-        assertTrue(handles.contains(new ServerHandle("wfly5", wfly13Type)));
-        assertTrue(handles.contains(new ServerHandle("wfly6", wfly13Type)));
+        assertTrue(handles.contains(new ServerHandle("wfly5", wildflyType)));
+        assertTrue(handles.contains(new ServerHandle("wfly6", wildflyType)));
     }
 }

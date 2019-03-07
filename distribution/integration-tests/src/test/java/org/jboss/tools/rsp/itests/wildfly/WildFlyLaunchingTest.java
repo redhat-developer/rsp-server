@@ -45,7 +45,7 @@ public class WildFlyLaunchingTest extends RSPCase {
 
 	@Test
     public void testGetLaunchModes() throws Exception {
-        List<ServerLaunchMode> modes = serverProxy.getLaunchModes(wfly13Type).get();
+        List<ServerLaunchMode> modes = serverProxy.getLaunchModes(wildflyType).get();
         
         ServerLaunchMode expectedRun = new ServerLaunchMode(MODE_RUN, "A launch mode indicating a simple run.");
         ServerLaunchMode expectedDebug = new ServerLaunchMode(MODE_DEBUG,
@@ -71,7 +71,7 @@ public class WildFlyLaunchingTest extends RSPCase {
 
     @Test
     public void testGetRequiredLaunchAttributes() throws Exception {
-        LaunchAttributesRequest req = new LaunchAttributesRequest(wfly13Type.getId(), MODE_RUN);
+        LaunchAttributesRequest req = new LaunchAttributesRequest(wildflyType.getId(), MODE_RUN);
         Attributes attr = serverProxy.getRequiredLaunchAttributes(req).get();
         
         assertNotNull(attr);
@@ -94,7 +94,7 @@ public class WildFlyLaunchingTest extends RSPCase {
 
     @Test
     public void testGetOptionalLaunchAttributes() throws Exception {
-        LaunchAttributesRequest req = new LaunchAttributesRequest(wfly13Type.getId(), MODE_RUN);
+        LaunchAttributesRequest req = new LaunchAttributesRequest(wildflyType.getId(), MODE_RUN);
         Attributes attr = serverProxy.getOptionalLaunchAttributes(req).get();
         
         assertNotNull(attr);
@@ -117,10 +117,10 @@ public class WildFlyLaunchingTest extends RSPCase {
 
     @Test
     public void testGetLaunchCommand() throws Exception {
-        createServer(WILDFLY13_ROOT, "wildfly");
+        createServer(WILDFLY_ROOT, "wildfly");
         
         LaunchParameters params = new LaunchParameters(
-                new ServerAttributes(wfly13Type.getId(), "wildfly", new HashMap<>()), MODE_RUN);
+                new ServerAttributes(wildflyType.getId(), "wildfly", new HashMap<>()), MODE_RUN);
         
         CommandLineDetails cmd = serverProxy.getLaunchCommand(params).get();
         
@@ -147,9 +147,9 @@ public class WildFlyLaunchingTest extends RSPCase {
 
     @Test
     public void testServerStartingByClient() throws Exception {
-        createServer(WILDFLY13_ROOT, "wildfly1");
+        createServer(WILDFLY_ROOT, "wildfly1");
         LaunchParameters params = new LaunchParameters(
-                new ServerAttributes(wfly13Type.getId(), "wildfly1", new HashMap<>()), MODE_RUN);
+                new ServerAttributes(wildflyType.getId(), "wildfly1", new HashMap<>()), MODE_RUN);
         ServerStartingAttributes attr = new ServerStartingAttributes(params, false);
         
         Status status = serverProxy.serverStartingByClient(attr).get();
@@ -180,9 +180,9 @@ public class WildFlyLaunchingTest extends RSPCase {
 
     @Test
     public void testServerStartedByClient() throws Exception {
-        createServer(WILDFLY13_ROOT, "wildfly2");
+        createServer(WILDFLY_ROOT, "wildfly2");
         LaunchParameters params = new LaunchParameters(
-                new ServerAttributes(wfly13Type.getId(), "wildfly2", new HashMap<>()), MODE_RUN);
+                new ServerAttributes(wildflyType.getId(), "wildfly2", new HashMap<>()), MODE_RUN);
         
         Status status = serverProxy.serverStartedByClient(params).get();
         
@@ -228,11 +228,11 @@ public class WildFlyLaunchingTest extends RSPCase {
 
     @Test
     public void testStartServer() throws Exception {
-        createServer(WILDFLY13_ROOT, "wildfly3");
+        createServer(WILDFLY_ROOT, "wildfly3");
         Map<String, Object> attr = new HashMap<>();
-        attr.put("server.home.dir", WILDFLY13_ROOT);
+        attr.put("server.home.dir", WILDFLY_ROOT);
         LaunchParameters params = new LaunchParameters(
-                new ServerAttributes(wfly13Type.getId(), "wildfly3", attr), MODE_RUN);
+                new ServerAttributes(wildflyType.getId(), "wildfly3", attr), MODE_RUN);
         
         StartServerResponse response = serverProxy.startServerAsync(params).get();
         
@@ -246,12 +246,12 @@ public class WildFlyLaunchingTest extends RSPCase {
 
     @Test
     public void testStartServerTwice() throws Exception {
-        createServer(WILDFLY13_ROOT, "wildfly4");
+        createServer(WILDFLY_ROOT, "wildfly4");
 
         Map<String, Object> attr = new HashMap<>();
-        attr.put("server.home.dir", WILDFLY13_ROOT);
+        attr.put("server.home.dir", WILDFLY_ROOT);
         LaunchParameters params = new LaunchParameters(
-                new ServerAttributes(wfly13Type.getId(), "wildfly4", attr), MODE_RUN);
+                new ServerAttributes(wildflyType.getId(), "wildfly4", attr), MODE_RUN);
         
         serverProxy.startServerAsync(params).get();
         waitForServerState(STATE_STARTED, 10);
@@ -265,11 +265,11 @@ public class WildFlyLaunchingTest extends RSPCase {
 
     @Test
     public void testStopServer() throws Exception {
-        createServer(WILDFLY13_ROOT, "wildfly5");
+        createServer(WILDFLY_ROOT, "wildfly5");
         Map<String, Object> attr = new HashMap<>();
-        attr.put("server.home.dir", WILDFLY13_ROOT);
+        attr.put("server.home.dir", WILDFLY_ROOT);
         LaunchParameters params = new LaunchParameters(
-                new ServerAttributes(wfly13Type.getId(), "wildfly5", attr), MODE_RUN);
+                new ServerAttributes(wildflyType.getId(), "wildfly5", attr), MODE_RUN);
         
         serverProxy.startServerAsync(params).get();
         waitForServerState(STATE_STARTED, 10);
@@ -283,7 +283,7 @@ public class WildFlyLaunchingTest extends RSPCase {
 
     @Test
     public void testStopStoppedServer() throws Exception {
-        createServer(WILDFLY13_ROOT, "wildfly6");
+        createServer(WILDFLY_ROOT, "wildfly6");
         Status status = serverProxy.stopServerAsync(new StopServerAttributes("wildfly6", false)).get();
         
         assertEquals("The server is already marked as stopped. "

@@ -21,18 +21,18 @@ public class WildFlyDiscoveryTest extends RSPCase {
     
     @Test
     public void testFindServerBeansWildfly() throws Exception {
-        List<ServerBean> beans = serverProxy.findServerBeans(new DiscoveryPath(WILDFLY13_ROOT)).get();
+        List<ServerBean> beans = serverProxy.findServerBeans(new DiscoveryPath(WILDFLY_ROOT)).get();
         ServerBean bean = beans.get(0);
         
-        assertEquals(bean.getServerAdapterTypeId(), "org.jboss.ide.eclipse.as.wildfly.130");
-        assertEquals(bean.getSpecificType(), "WildFly");
-        assertEquals(bean.getTypeCategory(), "WildFly");
-        assertEquals(bean.getFullVersion(), "13.0.0.Final");
+        assertEquals( WILDFLY_SERVER_ID, bean.getServerAdapterTypeId());
+        assertEquals("WildFly", bean.getSpecificType());
+        assertEquals("WildFly", bean.getTypeCategory());
+        assertEquals(WILDFLY_VERSION, bean.getFullVersion());
     }
     
     @Test
     public void testFindServerBeansInvalid() throws Exception {
-        List<ServerBean> beans = serverProxy.findServerBeans(new DiscoveryPath(WILDFLY13_ROOT + "/foo")).get();
+        List<ServerBean> beans = serverProxy.findServerBeans(new DiscoveryPath(WILDFLY_ROOT + "/foo")).get();
         ServerBean bean = beans.get(0);
         
         assertEquals("UNKNOWN", bean.getTypeCategory());
@@ -58,7 +58,7 @@ public class WildFlyDiscoveryTest extends RSPCase {
     
     @Test
     public void testAddDiscoveryPath() throws Exception {
-        DiscoveryPath path = new DiscoveryPath(WILDFLY13_ROOT + "1");
+        DiscoveryPath path = new DiscoveryPath(WILDFLY_ROOT + "1");
         Status status = serverProxy.addDiscoveryPath(path).get();
         List<DiscoveryPath> paths = serverProxy.getDiscoveryPaths().get();
         serverProxy.removeDiscoveryPath(path).get();
@@ -70,7 +70,7 @@ public class WildFlyDiscoveryTest extends RSPCase {
     
     @Test
     public void testAddDiscoveryPathTwice() throws Exception {
-        DiscoveryPath path = new DiscoveryPath(WILDFLY13_ROOT + "2");
+        DiscoveryPath path = new DiscoveryPath(WILDFLY_ROOT + "2");
         Status status1 = serverProxy.addDiscoveryPath(path).get();
         Status status2 = serverProxy.addDiscoveryPath(path).get();
         serverProxy.removeDiscoveryPath(path).get();
@@ -78,7 +78,7 @@ public class WildFlyDiscoveryTest extends RSPCase {
         assertEquals(0, status1.getSeverity());
         assertEquals("ok", status1.getMessage());
         assertEquals(Status.ERROR, status2.getSeverity());
-        assertEquals("Discovery path not added: " + WILDFLY13_ROOT + "2", status2.getMessage());
+        assertEquals("Discovery path not added: " + WILDFLY_ROOT + "2", status2.getMessage());
     }
     
     @Test
@@ -99,7 +99,7 @@ public class WildFlyDiscoveryTest extends RSPCase {
     
     @Test
     public void testRemoveDiscoveryPath() throws Exception {
-        DiscoveryPath path = new DiscoveryPath(WILDFLY13_ROOT + "3");
+        DiscoveryPath path = new DiscoveryPath(WILDFLY_ROOT + "3");
         serverProxy.addDiscoveryPath(path).get();        
         assertTrue(serverProxy.getDiscoveryPaths().get().contains(path));
         
@@ -127,8 +127,8 @@ public class WildFlyDiscoveryTest extends RSPCase {
     
     @Test
     public void testGetDiscoveryPaths() throws Exception {
-        DiscoveryPath path1 = new DiscoveryPath(WILDFLY13_ROOT + "4");
-        DiscoveryPath path2 = new DiscoveryPath(WILDFLY13_ROOT + "5");
+        DiscoveryPath path1 = new DiscoveryPath(WILDFLY_ROOT + "4");
+        DiscoveryPath path2 = new DiscoveryPath(WILDFLY_ROOT + "5");
         
         serverProxy.addDiscoveryPath(path1).get();
         serverProxy.addDiscoveryPath(path2).get();

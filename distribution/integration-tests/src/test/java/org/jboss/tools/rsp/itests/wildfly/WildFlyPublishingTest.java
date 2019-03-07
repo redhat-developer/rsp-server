@@ -47,11 +47,11 @@ public class WildFlyPublishingTest extends RSPCase {
     
     @Test
     public void testStartServer() throws Exception {
-        createServer(WILDFLY13_ROOT, "wildfly6a");
+        createServer(WILDFLY_ROOT, "wildfly6a");
         Map<String, Object> attr = new HashMap<>();
-        attr.put("server.home.dir", WILDFLY13_ROOT);
+        attr.put("server.home.dir", WILDFLY_ROOT);
         LaunchParameters params = new LaunchParameters(
-                new ServerAttributes(wfly13Type.getId(), "wildfly6a", attr), "run");
+                new ServerAttributes(wildflyType.getId(), "wildfly6a", attr), "run");
         
         StartServerResponse response = serverProxy.startServerAsync(params).get();
         
@@ -59,7 +59,7 @@ public class WildFlyPublishingTest extends RSPCase {
         assertEquals("ok", response.getStatus().getMessage());
         waitForServerState("started", 10);
         
-        ServerHandle handle = new ServerHandle("wildfly6a", wfly13Type);
+        ServerHandle handle = new ServerHandle("wildfly6a", wildflyType);
         File war = createWar();
         DeployableReference deployable = new DeployableReference(war.getAbsolutePath(), war.getAbsolutePath());
         ModifyDeployableRequest req = new ModifyDeployableRequest(handle, deployable);
