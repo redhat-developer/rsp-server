@@ -6,12 +6,11 @@ export interface WorkflowResponse {
 
 export interface Status {
     severity: number;
-    pluginId: string;
+    plugin: string;
     code: number;
     message: string;
     trace: string;
     ok: boolean;
-    plugin: string;
 }
 
 export interface WorkflowResponseItem {

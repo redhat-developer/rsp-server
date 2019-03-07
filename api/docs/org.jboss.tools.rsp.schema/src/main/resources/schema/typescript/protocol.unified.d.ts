@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2019-03-06 01:52:31.
+// Generated using typescript-generator version 2.2.413 on 2019-03-07 13:15:16.
 
 export interface Attribute {
     type: string;
@@ -155,12 +155,11 @@ export interface StartServerResponse {
 
 export interface Status {
     severity: number;
-    pluginId: string;
+    plugin: string;
     code: number;
     message: string;
     trace: string;
     ok: boolean;
-    plugin: string;
 }
 
 export interface StopServerAttributes {

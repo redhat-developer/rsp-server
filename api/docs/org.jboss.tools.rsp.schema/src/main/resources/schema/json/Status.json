@@ -4,7 +4,7 @@
     "severity" : {
       "type" : "integer"
     },
-    "pluginId" : {
+    "plugin" : {
       "type" : "string"
     },
     "code" : {
@@ -18,9 +18,6 @@
     },
     "ok" : {
       "type" : "boolean"
-    },
-    "plugin" : {
-      "type" : "string"
     }
   }
 }
