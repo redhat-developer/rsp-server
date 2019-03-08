@@ -56,7 +56,7 @@ public class ServerManagementModel implements IServerManagementModel {
 		this.secureStorage = createSecureStorageProvider(getSecureStorageFile(dataLocation), capabilities);
 		this.rpm = createDiscoveryPathModel();
 		this.serverBeanTypeManager = createServerBeanTypeManager();
-		this.serverModel = createServerModel(secureStorage);
+		this.serverModel = createServerModel();
 		this.vmModel = createVMInstallRegistry();
 		this.vmModel.addActiveVM();
 		this.fileWatcherService = createFileWatcherService();
@@ -140,7 +140,7 @@ public class ServerManagementModel implements IServerManagementModel {
 		return new VMInstallRegistry();
 	}
 
-	protected IServerModel createServerModel(ISecureStorageProvider secure) {
+	protected IServerModel createServerModel() {
 		return new ServerModel(this);
 	}
 
