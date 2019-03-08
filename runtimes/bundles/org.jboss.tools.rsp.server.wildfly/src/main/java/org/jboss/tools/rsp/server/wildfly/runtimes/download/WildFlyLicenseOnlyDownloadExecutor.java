@@ -15,10 +15,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.jboss.tools.rsp.api.dao.CreateServerResponse;
+import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.runtimes.AbstractLicenseOnlyDownloadExecutor;
 import org.jboss.tools.rsp.server.spi.runtimes.AbstractStacksDownloadRuntimesProvider;
+import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
 
@@ -28,7 +31,7 @@ public class WildFlyLicenseOnlyDownloadExecutor extends AbstractLicenseOnlyDownl
 		super(dlrt, model);
 	}
 
-	protected void createServer(DownloadRuntime dlrt, String newHome) {
+	protected IStatus createServer(DownloadRuntime dlrt, String newHome) {
 		String dlrtId = dlrt.getId();
 		
 		// The wtp-runtime id is used in stacks.yaml, 
@@ -45,7 +48,9 @@ public class WildFlyLicenseOnlyDownloadExecutor extends AbstractLicenseOnlyDownl
 		
 		Map<String,Object> attributes = new HashMap<>();
 		attributes.put(IJBossServerAttributes.SERVER_HOME, newHome);
-		getServerModel().createServer(serverType, chosenId, attributes);
+		
+		CreateServerResponse response = getServerModel().createServer(serverType, chosenId, attributes);
+		return StatusConverter.convert(response.getStatus());
 	}
 
 }

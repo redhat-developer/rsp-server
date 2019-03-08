@@ -32,6 +32,8 @@ import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
 import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
 import org.jboss.tools.rsp.runtime.core.model.installer.RuntimesInstallerModel;
 import org.jboss.tools.rsp.server.spi.SPIActivator;
+import org.jboss.tools.rsp.server.spi.jobs.IJob;
+import org.jboss.tools.rsp.server.spi.jobs.SimpleJob;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
 
@@ -113,16 +115,25 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 	
 	private void initiateDownload(DownloadSingleRuntimeRequest req, DownloadRuntime dlrt, 
 			IRuntimeInstaller installer, File uniqueLoc, File downloads) {
-		new Thread("Download runtime: " + dlrt.getId()) {
+		String jobId = model.getJobManager().generateJobId();
+		String jobName = "Download runtime: " + dlrt.getId();
+		final IJob job = new SimpleJob(jobName, jobId);
+		model.getJobManager().addJob(job);
+		new Thread(jobName) {
 			public void run() {
+				// TODO, implement a progress monitor that can update progress
 				TaskModel tm2 = createDownloadTaskModel(req);
 				IStatus ret = installer.installRuntime(dlrt, uniqueLoc.getAbsolutePath(), downloads.getAbsolutePath(), 
 						true, tm2, new NullProgressMonitor());
-				String newHome = (String)tm2.getObject(IDownloadRuntimeWorkflowConstants.UNZIPPED_SERVER_HOME_DIRECTORY);
-				if( ret.isOK()) {
-					// Now it's downloaded, but, we should now maybe install it? Or add it as a server?
-					createServer(dlrt, newHome);
+				if( !ret.isOK()) {
+					model.getJobManager().removeJob(job, ret);
+					return;
 				}
+				
+				// Now it's downloaded, but, we should now maybe install it? Or add it as a server?
+				String newHome = (String)tm2.getObject(IDownloadRuntimeWorkflowConstants.UNZIPPED_SERVER_HOME_DIRECTORY);
+				IStatus complete = createServer(dlrt, newHome);
+				model.getJobManager().removeJob(job, complete);
 			}
 		}.start();
 	}
@@ -131,7 +142,7 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 		return new TaskModel();
 	}
 	
-	protected abstract void createServer(DownloadRuntime dlrt, String newHome);
+	protected abstract IStatus createServer(DownloadRuntime dlrt, String newHome);
 
 	protected IServerModel getServerModel() {
 		return model.getServerModel();

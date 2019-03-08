@@ -21,10 +21,12 @@ import org.jboss.tools.rsp.server.CapabilityManagement;
 import org.jboss.tools.rsp.server.discovery.DiscoveryPathModel;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanTypeManager;
 import org.jboss.tools.rsp.server.filewatcher.FileWatcherService;
+import org.jboss.tools.rsp.server.jobs.JobManager;
 import org.jboss.tools.rsp.server.secure.SecureStorageGuardian;
 import org.jboss.tools.rsp.server.spi.discovery.IDiscoveryPathModel;
 import org.jboss.tools.rsp.server.spi.discovery.IServerBeanTypeManager;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
+import org.jboss.tools.rsp.server.spi.jobs.IJobManager;
 import org.jboss.tools.rsp.server.spi.model.ICapabilityManagement;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
@@ -45,6 +47,7 @@ public class ServerManagementModel implements IServerManagementModel {
 	private IVMInstallRegistry vmModel;
 	private IFileWatcherService fileWatcherService;
 	private IDownloadRuntimesModel downloadRuntimeModel;
+	private IJobManager jobManager;
 
 	public ServerManagementModel() {
 		this(LaunchingCore.getDataLocation());
@@ -62,6 +65,13 @@ public class ServerManagementModel implements IServerManagementModel {
 		this.fileWatcherService = createFileWatcherService();
 		this.fileWatcherService.start();
 		this.downloadRuntimeModel = createDownloadRuntimesModel();
+		this.jobManager = createJobManager();
+	}
+	
+	@Override
+	public IJobManager getJobManager() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	@Override
@@ -154,6 +164,10 @@ public class ServerManagementModel implements IServerManagementModel {
 
 	private IFileWatcherService createFileWatcherService() {
 		return new FileWatcherService();
+	}
+
+	private IJobManager createJobManager() {
+		return new JobManager();
 	}
 
 }
