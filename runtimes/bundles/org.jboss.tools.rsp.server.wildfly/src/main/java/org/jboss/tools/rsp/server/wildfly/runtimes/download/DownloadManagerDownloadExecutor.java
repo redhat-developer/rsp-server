@@ -12,10 +12,9 @@ package org.jboss.tools.rsp.server.wildfly.runtimes.download;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
+import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,15 +39,18 @@ import org.jboss.tools.rsp.server.spi.runtimes.AbstractStacksDownloadRuntimesPro
 import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
 import org.jboss.tools.rsp.server.wildfly.runtimes.download.DownloadManagerStateSingleton.DownloadManagerRequestState;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DownloadManagerDownloadExecutor extends AbstractLicenseOnlyDownloadExecutor {
+
+	private static final Logger LOG = LoggerFactory.getLogger(DownloadManagerDownloadExecutor.class);
 
 	private static int STEP_CREDENTIALS = 1;
 	private static int STEP_TC = 2;
 	private static int STEP_LICENSE = 3;
 	
 	private static final String KEY_INTERNAL_CREDENTIAL_VALIDATION = "internal.credential.validation";
-	
 	
 	public DownloadManagerDownloadExecutor(DownloadRuntime dlrt, IServerManagementModel model) {
 		super(dlrt, model);
@@ -59,39 +61,35 @@ public class DownloadManagerDownloadExecutor extends AbstractLicenseOnlyDownload
 		if( req == null || getRuntime() == null) {
 			return quickResponse(IStatus.ERROR, "No runtime found for id=null", req);
 		}
-		System.out.println("Request id is " + req.getRequestId());
+		LOG.debug("Request id is {}", req.getRequestId());
+
 		DownloadManagerRequestState state = null;
-		if( req.getRequestId() != 0 ) {
+		if (req.getRequestId() != 0) {
 			state = DownloadManagerStateSingleton.getDefault().getState(req.getRequestId());
 		}
 
-		if( req.getRequestId() == 0 || state == null ) {
-			try {
-				WorkflowResponse ret = requestCredentials();
-				DownloadManagerStateSingleton.getDefault().updateRequestState(
-						ret.getRequestId(), STEP_CREDENTIALS, new HashMap<String, Object>());
-				return ret;
-			} catch(CoreException ce) {
-				return quickResponse(ce.getStatus().getSeverity(),
-						ce.getMessage(), req);
-			}
+		if (req.getRequestId() == 0 || state == null) {
+			WorkflowResponse ret = requestCredentials();
+			DownloadManagerStateSingleton.getDefault().updateRequestState(
+					ret.getRequestId(), STEP_CREDENTIALS, new HashMap<String, Object>());
+			return ret;
 		}
 		
-		if( state.getWorkflowStep() == STEP_CREDENTIALS) {
+		if (state.getWorkflowStep() == STEP_CREDENTIALS) {
 			WorkflowResponse response = handleCredentials(req);
-			if( response != null )
+			if (response != null)
 				return response;
 		}
 		
-		if( state.getWorkflowStep() == STEP_TC) { 
+		if (state.getWorkflowStep() == STEP_TC) {
 			WorkflowResponse response = handleTC(req);
-			if( response != null )
+			if (response != null)
 				return response;
 		}
 
-		if( state.getWorkflowStep() == STEP_LICENSE) { 
+		if (state.getWorkflowStep() == STEP_LICENSE) {
 			WorkflowResponse response = handleLicense(req);
-			if( response != null )
+			if (response != null)
 				return response;
 		}
 
@@ -103,7 +101,7 @@ public class DownloadManagerDownloadExecutor extends AbstractLicenseOnlyDownload
 		Map<String, Object> data = req.getData();
 		Object d1 = data == null ? null : data.get(ServerManagementAPIConstants.WORKFLOW_LICENSE_SIGN_ID);
 		boolean approved = Boolean.TRUE.equals(d1);
-		if( !approved ) {
+		if (!approved) {
 			return quickResponse(IStatus.CANCEL,  "License not approved", req);
 		}
 		
@@ -113,13 +111,13 @@ public class DownloadManagerDownloadExecutor extends AbstractLicenseOnlyDownload
 	private WorkflowResponse handleTC(DownloadSingleRuntimeRequest req) {
 		Map<String, Object> data = DownloadManagerStateSingleton.getDefault().getState(req.getRequestId()).getData();
 		Object workflowStep = data.get(KEY_INTERNAL_CREDENTIAL_VALIDATION);
-		if(workflowStep == null ) {
+		if (workflowStep == null) {
 			return quickResponse(IStatus.ERROR, "Workflow Error", req);
 		}
-		if( !(workflowStep instanceof Integer)) {
+		if (!(workflowStep instanceof Integer)) {
 			return quickResponse(IStatus.ERROR, "Workflow Error", req);
 		}
-		if( ((Integer)workflowStep).intValue() == DownloadManagerWorkflowUtility.WORKFLOW_FAILED) {
+		if (((Integer) workflowStep).intValue() == DownloadManagerWorkflowUtility.WORKFLOW_FAILED) {
 			String rtUrl = getRuntime().getUrl();
 			String msg = NLS.bind("You have not yet signed the Terms and Conditions of the 0-dollar Subscription. Please go to {0} to accept and begin your download.", rtUrl);;
 			return quickResponse(IStatus.ERROR, msg, req);
@@ -139,8 +137,8 @@ public class DownloadManagerDownloadExecutor extends AbstractLicenseOnlyDownload
 				req.getRequestId(), existingStep, req.getData());
 		
 		// We're in the handle-credential step. They should actually be sending me credentials
-		if( req.getData().get(ServerManagementAPIConstants.WORKFLOW_USERNAME_ID) == null &&
-				req.getData().get(ServerManagementAPIConstants.WORKFLOW_PASSWORD_ID) == null) {
+		if (req.getData().get(ServerManagementAPIConstants.WORKFLOW_USERNAME_ID) == null
+				&& req.getData().get(ServerManagementAPIConstants.WORKFLOW_PASSWORD_ID) == null) {
 			return quickResponse(IStatus.ERROR, "Canceled by user", req);
 		}
 		
@@ -149,22 +147,22 @@ public class DownloadManagerDownloadExecutor extends AbstractLicenseOnlyDownload
 				.getData().get(ServerManagementAPIConstants.WORKFLOW_USERNAME_ID);
 		String pass = (String) DownloadManagerStateSingleton.getDefault().getState(req.getRequestId())
 				.getData().get(ServerManagementAPIConstants.WORKFLOW_PASSWORD_ID);
-		if( user == null ) {
+		if (user == null) {
 			return requestCredentials("Username cannot be null. ", req.getRequestId());
 		}
-		if( pass == null ) {
+		if (pass == null) {
 			return requestCredentials("Password cannot be null. ", req.getRequestId());
 		}
 
 		int credentialState = -1;
 		try {
 			credentialState = DownloadManagerWorkflowUtility.getWorkflowStatus(getRuntime(), user, pass);
-		} catch(Exception e ) {
+		} catch (CoreException | IOException e) {
 			return requestCredentials("Error while validating credentials: " + e.getMessage() + ". ", req.getRequestId());
 		}
 		
 		boolean valid = isValidCredentials(credentialState);
-		if( !valid ) {
+		if (!valid) {
 			WorkflowResponse retry = requestCredentials("Your credentials have failed. ", req.getRequestId());
 			return retry;
 		}
@@ -179,55 +177,57 @@ public class DownloadManagerDownloadExecutor extends AbstractLicenseOnlyDownload
 	}
 	
 	private boolean isValidCredentials(int credentialState) {
-		if( credentialState == DownloadManagerWorkflowUtility.AUTHORIZED || credentialState == DownloadManagerWorkflowUtility.WORKFLOW_FAILED)
-			return true;
-		return false;
+		return credentialState == DownloadManagerWorkflowUtility.AUTHORIZED 
+				|| credentialState == DownloadManagerWorkflowUtility.WORKFLOW_FAILED;
 	}
-	
-	
-	
-	
-	private WorkflowResponse requestCredentials() throws CoreException {
+
+	private WorkflowResponse requestCredentials() {
 		return requestCredentials("", -1);
 	}	
+
 	private WorkflowResponse requestCredentials(String prefix, long requestId) {
-		DownloadRuntime dlrt = getRuntime();
-		
-		if( requestId == -1 ) {
-			// New request, return what we need
-			requestId = (long) ((Math.random() * ((100000 - 10) + 1)) + 10);
-		}
+		requestId = ensureRequestId(requestId);
 		WorkflowResponse resp = new WorkflowResponse();
-		List<WorkflowResponseItem> items = new ArrayList<>();
-		
-		WorkflowResponseItem item1 = new WorkflowResponseItem();
-		item1.setId("downloadmanager.credentials.label");
-		item1.setLabel(prefix + "Please provide your Red Hat credentials:");
-		item1.setResponseType(ServerManagementAPIConstants.ATTR_TYPE_NONE);
+		WorkflowResponseItem item1 = createWorkflowItem(
+				"downloadmanager.credentials.label", 
+				prefix + "Please provide your Red Hat credentials:", 
+				ServerManagementAPIConstants.ATTR_TYPE_NONE);
 
-		WorkflowResponseItem item2 = new WorkflowResponseItem();
-		item2.setId(ServerManagementAPIConstants.WORKFLOW_USERNAME_ID);
-		item2.setLabel("Username: ");
-		item2.setResponseType(ServerManagementAPIConstants.ATTR_TYPE_STRING);
+		WorkflowResponseItem item2 = createWorkflowItem(
+				ServerManagementAPIConstants.WORKFLOW_USERNAME_ID,
+				"Username: ",
+				ServerManagementAPIConstants.ATTR_TYPE_STRING);
 
-		WorkflowResponseItem item3 = new WorkflowResponseItem();
-		item3.setId(ServerManagementAPIConstants.WORKFLOW_PASSWORD_ID);
-		item3.setLabel("Password: ");
-		item3.setResponseType(ServerManagementAPIConstants.ATTR_TYPE_STRING);
-
-		items.add(item1);
-		items.add(item2);
-		items.add(item3);
+		WorkflowResponseItem item3 = createWorkflowItem(
+				ServerManagementAPIConstants.WORKFLOW_PASSWORD_ID,
+				"Password: ",
+				ServerManagementAPIConstants.ATTR_TYPE_STRING);
+		List<WorkflowResponseItem> items = Arrays.asList(item1, item2, item3);
 		resp.setItems(items);
 		resp.setRequestId(requestId);
 		resp.setStatus(new Status(IStatus.INFO, SPIActivator.BUNDLE_ID, "Please fill the requried information"));
 		return resp;
 	}
+
+	private long ensureRequestId(long requestId) {
+		if (requestId == -1) {
+			// New request, return what we need
+			requestId = (long) ((Math.random() * ((100000 - 10) + 1)) + 10);
+		}
+		return requestId;
+	}
+
+	private WorkflowResponseItem createWorkflowItem(String id, String label, String responseType) {
+		WorkflowResponseItem item1 = new WorkflowResponseItem();
+		item1.setId(id);
+		item1.setLabel(label);
+		item1.setResponseType(responseType);
+		return item1;
+	}
 	
 	@Override
 	protected void createServer(DownloadRuntime dlrt, String newHome) {
 		// duplicate with the wildfly impl 
-		String dlrtId = dlrt.getId();
 		
 		// The wtp-runtime id is used in stacks.yaml, 
 		String wtpRuntimeId = dlrt.getProperty(AbstractStacksDownloadRuntimesProvider.PROP_WTP_RUNTIME);
@@ -255,20 +255,16 @@ public class DownloadManagerDownloadExecutor extends AbstractLicenseOnlyDownload
 				.getData().get(ServerManagementAPIConstants.WORKFLOW_PASSWORD_ID);
 		tm.putObject(IDownloadRuntimeWorkflowConstants.USERNAME_KEY, user);
 		tm.putObject(IDownloadRuntimeWorkflowConstants.PASSWORD_KEY, pass);
-		IDownloadRuntimeConnectionFactory fact = new IDownloadRuntimeConnectionFactory() {
+		IDownloadRuntimeConnectionFactory fact = (url, username, password) -> {
 			
-			@Override
-			public InputStream createConnection(URL url, String user, String pass) {
 				try {
-					HttpURLConnection ret = DownloadManagerWorkflowUtility.getWorkflowConnection(url.toString(), user, pass, "GET", true, true, 60*60*1000);
+					HttpURLConnection ret = DownloadManagerWorkflowUtility.getWorkflowConnection(url.toString(), username, password, "GET", true, true, 60*60*1000);
 					return ret.getInputStream();
 				} catch(IOException ioe) {
-					// TODO log
+					LOG.error(MessageFormat.format("Could not get workflow connection for url {0}", url), ioe);
 				}
-				// TODO Auto-generated method stub
 				return null;
-			}
-		};
+			};
 		tm.putObject(IDownloadRuntimeWorkflowConstants.CONNECTION_FACTORY, fact);
 		return tm;
 	}
