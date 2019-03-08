@@ -11,7 +11,14 @@ package org.jboss.tools.rsp.schema;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Arrays;
 
+import org.assertj.core.api.HamcrestCondition;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.jboss.tools.rsp.api.schema.DaoClasses;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,6 +30,8 @@ import daopackage.Status;
 import daopackage.subpackage1.DiscoveryPath;
 
 public class DaoClassesTest {
+
+	private static final String DAOCLASSES_JAR = "/daoclasses.jar";
 
 	private TestableDaoClasses daoClasses;
 
@@ -55,17 +64,33 @@ public class DaoClassesTest {
 	}
 
 	@Test
-	public void shouldDiscoverAllInPackageInJar() throws IOException {
+	public void shouldDiscoverAllInPackageInJar() throws Exception {
 		// given
+		addJarToClasspath(getClass().getResource(DAOCLASSES_JAR));
 		DaoClasses daoClasses = new TestableDaoClasses("jardaopackage");
 		// when
 		Class<?>[] classes = daoClasses.getAll();
 		// then
-		assertThat(classes).containsExactlyInAnyOrder(
-				jardaopackage.Attribute.class,
-				jardaopackage.ClientCapabilitiesRequest.class,
-				jardaopackage.CreateServerResponse.class,
-				jardaopackage.Status.class);
+		assertThat(classes).areExactly(4, new HamcrestCondition<Class<?>>(new BaseMatcher<Class<?>>() {
+
+			@Override
+			public boolean matches(Object clazz) {
+				if (!(clazz instanceof Class)) {
+					return false;
+				}
+				String className = ((Class<?>) clazz).getName();
+				return Arrays.asList(
+						"jardaopackage.Attribute",
+						"jardaopackage.ClientCapabilitiesRequest",
+						"jardaopackage.CreateServerResponse",
+						"jardaopackage.Status")
+						.contains(className);
+			}
+
+			@Override
+			public void describeTo(Description description) {				
+			}
+		}));
 	}
 
 	private class TestableDaoClasses extends DaoClasses {
@@ -73,6 +98,11 @@ public class DaoClassesTest {
 		public TestableDaoClasses(String daoPackage) {
 			super(daoPackage);
 		}
+	}
 
+	private static void addJarToClasspath(URL url) throws Exception {
+		Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] { URL.class });
+	    method.setAccessible(true);
+		method.invoke(ClassLoader.getSystemClassLoader(), new Object[] { url });
 	}
 }
