@@ -1,6 +1,7 @@
 package org.jboss.tools.rsp.server.spi.jobs;
 
-import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
+import org.jboss.tools.rsp.eclipse.core.runtime.IRunnableWithProgress;
+import org.jboss.tools.rsp.launching.utils.IStatusRunnableWithProgress;
 
 public interface IJobManager {
 	/**
@@ -17,32 +18,29 @@ public interface IJobManager {
 	
 	/**
 	 * Add a job to this model
-	 * @param job
+	 * @param jobName a name for the job (not a unique id)
+	 * @param runnable a runnable that accepts a progress monitor
+	 * @return job
 	 */
-	public void addJob(IJob job);
-	
-	/**
-	 * Remove a job from this model. 
-	 * The status object should indicate the reason for removal
-	 *    (ie, complete (OK), errored, or canceled
-	 *    
-	 * @param job
-	 * @param status
-	 */
-	public void removeJob(IJob job, IStatus status);
-	
-	/**
-	 * Create a job ID for an extender to use to register a custom job
-	 * @return
-	 */
-	public String generateJobId();
+	public IJob scheduleJob(String jobName, IRunnableWithProgress runnable);
 
 	/**
-	 * Update the job manager with the progress of a given job
-	 * and fire the events to all listeners
+	 * Add a job to this model
+	 * @param jobName a name for the job (not a unique id)
+	 * @param runnable a runnable that accepts a progress monitor and returns an IStatus object
+	 * @return job
+	 */
+	public IJob scheduleJob(String jobName, IStatusRunnableWithProgress runnable);
+
+	/**
+	 * Cancel a given job.
 	 * 
 	 * @param job
-	 * @param work
 	 */
-	void progressChanged(IJob job, double work);
+	public void cancel(IJob job);
+	
+	/**
+	 * Shut down this job manager
+	 */
+	public void shutdown();
 }

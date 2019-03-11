@@ -70,8 +70,7 @@ public class ServerManagementModel implements IServerManagementModel {
 	
 	@Override
 	public IJobManager getJobManager() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.jobManager;
 	}
 	
 	@Override
@@ -158,16 +157,23 @@ public class ServerManagementModel implements IServerManagementModel {
 		return new ServerBeanTypeManager();
 	}
 
-	private IDownloadRuntimesModel createDownloadRuntimesModel() {
+	protected IDownloadRuntimesModel createDownloadRuntimesModel() {
 		return RuntimeCoreActivator.createDownloadRuntimesModel();
 	}
 
-	private IFileWatcherService createFileWatcherService() {
+	protected IFileWatcherService createFileWatcherService() {
 		return new FileWatcherService();
 	}
 
-	private IJobManager createJobManager() {
+	protected IJobManager createJobManager() {
 		return new JobManager();
+	}
+
+	@Override
+	public void dispose() {
+		if( this.jobManager != null ) {
+			this.jobManager.shutdown();
+		}
 	}
 
 }

@@ -1,5 +1,7 @@
 package org.jboss.tools.rsp.server.spi.jobs;
 
+import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
+
 public interface IJob {
 	
 	/**
@@ -20,4 +22,12 @@ public interface IJob {
 	 * @return
 	 */
 	public double getProgress();
+	
+	/**
+	 * Get the progress monitor related to this job, or null 
+	 * if none has been created yet. 
+	 * 
+	 * @return
+	 */
+	public IProgressMonitor getProgressMonitor();
 }

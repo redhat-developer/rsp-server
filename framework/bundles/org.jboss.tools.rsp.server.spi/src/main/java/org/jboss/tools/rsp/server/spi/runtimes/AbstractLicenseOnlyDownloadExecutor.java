@@ -11,6 +11,7 @@
 package org.jboss.tools.rsp.server.spi.runtimes;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,10 +23,13 @@ import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
+import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
+import org.jboss.tools.rsp.eclipse.core.runtime.IRunnableWithProgress;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.foundation.core.tasks.TaskModel;
 import org.jboss.tools.rsp.launching.LaunchingCore;
+import org.jboss.tools.rsp.launching.utils.IStatusRunnableWithProgress;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeRunner;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
@@ -33,7 +37,6 @@ import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
 import org.jboss.tools.rsp.runtime.core.model.installer.RuntimesInstallerModel;
 import org.jboss.tools.rsp.server.spi.SPIActivator;
 import org.jboss.tools.rsp.server.spi.jobs.IJob;
-import org.jboss.tools.rsp.server.spi.jobs.SimpleJob;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
 
@@ -115,27 +118,28 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 	
 	private void initiateDownload(DownloadSingleRuntimeRequest req, DownloadRuntime dlrt, 
 			IRuntimeInstaller installer, File uniqueLoc, File downloads) {
-		String jobId = model.getJobManager().generateJobId();
 		String jobName = "Download runtime: " + dlrt.getId();
-		final IJob job = new SimpleJob(jobName, jobId);
-		model.getJobManager().addJob(job);
-		new Thread(jobName) {
-			public void run() {
+		
+		IStatusRunnableWithProgress task = new IStatusRunnableWithProgress() {
+			
+			@Override
+			public IStatus run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				// TODO, implement a progress monitor that can update progress
 				TaskModel tm2 = createDownloadTaskModel(req);
 				IStatus ret = installer.installRuntime(dlrt, uniqueLoc.getAbsolutePath(), downloads.getAbsolutePath(), 
-						true, tm2, new NullProgressMonitor());
+						true, tm2, monitor);
 				if( !ret.isOK()) {
-					model.getJobManager().removeJob(job, ret);
-					return;
+					return ret;
 				}
 				
 				// Now it's downloaded, but, we should now maybe install it? Or add it as a server?
 				String newHome = (String)tm2.getObject(IDownloadRuntimeWorkflowConstants.UNZIPPED_SERVER_HOME_DIRECTORY);
 				IStatus complete = createServer(dlrt, newHome);
-				model.getJobManager().removeJob(job, complete);
+				return complete;
 			}
-		}.start();
+		};
+		
+		model.getJobManager().scheduleJob(jobName, task);
 	}
 	
 	protected TaskModel createDownloadTaskModel(DownloadSingleRuntimeRequest req) {

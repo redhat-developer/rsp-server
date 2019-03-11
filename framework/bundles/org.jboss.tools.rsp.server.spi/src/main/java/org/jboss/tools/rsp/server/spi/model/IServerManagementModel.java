@@ -85,4 +85,9 @@ public interface IServerManagementModel {
 	 */
 	public void clientAdded(RSPClient client);
 	
+	/**
+	 * Dispose all sub-models
+	 */
+	public void dispose();
+	
 }

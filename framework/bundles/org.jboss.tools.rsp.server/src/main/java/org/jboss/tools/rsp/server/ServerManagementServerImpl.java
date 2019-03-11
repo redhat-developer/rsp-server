@@ -193,6 +193,7 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public void shutdown() {
+		managementModel.dispose();
 		launcher.shutdown();
 	}
 
