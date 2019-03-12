@@ -2063,6 +2063,9 @@ This endpoint returns the following schema as a return value:
     "requestId" : {
       "type" : "integer"
     },
+    "jobId" : {
+      "type" : "string"
+    },
     "items" : {
       "type" : "array",
       "items" : {
@@ -2099,6 +2102,7 @@ This endpoint returns the following schema as a return value:
 }</pre></td><td><pre>export interface WorkflowResponse {
     status: Status;
     requestId: number;
+    jobId: string;
     items: WorkflowResponseItem[];
 }
 
@@ -2603,6 +2607,133 @@ export interface ServerType {
     id: string;
     visibleName: string;
     description: string;
+}</pre></td></tr></table>
+
+This endpoint returns no value
+
+#### client/jobAdded
+
+ The `client/jobAdded` notification is sent by the server to all clients when any long-running task has been scheduled on the server. This notification may be sent by any procedure that an extension to the RSP may decide requires a long-running task to be registered. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "name" : {
+      "type" : "string"
+    },
+    "id" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface JobHandle {
+    name: string;
+    id: string;
+}</pre></td></tr></table>
+
+This endpoint returns no value
+
+#### client/jobRemoved
+
+ The `client/jobRemoved` notification is sent by the server to all clients when any long-running task has been completed, canceled, or errors. This notification may be sent by the server when any of its long-running tasks have been completed; 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "status" : {
+      "type" : "object",
+      "properties" : {
+        "severity" : {
+          "type" : "integer"
+        },
+        "plugin" : {
+          "type" : "string"
+        },
+        "code" : {
+          "type" : "integer"
+        },
+        "message" : {
+          "type" : "string"
+        },
+        "trace" : {
+          "type" : "string"
+        },
+        "ok" : {
+          "type" : "boolean"
+        }
+      }
+    },
+    "handle" : {
+      "type" : "object",
+      "properties" : {
+        "name" : {
+          "type" : "string"
+        },
+        "id" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface JobRemoved {
+    status: Status;
+    handle: JobHandle;
+}
+
+export interface Status {
+    severity: number;
+    plugin: string;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+}
+
+export interface JobHandle {
+    name: string;
+    id: string;
+}</pre></td></tr></table>
+
+This endpoint returns no value
+
+#### client/jobChanged
+
+ The `client/jobChanged` notification is sent by the server to all clients when any long-running task has its progress updated. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "pctg" : {
+      "type" : "number"
+    },
+    "handle" : {
+      "type" : "object",
+      "properties" : {
+        "name" : {
+          "type" : "string"
+        },
+        "id" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface JobProgress {
+    pctg: number;
+    handle: JobHandle;
+}
+
+export interface JobHandle {
+    name: string;
+    id: string;
 }</pre></td></tr></table>
 
 This endpoint returns no value

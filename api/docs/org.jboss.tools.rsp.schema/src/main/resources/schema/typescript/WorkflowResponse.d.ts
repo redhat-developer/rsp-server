@@ -1,6 +1,7 @@
 export interface WorkflowResponse {
     status: Status;
     requestId: number;
+    jobId: string;
     items: WorkflowResponseItem[];
 }
 

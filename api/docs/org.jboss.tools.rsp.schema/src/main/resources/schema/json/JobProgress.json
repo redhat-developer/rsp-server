@@ -1,0 +1,19 @@
+{
+  "type" : "object",
+  "properties" : {
+    "pctg" : {
+      "type" : "number"
+    },
+    "handle" : {
+      "type" : "object",
+      "properties" : {
+        "name" : {
+          "type" : "string"
+        },
+        "id" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}
