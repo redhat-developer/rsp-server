@@ -492,6 +492,10 @@ public class StandardCommandHandler implements InputHandler {
 			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
 				try {
 					DownloadRuntimeDescription dlrt = assistant.selectDownloadRuntime();
+					if( dlrt == null ) {
+						System.out.println("No runtime chosen.");
+						return;
+					}
 					DownloadSingleRuntimeRequest req = new DownloadSingleRuntimeRequest();
 					req.setDownloadRuntimeId(dlrt.getId());
 					WorkflowResponse resp = launcher.getServerProxy().downloadRuntime(req).get();

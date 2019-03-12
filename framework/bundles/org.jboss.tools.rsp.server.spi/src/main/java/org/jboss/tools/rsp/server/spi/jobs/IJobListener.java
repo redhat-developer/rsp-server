@@ -21,7 +21,7 @@ public interface IJobListener {
 	 * The progress on this job has been changed
 	 * 
 	 * @param job  The job
-	 * @param work A number between 0 and 100 indicating progress
+	 * @param work A double between 0 and 100 indicating progress
 	 */
 	public void progressChanged(IJob job, double work);
 	

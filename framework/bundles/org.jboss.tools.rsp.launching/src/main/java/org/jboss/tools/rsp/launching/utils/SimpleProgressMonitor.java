@@ -69,7 +69,7 @@ public class SimpleProgressMonitor implements IProgressMonitor {
 			currWork = 0;
 	}
 
-	public int getPercentage() {
+	public double getPercentage() {
 		if (done) {
 			return 100;
 		}

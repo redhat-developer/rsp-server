@@ -60,8 +60,12 @@ public class SimpleJob implements IJob {
 	
 	private class JobProgressMonitor extends SimpleProgressMonitor {
 		public void worked(int work) {
+			double d = getPercentage();
 			super.worked(work);
-			manager.jobWorkChanged(SimpleJob.this);
+			double d2 = getPercentage();
+			// Don't fire events if the old and new pctg is exactly the same
+			if( d2 > d )
+				manager.jobWorkChanged(SimpleJob.this);
 		}
 		@Override
 		public void done() {

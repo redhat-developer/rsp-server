@@ -14,28 +14,39 @@ import java.util.List;
 
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
+import org.jboss.tools.rsp.api.dao.JobHandle;
+import org.jboss.tools.rsp.api.dao.JobProgress;
+import org.jboss.tools.rsp.api.dao.JobRemoved;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerProcess;
 import org.jboss.tools.rsp.api.dao.ServerProcessOutput;
 import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.VMDescription;
+import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallChangedListener;
 import org.jboss.tools.rsp.eclipse.jdt.launching.PropertyChangeEvent;
 import org.jboss.tools.rsp.server.ServerManagementServerImpl;
 import org.jboss.tools.rsp.server.spi.discovery.IDiscoveryPathListener;
+import org.jboss.tools.rsp.server.spi.jobs.IJob;
+import org.jboss.tools.rsp.server.spi.jobs.IJobListener;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModelListener;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
+import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 
-public class RemoteEventManager implements IDiscoveryPathListener, IVMInstallChangedListener, IServerModelListener {
+public class RemoteEventManager implements IDiscoveryPathListener, 
+	IVMInstallChangedListener, IServerModelListener, IJobListener {
+	
 	private ServerManagementServerImpl server;
 	public RemoteEventManager(ServerManagementServerImpl serverManagementServerImpl) {
 		this.server = serverManagementServerImpl; 
 		serverManagementServerImpl.getModel().getDiscoveryPathModel().addListener(this);
 		//serverManagementServerImpl.getModel().getVMInstallModel().addListener(this);
 		serverManagementServerImpl.getModel().getServerModel().addServerModelListener(this);
+		serverManagementServerImpl.getModel().getJobManager().addJobListener(this);
 	}
+	
 	@Override
 	public void discoveryPathAdded(DiscoveryPath path) {
 		List<RSPClient> l = server.getClients();
@@ -148,5 +159,30 @@ public class RemoteEventManager implements IDiscoveryPathListener, IVMInstallCha
 //		for( RSPClient c : l) {
 //			c.vmRemoved(getDescription(vm));
 //		}
+	}
+	@Override
+	public void jobAdded(IJob job) {
+		JobHandle jh = new JobHandle(job.getName(), job.getId());
+		List<RSPClient> l = server.getClients();
+		for( RSPClient c : l) {
+			c.jobAdded(jh);
+		}
+	}
+	@Override
+	public void jobRemoved(IJob job, IStatus status) {
+		JobHandle jh = new JobHandle(job.getName(), job.getId());
+		JobRemoved rem = new JobRemoved(jh,  StatusConverter.convert(status));
+		List<RSPClient> l = server.getClients();
+		for( RSPClient c : l) {
+			c.jobRemoved(rem);
+		}
+	}
+	@Override
+	public void progressChanged(IJob job, double work) {
+		JobProgress progress = new JobProgress(new JobHandle(job.getName(), job.getId()), work); 
+		List<RSPClient> l = server.getClients();
+		for( RSPClient c : l) {
+			c.jobChanged(progress);
+		}
 	}
 }

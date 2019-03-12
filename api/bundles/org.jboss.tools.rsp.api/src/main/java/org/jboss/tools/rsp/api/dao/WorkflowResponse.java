@@ -17,6 +17,9 @@ public class WorkflowResponse {
 	
 	// A request id assigned by the server to possibly be followed up with by client later
 	private long requestId;
+	
+	// A job ID if a long-running task has been initiated
+	private String jobId;
 
 	// A possible list of workflow items to be completed or null 
 	private List<WorkflowResponseItem> items;
@@ -48,5 +51,13 @@ public class WorkflowResponse {
 
 	public void setRequestId(long requestId) {
 		this.requestId = requestId;
+	}
+
+	public String getJobId() {
+		return jobId;
+	}
+
+	public void setJobId(String jobId) {
+		this.jobId = jobId;
 	}
 }

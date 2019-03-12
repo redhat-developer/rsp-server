@@ -27,6 +27,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.IRunnableWithProgress;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
+import org.jboss.tools.rsp.eclipse.core.runtime.SubMonitor;
 import org.jboss.tools.rsp.foundation.core.tasks.TaskModel;
 import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.launching.utils.IStatusRunnableWithProgress;
@@ -110,13 +111,18 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 		File uniqueLoc = new File(installations, uniqueName);
 		
 		// Kick off a download in a new thread
-		initiateDownload(req, dlrt, installer, uniqueLoc, downloads);
+		String jobId = initiateDownload(req, dlrt, installer, uniqueLoc, downloads);
 		
 		// License is approved. Send a response about it.
-		return quickResponse(IStatus.OK,  "Download In Progress", req);
+		WorkflowResponse rsp = quickResponse(IStatus.OK,  "Download In Progress", req);
+		rsp.setJobId(jobId);
+		return rsp;
 	}
 	
-	private void initiateDownload(DownloadSingleRuntimeRequest req, DownloadRuntime dlrt, 
+	/*
+	 * Initiate the download, and return the job id
+	 */
+	private String initiateDownload(DownloadSingleRuntimeRequest req, DownloadRuntime dlrt, 
 			IRuntimeInstaller installer, File uniqueLoc, File downloads) {
 		String jobName = "Download runtime: " + dlrt.getId();
 		
@@ -125,13 +131,15 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 			@Override
 			public IStatus run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				// TODO, implement a progress monitor that can update progress
+				SubMonitor sub = SubMonitor.convert(monitor, 100);
+				
 				TaskModel tm2 = createDownloadTaskModel(req);
 				IStatus ret = installer.installRuntime(dlrt, uniqueLoc.getAbsolutePath(), downloads.getAbsolutePath(), 
-						true, tm2, monitor);
+						true, tm2, sub.split(90));
+				
 				if( !ret.isOK()) {
 					return ret;
 				}
-				
 				// Now it's downloaded, but, we should now maybe install it? Or add it as a server?
 				String newHome = (String)tm2.getObject(IDownloadRuntimeWorkflowConstants.UNZIPPED_SERVER_HOME_DIRECTORY);
 				IStatus complete = createServer(dlrt, newHome);
@@ -139,7 +147,8 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 			}
 		};
 		
-		model.getJobManager().scheduleJob(jobName, task);
+		IJob job = model.getJobManager().scheduleJob(jobName, task);
+		return job.getId();
 	}
 	
 	protected TaskModel createDownloadTaskModel(DownloadSingleRuntimeRequest req) {
