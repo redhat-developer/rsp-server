@@ -3,9 +3,9 @@ package org.jboss.tools.rsp.server.spi.jobs;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.IRunnableWithProgress;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
-import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.launching.utils.IStatusRunnableWithProgress;
+import org.jboss.tools.rsp.launching.utils.SimpleProgressMonitor;
 import org.jboss.tools.rsp.server.spi.SPIActivator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,20 +17,25 @@ public class SimpleJob implements IJob {
 	private String id;
 	private IRunnableWithProgress runnable;
 	private IStatusRunnableWithProgress statusRunnable;
-	private IProgressMonitor monitor = null;
+	private JobProgressMonitor monitor = null;
+	private IJobManager manager;
 	
-	public SimpleJob(String name, String id, IRunnableWithProgress runnable) {
-		this.name = name;
-		this.id = id;
+	public SimpleJob(String name, String id, IRunnableWithProgress runnable, IJobManager manager) {
+		this(name, id, manager);
 		this.runnable = runnable;
 	}
 
-	public SimpleJob(String name, String id, IStatusRunnableWithProgress statusRunnable) {
-		this.name = name;
-		this.id = id;
+	public SimpleJob(String name, String id, IStatusRunnableWithProgress statusRunnable, IJobManager manager) {
+		this(name, id, manager);
 		this.statusRunnable = statusRunnable;
 	}
 
+	private SimpleJob(String name, String id, IJobManager manager) {
+		this.name = name;
+		this.id = id;
+		this.manager = manager;
+	}
+	
 	@Override
 	public String getName() {
 		return name;
@@ -43,15 +48,26 @@ public class SimpleJob implements IJob {
 
 	@Override
 	public double getProgress() {
-		return -1;
+		return ((JobProgressMonitor)getProgressMonitor()).getPercentage();
 	}
 	
-	@Override
 	public synchronized IProgressMonitor getProgressMonitor() {
 		if( monitor == null ) {
-			monitor = new NullProgressMonitor(); // TODO make a real impl
+			monitor = new JobProgressMonitor(); 
 		}
 		return monitor;
+	}
+	
+	private class JobProgressMonitor extends SimpleProgressMonitor {
+		public void worked(int work) {
+			super.worked(work);
+			manager.jobWorkChanged(SimpleJob.this);
+		}
+		@Override
+		public void done() {
+			super.done();
+			manager.jobWorkChanged(SimpleJob.this);
+		}
 	}
 	
 	public IStatus run() {

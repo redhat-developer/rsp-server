@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
@@ -122,6 +124,58 @@ public class JobManagerTest {
 		assertEquals(jobRemovedCause[0].getMessage(), completionStatus.getMessage());
 		
 		
+	}
+	@Test
+	public void testJobProgress() {
+		JobManager jm = new JobManager();
+		CountDownLatch[] signal1 = new CountDownLatch[] { new CountDownLatch(1) };
+		CountDownLatch[] signal2 = new CountDownLatch[] { new CountDownLatch(1) };
+		
+		List<Double> calls = new ArrayList<>();
+		jm.addJobListener(new JobListenerAdapter() {
+			@Override
+			public void progressChanged(IJob job, double work) {
+				// TODO Auto-generated method stub
+				calls.add(work);
+			}
+		});
+		
+		
+		IStatusRunnableWithProgress runnable = new IStatusRunnableWithProgress() {
+			@Override
+			public IStatus run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+				try {
+					signal1[0].await();
+				} catch(InterruptedException ie) {}
+				monitor.beginTask("Some Task", 10);
+				monitor.worked(1);
+				monitor.worked(1);
+				monitor.worked(1);
+				monitor.worked(2);
+				monitor.worked(2);
+				monitor.done();
+				signal2[0].countDown();
+				return Status.OK_STATUS;
+			}
+		};
+
+		
+		IJob scheduled = jm.scheduleJob("Test1", runnable);
+		assertNotNull(scheduled);
+		
+		// countdown once
+		signal1[0].countDown();
+		try {
+			signal2[0].await();
+		} catch(InterruptedException ie) {}
+		
+		assertEquals(calls.size(), 6);
+		assertEquals(calls.get(0), 10.0, .001);
+		assertEquals(calls.get(1), 20.0, .001);
+		assertEquals(calls.get(2), 30.0, .001);
+		assertEquals(calls.get(3), 50.0, .001);
+		assertEquals(calls.get(4), 70.0, .001);
+		assertEquals(calls.get(5), 100.0, .001);
 	}
 
 	

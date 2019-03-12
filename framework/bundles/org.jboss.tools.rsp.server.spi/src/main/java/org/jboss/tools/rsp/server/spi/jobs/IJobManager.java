@@ -33,6 +33,11 @@ public interface IJobManager {
 	public IJob scheduleJob(String jobName, IStatusRunnableWithProgress runnable);
 
 	/**
+	 * The job work pctg has changed
+	 */
+	public void jobWorkChanged(IJob job);
+	
+	/**
 	 * Cancel a given job.
 	 * 
 	 * @param job

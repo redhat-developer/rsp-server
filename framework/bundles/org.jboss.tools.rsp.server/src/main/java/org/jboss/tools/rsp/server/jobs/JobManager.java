@@ -39,7 +39,7 @@ public class JobManager implements IJobManager {
 
 	@Override
 	public IJob scheduleJob(String jobName, IRunnableWithProgress runnable) {
-		SimpleJob job = new SimpleJob(jobName, generateJobId(), runnable);
+		SimpleJob job = new SimpleJob(jobName, generateJobId(), runnable, this);
 		currentJobs.put(job.getId(), job);
 		fireJobAdded(job);
 		schedule(job);
@@ -48,7 +48,7 @@ public class JobManager implements IJobManager {
 
 	@Override
 	public IJob scheduleJob(String jobName, IStatusRunnableWithProgress runnable) {
-		SimpleJob job = new SimpleJob(jobName, generateJobId(), runnable);
+		SimpleJob job = new SimpleJob(jobName, generateJobId(), runnable, this);
 		currentJobs.put(job.getId(), job);
 		fireJobAdded(job);
 		schedule(job);
@@ -76,7 +76,7 @@ public class JobManager implements IJobManager {
 	
 	@Override
 	public void cancel(IJob job) {
-		job.getProgressMonitor().setCanceled(true);
+		((SimpleJob)job).getProgressMonitor().setCanceled(true);
 	}
 	
 	private void jobComplete(SimpleJob job, IStatus s) {
@@ -94,6 +94,13 @@ public class JobManager implements IJobManager {
 	@Override
 	public void shutdown() {
 		executor.shutdown();
+	}
+	@Override
+	public void jobWorkChanged(IJob job) {
+		ArrayList<IJobListener> tmp = new ArrayList<>(listeners);
+		for( IJobListener l : tmp ) {
+			l.progressChanged(job, job.getProgress());
+		}
 	}
 
 }
