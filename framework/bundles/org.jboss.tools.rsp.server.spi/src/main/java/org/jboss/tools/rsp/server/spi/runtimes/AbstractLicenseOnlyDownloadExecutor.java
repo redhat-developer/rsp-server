@@ -24,7 +24,6 @@ import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
-import org.jboss.tools.rsp.eclipse.core.runtime.IRunnableWithProgress;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.SubMonitor;
@@ -86,7 +85,14 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 		return executeDownload(req);
 	}
 	
-	public WorkflowResponse executeDownload(DownloadSingleRuntimeRequest req) {
+	/**
+	 * Execute the download of a given download-runtime, and, once complete, 
+	 * attempt to configure a server out of whatever was downloaded. 
+	 * 
+	 * @param req
+	 * @return
+	 */
+	protected WorkflowResponse executeDownload(DownloadSingleRuntimeRequest req) {
 		// Now find an installer for this file type (jar, zip, runnable binary, etc)
 		String installationMethod = dlrt.getInstallationMethod();
 		installationMethod = (installationMethod == null ? IRuntimeInstaller.EXTRACT_INSTALLER : installationMethod);
@@ -111,7 +117,7 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 		File uniqueLoc = new File(installations, uniqueName);
 		
 		// Kick off a download in a new thread
-		String jobId = initiateDownload(req, dlrt, installer, uniqueLoc, downloads);
+		String jobId = initiateDownloadAndCreateServer(req, dlrt, installer, uniqueLoc, downloads);
 		
 		// License is approved. Send a response about it.
 		WorkflowResponse rsp = quickResponse(IStatus.OK,  "Download In Progress", req);
@@ -122,7 +128,7 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 	/*
 	 * Initiate the download, and return the job id
 	 */
-	private String initiateDownload(DownloadSingleRuntimeRequest req, DownloadRuntime dlrt, 
+	private String initiateDownloadAndCreateServer(DownloadSingleRuntimeRequest req, DownloadRuntime dlrt, 
 			IRuntimeInstaller installer, File uniqueLoc, File downloads) {
 		String jobName = "Download runtime: " + dlrt.getId();
 		

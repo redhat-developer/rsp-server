@@ -40,6 +40,10 @@ public class JobManager implements IJobManager {
 	@Override
 	public IJob scheduleJob(String jobName, IRunnableWithProgress runnable) {
 		SimpleJob job = new SimpleJob(jobName, generateJobId(), runnable, this);
+		IJob oldJob = currentJobs.get(job.getId());
+		if( oldJob != null )
+			return null;
+		
 		currentJobs.put(job.getId(), job);
 		fireJobAdded(job);
 		schedule(job);
@@ -49,6 +53,10 @@ public class JobManager implements IJobManager {
 	@Override
 	public IJob scheduleJob(String jobName, IStatusRunnableWithProgress runnable) {
 		SimpleJob job = new SimpleJob(jobName, generateJobId(), runnable, this);
+		IJob oldJob = currentJobs.get(job.getId());
+		if( oldJob != null )
+			return null;
+		
 		currentJobs.put(job.getId(), job);
 		fireJobAdded(job);
 		schedule(job);
@@ -70,16 +78,18 @@ public class JobManager implements IJobManager {
 			} catch(Exception e) {
 				s = new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, e.getMessage(), e);
 			}
-			jobComplete(job, s);
+			fireJobComplete(job, s);
 		});
 	}
 	
 	@Override
 	public void cancel(IJob job) {
-		((SimpleJob)job).getProgressMonitor().setCanceled(true);
+		if( job instanceof SimpleJob && ((SimpleJob)job).getProgressMonitor() != null ) {
+			((SimpleJob)job).getProgressMonitor().setCanceled(true);
+		}
 	}
 	
-	private void jobComplete(SimpleJob job, IStatus s) {
+	private void fireJobComplete(SimpleJob job, IStatus s) {
 		currentJobs.remove(job.getId());
 		ArrayList<IJobListener> tmp = new ArrayList<>(listeners);
 		for( IJobListener l : tmp ) {

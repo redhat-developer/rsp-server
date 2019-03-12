@@ -20,7 +20,7 @@ public interface IJobManager {
 	 * Add a job to this model
 	 * @param jobName a name for the job (not a unique id)
 	 * @param runnable a runnable that accepts a progress monitor
-	 * @return job
+	 * @return job the created job, or null if a job with the same id already exists
 	 */
 	public IJob scheduleJob(String jobName, IRunnableWithProgress runnable);
 
@@ -28,7 +28,7 @@ public interface IJobManager {
 	 * Add a job to this model
 	 * @param jobName a name for the job (not a unique id)
 	 * @param runnable a runnable that accepts a progress monitor and returns an IStatus object
-	 * @return job
+	 * @return job the created job, or null if a job with the same id already exists
 	 */
 	public IJob scheduleJob(String jobName, IStatusRunnableWithProgress runnable);
 

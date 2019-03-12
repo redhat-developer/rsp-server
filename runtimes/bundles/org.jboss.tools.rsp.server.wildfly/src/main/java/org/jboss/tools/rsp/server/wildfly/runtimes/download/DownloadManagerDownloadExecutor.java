@@ -63,8 +63,6 @@ public class DownloadManagerDownloadExecutor extends AbstractLicenseOnlyDownload
 		if( req == null || getRuntime() == null) {
 			return quickResponse(IStatus.ERROR, "No runtime found for id=null", req);
 		}
-		LOG.debug("Request id is {}", req.getRequestId());
-
 		DownloadManagerRequestState state = null;
 		if (req.getRequestId() != 0) {
 			state = DownloadManagerStateSingleton.getDefault().getState(req.getRequestId());

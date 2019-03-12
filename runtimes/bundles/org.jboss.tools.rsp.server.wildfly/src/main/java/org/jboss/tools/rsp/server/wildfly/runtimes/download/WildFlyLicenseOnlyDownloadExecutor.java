@@ -32,8 +32,6 @@ public class WildFlyLicenseOnlyDownloadExecutor extends AbstractLicenseOnlyDownl
 	}
 
 	protected IStatus createServer(DownloadRuntime dlrt, String newHome) {
-		String dlrtId = dlrt.getId();
-		
 		// The wtp-runtime id is used in stacks.yaml, 
 		String wtpRuntimeId = dlrt.getProperty(AbstractStacksDownloadRuntimesProvider.PROP_WTP_RUNTIME);
 		
