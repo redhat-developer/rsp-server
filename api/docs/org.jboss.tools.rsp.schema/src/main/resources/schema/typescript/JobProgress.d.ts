@@ -1,5 +1,5 @@
 export interface JobProgress {
-    pctg: number;
+    percent: number;
     handle: JobHandle;
 }
 

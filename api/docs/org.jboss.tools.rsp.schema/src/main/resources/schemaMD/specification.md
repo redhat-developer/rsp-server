@@ -2125,6 +2125,99 @@ export interface WorkflowResponseItem {
     validResponses: string[];
 }</pre></td></tr></table>
 
+#### server/getJobs
+
+ Initiate a request to get a view of the current job model @return 
+
+This endpoint takes no parameters. 
+
+This endpoint returns a list of the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "percent" : {
+      "type" : "number"
+    },
+    "handle" : {
+      "type" : "object",
+      "properties" : {
+        "name" : {
+          "type" : "string"
+        },
+        "id" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface JobProgress {
+    percent: number;
+    handle: JobHandle;
+}
+
+export interface JobHandle {
+    name: string;
+    id: string;
+}</pre></td></tr></table>
+
+#### server/cancelJob
+
+ Initiate a request to cancel a given job @param job The handle to the given job @return 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "name" : {
+      "type" : "string"
+    },
+    "id" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface JobHandle {
+    name: string;
+    id: string;
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "severity" : {
+      "type" : "integer"
+    },
+    "plugin" : {
+      "type" : "string"
+    },
+    "code" : {
+      "type" : "integer"
+    },
+    "message" : {
+      "type" : "string"
+    },
+    "trace" : {
+      "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
+    }
+  }
+}</pre></td><td><pre>export interface Status {
+    severity: number;
+    plugin: string;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+}</pre></td></tr></table>
+
 
 
 ### The Client Interface
@@ -2711,7 +2804,7 @@ This endpoint takes the following json schemas as parameters:
 <tr><td>0</td><td><pre>{
   "type" : "object",
   "properties" : {
-    "pctg" : {
+    "percent" : {
       "type" : "number"
     },
     "handle" : {
@@ -2727,7 +2820,7 @@ This endpoint takes the following json schemas as parameters:
     }
   }
 }</pre></td><td><pre>export interface JobProgress {
-    pctg: number;
+    percent: number;
     handle: JobHandle;
 }
 

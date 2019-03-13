@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2019-03-12 17:26:14.
+// Generated using typescript-generator version 2.2.413 on 2019-03-13 13:10:02.
 
 export interface Attribute {
     type: string;
@@ -69,7 +69,7 @@ export interface JobHandle {
 }
 
 export interface JobProgress {
-    pctg: number;
+    percent: number;
     handle: JobHandle;
 }
 

@@ -1,20 +1,28 @@
+/*******************************************************************************
+ * Copyright (c) 2019 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v2.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v20.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.rsp.api.dao;
 
 public class JobProgress {
-	private double pctg;
+	private double percent;
 	private JobHandle handle;
 
-	public JobProgress( JobHandle handle, double pctg) {
+	public JobProgress( JobHandle handle, double percent) {
 		this.handle = handle;
-		this.pctg = pctg;
+		this.percent = percent;
 	}
 
-	public double getPctg() {
-		return pctg;
+	public double getPercent() {
+		return percent;
 	}
 
-	public void setPctg(double pctg) {
-		this.pctg = pctg;
+	public void setPercent(double percent) {
+		this.percent = percent;
 	}
 
 	public JobHandle getHandle() {

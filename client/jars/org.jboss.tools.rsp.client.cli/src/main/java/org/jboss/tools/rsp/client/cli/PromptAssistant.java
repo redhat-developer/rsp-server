@@ -111,7 +111,7 @@ public class PromptAssistant {
 		List<JobProgress> jobs = launcher.getServerProxy().getJobs().get();
 		List<String> collector = new ArrayList<>();
 		for( JobProgress jp : jobs ) {
-			collector.add(jp.getHandle().getId() + " [" + jp.getHandle().getName() + ", " + jp.getPctg() + "%]");
+			collector.add(jp.getHandle().getId() + " [" + jp.getHandle().getName() + ", " + jp.getPercent() + "%]");
 		}
 		String prompted = promptUser(collector, "Please select a job:");
 		if( prompted != null && collector.contains(prompted)) {

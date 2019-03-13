@@ -124,7 +124,7 @@ public class StandardCommandHandler implements InputHandler {
 				List<JobProgress> list = launcher.getServerProxy().getJobs().get();
 				int i = 1;
 				for( JobProgress jp : list ) {
-					System.out.println(i++ + ": " + jp.getHandle().getId() + " [" + jp.getHandle().getName() + ", " + jp.getPctg() + "%]");
+					System.out.println(i++ + ": " + jp.getHandle().getId() + " [" + jp.getHandle().getName() + ", " + jp.getPercent() + "%]");
 				}
 			}
 		},

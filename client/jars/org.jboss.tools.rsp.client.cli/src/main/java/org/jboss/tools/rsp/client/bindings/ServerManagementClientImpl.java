@@ -225,7 +225,7 @@ public class ServerManagementClientImpl implements RSPClient {
 	@Override
 	public void jobChanged(JobProgress progress) {
 		JobHandle h = progress.getHandle();
-		System.out.println("Job " + h.getName() + " (" + h.getId() + ") is at " + progress.getPctg() + "%");
+		System.out.println("Job " + h.getName() + " (" + h.getId() + ") is at " + progress.getPercent() + "%");
 	}
 
 }
