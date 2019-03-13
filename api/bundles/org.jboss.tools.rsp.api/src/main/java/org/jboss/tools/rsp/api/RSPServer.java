@@ -21,6 +21,8 @@ import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
+import org.jboss.tools.rsp.api.dao.JobHandle;
+import org.jboss.tools.rsp.api.dao.JobProgress;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
@@ -358,5 +360,22 @@ public interface RSPServer {
 	@JsonRequest
 	public CompletableFuture<WorkflowResponse> downloadRuntime(DownloadSingleRuntimeRequest req);
 
+
+	/**
+	 * Initiate a request to get a view of the current job model
+	 * @return
+	 */
+	@JsonRequest
+	public CompletableFuture<List<JobProgress>> getJobs();
+
+	/**
+	 * Initiate a request to cancel a given job
+	 * @param job The handle to the given job
+	 * @return
+	 */
+	@JsonRequest
+	public CompletableFuture<Status> cancelJob(JobHandle job);
+
 	
+
 }

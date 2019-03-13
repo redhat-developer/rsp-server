@@ -1,5 +1,7 @@
 package org.jboss.tools.rsp.server.spi.jobs;
 
+import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
+
 public interface IJob {
 	
 	/**
@@ -20,4 +22,10 @@ public interface IJob {
 	 * @return
 	 */
 	public double getProgress();
+	
+	/**
+	 * Cancel the current job
+	 * @return 
+	 */
+	public IStatus cancel();
 }

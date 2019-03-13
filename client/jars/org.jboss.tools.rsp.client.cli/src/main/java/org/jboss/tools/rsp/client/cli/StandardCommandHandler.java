@@ -26,6 +26,8 @@ import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
 import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
+import org.jboss.tools.rsp.api.dao.JobHandle;
+import org.jboss.tools.rsp.api.dao.JobProgress;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
@@ -109,6 +111,35 @@ public class StandardCommandHandler implements InputHandler {
 				String suffix = command.substring(this.command.length());
 				DiscoveryPath dp = new DiscoveryPath(suffix.trim());
 				launcher.getServerProxy().removeDiscoveryPath(dp);
+			}
+		},
+		LIST_JOBS("list jobs") {
+			@Override
+			public boolean isMatching(String command) {
+				return command.startsWith(this.command);
+			}
+
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
+				List<JobProgress> list = launcher.getServerProxy().getJobs().get();
+				int i = 1;
+				for( JobProgress jp : list ) {
+					System.out.println(i++ + ": " + jp.getHandle().getId() + " [" + jp.getHandle().getName() + ", " + jp.getPctg() + "%]");
+				}
+			}
+		},
+		CANCEL_JOB("cancel job") {
+			@Override
+			public boolean isMatching(String command) {
+				return command.startsWith(this.command);
+			}
+
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
+				JobHandle selected = assistant.selectJob();
+				if( selected != null ) {
+					launcher.getServerProxy().cancelJob(selected);
+				}
 			}
 		},
 		START_SERVER("start server") {

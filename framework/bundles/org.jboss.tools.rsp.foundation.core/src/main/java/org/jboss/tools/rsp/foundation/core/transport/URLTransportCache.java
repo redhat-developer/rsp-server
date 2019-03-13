@@ -31,6 +31,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.concurrent.CancellationException;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
@@ -396,7 +397,9 @@ public class URLTransportCache {
 			
 			ProgressCallBack progmonCallback = new ProgressCallBack() {
 				@Override
-				public void callback(CallbackByteChannel rbc, double progress) {
+				public void callback(CallbackByteChannel rbc, double progress) throws CancellationException {
+					if( monitor.isCanceled()) 
+						throw new CancellationException("Operation has been canceled.");
 					int oldWorked = worked[0];
 					int progInt = (int)Math.floor(progress);
 					if( progInt > oldWorked ) {

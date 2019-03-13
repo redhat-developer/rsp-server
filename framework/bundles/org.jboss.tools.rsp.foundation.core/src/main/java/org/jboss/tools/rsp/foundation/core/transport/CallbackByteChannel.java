@@ -3,13 +3,14 @@ package org.jboss.tools.rsp.foundation.core.transport;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
+import java.util.concurrent.CancellationException;
 
 class CallbackByteChannel implements ReadableByteChannel {
 
 	public static interface ProgressCallBack {
-		public void callback(CallbackByteChannel rbc, double progress);
+		public void callback(CallbackByteChannel rbc, double progress) throws CancellationException;
 	}
-
+	
 	private ProgressCallBack delegate;
 	private long size;
 	private ReadableByteChannel rbc;
@@ -39,7 +40,12 @@ class CallbackByteChannel implements ReadableByteChannel {
 		if ((n = rbc.read(bb)) > 0) {
 			sizeRead += n;
 			progress = size > 0 ? (double) sizeRead / (double) size * 100.0 : -1.0;
-			delegate.callback(this, progress);
+			try {
+				delegate.callback(this, progress);
+			} catch(CancellationException ce) {
+				close();
+				return n;
+			}
 		}
 		return n;
 	}

@@ -1,6 +1,10 @@
 package org.jboss.tools.rsp.server.spi.jobs;
 
+import java.util.List;
+
+import org.jboss.tools.rsp.api.dao.JobHandle;
 import org.jboss.tools.rsp.eclipse.core.runtime.IRunnableWithProgress;
+import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.launching.utils.IStatusRunnableWithProgress;
 
 public interface IJobManager {
@@ -48,4 +52,17 @@ public interface IJobManager {
 	 * Shut down this job manager
 	 */
 	public void shutdown();
+	
+	/**
+	 * Get a list of jobs currently registered in the model
+	 * @return
+	 */
+	public List<IJob> getJobs();
+	
+	/**
+	 * Cancel a given job
+	 * @param job
+	 * @return
+	 */
+	public IStatus cancelJob(JobHandle job);
 }

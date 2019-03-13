@@ -94,4 +94,13 @@ public class SimpleJob implements IJob {
 		// Should not happen
 		return new Status(IStatus.ERROR, SPIActivator.BUNDLE_ID, "No runnable found");
 	}
+
+	@Override
+	public IStatus cancel() {
+		IProgressMonitor monitor = getProgressMonitor();
+		if( monitor == null )
+			return new Status(IStatus.ERROR, SPIActivator.BUNDLE_ID, "Unable to cancel job");
+		monitor.setCanceled(true);
+		return Status.OK_STATUS;
+	}
 }

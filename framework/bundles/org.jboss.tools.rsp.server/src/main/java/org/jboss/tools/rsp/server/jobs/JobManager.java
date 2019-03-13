@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.jboss.tools.rsp.api.dao.JobHandle;
 import org.jboss.tools.rsp.eclipse.core.runtime.IRunnableWithProgress;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
@@ -112,5 +113,17 @@ public class JobManager implements IJobManager {
 			l.progressChanged(job, job.getProgress());
 		}
 	}
-
+	@Override
+	public List<IJob> getJobs() {
+		return new ArrayList<>(currentJobs.values());
+	}
+	
+	@Override
+	public IStatus cancelJob(JobHandle job) {
+		IJob ijob = currentJobs.get(job.getId());
+		if( ijob == null ) {
+			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Job not found: " + job.getId());
+		}
+		return ijob.cancel();
+	}
 }
