@@ -31,9 +31,11 @@ import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
 import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
-import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
+import org.jboss.tools.rsp.api.dao.JobHandle;
+import org.jboss.tools.rsp.api.dao.JobProgress;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
+import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
 import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
@@ -59,6 +61,7 @@ import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesProvider;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.rsp.server.model.RemoteEventManager;
 import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
+import org.jboss.tools.rsp.server.spi.jobs.IJob;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
@@ -193,6 +196,7 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public void shutdown() {
+		managementModel.dispose();
 		launcher.shutdown();
 	}
 
@@ -618,4 +622,31 @@ public class ServerManagementServerImpl implements RSPServer {
 		error.setItems(new ArrayList<>());
 		return error;
 	}
+
+	@Override
+	public CompletableFuture<List<JobProgress>> getJobs() {
+		return createCompletableFuture(() -> getJobsSync());
+	}
+	
+	protected List<JobProgress> getJobsSync() {
+		List<IJob> jobs = managementModel.getJobManager().getJobs();
+		List<JobProgress> ret = new ArrayList<>();
+		JobProgress jp = null;
+		for( IJob i : jobs ) {
+			jp = new JobProgress(new JobHandle(i.getName(), i.getId()), i.getProgress());
+			ret.add(jp);
+		}
+		return ret;
+	}
+
+	@Override
+	public CompletableFuture<Status> cancelJob(JobHandle job) {
+		return createCompletableFuture(() -> cancelJobSync(job));
+	}
+	
+	protected Status cancelJobSync(JobHandle job) {
+		IStatus s =  managementModel.getJobManager().cancelJob(job);
+		return StatusConverter.convert(s);
+	}
+
 }

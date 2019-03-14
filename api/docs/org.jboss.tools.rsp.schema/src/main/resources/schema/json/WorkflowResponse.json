@@ -27,6 +27,9 @@
     "requestId" : {
       "type" : "integer"
     },
+    "jobId" : {
+      "type" : "string"
+    },
     "items" : {
       "type" : "array",
       "items" : {

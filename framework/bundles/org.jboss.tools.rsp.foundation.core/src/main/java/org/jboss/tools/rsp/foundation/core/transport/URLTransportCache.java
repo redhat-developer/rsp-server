@@ -31,14 +31,17 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.concurrent.CancellationException;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
+import org.jboss.tools.rsp.eclipse.core.runtime.SubMonitor;
 import org.jboss.tools.rsp.foundation.core.FoundationCoreActivator;
 import org.jboss.tools.rsp.foundation.core.digest.DigestUtils;
+import org.jboss.tools.rsp.foundation.core.transport.CallbackByteChannel.ProgressCallBack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -357,27 +360,57 @@ public class URLTransportCache {
 	private IStatus download(String displayName, String url, 
 			FileOutputStream fileOutputStream, int timeout, 
 			IProgressMonitor monitor) throws IOException {
-		return download(displayName, createStream(url), fileOutputStream, timeout, monitor);
+		int contentLength = contentLength(new URL(url));
+		return download(displayName, createStream(url), fileOutputStream, timeout, contentLength, monitor);
 	}
 
 	public IStatus download(String displayName, String url, 
 			String user, String pass, 
 			FileOutputStream fileOutputStream, int timeout,
 			IProgressMonitor monitor) throws IOException {
-		return download(displayName, createStream(url, user, pass), 
-				fileOutputStream, timeout, monitor);
+		HttpURLConnection con = getURLConnection(url, user, pass);
+		return download(displayName, con.getInputStream(), 
+				fileOutputStream, timeout, contentLength(con), monitor);
 	}
 
 	public IStatus download(String name, InputStream istream,
 			FileOutputStream out, int timeout,
 			IProgressMonitor monitor) throws IOException {
+		return download(name, istream, out, timeout, -1, monitor);
+	}
+	public IStatus download(String name, InputStream istream,
+			FileOutputStream out, int timeout, int contentLength,
+			final IProgressMonitor monitor) throws IOException {
 		// TODO respect timeout
+		monitor.beginTask(name, 100);
+		
 		ReadableByteChannel readableByteChannel = null;
 		FileChannel fileChannel = null;
+		final Integer[] worked = new Integer[] {new Integer(0)};
 		try {
 			readableByteChannel = Channels.newChannel(istream);
 			fileChannel = out.getChannel();
-			fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+			if( contentLength == -1 ) {
+				fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+				return Status.OK_STATUS;
+			}
+			
+			ProgressCallBack progmonCallback = new ProgressCallBack() {
+				@Override
+				public void callback(CallbackByteChannel rbc, double progress) throws CancellationException {
+					if( monitor.isCanceled()) 
+						throw new CancellationException("Operation has been canceled.");
+					int oldWorked = worked[0];
+					int progInt = (int)Math.floor(progress);
+					if( progInt > oldWorked ) {
+						int diff = progInt - oldWorked;
+						monitor.worked(diff);
+						worked[0] = new Integer(progInt);
+					}
+				}
+			};
+			CallbackByteChannel cbbc = new CallbackByteChannel(readableByteChannel, contentLength, progmonCallback);
+			fileChannel.transferFrom(cbbc, 0, Long.MAX_VALUE);
 			return Status.OK_STATUS;
 		} finally {
 	        if (readableByteChannel != null) {
@@ -387,6 +420,26 @@ public class URLTransportCache {
 	        	fileChannel.close();
 	        }
 		}
+	}
+
+	private int contentLength(URL url) {
+		HttpURLConnection connection;
+		int contentLength = -1;
+		try {
+			connection = (HttpURLConnection) url.openConnection();
+			contentLength = connection.getContentLength();
+		} catch (Exception e) {
+		}
+		return contentLength;
+	}
+
+	private int contentLength(HttpURLConnection connection) {
+		int contentLength = -1;
+		try {
+			contentLength = connection.getContentLength();
+		} catch (Exception e) {
+		}
+		return contentLength;
 	}
 
 	private InputStream createStream(String url) throws IOException {

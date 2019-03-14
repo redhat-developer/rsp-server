@@ -6,13 +6,13 @@ Automatic-Module-Name: org.jboss.tools.rsp.server
 Bundle-Version: 0.14.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Activator: org.jboss.tools.rsp.server.ServerCoreActivator
-Import-Package: org.eclipse.lsp4j.jsonrpc,
+Import-Package: com.google.gson,
+ org.eclipse.lsp4j.jsonrpc,
  org.eclipse.lsp4j.jsonrpc.json,
  org.eclipse.lsp4j.jsonrpc.json.adapters,
  org.eclipse.lsp4j.jsonrpc.messages,
  org.eclipse.lsp4j.jsonrpc.services,
  org.eclipse.lsp4j.jsonrpc.validation,
- com.google.gson,
  org.jboss.tools.rsp.api,
  org.jboss.tools.rsp.api.dao,
  org.jboss.tools.rsp.api.dao.util,
@@ -34,6 +34,7 @@ Import-Package: org.eclipse.lsp4j.jsonrpc,
  org.jboss.tools.rsp.server.spi.client,
  org.jboss.tools.rsp.server.spi.discovery,
  org.jboss.tools.rsp.server.spi.filewatcher,
+ org.jboss.tools.rsp.server.spi.jobs,
  org.jboss.tools.rsp.server.spi.model,
  org.jboss.tools.rsp.server.spi.model.polling,
  org.jboss.tools.rsp.server.spi.servertype,
@@ -45,5 +46,6 @@ Export-Package: org.jboss.tools.rsp.server,
  org.jboss.tools.rsp.server.discovery,
  org.jboss.tools.rsp.server.discovery.serverbeans,
  org.jboss.tools.rsp.server.filewatcher,
+ org.jboss.tools.rsp.server.jobs,
  org.jboss.tools.rsp.server.model
 Require-Bundle: org.jboss.tools.rsp.api

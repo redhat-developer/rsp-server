@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
 import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
@@ -36,6 +37,7 @@ import org.jboss.tools.rsp.server.spi.SPIActivator;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.runtimes.AbstractLicenseOnlyDownloadExecutor;
 import org.jboss.tools.rsp.server.spi.runtimes.AbstractStacksDownloadRuntimesProvider;
+import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
 import org.jboss.tools.rsp.server.wildfly.runtimes.download.DownloadManagerStateSingleton.DownloadManagerRequestState;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
@@ -61,8 +63,6 @@ public class DownloadManagerDownloadExecutor extends AbstractLicenseOnlyDownload
 		if( req == null || getRuntime() == null) {
 			return quickResponse(IStatus.ERROR, "No runtime found for id=null", req);
 		}
-		LOG.debug("Request id is {}", req.getRequestId());
-
 		DownloadManagerRequestState state = null;
 		if (req.getRequestId() != 0) {
 			state = DownloadManagerStateSingleton.getDefault().getState(req.getRequestId());
@@ -226,7 +226,7 @@ public class DownloadManagerDownloadExecutor extends AbstractLicenseOnlyDownload
 	}
 	
 	@Override
-	protected void createServer(DownloadRuntime dlrt, String newHome) {
+	protected IStatus createServer(DownloadRuntime dlrt, String newHome) {
 		// duplicate with the wildfly impl 
 		
 		// The wtp-runtime id is used in stacks.yaml, 
@@ -243,7 +243,8 @@ public class DownloadManagerDownloadExecutor extends AbstractLicenseOnlyDownload
 		
 		Map<String,Object> attributes = new HashMap<>();
 		attributes.put(IJBossServerAttributes.SERVER_HOME, newHome);
-		getServerModel().createServer(serverType, chosenId, attributes);
+		CreateServerResponse response = getServerModel().createServer(serverType, chosenId, attributes);
+		return StatusConverter.convert(response.getStatus());
 	}
 
 	@Override 

@@ -24,6 +24,8 @@ import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
+import org.jboss.tools.rsp.api.dao.JobHandle;
+import org.jboss.tools.rsp.api.dao.JobProgress;
 import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
@@ -101,6 +103,20 @@ public class PromptAssistant {
 		if( ret != null && collectorCollection.contains(ret)) {
 			int ind = collectorCollection.indexOf(ret);
 			return servers.get(ind);
+		}
+		return null;
+	}
+	
+	public JobHandle selectJob() throws InterruptedException, ExecutionException {
+		List<JobProgress> jobs = launcher.getServerProxy().getJobs().get();
+		List<String> collector = new ArrayList<>();
+		for( JobProgress jp : jobs ) {
+			collector.add(jp.getHandle().getId() + " [" + jp.getHandle().getName() + ", " + jp.getPercent() + "%]");
+		}
+		String prompted = promptUser(collector, "Please select a job:");
+		if( prompted != null && collector.contains(prompted)) {
+			int ind = collector.indexOf(prompted);
+			return jobs.get(ind).getHandle();
 		}
 		return null;
 	}

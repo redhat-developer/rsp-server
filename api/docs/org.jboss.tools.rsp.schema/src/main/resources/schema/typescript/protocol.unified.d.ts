@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2019-03-07 13:15:16.
+// Generated using typescript-generator version 2.2.413 on 2019-03-13 13:10:02.
 
 export interface Attribute {
     type: string;
@@ -61,6 +61,21 @@ export interface DownloadSingleRuntimeRequest {
     requestId: number;
     downloadRuntimeId: string;
     data: { [index: string]: any };
+}
+
+export interface JobHandle {
+    name: string;
+    id: string;
+}
+
+export interface JobProgress {
+    percent: number;
+    handle: JobHandle;
+}
+
+export interface JobRemoved {
+    status: Status;
+    handle: JobHandle;
 }
 
 export interface LaunchAttributesRequest {
@@ -186,6 +201,7 @@ export interface VMHandle {
 export interface WorkflowResponse {
     status: Status;
     requestId: number;
+    jobId: string;
     items: WorkflowResponseItem[];
 }
 

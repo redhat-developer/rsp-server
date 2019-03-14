@@ -1,0 +1,39 @@
+{
+  "type" : "object",
+  "properties" : {
+    "status" : {
+      "type" : "object",
+      "properties" : {
+        "severity" : {
+          "type" : "integer"
+        },
+        "plugin" : {
+          "type" : "string"
+        },
+        "code" : {
+          "type" : "integer"
+        },
+        "message" : {
+          "type" : "string"
+        },
+        "trace" : {
+          "type" : "string"
+        },
+        "ok" : {
+          "type" : "boolean"
+        }
+      }
+    },
+    "handle" : {
+      "type" : "object",
+      "properties" : {
+        "name" : {
+          "type" : "string"
+        },
+        "id" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}

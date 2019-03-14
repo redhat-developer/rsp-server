@@ -187,8 +187,10 @@ public class DownloadRuntimeOperationUtility {
 			}
 			if( !result.isOK())
 				throw new CoreException(result);
-			if (monitor.isCanceled())
+			if (monitor.isCanceled()) {
+				file.delete();
 				throw new CoreException(cancel(file));
+			}
 			
 			return file;
 		} catch (IOException  e) {

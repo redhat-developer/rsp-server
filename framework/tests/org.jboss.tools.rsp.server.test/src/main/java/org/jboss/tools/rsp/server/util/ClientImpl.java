@@ -17,6 +17,9 @@ import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.RSPServer;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
+import org.jboss.tools.rsp.api.dao.JobHandle;
+import org.jboss.tools.rsp.api.dao.JobProgress;
+import org.jboss.tools.rsp.api.dao.JobRemoved;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerProcess;
 import org.jboss.tools.rsp.api.dao.ServerProcessOutput;
@@ -107,5 +110,22 @@ public class ClientImpl implements RSPClient {
 	@Override
 	public CompletableFuture<String> promptString(StringPrompt prompt) {
 		return CompletableFuture.completedFuture("this_is_a_password"); 
+	}
+
+	@Override
+	public void jobAdded(JobHandle job) {
+		System.out.println("Job " + job.getName() + " (" + job.getId() + ") is now running.");
+	}
+
+	@Override
+	public void jobRemoved(JobRemoved removed) {
+		JobHandle h = removed.getHandle();
+		System.out.println("Job " + h.getName() + " (" + h.getId() + ") has stopped running: " + removed.getStatus().toString());
+	}
+
+	@Override
+	public void jobChanged(JobProgress progress) {
+		JobHandle h = progress.getHandle();
+		System.out.println("Job " + h.getName() + " (" + h.getId() + ") is at " + progress.getPercent() + "%");
 	}
 }

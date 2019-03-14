@@ -14,6 +14,9 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
+import org.jboss.tools.rsp.api.dao.JobHandle;
+import org.jboss.tools.rsp.api.dao.JobProgress;
+import org.jboss.tools.rsp.api.dao.JobRemoved;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerProcess;
 import org.jboss.tools.rsp.api.dao.ServerProcessOutput;
@@ -135,5 +138,35 @@ public interface RSPClient {
 	 */
 	@JsonNotification
 	void serverProcessOutputAppended(ServerProcessOutput output);
+
+	
+	/**
+	 * The `client/jobAdded` notification is sent by
+	 * the server to all clients when any long-running task 
+	 * has been scheduled on the server. 
+	 * 
+	 * This notification may be sent by any procedure that an extension
+	 * to the RSP may decide requires a long-running task to be registered.
+	 */
+	@JsonNotification
+	void jobAdded(JobHandle job);
+
+	/**
+	 * The `client/jobRemoved` notification is sent by
+	 * the server to all clients when any long-running task 
+	 * has been completed, canceled, or errors. 
+	 * 
+	 * This notification may be sent by the server when any of its long-running
+	 * tasks have been completed; 
+	 */
+	@JsonNotification
+	void jobRemoved(JobRemoved removed);
+
+	/**
+	 * The `client/jobChanged` notification is sent by the server to all clients
+	 * when any long-running task has its progress updated. 
+	 */
+	@JsonNotification
+	void jobChanged(JobProgress progress);
 
 }

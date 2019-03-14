@@ -1,0 +1,19 @@
+{
+  "type" : "object",
+  "properties" : {
+    "percent" : {
+      "type" : "number"
+    },
+    "handle" : {
+      "type" : "object",
+      "properties" : {
+        "name" : {
+          "type" : "string"
+        },
+        "id" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}
