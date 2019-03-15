@@ -57,88 +57,7 @@ public class SpecificationGenerator {
 					if (!(o.get() instanceof CompilationUnit)) {
 						Node n = o.get();
 						if (n instanceof MethodDeclaration) {
-							MethodDeclaration md = (MethodDeclaration) n;
-							String methodName = md.getNameAsString();
-							sb.append("#### " + segment + "/" + methodName + "\n\n");
-							String jdoc = comment.toString();
-							jdoc = jdoc.replaceAll("/\\*", "").replaceAll("\\*/", "").replaceAll("\\*", "")
-									.replaceAll("\\s+", " ");
-							sb.append(jdoc);
-							sb.append("\n\n");
-
-							NodeList<Parameter> params = md.getParameters();
-							if (params.size() == 0) {
-								sb.append("This endpoint takes no parameters. \n\n");
-							} else if (params.size() > 0) {
-								sb.append("This endpoint takes the following json schemas as parameters: \n\n");
-
-								sb.append("<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>");
-								int i = 0;
-
-								for (Parameter p : params) {
-
-									Type t = p.getType();
-									String typeName = t.toString();
-									String jsonString = safeReadFile(json.getDaoJsonFile(typeName));
-									String tsString = safeReadFile(ts.getDaoTypescriptFile(typeName));
-
-									if (jsonString.isEmpty() || tsString.isEmpty()) {
-										throw new RuntimeException(
-												"Endpoints should have a single object parameter if possible: " 
-										+ f.getAbsolutePath() + "    -   " + methodName);
-									}
-
-									sb.append("\n<tr>");
-									sb.append("<td>" + i + "</td>");
-									i++;
-									sb.append("<td><pre>");
-									sb.append(jsonString);
-									sb.append("</pre></td>");
-									sb.append("<td><pre>");
-									sb.append(tsString);
-									sb.append("</pre></td>");
-
-									sb.append("</tr>");
-								}
-								sb.append("</table>\n\n");
-							}
-
-							Type return2 = md.getType();
-							String typeName = return2.toString();
-							boolean completableFuture = false;
-							if( typeName.startsWith("CompletableFuture<") && typeName.endsWith(">")) {
-								typeName = typeName.substring("CompletableFuture<".length(), typeName.length() - 1);
-								completableFuture = true;
-							}
-							
-							boolean list = false;
-							if( typeName.startsWith("List<") && typeName.endsWith(">")) {
-								typeName = typeName.substring("List<".length(), typeName.length() - 1);
-								list = true;
-							}
-							
-							if (return2 == null || typeName.equals("void")) {
-								sb.append("This endpoint returns no value\n\n");
-							} else {
-								String msg = "This endpoint returns the following schema as a return value: \n\n"; 
-								if( list ) {
-									msg = "This endpoint returns a list of the following schema as a return value: \n\n";
-								}
-								
-								sb.append(msg);
-								sb.append("<table><tr><th>json</th><th>typescript</th></tr>");
-								String jsonString = safeReadFile(json.getDaoJsonFile(typeName));
-								String tsString = safeReadFile(ts.getDaoTypescriptFile(typeName));
-								sb.append("\n<tr>");
-								sb.append("<td><pre>");
-								sb.append(jsonString);
-								sb.append("</pre></td>");
-								sb.append("<td><pre>");
-								sb.append(tsString);
-								sb.append("</pre></td>");
-								sb.append("</tr>");
-								sb.append("</table>\n\n");
-							}
+							printSingleMethodDeclaration((MethodDeclaration)n, comment, sb, segment, f);
 						}
 					}
 				}
@@ -148,8 +67,94 @@ public class SpecificationGenerator {
 			CompilationUnit cu = JavaParser.parse(f);
 			adapter.visit(cu, null);
 		} catch (IOException e) {
-			new RuntimeException(e);
+			throw new RuntimeException(e);
 		}
+	}
+	
+	private void printSingleMethodDeclaration(MethodDeclaration md, JavadocComment comment,
+			StringBuffer sb, String segment, File f) {
+		String methodName = md.getNameAsString();
+		sb.append("#### " + segment + "/" + methodName + "\n\n");
+		String jdoc = comment.toString();
+		jdoc = jdoc.replaceAll("/\\*", "").replaceAll("\\*/", "").replaceAll("\\*", "")
+				.replaceAll("\\s+", " ");
+		sb.append(jdoc);
+		sb.append("\n\n");
+
+		NodeList<Parameter> params = md.getParameters();
+		if (params.size() == 0) {
+			sb.append("This endpoint takes no parameters. \n\n");
+		} else if (params.size() > 0) {
+			sb.append("This endpoint takes the following json schemas as parameters: \n\n");
+
+			sb.append("<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>");
+			int i = 0;
+
+			for (Parameter p : params) {
+
+				Type t = p.getType();
+				String typeName = t.toString();
+				String jsonString = safeReadFile(json.getDaoJsonFile(typeName));
+				String tsString = safeReadFile(ts.getDaoTypescriptFile(typeName));
+
+				if (jsonString.isEmpty() || tsString.isEmpty()) {
+					throw new RuntimeException(
+							"Endpoints should have a single object parameter if possible: " 
+					+ f.getAbsolutePath() + "    -   " + methodName);
+				}
+
+				sb.append("\n<tr>");
+				sb.append("<td>" + i + "</td>");
+				i++;
+				sb.append("<td><pre>");
+				sb.append(jsonString);
+				sb.append("</pre></td>");
+				sb.append("<td><pre>");
+				sb.append(tsString);
+				sb.append("</pre></td>");
+
+				sb.append("</tr>");
+			}
+			sb.append("</table>\n\n");
+		}
+
+		Type return2 = md.getType();
+		String typeName = return2.toString();
+		boolean completableFuture = false;
+		if( typeName.startsWith("CompletableFuture<") && typeName.endsWith(">")) {
+			typeName = typeName.substring("CompletableFuture<".length(), typeName.length() - 1);
+			completableFuture = true;
+		}
+		
+		boolean list = false;
+		if( typeName.startsWith("List<") && typeName.endsWith(">")) {
+			typeName = typeName.substring("List<".length(), typeName.length() - 1);
+			list = true;
+		}
+		
+		if (return2 == null || typeName.equals("void")) {
+			sb.append("This endpoint returns no value\n\n");
+		} else {
+			String msg = "This endpoint returns the following schema as a return value: \n\n"; 
+			if( list ) {
+				msg = "This endpoint returns a list of the following schema as a return value: \n\n";
+			}
+			
+			sb.append(msg);
+			sb.append("<table><tr><th>json</th><th>typescript</th></tr>");
+			String jsonString = safeReadFile(json.getDaoJsonFile(typeName));
+			String tsString = safeReadFile(ts.getDaoTypescriptFile(typeName));
+			sb.append("\n<tr>");
+			sb.append("<td><pre>");
+			sb.append(jsonString);
+			sb.append("</pre></td>");
+			sb.append("<td><pre>");
+			sb.append(tsString);
+			sb.append("</pre></td>");
+			sb.append("</tr>");
+			sb.append("</table>\n\n");
+		}
+
 	}
 
 	private String safeReadFile(Path p) {
