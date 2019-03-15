@@ -13,8 +13,24 @@ import java.io.IOException;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.comments.JavadocComment;
+import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import cz.habarta.typescript.generator.Input;
 import cz.habarta.typescript.generator.JsonLibrary;
@@ -56,11 +72,15 @@ public class TypescriptUtility {
 			clazNames[i] = daoClasses[i].getName();
 		}		
 
-		File output = getDaoTypescriptFolder().resolve(PROTOCOL_TYPE_FILE).toFile();
+		File output = getUnifiedSchemaFile();
 		new TypeScriptGenerator(settings).generateTypeScript(
 				Input.fromClassNamesAndJaxrsApplication(
 						Arrays.asList(clazNames), null, null, false, null, cl, true), 
 				Output.to(output));
+	}
+	
+	public File getUnifiedSchemaFile() {
+		return getDaoTypescriptFolder().resolve(PROTOCOL_TYPE_FILE).toFile();
 	}
 
 	private void writeTypescriptType(Class<?> clazz, final Settings settings) throws IOException {
@@ -119,5 +139,341 @@ public class TypescriptUtility {
 			}
 		}
 		return "";
+	}
+
+	public void generateTypescriptClient(String dir) {
+		generateProtocolTs(dir);
+		generateMessageTs(dir);
+	}
+	
+	private void generateProtocolTs(String dir) {
+		File existing = getUnifiedSchemaFile();
+		File destination = new File(dir).toPath().resolve("src").resolve("protocol").resolve("protocol.ts").toFile();
+		String contents = readFile(existing);
+		String header = 
+				"/**\n" + 
+				" * Json objects sent between the server and the client\n" + 
+				" */\n" + 
+				"export namespace Protocol {\n" + 
+				"";
+		String footer = "}";
+		
+		String total = header + linePrefix(contents, "    ") + footer;
+		try {
+			Files.write(destination.toPath(), total.getBytes());
+		} catch(IOException ioe) {
+			
+		}
+	}
+	
+	private void generateMessageTs(String dir) {
+		File destination = new File(dir).toPath().resolve("src").resolve("protocol").resolve("messages.ts").toFile();
+		String fileContents = messageTsHeader() + messageTsServer() + messageTsClient() + messageTsFooter();
+		try {
+			Files.write(destination.toPath(), fileContents.getBytes());
+		} catch(IOException ioe) {
+			
+		}
+	}
+	
+	private String messageTsHeader() {
+		return "import { NotificationType, RequestType } from 'vscode-jsonrpc';\n" + 
+				"import { Protocol } from './protocol';\n" + 
+				"\n" + 
+				"/**\n" + 
+				" * Message types sent between the RSP server and the client\n" + 
+				" */\n" + 
+				"export namespace Messages {\n";
+	}
+	
+	private String messageTsServer() {
+		String header = "\n" + 
+				"    /**\n" + 
+				"     * Server methods\n" + 
+				"     */\n" + 
+				"    export namespace Server {\n\n";
+		String footer = "    }\n";
+		
+		StringBuffer sb = new StringBuffer();
+		try {
+			Map<String, JavadocComment> map = methodToJavadocMap(getServerInterfaceFile());
+			List<String> names = new ArrayList<>(map.keySet());
+			String[] methods = names.toArray(new String[names.size()]);
+			
+			for( int i = 0; i < methods.length; i++ ) {
+				JavadocComment jdc = map.get(methods[i]);
+				if( isNotification(getMethodDeclaration(jdc)) ) {
+					printOneNotification(methods[i], jdc, sb, "server");
+				} else {
+					printOneRequest(methods[i], jdc, sb, "server");
+				}
+			}
+		} catch(IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
+		
+		return header + sb.toString() + footer;
+	}
+
+	private String messageTsClient() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("    /**\n" + 
+				"     * Client methods\n" + 
+				"     */\n" + 
+				"    export namespace Client {\n");
+		
+		
+		try {
+			Map<String, JavadocComment> map = methodToJavadocMap(getClientInterfaceFile());
+			List<String> names = new ArrayList<>(map.keySet());
+			String[] methods = names.toArray(new String[names.size()]);
+			for( int i = 0; i < methods.length; i++ ) {
+				JavadocComment jdc = map.get(methods[i]);
+				if( isNotification(getMethodDeclaration(jdc)) ) {
+					printOneNotification(methods[i], jdc, sb, "client");
+				} else {
+					printOneRequest(methods[i], jdc, sb, "client");
+				}
+			}
+		} catch(IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
+
+		
+		
+		sb.append("    }\n");
+		return sb.toString();
+	}
+
+	private boolean isNotification(MethodDeclaration dec) {
+		NodeList<AnnotationExpr> annotations = dec.getAnnotations();
+		for( AnnotationExpr a : annotations) {
+			String annotName = annotations.get(0).getNameAsString();
+			if( annotName.equalsIgnoreCase("JsonNotification")) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isRequest(MethodDeclaration dec) {
+		NodeList<AnnotationExpr> annotations = dec.getAnnotations();
+		for( AnnotationExpr a : annotations) {
+			String annotName = annotations.get(0).getNameAsString();
+			if( annotName.equalsIgnoreCase("JsonRequest")) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	
+	private void printOneRequest(String methodName, JavadocComment jdc, 
+			StringBuffer sb, String serverOrClient) {
+		if( jdc != null ) {
+			String comment = jdc.getContent().substring(1);
+			sb.append("        /**\n");
+			sb.append(comment.replaceAll("\t", "        "));
+			sb.append("*/");
+			sb.append("\n        export namespace ");
+			sb.append(methodName.substring(0, 1).toUpperCase());
+			sb.append(methodName.substring(1));
+			sb.append("Request {\n");
+			
+			// TODO body
+			MethodDeclaration md = getMethodDeclaration(jdc);
+			sb.append("            export const type = new RequestType<");
+			NodeList<Parameter> params = md.getParameters();
+			if( params.size() == 0 ) {
+				sb.append("void, ");
+			} else {
+				Type type = params.get(0).getType();
+				String typeName = type.toString();
+				if( typeName.equalsIgnoreCase("void")) 
+					sb.append("void, ");
+				else 
+					sb.append("Protocol." + typeName + ", ");
+
+			}
+			
+			Type retType = md.getType();
+			String retTypeName = convertReturnType(retType.toString());
+			sb.append(retTypeName);
+			sb.append(", void, void>('" + serverOrClient + "/" + methodName + "');");
+			sb.append("\n");
+			sb.append("        }\n");
+		}
+	}
+
+	private void printOneNotification(String methodName, JavadocComment jdc, 
+			StringBuffer sb, String serverOrClient) {
+		if( jdc != null ) {
+			String comment = jdc.getContent().substring(1);
+			sb.append("        /**\n");
+			sb.append(comment.replaceAll("\t", "        "));
+			sb.append("*/");
+			sb.append("\n        export namespace ");
+			sb.append(methodName.substring(0, 1).toUpperCase());
+			sb.append(methodName.substring(1));
+			sb.append("Notification {\n");
+			
+			// TODO body
+			MethodDeclaration md = getMethodDeclaration(jdc);
+			sb.append("            export const type = new NotificationType<");
+			NodeList<Parameter> params = md.getParameters();
+			if( params.size() == 0 ) {
+				sb.append("void, ");
+			} else {
+				Type type = params.get(0).getType();
+				String typeName = type.toString();
+				if( typeName.equalsIgnoreCase("void")) 
+					sb.append("void, ");
+				else 
+					sb.append("Protocol." + typeName + ", ");
+			}
+			
+			Type retType = md.getType();
+			String retTypeName = convertReturnType(retType.toString());
+			sb.append(retTypeName);
+			sb.append(">('" + serverOrClient + "/" + methodName + "');");
+			sb.append("\n");
+			sb.append("        }\n");
+		}
+	}
+
+	private String convertReturnType(String type) {
+		if( type.startsWith("CompletableFuture<") && type.endsWith(">")) {
+			type = type.substring("CompletableFuture<".length());
+			type = type.substring(0, type.length()-1);
+		}
+		if( type.startsWith("List<")) {
+			type = "Array<Protocol." + type.substring("List<".length());
+		} else {
+			if( type.equals("String"))
+				type = "string";
+			else if( !type.equalsIgnoreCase("void")) 
+				type = "Protocol." + type;
+			
+		}
+		return type;
+	}
+
+	private MethodDeclaration getMethodDeclaration(JavadocComment comment) {
+		Optional<Node> o = comment.getCommentedNode();
+		if (o.get() != null) {
+			if (!(o.get() instanceof CompilationUnit)) {
+				Node n = o.get();
+				if (n instanceof MethodDeclaration) {
+					return (MethodDeclaration) n;
+				}
+			}
+		}
+		return null;
+	}
+	
+	private String messageTsFooter() {
+		return "}\n";
+	}
+	
+
+	private String[] temporaryServerMethodOrder() {
+		String[] methodNames = new String[] {
+		"getDiscoveryPaths",
+		"findServerBeans",
+		"addDiscoveryPath",
+		"removeDiscoveryPath",
+		"getServerHandles",
+		"getServerState",
+		"getServerTypes",
+		"deleteServer",
+		"getRequiredAttributes",
+		"getOptionalAttributes",
+		"createServer",
+		"getLaunchModes",
+		"getRequiredLaunchAttributes",
+		"getOptionalLaunchAttributes",
+		"getLaunchCommand",
+		"serverStartingByClient",
+		"serverStartedByClient",
+		"startServerAsync",
+		"stopServerAsync",
+		"shutdown",
+		"registerClientCapabilities",
+		"getDeployables",
+		"addDeployable",
+		"removeDeployable",
+		"publish",
+		"listDownloadableRuntimes",
+		"downloadRuntime",
+		};
+		return methodNames;
+	}
+
+	private String[] temporaryClientMethodOrder() {
+		String[] methodNames = new String[] {
+				"discoveryPathAdded", 
+				"discoveryPathRemoved", 
+				"serverAdded", 
+				"serverRemoved", 
+				"serverAttributesChanged", 
+				"serverStateChanged", 
+				"serverProcessCreated", 
+				"serverProcessTerminated", 
+				"serverProcessOutputAppended", 
+				"promptString"
+		};
+		return methodNames;
+	}
+
+	private File getClientInterfaceFile() throws IOException {
+		File f2 = new File(baseDir);
+		File f = new File(f2, "../../bundles/org.jboss.tools.rsp.api/src/main/java/org/jboss/tools/rsp/api/RSPClient.java").getCanonicalFile();
+		return f;
+	}
+
+	private File getServerInterfaceFile() throws IOException {
+		File f2 = new File(baseDir);
+		File f = new File(f2, "../../bundles/org.jboss.tools.rsp.api/src/main/java/org/jboss/tools/rsp/api/RSPServer.java").getCanonicalFile();
+		return f;
+	}
+	private static String linePrefix(String original, String prefix ) {
+		String before = original;
+		String after = ("\n" + original).replace("\n", "\n" + prefix).substring(1);
+		return after;
+	}
+	
+	private static String readFile(File file) {
+		String content = "";
+		try {
+			content = new String(Files.readAllBytes(file.toPath()));
+		} catch (IOException e) {
+		}
+		return content;
+	}
+	
+	private HashMap<String, JavadocComment> methodToJavadocMap(File f) {
+		HashMap<String, JavadocComment> map = new LinkedHashMap<>();
+		VoidVisitorAdapter adapter = new VoidVisitorAdapter<Object>() {
+			@Override
+			public void visit(JavadocComment comment, Object arg) {
+				super.visit(comment, arg);
+				Optional<Node> o = comment.getCommentedNode();
+				if (o.get() != null) {
+					if (!(o.get() instanceof CompilationUnit)) {
+						Node n = o.get();
+						if (n instanceof MethodDeclaration) {
+							map.put(((MethodDeclaration)n).getNameAsString(), comment);
+						}
+					}
+				}
+			}
+		};
+		try {
+			CompilationUnit cu = JavaParser.parse(f);
+			adapter.visit(cu, null);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		return map;
 	}
 }

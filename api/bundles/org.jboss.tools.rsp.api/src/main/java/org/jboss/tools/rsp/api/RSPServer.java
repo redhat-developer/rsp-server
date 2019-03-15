@@ -360,6 +360,10 @@ public interface RSPServer {
 	@JsonRequest
 	public CompletableFuture<WorkflowResponse> downloadRuntime(DownloadSingleRuntimeRequest req);
 
+	
+	/*
+	 * Jobs
+	 */
 
 	/**
 	 * Initiate a request to get a view of the current job model

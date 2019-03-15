@@ -9,16 +9,28 @@
 package org.jboss.tools.rsp.api.schema;
 
 
+import java.io.File;
 import java.io.IOException;
 
 public class GenerateSchemaMain {
-
+	private static final String TYPESCRIPT_CLIENT_DIR = "generate.typescript.client.output";
+	
+	
 	public static void main(String[] args) throws Exception {
 		String baseDir = args.length > 0 ? args[0] : ".";
 		Class<?>[] daos = new DaoClasses().getAll();
 		JSONUtility json = generateJson(baseDir, daos);
 		TypescriptUtility ts = generateTypescript(baseDir, daos);
 		generateSpecifications(baseDir, json, ts);
+		
+		if( System.getProperty(TYPESCRIPT_CLIENT_DIR) != null ) {
+			String dir = System.getProperty(TYPESCRIPT_CLIENT_DIR);
+			if( new File(dir).exists()) {
+				ts.generateTypescriptClient(dir);
+			}
+			return;
+		}
+
 	}
 
 	private static void generateSpecifications(String baseDir, JSONUtility json, TypescriptUtility ts)
