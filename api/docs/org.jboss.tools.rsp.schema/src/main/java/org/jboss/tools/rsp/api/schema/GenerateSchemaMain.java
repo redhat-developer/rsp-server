@@ -41,7 +41,7 @@ public class GenerateSchemaMain {
 
 	private static TypescriptUtility generateTypescript(String baseDir, Class<?>[] daos) throws IOException {
 		TypescriptUtility ts = new TypescriptUtility(baseDir);
-		ts.cleanFolder();
+		SchemaIOUtil.cleanFolder(ts.getDaoTypescriptFolder());
 		ts.writeTypescriptSchemas(daos);
 		return ts;
 	}
