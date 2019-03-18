@@ -144,6 +144,7 @@ public class TypescriptUtility {
 	public void generateTypescriptClient(String dir) {
 		generateProtocolTs(dir);
 		generateMessageTs(dir);
+		generateIncomingTs(dir);
 	}
 	
 	private void generateProtocolTs(String dir) {
@@ -154,8 +155,7 @@ public class TypescriptUtility {
 				"/**\n" + 
 				" * Json objects sent between the server and the client\n" + 
 				" */\n" + 
-				"export namespace Protocol {\n" + 
-				"";
+				"export namespace Protocol {\n";
 		String footer = "}";
 		
 		String total = header + linePrefix(contents, "    ") + footer;
@@ -174,6 +174,124 @@ public class TypescriptUtility {
 		} catch(IOException ioe) {
 			
 		}
+	}
+
+	private void generateIncomingTs(String dir) {
+		File destination = new File(dir).toPath().resolve("src").resolve("util").resolve("incoming.ts").toFile();
+		String fileContents = incomingTsHeader() + incomingTsClient() + incomingTsFooter();
+		try {
+			Files.write(destination.toPath(), fileContents.getBytes());
+		} catch(IOException ioe) {
+			
+		}
+	}
+	
+	private String incomingTsHeader() {
+		return "import { Protocol } from '../protocol/protocol';\n" + 
+				"import { Messages } from '../protocol/messages';\n" + 
+				"import { MessageConnection } from 'vscode-jsonrpc';\n" + 
+				"import { EventEmitter } from 'events';\n" + 
+				"\n" + 
+				"/**\n" + 
+				" * Server incoming\n" + 
+				" */\n" + 
+				"export class Incoming {\n" + 
+				"\n" + 
+				"    private connection: MessageConnection;\n" + 
+				"    private emitter: EventEmitter;\n" + 
+				"\n" + 
+				"    /**\n" + 
+				"     * Constructs a new discovery handler\n" + 
+				"     * @param connection message connection to the RSP\n" + 
+				"     * @param emitter event emitter to handle notification events\n" + 
+				"     */\n" + 
+				"    constructor(connection: MessageConnection, emitter: EventEmitter) {\n" + 
+				"        this.connection = connection;\n" + 
+				"        this.emitter = emitter;\n" + 
+				"        this.listen();\n" + 
+				"    }\n" + 
+				"";
+	}
+
+	private String incomingTsFooter() {
+		return "}";
+	}
+
+	private String incomingTsListen() {
+		String header = "    /**\n" + 
+				"     * Subscribes to notifications sent by the server\n" + 
+				"     */\n" + 
+				"    private listen() {\n";
+		String footer = "}";
+		
+		StringBuffer sb = new StringBuffer();
+		try {
+			Map<String, JavadocComment> map = methodToJavadocMap(getClientInterfaceFile());
+			List<String> names = new ArrayList<>(map.keySet());
+			String[] methods = names.toArray(new String[names.size()]);
+			for( int i = 0; i < methods.length; i++ ) {
+				JavadocComment jdc = map.get(methods[i]);
+				MethodDeclaration md = getMethodDeclaration(jdc);
+				if( isNotification(md) ) {
+					
+					String methodName = md.getNameAsString();
+					String notificationName = methodNameToNotificationName(methodName);
+					
+					sb.append("        this.connection.onNotification(Messages.Client." + notificationName + ".type, param => {\n");
+					sb.append("            this.emitter.emit('" + methodName + "', param);\n");
+					sb.append("        });\n\n");
+					
+				} else {
+
+				}
+			}
+		} catch(IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
+
+		
+		
+		return header + sb.toString() + footer;
+	}
+	
+
+	private String incomingTsRegisterListeners() {
+		StringBuffer sb = new StringBuffer();
+		try {
+			Map<String, JavadocComment> map = methodToJavadocMap(getClientInterfaceFile());
+			List<String> names = new ArrayList<>(map.keySet());
+			String[] methods = names.toArray(new String[names.size()]);
+			for( int i = 0; i < methods.length; i++ ) {
+				JavadocComment jdc = map.get(methods[i]);
+				MethodDeclaration md = getMethodDeclaration(jdc);
+
+				String methodName = md.getNameAsString();
+				String capName = capFirstLetter(methodName);
+				int paramCount = md.getParameters().size();
+				String paramType = paramCount > 0 ? convertReturnType(md.getParameter(0).getType().toString()) : null;
+				Type retType = md.getType();
+				String retTypeName = convertReturnType(retType.toString());
+
+				if( isNotification(md) ) {
+					sb.append("    on" + capName + "(listener: (arg: " + paramType + ") => " + retTypeName + "): void\n    {\n");
+					sb.append("        this.emitter.on('" + methodName + "', listener);\n");
+					sb.append("    }\n");
+				} else {
+					String requestName = methodNameToRequestName(methodName);
+					sb.append("    on" + capName + "(listener: (arg: " + paramType + ") => Promise<" + retTypeName + ">): void\n    {\n");
+					sb.append("        this.connection.onRequest(Messages.Client." + requestName + ".type, listener);\n");
+					sb.append("    }\n");
+				}
+			}
+		} catch(IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
+		
+		return sb.toString();
+	}
+	
+	private String incomingTsClient() {
+		return incomingTsListen() + "\n\n" + incomingTsRegisterListeners();
 	}
 	
 	private String messageTsHeader() {
@@ -276,9 +394,8 @@ public class TypescriptUtility {
 			sb.append(comment.replaceAll("\t", "        "));
 			sb.append("*/");
 			sb.append("\n        export namespace ");
-			sb.append(methodName.substring(0, 1).toUpperCase());
-			sb.append(methodName.substring(1));
-			sb.append("Request {\n");
+			sb.append(methodNameToRequestName(methodName));
+			sb.append(" {\n");
 			
 			// TODO body
 			MethodDeclaration md = getMethodDeclaration(jdc);
@@ -305,6 +422,18 @@ public class TypescriptUtility {
 		}
 	}
 
+	private String methodNameToNotificationName(String methodName) {
+		return capFirstLetter(methodName) + "Notification";	
+	}
+	
+	private String methodNameToRequestName(String methodName) {
+		return capFirstLetter(methodName) + "Request";
+	}
+	
+	private String capFirstLetter(String s) {
+		return s.substring(0, 1).toUpperCase() + s.substring(1);
+	}
+	
 	private void printOneNotification(String methodName, JavadocComment jdc, 
 			StringBuffer sb, String serverOrClient) {
 		if( jdc != null ) {
@@ -313,9 +442,8 @@ public class TypescriptUtility {
 			sb.append(comment.replaceAll("\t", "        "));
 			sb.append("*/");
 			sb.append("\n        export namespace ");
-			sb.append(methodName.substring(0, 1).toUpperCase());
-			sb.append(methodName.substring(1));
-			sb.append("Notification {\n");
+			sb.append(methodNameToNotificationName(methodName));
+			sb.append(" {\n");
 			
 			// TODO body
 			MethodDeclaration md = getMethodDeclaration(jdc);
@@ -375,56 +503,6 @@ public class TypescriptUtility {
 		return "}\n";
 	}
 	
-
-	private String[] temporaryServerMethodOrder() {
-		String[] methodNames = new String[] {
-		"getDiscoveryPaths",
-		"findServerBeans",
-		"addDiscoveryPath",
-		"removeDiscoveryPath",
-		"getServerHandles",
-		"getServerState",
-		"getServerTypes",
-		"deleteServer",
-		"getRequiredAttributes",
-		"getOptionalAttributes",
-		"createServer",
-		"getLaunchModes",
-		"getRequiredLaunchAttributes",
-		"getOptionalLaunchAttributes",
-		"getLaunchCommand",
-		"serverStartingByClient",
-		"serverStartedByClient",
-		"startServerAsync",
-		"stopServerAsync",
-		"shutdown",
-		"registerClientCapabilities",
-		"getDeployables",
-		"addDeployable",
-		"removeDeployable",
-		"publish",
-		"listDownloadableRuntimes",
-		"downloadRuntime",
-		};
-		return methodNames;
-	}
-
-	private String[] temporaryClientMethodOrder() {
-		String[] methodNames = new String[] {
-				"discoveryPathAdded", 
-				"discoveryPathRemoved", 
-				"serverAdded", 
-				"serverRemoved", 
-				"serverAttributesChanged", 
-				"serverStateChanged", 
-				"serverProcessCreated", 
-				"serverProcessTerminated", 
-				"serverProcessOutputAppended", 
-				"promptString"
-		};
-		return methodNames;
-	}
-
 	private File getClientInterfaceFile() throws IOException {
 		File f2 = new File(baseDir);
 		File f = new File(f2, "../../bundles/org.jboss.tools.rsp.api/src/main/java/org/jboss/tools/rsp/api/RSPClient.java").getCanonicalFile();
