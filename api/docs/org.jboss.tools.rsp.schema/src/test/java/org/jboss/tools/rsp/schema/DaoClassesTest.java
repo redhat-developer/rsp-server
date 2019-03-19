@@ -11,7 +11,6 @@ package org.jboss.tools.rsp.schema;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
@@ -100,9 +99,12 @@ public class DaoClassesTest {
 		}
 	}
 
-	private static void addJarToClasspath(URL url) throws Exception {
-		Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] { URL.class });
-	    method.setAccessible(true);
-		method.invoke(ClassLoader.getSystemClassLoader(), new Object[] { url });
+	/*
+	 * Due to Java 8 vs java 9+ incompatibility issues
+	 * See https://stackoverflow.com/questions/46694600/java-9-compatability-issue-with-classloader-getsystemclassloader/51584718
+	 */
+	private void addJarToClasspath(URL url) throws Exception {
+		URLClassLoader loader = new URLClassLoader(new URL [] {url}, this.getClass().getClassLoader());
+		Thread.currentThread().setContextClassLoader(loader);
 	}
 }
