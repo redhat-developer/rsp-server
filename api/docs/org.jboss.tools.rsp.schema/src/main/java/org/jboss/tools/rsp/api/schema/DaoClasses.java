@@ -128,9 +128,10 @@ public class DaoClasses {
 					.sorted()
 					.map(className -> {
 						try {
-							return Class.forName(className);
+							return Class.forName(className, true, getClassloader());
 						} catch (ClassNotFoundException e) {
 							LOG.error("Could not instantiate class " + className + " that we found in jar " + uri.toString());
+							e.printStackTrace();
 							return null;
 						}
 					})
