@@ -325,7 +325,7 @@ public class TypescriptUtility {
 
 				String standardParams = paramType == null ? "" : "param: " + paramType;
 				String timeoutParams = (standardParams.isEmpty() ? "" : ", ") + "timeout: number = 2000";
-				String functionDecLine = "    " + methodName + "Async(" + standardParams + timeoutParams + "): ";
+				String functionDecLine = "    " + methodName + "(" + standardParams + timeoutParams + "): ";
 				if( retTypeName.equals("void")) {
 					functionDecLine += retTypeName + " {\n";
 				} else {
