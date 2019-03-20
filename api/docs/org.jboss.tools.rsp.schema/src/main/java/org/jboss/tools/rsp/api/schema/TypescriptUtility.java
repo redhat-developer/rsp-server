@@ -116,7 +116,8 @@ public class TypescriptUtility {
 	
 	private void generateProtocolTs(String dir) {
 		File existing = getUnifiedSchemaFile();
-		File destination = new File(dir).toPath().resolve("src").resolve("protocol").resolve("protocol.ts").toFile();
+		File destination = new File(dir).toPath().resolve("src").resolve("protocol")
+				.resolve("generated").resolve("protocol.ts").toFile();
 		String contents = SchemaIOUtil.readFile(existing);
 		String header = 
 				"/**\n" + 
@@ -134,7 +135,8 @@ public class TypescriptUtility {
 	}
 	
 	private void generateMessageTs(String dir) {
-		File destination = new File(dir).toPath().resolve("src").resolve("protocol").resolve("messages.ts").toFile();
+		File destination = new File(dir).toPath().resolve("src").resolve("protocol")
+				.resolve("generated").resolve("messages.ts").toFile();
 		String fileContents = messageTsHeader() + messageTsServer() + messageTsClient() + emptyFooter();
 		try {
 			Files.write(destination.toPath(), fileContents.getBytes());
@@ -144,7 +146,8 @@ public class TypescriptUtility {
 	}
 
 	private void generateIncomingTs(String dir) {
-		File destination = new File(dir).toPath().resolve("src").resolve("util").resolve("incoming.ts").toFile();
+		File destination = new File(dir).toPath().resolve("src").resolve("protocol")
+				.resolve("generated").resolve("incoming.ts").toFile();
 		String fileContents = incomingTsHeader() + incomingTsClient() + emptyFooter();
 		try {
 			Files.write(destination.toPath(), fileContents.getBytes());
@@ -154,7 +157,8 @@ public class TypescriptUtility {
 	}
 
 	private void generateOutgoingTs(String dir) {
-		File destination = new File(dir).toPath().resolve("src").resolve("util").resolve("outgoing.ts").toFile();
+		File destination = new File(dir).toPath().resolve("src").resolve("protocol")
+				.resolve("generated").resolve("outgoing.ts").toFile();
 		String fileContents = outgoingTsHeader() + outgoingTsServer() + outgoingTsFooter() + outgoingTsErrors();
 		try {
 			Files.write(destination.toPath(), fileContents.getBytes());
@@ -203,16 +207,14 @@ public class TypescriptUtility {
 	}
 	
 	private String outgoingTsHeader() {
-		return  "import { Protocol } from '../protocol/protocol';\n" + 
-				"import { Messages } from '../protocol/messages';\n" + 
-				"import { Common } from './common';\n" + 
+		return  "import { Protocol } from './protocol';\n" + 
+				"import { Messages } from './messages';\n" + 
+				"import { Common } from '../../util/common';\n" + 
 				"import { MessageConnection } from 'vscode-jsonrpc';\n" + 
-				"import { EventEmitter } from 'events';\n" + 
-				//"import { ServerState } from '../protocol/serverState';\n" + 
-				"\n" + 
+				"import { EventEmitter } from 'events';\n" +
 				"\n" + 
 				"/**\n" + 
-				" * Server incoming\n" + 
+				" * Server Outgoing\n" + 
 				" */\n" + 
 				"export class Outgoing {\n" + 
 				"\n" + 
@@ -235,8 +237,8 @@ public class TypescriptUtility {
 	}
 	
 	private String incomingTsHeader() {
-		return "import { Protocol } from '../protocol/protocol';\n" + 
-				"import { Messages } from '../protocol/messages';\n" + 
+		return "import { Protocol } from './protocol';\n" + 
+				"import { Messages } from './messages';\n" + 
 				"import { MessageConnection } from 'vscode-jsonrpc';\n" + 
 				"import { EventEmitter } from 'events';\n" + 
 				"\n" + 
@@ -323,7 +325,7 @@ public class TypescriptUtility {
 
 				String standardParams = paramType == null ? "" : "param: " + paramType;
 				String timeoutParams = (standardParams.isEmpty() ? "" : ", ") + "timeout: number = 2000";
-				String functionDecLine = "    " + methodName + "Sync(" + standardParams + timeoutParams + "): ";
+				String functionDecLine = "    " + methodName + "Async(" + standardParams + timeoutParams + "): ";
 				if( retTypeName.equals("void")) {
 					functionDecLine += retTypeName + " {\n";
 				} else {
@@ -379,7 +381,7 @@ public class TypescriptUtility {
 				String retTypeName = convertReturnType(retType.toString());
 
 				if( JavadocUtilities.isNotification(md) ) {
-					sb.append("    on" + capName + "(listener: (arg: " + paramType + ") => " + retTypeName + "): void\n    {\n");
+					sb.append("    on" + capName + "(listener: (arg: " + paramType + ") => " + retTypeName + "): void {\n");
 					sb.append("        this.emitter.on('" + methodName + "', listener);\n");
 					sb.append("    }\n");
 				} else {

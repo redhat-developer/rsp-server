@@ -201,7 +201,7 @@ public class DownloadManagerDownloadExecutor extends AbstractLicenseOnlyDownload
 		WorkflowResponseItem item3 = createWorkflowItem(
 				ServerManagementAPIConstants.WORKFLOW_PASSWORD_ID,
 				"Password: ",
-				ServerManagementAPIConstants.ATTR_TYPE_STRING);
+				ServerManagementAPIConstants.ATTR_TYPE_STRING, true);
 		List<WorkflowResponseItem> items = Arrays.asList(item1, item2, item3);
 		resp.setItems(items);
 		resp.setRequestId(requestId);
@@ -218,13 +218,18 @@ public class DownloadManagerDownloadExecutor extends AbstractLicenseOnlyDownload
 	}
 
 	private WorkflowResponseItem createWorkflowItem(String id, String label, String responseType) {
+		return createWorkflowItem(id, label, responseType, false);
+	}
+
+	private WorkflowResponseItem createWorkflowItem(String id, String label, String responseType, boolean secret) {
 		WorkflowResponseItem item1 = new WorkflowResponseItem();
 		item1.setId(id);
 		item1.setLabel(label);
 		item1.setResponseType(responseType);
+		item1.setResponseSecret(secret);
 		return item1;
 	}
-	
+
 	@Override
 	protected IStatus createServer(DownloadRuntime dlrt, String newHome) {
 		// duplicate with the wildfly impl 
