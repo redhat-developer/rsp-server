@@ -319,7 +319,7 @@ public class TypescriptUtility {
 				boolean isNotification = JavadocUtilities.isNotification(md);
 
 				String standardParams = paramType == null ? "" : "param: " + paramType;
-				String timeoutParams = (standardParams.isEmpty() ? "" : ", ") + "timeout: number = Common.LONG_TIMEOUT";
+				String timeoutParams = (standardParams.isEmpty() ? "" : ", ") + "timeout: number = Common.DEFAULT_TIMEOUT";
 				String functionDecLine = "    " + methodName + "(" + standardParams + timeoutParams + "): ";
 				if( retTypeName.equals("void")) {
 					functionDecLine += retTypeName + " {\n";
