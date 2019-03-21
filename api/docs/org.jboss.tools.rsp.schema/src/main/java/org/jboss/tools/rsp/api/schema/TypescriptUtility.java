@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * Copyright (c) 2018-2019 Red Hat, Inc. Distributed under license by Red Hat, Inc.
  * All rights reserved. This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v20.html
@@ -13,24 +13,20 @@ import java.io.IOException;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.comments.JavadocComment;
-import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.type.Type;
-import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import cz.habarta.typescript.generator.Input;
 import cz.habarta.typescript.generator.JsonLibrary;
@@ -41,9 +37,14 @@ import cz.habarta.typescript.generator.TypeScriptOutputKind;
 
 public class TypescriptUtility {
 
+	private static final String JAVA_END = " */\n";
+	private static final String JAVADOC_START = "/**\n";
+	private static final String CLIENT_INTERFACE_PATH = "../../bundles/org.jboss.tools.rsp.api/src/main/java/org/jboss/tools/rsp/api/RSPClient.java";
+	private static final String SERVER_INTERFACE_PATH = "../../bundles/org.jboss.tools.rsp.api/src/main/java/org/jboss/tools/rsp/api/RSPServer.java";
 	private static final String PROTOCOL_TYPE_FILE = "protocol.unified.d.ts";
 	private static final String TS_TYPE_FILE_SUFFIX = ".d.ts";
-
+	private static final Path BASE_GEN_DIRECTORY = Paths.get("src", "protocol", "generated");
+	
 	private String baseDir;
 
 	public TypescriptUtility(String baseDir) {
@@ -116,13 +117,12 @@ public class TypescriptUtility {
 	
 	private void generateProtocolTs(String dir) {
 		File existing = getUnifiedSchemaFile();
-		File destination = new File(dir).toPath().resolve("src").resolve("protocol")
-				.resolve("generated").resolve("protocol.ts").toFile();
+		File destination = new File(dir).toPath().resolve(BASE_GEN_DIRECTORY).resolve("protocol.ts").toFile();
 		String contents = SchemaIOUtil.readFile(existing);
 		String header = 
-				"/**\n" + 
+				JAVADOC_START + 
 				" * Json objects sent between the server and the client\n" + 
-				" */\n" + 
+				JAVA_END + 
 				"export namespace Protocol {\n";
 		String footer = emptyFooter();
 		
@@ -135,8 +135,7 @@ public class TypescriptUtility {
 	}
 	
 	private void generateMessageTs(String dir) {
-		File destination = new File(dir).toPath().resolve("src").resolve("protocol")
-				.resolve("generated").resolve("messages.ts").toFile();
+		File destination = new File(dir).toPath().resolve(BASE_GEN_DIRECTORY).resolve("messages.ts").toFile();
 		String fileContents = messageTsHeader() + messageTsServer() + messageTsClient() + emptyFooter();
 		try {
 			Files.write(destination.toPath(), fileContents.getBytes());
@@ -146,8 +145,7 @@ public class TypescriptUtility {
 	}
 
 	private void generateIncomingTs(String dir) {
-		File destination = new File(dir).toPath().resolve("src").resolve("protocol")
-				.resolve("generated").resolve("incoming.ts").toFile();
+		File destination = new File(dir).toPath().resolve(BASE_GEN_DIRECTORY).resolve("incoming.ts").toFile();
 		String fileContents = incomingTsHeader() + incomingTsClient() + emptyFooter();
 		try {
 			Files.write(destination.toPath(), fileContents.getBytes());
@@ -157,8 +155,7 @@ public class TypescriptUtility {
 	}
 
 	private void generateOutgoingTs(String dir) {
-		File destination = new File(dir).toPath().resolve("src").resolve("protocol")
-				.resolve("generated").resolve("outgoing.ts").toFile();
+		File destination = new File(dir).toPath().resolve(BASE_GEN_DIRECTORY).resolve("outgoing.ts").toFile();
 		String fileContents = outgoingTsHeader() + outgoingTsServer() + outgoingTsFooter() + outgoingTsErrors();
 		try {
 			Files.write(destination.toPath(), fileContents.getBytes());
@@ -168,11 +165,11 @@ public class TypescriptUtility {
 	}
 	
 	private String outgoingTsErrors() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("\n" + 
-				"/**\n" + 
+				JAVADOC_START + 
 				" * Error messages\n" + 
-				" */\n" + 
+				JAVA_END + 
 				"export namespace ErrorMessages {\n");
 		List<String> mNames = null;
 		try {
@@ -194,7 +191,7 @@ public class TypescriptUtility {
 	}
 
 	private String camelCaseToSpaces(String n) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for( int i = 0; i < n.length(); i++ ) {
 			if(Character.isUpperCase(n.charAt(i))) {
 				sb.append(" ");
@@ -211,20 +208,24 @@ public class TypescriptUtility {
 				"import { Messages } from './messages';\n" + 
 				"import { Common } from '../../util/common';\n" + 
 				"import { MessageConnection } from 'vscode-jsonrpc';\n" + 
+				"import { EventEmitter } from 'events';\n" +
 				"\n" + 
-				"/**\n" + 
+				JAVADOC_START + 
 				" * Server Outgoing\n" + 
-				" */\n" + 
+				JAVA_END + 
 				"export class Outgoing {\n" + 
 				"\n" + 
 				"    private connection: MessageConnection;\n" + 
+				//"    private emitter: EventEmitter;\n" + 
 				"\n" + 
 				"     /**\n" + 
 				"     * Constructs a new discovery handler\n" + 
 				"     * @param connection message connection to the RSP\n" + 
+				"     * @param emitter event emitter to handle notification events\n" + 
 				"     */\n" + 
-				"    constructor(connection: MessageConnection) {\n" + 
+				"    constructor(connection: MessageConnection, emitter: EventEmitter) {\n" + 
 				"        this.connection = connection;\n" + 
+				//"        this.emitter = emitter;\n" + 
 				"    }\n";
 	}
 	
@@ -238,9 +239,9 @@ public class TypescriptUtility {
 				"import { MessageConnection } from 'vscode-jsonrpc';\n" + 
 				"import { EventEmitter } from 'events';\n" + 
 				"\n" + 
-				"/**\n" + 
+				JAVADOC_START + 
 				" * Server incoming\n" + 
-				" */\n" + 
+				JAVA_END + 
 				"export class Incoming {\n" + 
 				"\n" + 
 				"    private connection: MessageConnection;\n" + 
@@ -265,9 +266,9 @@ public class TypescriptUtility {
 				"     * Subscribes to notifications sent by the server\n" + 
 				"     */\n" + 
 				"    private listen() {\n";
-		String footer = "    " + emptyFooter();
+		String footer = emptyFooter();
 		
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		try {
 			Map<String, JavadocComment> map = JavadocUtilities.methodToJavadocMap(getClientInterfaceFile());
 			List<String> names = new ArrayList<>(map.keySet());
@@ -282,7 +283,8 @@ public class TypescriptUtility {
 					
 					sb.append("        this.connection.onNotification(Messages.Client." + notificationName + ".type, param => {\n");
 					sb.append("            this.emitter.emit('" + methodName + "', param);\n");
-					sb.append("        });\n");
+					sb.append("        });\n\n");
+					
 				} else {
 					// TOD? idk
 				}
@@ -301,52 +303,13 @@ public class TypescriptUtility {
 	}
 	
 	private String outgoingTsServer() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		try {
 			Map<String, JavadocComment> map = JavadocUtilities.methodToJavadocMap(getServerInterfaceFile());
 			List<String> names = new ArrayList<>(map.keySet());
 			String[] methods = names.toArray(new String[names.size()]);
 			for( int i = 0; i < methods.length; i++ ) {
-				JavadocComment jdc = map.get(methods[i]);
-				MethodDeclaration md = getMethodDeclaration(jdc);
-
-				String methodName = md.getNameAsString();
-				int paramCount = md.getParameters().size();
-				String paramType = paramCount > 0 ? convertReturnType(md.getParameter(0).getType().toString()) : null;
-				Type retType = md.getType();
-				String retTypeName = convertReturnType(retType.toString());
-				
-				boolean isNotification = JavadocUtilities.isNotification(md);
-
-				String standardParams = paramType == null ? "" : "param: " + paramType;
-				String timeoutParams = (standardParams.isEmpty() ? "" : ", ") + "timeout: number = Common.DEFAULT_TIMEOUT";
-				String functionDecLine = "    " + methodName + "(" + standardParams + timeoutParams + "): ";
-				if( retTypeName.equals("void")) {
-					functionDecLine += retTypeName + " {\n";
-				} else {
-					functionDecLine += "Promise<" + retTypeName + "> {\n";
-				}
-				String functionFooter = "    }\n";
-				
-				String functionBody = null;
-				if( isNotification ) {
-					functionBody = "        return Common.sendSimpleNotification(this.connection, Messages.Server.";
-					functionBody += methodNameToNotificationName(methodName);
-					functionBody += ".type, ";
-					functionBody += (paramType == null ? "null" : "param");
-					functionBody += ");\n";
-				} else {
-					functionBody = "        return Common.sendSimpleRequest(this.connection, Messages.Server.";
-					functionBody += methodNameToRequestName(methodName); 
-					functionBody += ".type,\n            ";
-					functionBody += (paramType == null ? "null" : "param") + ", timeout, ErrorMessages.";
-					functionBody += methodName.toUpperCase() + "_TIMEOUT);\n";
-				}
-				
-				
-				sb.append(functionDecLine);
-				sb.append(functionBody);
-				sb.append(functionFooter);
+				outgoingTsServerMethod(sb, map, methods, i);
 			}
 		} catch(IOException ioe) {
 			throw new RuntimeException(ioe);
@@ -354,12 +317,55 @@ public class TypescriptUtility {
 		
 		return sb.toString();
 	}
+
+	private void outgoingTsServerMethod(StringBuilder sb, Map<String, JavadocComment> map, String[] methods, int i) {
+		JavadocComment jdc = map.get(methods[i]);
+		MethodDeclaration md = getMethodDeclaration(jdc);
+
+		String methodName = md.getNameAsString();
+		int paramCount = md.getParameters().size();
+		String paramType = paramCount > 0 ? convertReturnType(md.getParameter(0).getType().toString()) : null;
+		Type retType = md.getType();
+		String retTypeName = convertReturnType(retType.toString());
+		
+		boolean isNotification = JavadocUtilities.isNotification(md);
+
+		String standardParams = paramType == null ? "" : "param: " + paramType;
+		String timeoutParams = (standardParams.isEmpty() ? "" : ", ") + "timeout: number = 2000";
+		String functionDecLine = "    " + methodName + "(" + standardParams + timeoutParams + "): ";
+		if( retTypeName.equals("void")) {
+			functionDecLine += retTypeName + " {\n";
+		} else {
+			functionDecLine += "Promise<" + retTypeName + "> {\n";
+		}
+		String functionFooter = "    }\n";
+		
+		String functionBody = null;
+		if( isNotification ) {
+			functionBody = "        return Common.sendSimpleNotification(this.connection, Messages.Server.";
+			functionBody += methodNameToNotificationName(methodName);
+			functionBody += ".type, ";
+			functionBody += (paramType == null ? "null" : "param");
+			functionBody += ");\n";
+		} else {
+			functionBody = "        return Common.sendSimpleRequest(this.connection, Messages.Server.";
+			functionBody += methodNameToRequestName(methodName); 
+			functionBody += ".type,\n            ";
+			functionBody += (paramType == null ? "null" : "param") + ", timeout, ErrorMessages.";
+			functionBody += methodName.toUpperCase() + "_TIMEOUT);\n";
+		}
+		
+		
+		sb.append(functionDecLine);
+		sb.append(functionBody);
+		sb.append(functionFooter);
+	}
 	
 	private String methodNameToTimeoutErrorName(String name) {
 		return name.toUpperCase() + "_TIMEOUT";
 	}
 	private String incomingTsRegisterListeners() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		try {
 			Map<String, JavadocComment> map = JavadocUtilities.methodToJavadocMap(getClientInterfaceFile());
 			List<String> names = new ArrayList<>(map.keySet());
@@ -381,7 +387,7 @@ public class TypescriptUtility {
 					sb.append("    }\n");
 				} else {
 					String requestName = methodNameToRequestName(methodName);
-					sb.append("    on" + capName + "(listener: (arg: " + paramType + ") => Promise<" + retTypeName + ">): void {\n");
+					sb.append("    on" + capName + "(listener: (arg: " + paramType + ") => Promise<" + retTypeName + ">): void\n    {\n");
 					sb.append("        this.connection.onRequest(Messages.Client." + requestName + ".type, listener);\n");
 					sb.append("    }\n");
 				}
@@ -394,16 +400,16 @@ public class TypescriptUtility {
 	}
 	
 	private String incomingTsClient() {
-		return incomingTsListen() + "\n" + incomingTsRegisterListeners();
+		return incomingTsListen() + "\n\n" + incomingTsRegisterListeners();
 	}
 	
 	private String messageTsHeader() {
 		return "import { NotificationType, RequestType } from 'vscode-jsonrpc';\n" + 
 				"import { Protocol } from './protocol';\n" + 
 				"\n" + 
-				"/**\n" + 
+				JAVADOC_START + 
 				" * Message types sent between the RSP server and the client\n" + 
-				" */\n" + 
+				JAVA_END + 
 				"export namespace Messages {\n";
 	}
 	
@@ -415,7 +421,7 @@ public class TypescriptUtility {
 				"    export namespace Server {\n\n";
 		String footer = "    }\n";
 		
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		try {
 			Map<String, JavadocComment> map = JavadocUtilities.methodToJavadocMap(getServerInterfaceFile());
 			List<String> names = new ArrayList<>(map.keySet());
@@ -437,7 +443,7 @@ public class TypescriptUtility {
 	}
 
 	private String messageTsClient() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("    /**\n" + 
 				"     * Client methods\n" + 
 				"     */\n" + 
@@ -469,7 +475,7 @@ public class TypescriptUtility {
 
 	
 	private void printOneRequest(String methodName, JavadocComment jdc, 
-			StringBuffer sb, String serverOrClient) {
+			StringBuilder sb, String serverOrClient) {
 		if( jdc != null ) {
 			String comment = jdc.getContent().substring(1);
 			sb.append("        /**\n");
@@ -483,7 +489,7 @@ public class TypescriptUtility {
 			MethodDeclaration md = getMethodDeclaration(jdc);
 			sb.append("            export const type = new RequestType<");
 			NodeList<Parameter> params = md.getParameters();
-			if( params.size() == 0 ) {
+			if (params.isEmpty()) {
 				sb.append("void, ");
 			} else {
 				Type type = params.get(0).getType();
@@ -517,7 +523,7 @@ public class TypescriptUtility {
 	}
 	
 	private void printOneNotification(String methodName, JavadocComment jdc, 
-			StringBuffer sb, String serverOrClient) {
+			StringBuilder sb, String serverOrClient) {
 		if( jdc != null ) {
 			String comment = jdc.getContent().substring(1);
 			sb.append("        /**\n");
@@ -570,13 +576,12 @@ public class TypescriptUtility {
 
 	private MethodDeclaration getMethodDeclaration(JavadocComment comment) {
 		Optional<Node> o = comment.getCommentedNode();
-		if (o.get() != null) {
-			if (!(o.get() instanceof CompilationUnit)) {
-				Node n = o.get();
-				if (n instanceof MethodDeclaration) {
-					return (MethodDeclaration) n;
-				}
-			}
+		if (o.isPresent() 
+				&& (!(o.get() instanceof CompilationUnit))) {
+					Node n = o.get();
+					if (n instanceof MethodDeclaration) {
+						return (MethodDeclaration) n;
+					}
 		}
 		return null;
 	}
@@ -587,13 +592,13 @@ public class TypescriptUtility {
 	
 	private File getClientInterfaceFile() throws IOException {
 		File f2 = new File(baseDir);
-		File f = new File(f2, "../../bundles/org.jboss.tools.rsp.api/src/main/java/org/jboss/tools/rsp/api/RSPClient.java").getCanonicalFile();
+		File f = new File(f2, CLIENT_INTERFACE_PATH).getCanonicalFile();
 		return f;
 	}
 
 	private File getServerInterfaceFile() throws IOException {
 		File f2 = new File(baseDir);
-		File f = new File(f2, "../../bundles/org.jboss.tools.rsp.api/src/main/java/org/jboss/tools/rsp/api/RSPServer.java").getCanonicalFile();
+		File f = new File(f2, SERVER_INTERFACE_PATH).getCanonicalFile();
 		return f;
 	}
 
