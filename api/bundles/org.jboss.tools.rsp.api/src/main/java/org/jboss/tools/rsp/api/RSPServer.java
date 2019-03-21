@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * Copyright (c) 2018-2019 Red Hat, Inc. Distributed under license by Red Hat, Inc.
  * All rights reserved. This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v20.html
@@ -61,11 +61,10 @@ public interface RSPServer {
 	void shutdown();
 
 
-
-
 	/*
 	 * Discovery
 	 */
+
 	/**
 	 * The `server/getDiscoveryPaths` request is sent by the client to fetch a list
 	 * of discovery paths that can be searched.
@@ -117,9 +116,6 @@ public interface RSPServer {
 	CompletableFuture<Status> removeDiscoveryPath(DiscoveryPath path);
 
 
-
-
-
 	/*
 	 * Server Model
 	 */
@@ -162,7 +158,7 @@ public interface RSPServer {
 	 * The `server/getOptionalAttributes` request is sent by the client to list the
 	 * optional attributes that can be stored on a server object of this type. This
 	 * may include things like customizing ports, or custom methods of interacting
-	 * with various functionality specific to the server type.This request may return
+	 * with various functionality specific to the server type. This request may return
 	 * null in case of error.
 	 */
 	@JsonRequest
@@ -175,13 +171,11 @@ public interface RSPServer {
 	 * have impossible, unexpected, or invalid values, or any error occurs
 	 * while attempting to create the server adapter as requested.
 	 *
-	 * In the event of failure, the returend `Status` object will
+	 * In the event of failure, the returned `Status` object will
 	 * detail the cause of error.
 	 */
 	@JsonRequest
 	CompletableFuture<CreateServerResponse> createServer(ServerAttributes csa);
-
-
 
 
 	/*
@@ -266,7 +260,6 @@ public interface RSPServer {
 	@JsonRequest
 	CompletableFuture<Status> serverStartedByClient(LaunchParameters attr);
 
-
 	/**
 	 * Get the state of the current server
 	 */
@@ -295,14 +288,13 @@ public interface RSPServer {
 	/*
 	 * Publishing
 	 */
+
 	/**
 	 * The `server/getDeployables` request is sent by the client to the server to
 	 * get a list of all deployables
 	 */
 	@JsonRequest
 	CompletableFuture<List<DeployableState>> getDeployables(ServerHandle handle);
-
-
 
 	/**
 	 * The `server/addDeployable` request is sent by the client to the server
@@ -327,8 +319,6 @@ public interface RSPServer {
 	 */
 	@JsonRequest
 	public CompletableFuture<Status> removeDeployable(ModifyDeployableRequest req);
-
-
 	/**
 	 * The `server/publish` request is sent by the client to the server
 	 * to instruct the server adapter to publish any changes to the backing runtime.
@@ -340,8 +330,6 @@ public interface RSPServer {
 	public CompletableFuture<Status> publish(PublishServerRequest request);
 
 
-
-
 	/*
 	 * Downloading Runtimes
 	 */
@@ -351,7 +339,6 @@ public interface RSPServer {
 	 */
 	@JsonRequest
 	public CompletableFuture<ListDownloadRuntimeResponse> listDownloadableRuntimes();
-
 
 	/**
 	 * Initiate a request to download a runtime
@@ -379,7 +366,5 @@ public interface RSPServer {
 	 */
 	@JsonRequest
 	public CompletableFuture<Status> cancelJob(JobHandle job);
-
-
 
 }
