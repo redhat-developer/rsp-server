@@ -3,7 +3,7 @@
  * All rights reserved. This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v20.html
- * 
+ *
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
 package org.jboss.tools.rsp.api;
@@ -26,18 +26,18 @@ import org.jboss.tools.rsp.api.dao.StringPrompt;
 @JsonSegment("client")
 public interface RSPClient {
 
-	/** 
+	/**
 	 * Prompt the user for some feature
 	 */
 	@JsonRequest
 	CompletableFuture<String> promptString(StringPrompt prompt);
 
-	
+
 
 	/**
 	 * The `client/discoveryPathAdded` notification is sent by the server to all
 	 * clients in response to the `server/addDiscoveryPath` notification.
-	 * 
+	 *
 	 * This call indicates that a discovery path has been added to the RSP model
 	 * which keeps track of filesystem paths that may be searched for server
 	 * runtimes.
@@ -59,7 +59,7 @@ public interface RSPClient {
 	/**
 	 * The `client/serverAdded` notification is sent by the server to all clients in
 	 * a response to the `server/createServer` notification.
-	 * 
+	 *
 	 * This notification indicates that a new server adapter has been created in the
 	 * RSP model of existing servers. As mentioned above, this was most likely in
 	 * response to a server/createServer notification, but is not strictly limited
@@ -71,7 +71,7 @@ public interface RSPClient {
 	/**
 	 * The `client/serverRemoved` notification is sent by the server to all clients
 	 * in response to the `server/deleteServer` notification.
-	 * 
+	 *
 	 * This notification indicates that a server adapter has been removed from the
 	 * RSP model of existing servers. As mentioned above, this was most likely in
 	 * response to a server/deleteServer notification, but is not strictly limited
@@ -89,37 +89,37 @@ public interface RSPClient {
 
 	/**
 	 * The `client/serverStateChanged` notification is sent by the server to all
-	 * clients when any server has had its state change. 
-	 * 
+	 * clients when any server has had its state change.
+	 *
 	 * Possible values include:
-	 *   `0` representing an unknown state 
-	 *   `1` representing starting 
-	 *   `2` representing started 
-	 *   `3` representing stopping 
+	 *   `0` representing an unknown state
+	 *   `1` representing starting
+	 *   `2` representing started
+	 *   `3` representing stopping
 	 *   `4` representing stopped
-	 * 
+	 *
 	 */
 	@JsonNotification
 	void serverStateChanged(ServerState state);
 
 	/**
-	 * The `client/serverProcessCreated` notification is sent 
-	 * by the server to all clients when any server 
-	 * has launched a new process which can be monitored. 
-	 * 
-	 * This notification is most often sent in response to a call to 
+	 * The `client/serverProcessCreated` notification is sent
+	 * by the server to all clients when any server
+	 * has launched a new process which can be monitored.
+	 *
+	 * This notification is most often sent in response to a call to
 	 * `server/startServerAsync` which will typically launch a process
-	 * to run the server in question. 
+	 * to run the server in question.
 	 */
 	@JsonNotification
 	void serverProcessCreated(ServerProcess process);
 
 	/**
-	 * The `client/serverProcessTerminated` notification is sent by 
-	 * the server to all clients when any process associated with a 
+	 * The `client/serverProcessTerminated` notification is sent by
+	 * the server to all clients when any process associated with a
 	 * server has been terminated.
-	 * 
-	 * This notification is most often sent as a result of a call to 
+	 *
+	 * This notification is most often sent as a result of a call to
 	 * `server/stopServerAsync`, which  should shut down a given server
 	 * and cause all of that server's processes to terminate after some time.
 	 */
@@ -127,24 +127,24 @@ public interface RSPClient {
 	void serverProcessTerminated(ServerProcess process);
 
 	/**
-	 * The `client/serverProcessOutputAppended` notification is sent by 
-	 * the server to all clients when any process associated with a 
+	 * The `client/serverProcessOutputAppended` notification is sent by
+	 * the server to all clients when any process associated with a
 	 * server generated output on any of its output streams.
-	 * 
-	 * This notification may be sent as a result of anything that 
-	 * causes a given server process to emit output, such as a change in 
-	 * configuration, a deployment, an error, normal logging, 
-	 * or any other number of possibilities. 
+	 *
+	 * This notification may be sent as a result of anything that
+	 * causes a given server process to emit output, such as a change in
+	 * configuration, a deployment, an error, normal logging,
+	 * or any other number of possibilities.
 	 */
 	@JsonNotification
 	void serverProcessOutputAppended(ServerProcessOutput output);
 
-	
+
 	/**
 	 * The `client/jobAdded` notification is sent by
-	 * the server to all clients when any long-running task 
-	 * has been scheduled on the server. 
-	 * 
+	 * the server to all clients when any long-running task
+	 * has been scheduled on the server.
+	 *
 	 * This notification may be sent by any procedure that an extension
 	 * to the RSP may decide requires a long-running task to be registered.
 	 */
@@ -153,18 +153,18 @@ public interface RSPClient {
 
 	/**
 	 * The `client/jobRemoved` notification is sent by
-	 * the server to all clients when any long-running task 
-	 * has been completed, canceled, or errors. 
-	 * 
+	 * the server to all clients when any long-running task
+	 * has been completed, canceled, or errors.
+	 *
 	 * This notification may be sent by the server when any of its long-running
-	 * tasks have been completed; 
+	 * tasks have been completed;
 	 */
 	@JsonNotification
 	void jobRemoved(JobRemoved removed);
 
 	/**
 	 * The `client/jobChanged` notification is sent by the server to all clients
-	 * when any long-running task has its progress updated. 
+	 * when any long-running task has its progress updated.
 	 */
 	@JsonNotification
 	void jobChanged(JobProgress progress);
