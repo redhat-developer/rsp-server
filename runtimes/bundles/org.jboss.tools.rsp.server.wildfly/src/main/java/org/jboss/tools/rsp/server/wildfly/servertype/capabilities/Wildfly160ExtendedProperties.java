@@ -11,6 +11,8 @@
 package org.jboss.tools.rsp.server.wildfly.servertype.capabilities;
 
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
+import org.jboss.tools.rsp.server.wildfly.servertype.launch.IDefaultLaunchArguments;
+import org.jboss.tools.rsp.server.wildfly.servertype.launch.Wildfly150DefaultLaunchArguments;
 
 public class Wildfly160ExtendedProperties extends Wildfly130ExtendedProperties {
 
@@ -22,4 +24,9 @@ public class Wildfly160ExtendedProperties extends Wildfly130ExtendedProperties {
 	public String getRuntimeTypeVersionString() {
 		return "16.0"; //$NON-NLS-1$
 	}
+	@Override
+	public IDefaultLaunchArguments getDefaultLaunchArguments() {
+		return new Wildfly150DefaultLaunchArguments(server);
+	}
+
 }
