@@ -20,10 +20,15 @@ import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
 public class JBossVMRegistryDiscovery {
 	public IVMInstall findVMInstall(IServerDelegate delegate) {
-		String vmPath = delegate.getServer().getAttribute(IJBossServerAttributes.VM_INSTALL_PATH, (String)null);
+		String vmPath = delegate == null ? null : delegate.getServer().getAttribute(IJBossServerAttributes.VM_INSTALL_PATH, (String)null);
 		return findVMInstall(vmPath);
 	}
 	public IVMInstall findVMInstall(String vmPath) {
+		IVMInstallRegistry reg = getDefaultRegistry();
+	
+		if( reg == null )
+			return null;
+		
 		IVMInstall vmi = null;
 		if( vmPath == null ) {
 			vmi = getDefaultRegistry().getDefaultVMInstall();
@@ -42,7 +47,10 @@ public class JBossVMRegistryDiscovery {
 	}
 	
 	public IVMInstallRegistry getDefaultRegistry() {
-		return LauncherSingleton.getDefault().getLauncher().getModel().getVMInstallModel();
+		return LauncherSingleton.getDefault() == null ? null : 
+			LauncherSingleton.getDefault().getLauncher() == null ? null :
+				LauncherSingleton.getDefault().getLauncher().getModel() == null ? null :
+					LauncherSingleton.getDefault().getLauncher().getModel().getVMInstallModel();
 	}
 	
 	public boolean ensureVMInstallAdded(IServer server) {

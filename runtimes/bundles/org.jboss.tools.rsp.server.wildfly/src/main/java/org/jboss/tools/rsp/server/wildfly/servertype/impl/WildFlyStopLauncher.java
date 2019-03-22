@@ -17,7 +17,9 @@ import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.wildfly.servertype.AbstractLauncher;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
+import org.jboss.tools.rsp.server.wildfly.servertype.JBossVMRegistryDiscovery;
 import org.jboss.tools.rsp.server.wildfly.servertype.launch.IDefaultLaunchArguments;
+import org.jboss.tools.rsp.server.wildfly.servertype.launch.Java9LaunchArgUtil;
 
 public class WildFlyStopLauncher extends AbstractLauncher implements IServerShutdownLauncher{
 	public WildFlyStopLauncher(IServerDelegate jBossServerDelegate) {
@@ -45,7 +47,7 @@ public class WildFlyStopLauncher extends AbstractLauncher implements IServerShut
 	}
 
 	protected String getVMArguments() {
-		return "";
+		return Java9LaunchArgUtil.getJava9VMArgs(new JBossVMRegistryDiscovery().findVMInstall(getDelegate()));
 	}
 
 	protected String getProgramArguments() {

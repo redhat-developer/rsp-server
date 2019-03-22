@@ -27,17 +27,22 @@ import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.util.PortalUti
 
 public class JBossDefaultLaunchArguments implements IDefaultLaunchArguments, IJBossRuntimeResourceConstants, IJBossRuntimeConstants {
 	protected IServer server;
-	
 	private IPath serverHome;
+	private IVMInstall vm;
 	
 	// If created with a server, we can try to get values from 
 	// whatever 'mode' it is in (local vs rse). 
 	public JBossDefaultLaunchArguments(IServer s) {
 		this.server = s;
+		this.vm = new JBossVMRegistryDiscovery().findVMInstall(s.getDelegate());
 	}
 
 	private void setServerHome(IPath path) {
 		this.serverHome = path;
+	}
+	
+	protected IVMInstall getVM() {
+		return this.vm;
 	}
 	
 	protected IPath getServerHome() {
@@ -205,5 +210,8 @@ public class JBossDefaultLaunchArguments implements IDefaultLaunchArguments, IJB
 	public String getDefaultStopVMArgs() {
 		return "";
 	}
-
+	
+	protected String getJava9VMArgs() {
+		return Java9LaunchArgUtil.getJava9VMArgs(getVM());
+	}
 }
