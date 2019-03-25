@@ -149,7 +149,7 @@ public class StacksManager {
 	 * @param monitor
 	 * @return
 	 */
-	protected Stacks getStacks(String url, String jobName, IProgressMonitor monitor) {
+	public Stacks getStacks(String url, String jobName, IProgressMonitor monitor) {
 		return getStacksFromURL(url, jobName, monitor);
 	}
 

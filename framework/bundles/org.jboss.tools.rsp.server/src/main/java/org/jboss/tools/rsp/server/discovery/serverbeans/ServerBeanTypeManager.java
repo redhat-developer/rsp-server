@@ -29,7 +29,7 @@ public class ServerBeanTypeManager implements IServerBeanTypeManager {
 	}
 	
 	public void removeTypeProvider(IServerBeanTypeProvider provider) {
-		typeProviders.add(provider);
+		typeProviders.remove(provider);
 	}
 
 	public ServerBeanType[] getAllRegisteredTypes() {

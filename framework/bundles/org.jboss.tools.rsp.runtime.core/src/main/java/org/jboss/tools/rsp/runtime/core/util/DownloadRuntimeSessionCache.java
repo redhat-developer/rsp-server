@@ -8,27 +8,27 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.rsp.server.wildfly.runtimes.download;
+package org.jboss.tools.rsp.runtime.core.util;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class DownloadManagerStateSingleton   {
+public class DownloadRuntimeSessionCache   {
 
-	private static DownloadManagerStateSingleton instance = new DownloadManagerStateSingleton();
-	public static DownloadManagerStateSingleton getDefault() {
+	private static DownloadRuntimeSessionCache instance = new DownloadRuntimeSessionCache();
+	public static DownloadRuntimeSessionCache getDefault() {
 		return instance;
 	}
 	
-	private Map<Long, DownloadManagerRequestState> map = new HashMap<>();
-	public DownloadManagerRequestState getState(long requestId) {
+	private Map<Long, DownloadManagerSessionState> map = new HashMap<>();
+	public DownloadManagerSessionState getState(long requestId) {
 		return map.get(requestId);
 	}
 	
 	public void updateRequestState(long requestId, int workflowStep, Map<String,Object> data) {
-		DownloadManagerRequestState existing = map.get(requestId);
+		DownloadManagerSessionState existing = map.get(requestId);
 		if( existing == null ) {
-			existing = new DownloadManagerRequestState();
+			existing = new DownloadManagerSessionState();
 			map.put(requestId,  existing);
 			existing.setData(new HashMap<String, Object>());
 		}
@@ -36,7 +36,7 @@ public class DownloadManagerStateSingleton   {
 		existing.getData().putAll(data);
 	}
 	
-	static class DownloadManagerRequestState {
+	public static class DownloadManagerSessionState {
 		private int workflowStep;
 		private Map<String, Object> data;
 		public int getWorkflowStep() {

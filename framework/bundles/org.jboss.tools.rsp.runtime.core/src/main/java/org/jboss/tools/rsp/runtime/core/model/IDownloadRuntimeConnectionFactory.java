@@ -5,4 +5,5 @@ import java.net.URL;
 
 public interface IDownloadRuntimeConnectionFactory {
 	public InputStream createConnection(URL url, String user, String pass);
+	public int getContentLength(URL url, String user, String pass);
 }

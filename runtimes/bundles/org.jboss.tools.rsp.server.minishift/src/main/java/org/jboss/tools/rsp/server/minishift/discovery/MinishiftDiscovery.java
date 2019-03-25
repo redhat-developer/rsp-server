@@ -27,17 +27,24 @@ public class MinishiftDiscovery {
 	private static final String MINISHIFT_EXE = "minishift.exe";
 
 	public boolean isMinishiftBinaryFile(File file) {
+		return isMinishiftBinaryFile(file, true);
+	}
+	
+	public boolean isMinishiftBinaryFile(File file, boolean checkPermissions) {
+
 		try {
-			Path path = file.toPath();
-			File resolvedFile = path.toRealPath().toFile();
-			if (resolvedFile.exists() 
-					&& resolvedFile.isFile() 
-					&& resolvedFile.canExecute()) {
-				String name = resolvedFile.getName();
-				return name.equals(MINISHIFT) 
-						|| name.equals(MINISHIFT_EXE) 
-						|| whitelistMatchesName(name);
-			}
+			File resolvedFile = file.toPath().toRealPath().toFile();
+			// must exist and be a file
+			if(!resolvedFile.exists() || !resolvedFile.isFile())
+				return false;
+			
+			// If we've been asked to check permissions and this file isn't executable, fail
+			if( checkPermissions && !resolvedFile.canExecute()) 
+				return false;
+			
+			String name = resolvedFile.getName();
+			return name.equals(MINISHIFT) || name.equals(MINISHIFT_EXE) 
+					|| whitelistMatchesName(name);
 		} catch (IOException e) {
 			LOG.error("Could not determine if {} is a minishift binary.", file.getAbsolutePath());
 		}
@@ -45,11 +52,15 @@ public class MinishiftDiscovery {
 	}
 	
 	public File getMinishiftBinaryFromFolder(File root) {
+		return getMinishiftBinaryFromFolder(root, true);
+	}
+	
+	public File getMinishiftBinaryFromFolder(File root, boolean checkPermissions) {
 		File ms = new File(root, MINISHIFT);
-		if (isMinishiftBinaryFile(ms)) 
+		if (isMinishiftBinaryFile(ms, checkPermissions)) 
 			return ms;
 		ms = new File(root, MINISHIFT_EXE);
-		if (isMinishiftBinaryFile(ms)) 
+		if (isMinishiftBinaryFile(ms, checkPermissions)) 
 			return ms;
 		return folderWhiteListBin(root);
 	}

@@ -47,14 +47,19 @@ public class ExtensionHandler {
 		// inhibit instantiation
 	}
 
+	private static JBossServerBeanTypeProvider beanProvider = null;
+	private static DownloadRuntimesProvider dlrtProvider = null;
 	public static void addExtensions(IServerManagementModel model) {
-		model.getServerBeanTypeManager().addTypeProvider(new JBossServerBeanTypeProvider());
+		beanProvider = new JBossServerBeanTypeProvider();
+		dlrtProvider = new DownloadRuntimesProvider(model);
+		model.getServerBeanTypeManager().addTypeProvider(beanProvider);
 		model.getServerModel().addServerTypes(TYPES);
-		model.getDownloadRuntimeModel().addDownloadRuntimeProvider(new DownloadRuntimesProvider(model));
+		model.getDownloadRuntimeModel().addDownloadRuntimeProvider(dlrtProvider);
 	}
 	
 	public static void removeExtensions(IServerManagementModel model) {
-		model.getServerBeanTypeManager().removeTypeProvider(new JBossServerBeanTypeProvider());
+		model.getServerBeanTypeManager().removeTypeProvider(beanProvider);
 		model.getServerModel().removeServerTypes(TYPES);
+		model.getDownloadRuntimeModel().removeDownloadRuntimeProvider(dlrtProvider);
 	}
 }
