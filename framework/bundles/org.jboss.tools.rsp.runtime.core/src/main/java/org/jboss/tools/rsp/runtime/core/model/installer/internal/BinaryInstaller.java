@@ -72,6 +72,9 @@ public class BinaryInstaller implements IRuntimeInstaller {
 			protected InputStream createDownloadInputStream(URL url, String user, String pass) {
 				return fact.createConnection(url, user, pass);
 			}
+			protected int getContentLength(URL url, String user, String pass) {
+				return fact.getContentLength(url, user, pass);
+			}
 		};
 	}
 	private String getDownloadUrl(DownloadRuntime downloadRuntime, TaskModel taskModel) {

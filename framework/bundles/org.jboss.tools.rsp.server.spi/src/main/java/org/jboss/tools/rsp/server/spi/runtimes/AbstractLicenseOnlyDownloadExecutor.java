@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
 import org.jboss.tools.rsp.api.dao.Status;
@@ -36,6 +37,8 @@ import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
 import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
 import org.jboss.tools.rsp.runtime.core.model.installer.RuntimesInstallerModel;
 import org.jboss.tools.rsp.server.spi.SPIActivator;
+import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
+import org.jboss.tools.rsp.server.spi.client.MessageContextStore.MessageContext;
 import org.jboss.tools.rsp.server.spi.jobs.IJob;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
@@ -131,11 +134,13 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 	private String initiateDownloadAndCreateServer(DownloadSingleRuntimeRequest req, DownloadRuntime dlrt, 
 			IRuntimeInstaller installer, File uniqueLoc, File downloads) {
 		String jobName = "Download runtime: " + dlrt.getId();
-		
+		final MessageContext<RSPClient> client = ClientThreadLocal.getStore().getContext();
 		IStatusRunnableWithProgress task = new IStatusRunnableWithProgress() {
 			
 			@Override
 			public IStatus run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+				final MessageContext<RSPClient> prev = ClientThreadLocal.getStore().getContext();
+				ClientThreadLocal.getStore().setContext(client);
 				// TODO, implement a progress monitor that can update progress
 				SubMonitor sub = SubMonitor.convert(monitor, 100);
 				
@@ -148,7 +153,8 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 				}
 				// Now it's downloaded, but, we should now maybe install it? Or add it as a server?
 				String newHome = (String)tm2.getObject(IDownloadRuntimeWorkflowConstants.UNZIPPED_SERVER_HOME_DIRECTORY);
-				IStatus complete = createServer(dlrt, newHome);
+				IStatus complete = createServer(dlrt, newHome, tm2);
+				ClientThreadLocal.getStore().setContext(prev);
 				return complete;
 			}
 		};
@@ -161,7 +167,7 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 		return new TaskModel();
 	}
 	
-	protected abstract IStatus createServer(DownloadRuntime dlrt, String newHome);
+	protected abstract IStatus createServer(DownloadRuntime dlrt, String newHome, TaskModel tm);
 
 	protected IServerModel getServerModel() {
 		return model.getServerModel();

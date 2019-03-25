@@ -10,7 +10,8 @@ Bundle-Vendor: %BundleVendor
 Bundle-Localization: plugin
 Export-Package: org.jboss.tools.rsp.runtime.core,
  org.jboss.tools.rsp.runtime.core.model,
- org.jboss.tools.rsp.runtime.core.model.installer
+ org.jboss.tools.rsp.runtime.core.model.installer,
+ org.jboss.tools.rsp.runtime.core.util
 Import-Package: org.apache.commons.compress.archivers.tar,
  org.apache.commons.compress.compressors.gzip,
  org.jboss.tools.rsp.api.dao,

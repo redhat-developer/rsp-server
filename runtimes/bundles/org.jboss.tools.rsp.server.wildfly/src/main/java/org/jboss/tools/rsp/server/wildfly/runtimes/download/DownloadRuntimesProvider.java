@@ -95,7 +95,7 @@ public class DownloadRuntimesProvider extends AbstractStacksDownloadRuntimesProv
 		String prop = dr.getProperty(DownloadRuntime.PROPERTY_REQUIRES_CREDENTIALS);
 		if( prop != null && "true".equalsIgnoreCase(prop))
 			// // Requires credentials is handled by another executor
-			return new DownloadManagerDownloadExecutor(dr, model);  
+			return new EAPDownloadExecutor(dr, model);  
 
 		return new WildFlyLicenseOnlyDownloadExecutor(dr, model);
 	}

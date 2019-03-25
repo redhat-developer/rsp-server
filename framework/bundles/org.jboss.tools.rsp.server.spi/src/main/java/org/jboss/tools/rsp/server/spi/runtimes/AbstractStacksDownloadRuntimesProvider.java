@@ -39,6 +39,11 @@ public abstract class AbstractStacksDownloadRuntimesProvider implements IDownloa
 	public static final String PROP_WTP_RUNTIME = LABEL_WTP_RUNTIME;
 	
 	private List<DownloadRuntime> downloads = null;
+	
+	public AbstractStacksDownloadRuntimesProvider() {
+		// Do nothing
+	}
+	
 
 	protected abstract Stacks[] getStacks(IProgressMonitor monitor);
 	protected abstract String getLegacyId(String id);

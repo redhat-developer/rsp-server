@@ -38,7 +38,6 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
-import org.jboss.tools.rsp.eclipse.core.runtime.SubMonitor;
 import org.jboss.tools.rsp.foundation.core.FoundationCoreActivator;
 import org.jboss.tools.rsp.foundation.core.digest.DigestUtils;
 import org.jboss.tools.rsp.foundation.core.transport.CallbackByteChannel.ProgressCallBack;

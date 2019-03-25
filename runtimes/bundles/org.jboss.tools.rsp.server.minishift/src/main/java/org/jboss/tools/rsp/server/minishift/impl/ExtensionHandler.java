@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.server.minishift.impl;
 
 import org.jboss.tools.rsp.server.minishift.discovery.MinishiftBeanTypeProvider;
+import org.jboss.tools.rsp.server.minishift.download.MinishiftCdkDownloadRuntimesProvider;
 import org.jboss.tools.rsp.server.minishift.servertype.impl.MinishiftServerTypes;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
@@ -23,16 +24,22 @@ public class ExtensionHandler {
 	private ExtensionHandler() {
 		// inhibit instantionation
 	}
+	
+	private static MinishiftBeanTypeProvider beanProvider = null;
+	private static MinishiftCdkDownloadRuntimesProvider dlrtProvider = null;
 
 	public static void addExtensions(IServerManagementModel model) {
-		model.getServerBeanTypeManager().addTypeProvider(new MinishiftBeanTypeProvider());
-
+		beanProvider = new MinishiftBeanTypeProvider();
+		dlrtProvider = new MinishiftCdkDownloadRuntimesProvider(model);
+		
+		model.getServerBeanTypeManager().addTypeProvider(beanProvider);
 		model.getServerModel().addServerTypes(TYPES);
+		model.getDownloadRuntimeModel().addDownloadRuntimeProvider(dlrtProvider);
 	}
 	
 	public static void removeExtensions(IServerManagementModel model) {
 		model.getServerBeanTypeManager().removeTypeProvider(new MinishiftBeanTypeProvider());
-
 		model.getServerModel().removeServerTypes(TYPES);
+		model.getDownloadRuntimeModel().removeDownloadRuntimeProvider(dlrtProvider);
 	}
 }

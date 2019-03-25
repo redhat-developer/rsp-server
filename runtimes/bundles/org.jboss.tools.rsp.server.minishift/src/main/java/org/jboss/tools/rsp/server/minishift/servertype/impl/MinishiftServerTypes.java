@@ -8,6 +8,9 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.minishift.servertype.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jboss.tools.rsp.server.minishift.servertype.BaseMinishiftServerType;
 
 public class MinishiftServerTypes {
@@ -25,4 +28,10 @@ public class MinishiftServerTypes {
 
 	public static final BaseMinishiftServerType CDK_3X_SERVER_TYPE = 
 			new CDKServerType(CDK_3X_ID, CDK_3X_NAME, CDK_3X_DESC);
+	
+	public static final Map<String, String> RUNTIME_TO_SERVER = new HashMap<String, String>() {{
+		put("org.jboss.tools.openshift.cdk.server.runtime.type.minishift.17", MINISHIFT_1_12_ID);
+		put("org.jboss.tools.openshift.cdk.server.runtime.type.cdk.30", CDK_3X_ID);
+		put("org.jboss.tools.openshift.cdk.server.runtime.type.cdk.32", CDK_3X_ID);
+	}};
 }
