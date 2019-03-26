@@ -15,12 +15,15 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.Attribute;
+import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
 import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
@@ -103,7 +106,7 @@ public abstract class AbstractDownloadManagerExecutor
 		return executeDownload(req);
 	}
 
-	private WorkflowResponse handleLicense(DownloadSingleRuntimeRequest req) {
+	protected WorkflowResponse handleLicense(DownloadSingleRuntimeRequest req) {
 		Map<String, Object> data = req.getData();
 		Object d1 = data == null ? null : data.get(ServerManagementAPIConstants.WORKFLOW_LICENSE_SIGN_ID);
 		boolean approved = Boolean.TRUE.equals(d1);
@@ -114,7 +117,7 @@ public abstract class AbstractDownloadManagerExecutor
 		return null;
 	}
 
-	private WorkflowResponse handleTC(DownloadSingleRuntimeRequest req) {
+	protected WorkflowResponse handleTC(DownloadSingleRuntimeRequest req) {
 		Map<String, Object> data = SESSION_STATE.getState(req.getRequestId()).getData();
 		Object workflowStep = data.get(KEY_INTERNAL_CREDENTIAL_VALIDATION);
 		if (workflowStep == null) {
@@ -135,7 +138,7 @@ public abstract class AbstractDownloadManagerExecutor
 		return licenseWorkflowResponse(req);
 	}
 	
-	private WorkflowResponse handleCredentials(DownloadSingleRuntimeRequest req) {
+	protected WorkflowResponse handleCredentials(DownloadSingleRuntimeRequest req) {
 		int existingStep = 	SESSION_STATE.getState(req.getRequestId()).getWorkflowStep();
 		
 		// Update model with new values from user
@@ -223,19 +226,6 @@ public abstract class AbstractDownloadManagerExecutor
 		return requestId;
 	}
 
-	protected WorkflowResponseItem createWorkflowItem(String id, String label, String responseType) {
-		return createWorkflowItem(id, label, responseType, false);
-	}
-
-	protected WorkflowResponseItem createWorkflowItem(String id, String label, String responseType, boolean secret) {
-		WorkflowResponseItem item1 = new WorkflowResponseItem();
-		item1.setId(id);
-		item1.setLabel(label);
-		item1.setResponseType(responseType);
-		item1.setResponseSecret(secret);
-		return item1;
-	}
-
 	@Override 
 	protected TaskModel createDownloadTaskModel(DownloadSingleRuntimeRequest req) {
 		TaskModel tm = new TaskModel();
@@ -283,4 +273,7 @@ public abstract class AbstractDownloadManagerExecutor
 
 	@Override
 	protected abstract IStatus createServer(DownloadRuntime dlrt, String newHome, TaskModel tm);
+	
+	
+
 }
