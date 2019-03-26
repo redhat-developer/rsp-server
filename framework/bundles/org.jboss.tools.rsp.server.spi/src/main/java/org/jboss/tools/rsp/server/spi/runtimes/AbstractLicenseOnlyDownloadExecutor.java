@@ -19,6 +19,8 @@ import java.util.Set;
 
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.Attribute;
+import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
 import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
@@ -84,7 +86,6 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 		if( !approved ) {
 			return quickResponse(IStatus.CANCEL,  "License not approved", req);
 		}
-		
 		return executeDownload(req);
 	}
 	
@@ -233,5 +234,46 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 		resp.setStatus(new Status(IStatus.INFO, SPIActivator.BUNDLE_ID, "Please fill the requried information"));
 		return resp;
 	}
+
+
+	protected WorkflowResponse convertAttributes(String serverTypeId, DownloadSingleRuntimeRequest req, List<String> ignored) {
+		List<WorkflowResponseItem> items = new ArrayList<>();
+		Attributes reqAttrs = getServerModel().getRequiredAttributes(getServerModel().getIServerType(serverTypeId));
+		for( String k : reqAttrs.getAttributes().keySet()) {
+			if( !ignored.contains(k)) {
+				Attribute v = reqAttrs.getAttributes().get(k);
+				items.add(createWorkflowItem(k, v.getDescription(), v.getType(), v.isSecret()));
+			}
+		}
+
+		Attributes optAttrs = getServerModel().getOptionalAttributes(getServerModel().getIServerType(serverTypeId));
+		for( String k : optAttrs.getAttributes().keySet()) {
+			if( !ignored.contains(k)) {
+				Attribute v = optAttrs.getAttributes().get(k);
+				WorkflowResponseItem item = createWorkflowItem(k, v.getDescription(), v.getType(), v.isSecret()); 
+				items.add(item);
+			}
+		}
+		
+		WorkflowResponse resp = new WorkflowResponse();
+		resp.setItems(items);
+		resp.setRequestId(req.getRequestId());
+		resp.setStatus(	new Status(IStatus.INFO, SPIActivator.BUNDLE_ID, "Please fill the requried information"));
+		return resp;
+	}
+	
+	protected WorkflowResponseItem createWorkflowItem(String id, String label, String responseType) {
+		return createWorkflowItem(id, label, responseType, false);
+	}
+
+	protected WorkflowResponseItem createWorkflowItem(String id, String label, String responseType, boolean secret) {
+		WorkflowResponseItem item1 = new WorkflowResponseItem();
+		item1.setId(id);
+		item1.setLabel(label);
+		item1.setResponseType(responseType);
+		item1.setResponseSecret(secret);
+		return item1;
+	}
+
 
 }

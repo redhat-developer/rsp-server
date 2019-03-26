@@ -1,27 +1,39 @@
 package org.jboss.tools.rsp.server.minishift.download;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.Attribute;
+import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
+import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
+import org.jboss.tools.rsp.api.dao.WorkflowResponse;
+import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.foundation.core.tasks.TaskModel;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
+import org.jboss.tools.rsp.runtime.core.util.DownloadRuntimeSessionCache.DownloadManagerSessionState;
 import org.jboss.tools.rsp.server.minishift.discovery.MinishiftDiscovery;
 import org.jboss.tools.rsp.server.minishift.impl.Activator;
 import org.jboss.tools.rsp.server.minishift.servertype.IMinishiftServerAttributes;
 import org.jboss.tools.rsp.server.minishift.servertype.impl.MinishiftServerTypes;
+import org.jboss.tools.rsp.server.spi.SPIActivator;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.runtimes.AbstractStacksDownloadRuntimesProvider;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 import org.jboss.tools.rsp.server.wildfly.runtimes.download.AbstractDownloadManagerExecutor;
 
 public class CDKDownloadExecutor extends AbstractDownloadManagerExecutor {
+	protected static int STEP_ATTRIBUTES = 4;
+	protected static int STEP_DOWNLOAD = 5;
 
 	public CDKDownloadExecutor(DownloadRuntime dlrt, IServerManagementModel model) {
 		super(dlrt, model);
@@ -48,6 +60,19 @@ public class CDKDownloadExecutor extends AbstractDownloadManagerExecutor {
 		}
 		binFile.setExecutable(true);
 		attributes.put(ServerManagementAPIConstants.SERVER_HOME_FILE, binFile.getAbsolutePath());
+		
+		// A list of keys we should copy over IF the user contributed them
+		List<String> serverKeys = new ArrayList<>();
+		serverKeys.addAll(getServerModel().getRequiredAttributes(getServerModel().getIServerType(serverType)).getAttributes().keySet());
+		serverKeys.addAll(getServerModel().getOptionalAttributes(getServerModel().getIServerType(serverType)).getAttributes().keySet());
+		serverKeys.remove(ServerManagementAPIConstants.SERVER_HOME_FILE);
+		
+		for( String k1 : serverKeys ) {
+			if( tm.getObject(k1) != null && !(tm.getObject(k1) instanceof String && ((String)tm.getObject(k1)).isEmpty())) {
+				attributes.put(k1, tm.getObject(k1));
+			}
+		}
+		
 		attributes.put(IMinishiftServerAttributes.MINISHIFT_REG_USERNAME, 
 				(String)tm.getObject(IDownloadRuntimeWorkflowConstants.USERNAME_KEY));
 		attributes.put(IMinishiftServerAttributes.MINISHIFT_REG_PASSWORD, 
@@ -57,4 +82,35 @@ public class CDKDownloadExecutor extends AbstractDownloadManagerExecutor {
 		return StatusConverter.convert(response.getStatus());
 	}
 
+	protected WorkflowResponse handleLicense(DownloadSingleRuntimeRequest req) {
+		WorkflowResponse r = super.handleLicense(req);
+		if( r == null ) {
+			SESSION_STATE.updateRequestState(
+					req.getRequestId(), STEP_ATTRIBUTES, req.getData());
+		}
+		return r;
+
+	}
+	
+	protected WorkflowResponse executeAdditionalSteps(DownloadSingleRuntimeRequest req) {
+		DownloadManagerSessionState state = null;
+		if (req.getRequestId() != 0) {
+			state = SESSION_STATE.getState(req.getRequestId());
+		}
+		if (state.getWorkflowStep() == STEP_ATTRIBUTES) {
+			String wtpRuntimeId = getRuntime().getProperty(AbstractStacksDownloadRuntimesProvider.PROP_WTP_RUNTIME);
+			String serverType = MinishiftServerTypes.RUNTIME_TO_SERVER.get(wtpRuntimeId);
+			List<String> list = Arrays.asList(new String[] {
+					IMinishiftServerAttributes.MINISHIFT_BINARY, IMinishiftServerAttributes.MINISHIFT_REG_USERNAME, IMinishiftServerAttributes.MINISHIFT_REG_PASSWORD
+			});
+			WorkflowResponse resp = convertAttributes(serverType, req, list);
+			SESSION_STATE.updateRequestState(
+					req.getRequestId(), STEP_DOWNLOAD, req.getData());
+			return resp;
+		}
+		
+		SESSION_STATE.updateRequestState(
+				req.getRequestId(), STEP_DOWNLOAD, req.getData());
+		return executeDownload(req);
+	}
 }
