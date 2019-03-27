@@ -18,4 +18,22 @@ public class NullSecureStorageProvider implements ISecureStorageProvider {
 	public ISecureStorage getSecureStorage(boolean prompt) {
 		return null;
 	}
+
+	@Override
+	public boolean currentThreadHasSystemPermissions() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void grantCurrentThreadSystemPermissions() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void revokeCurrentThreadSystemPermissions() {
+		// TODO Auto-generated method stub
+		
+	}
 }

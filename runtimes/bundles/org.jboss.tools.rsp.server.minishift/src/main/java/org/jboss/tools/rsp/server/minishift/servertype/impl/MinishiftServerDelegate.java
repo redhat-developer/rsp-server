@@ -23,6 +23,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.debug.core.DebugException;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
+import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
 import org.jboss.tools.rsp.server.minishift.discovery.MinishiftDiscovery;
 import org.jboss.tools.rsp.server.minishift.impl.Activator;
 import org.jboss.tools.rsp.server.minishift.servertype.IMinishiftServerAttributes;
@@ -191,6 +192,14 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 		// Not that the runtime has shutdown.
 		fireServerProcessTerminated(getProcessId(p));
 		
+		// Because this was a background thread, we must elevate permissions.
+		// This thread is not associated with any specific client.
+		ISecureStorageProvider storage = getServer().getServerManagementModel().getSecureStorageProvider();
+		boolean hasPerms = storage.currentThreadHasSystemPermissions();
+		if( !hasPerms ) {
+			storage.grantCurrentThreadSystemPermissions();
+		}
+		
 		// Time to poll to check the state
 		IServerStatePoller poller = getMinishiftStatusPoller();
 		SERVER_STATE state = poller.getCurrentStateSynchronous(getServer());
@@ -198,6 +207,11 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 			setServerState(IServerDelegate.STATE_STARTED);
 		} else {
 			setServerState(IServerDelegate.STATE_STOPPED);
+		}
+		
+		// Don't forget to revoke the permissions if we were the first one to grant it
+		if( !hasPerms ) {
+			storage.revokeCurrentThreadSystemPermissions();
 		}
 	}
 

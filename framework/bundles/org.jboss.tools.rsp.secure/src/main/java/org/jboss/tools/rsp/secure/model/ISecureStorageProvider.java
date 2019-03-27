@@ -12,4 +12,11 @@ public interface ISecureStorageProvider {
 	public ISecureStorage getSecureStorage();
 	
 	public ISecureStorage getSecureStorage(boolean prompt);
+	
+	public boolean currentThreadHasSystemPermissions();
+	
+	public void grantCurrentThreadSystemPermissions();
+	
+	public void revokeCurrentThreadSystemPermissions();
+	
 }
