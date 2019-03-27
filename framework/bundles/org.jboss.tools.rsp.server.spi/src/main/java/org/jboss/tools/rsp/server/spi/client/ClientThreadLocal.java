@@ -42,7 +42,8 @@ public class ClientThreadLocal {
 	 }
 	 
 	 public synchronized static RSPClient getActiveClient() {
-		 return getStore().getContext().getRemoteProxy();
+		 MessageContext<RSPClient> context = getStore().getContext();
+		 return context == null ? null : context.getRemoteProxy();
 	 }
 	 
 	 public synchronized static void setActiveClient(RSPClient client) {

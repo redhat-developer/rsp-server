@@ -118,6 +118,13 @@ public class SecureStorageGuardian implements ISecureStorageProvider {
 		if( rspc != null && permissions.containsKey(rspc) && permissions.get(rspc) != null ) {
 			return storage;
 		}
+		
+		// A thread with no client associated with it but has elevated permissions
+		// can access the secure storage without validation
+		if( rspc == null && currentThreadHasSystemPermissions()) {
+			return storage;
+		}
+		
 		return null;
 	}
 	
@@ -138,6 +145,24 @@ public class SecureStorageGuardian implements ISecureStorageProvider {
 			}
 		}
 		return storage;
+	}
+
+	
+	
+	private List<Thread> systemPermissions = new ArrayList<Thread>();
+	@Override
+	public boolean currentThreadHasSystemPermissions() {
+		return systemPermissions.contains(Thread.currentThread());
+	}
+
+	@Override
+	public void grantCurrentThreadSystemPermissions() {
+		systemPermissions.add(Thread.currentThread());
+	}
+
+	@Override
+	public void revokeCurrentThreadSystemPermissions() {
+		systemPermissions.remove(Thread.currentThread());
 	}
 
 }
