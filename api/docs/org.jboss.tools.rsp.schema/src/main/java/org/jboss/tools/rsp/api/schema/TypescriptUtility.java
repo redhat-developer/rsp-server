@@ -108,6 +108,7 @@ public class TypescriptUtility {
 	}
 
 	public void generateTypescriptClient(String dir) {
+		new File(dir).mkdirs();
 		generateProtocolTs(dir);
 		generateMessageTs(dir);
 		generateIncomingTs(dir);
@@ -116,8 +117,9 @@ public class TypescriptUtility {
 	
 	private void generateProtocolTs(String dir) {
 		File existing = getUnifiedSchemaFile();
-		File destination = new File(dir).toPath().resolve("src").resolve("protocol")
+		File destination = new File(dir).toPath().resolve("src").resolve("main").resolve("resources").resolve("protocol")
 				.resolve("generated").resolve("protocol.ts").toFile();
+		destination.getParentFile().mkdirs();
 		String contents = SchemaIOUtil.readFile(existing);
 		String header = 
 				"/**\n" + 
@@ -135,7 +137,7 @@ public class TypescriptUtility {
 	}
 	
 	private void generateMessageTs(String dir) {
-		File destination = new File(dir).toPath().resolve("src").resolve("protocol")
+		File destination = new File(dir).toPath().resolve("src").resolve("main").resolve("resources").resolve("protocol")
 				.resolve("generated").resolve("messages.ts").toFile();
 		String fileContents = messageTsHeader() + messageTsServer() + messageTsClient() + emptyFooter();
 		try {
@@ -146,7 +148,7 @@ public class TypescriptUtility {
 	}
 
 	private void generateIncomingTs(String dir) {
-		File destination = new File(dir).toPath().resolve("src").resolve("protocol")
+		File destination = new File(dir).toPath().resolve("src").resolve("main").resolve("resources").resolve("protocol")
 				.resolve("generated").resolve("incoming.ts").toFile();
 		String fileContents = incomingTsHeader() + incomingTsClient() + emptyFooter();
 		try {
@@ -157,7 +159,7 @@ public class TypescriptUtility {
 	}
 
 	private void generateOutgoingTs(String dir) {
-		File destination = new File(dir).toPath().resolve("src").resolve("protocol")
+		File destination = new File(dir).toPath().resolve("src").resolve("main").resolve("resources").resolve("protocol")
 				.resolve("generated").resolve("outgoing.ts").toFile();
 		String fileContents = outgoingTsHeader() + outgoingTsServer() + outgoingTsFooter() + outgoingTsErrors();
 		try {

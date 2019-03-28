@@ -23,8 +23,10 @@ public class SchemaIOUtil {
 
 	public static void cleanFolder(Path folder) {
 		File[] ts = folder.toFile().listFiles();
-		for( int i = 0; i < ts.length; i++ ) {
-			ts[i].delete();
+		if (ts != null) {
+			for( int i = 0; i < ts.length; i++ ) {
+				ts[i].delete();
+			}
 		}
 	}
 

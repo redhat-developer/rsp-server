@@ -190,7 +190,7 @@ public class DaoClasses {
 	}
 
 	private String getPath(final String packageName) {
-		return packageName.replace(SUBPACKAGE_SEPARATOR, File.separatorChar);
+		return packageName.replace(SUBPACKAGE_SEPARATOR, '/');
 	}
 
 	private String getClassName(String filename, String packageName) {

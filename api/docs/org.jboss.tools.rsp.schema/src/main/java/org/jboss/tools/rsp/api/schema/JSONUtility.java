@@ -34,8 +34,10 @@ public class JSONUtility {
 	public void cleanFolder() {
 		Path folder = getDaoJsonFolder();
 		File[] jsons = folder.toFile().listFiles();
-		for( int i = 0; i < jsons.length; i++ ) {
-			jsons[i].delete();
+		if (jsons != null) {
+			for( int i = 0; i < jsons.length; i++ ) {
+				jsons[i].delete();
+			}
 		}
 	}
 

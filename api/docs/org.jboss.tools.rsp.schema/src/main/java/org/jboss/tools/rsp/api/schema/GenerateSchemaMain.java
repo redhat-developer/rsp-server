@@ -25,9 +25,7 @@ public class GenerateSchemaMain {
 		
 		if( System.getProperty(TYPESCRIPT_CLIENT_DIR) != null ) {
 			String dir = System.getProperty(TYPESCRIPT_CLIENT_DIR);
-			if( new File(dir).exists()) {
-				ts.generateTypescriptClient(dir);
-			}
+			ts.generateTypescriptClient(dir);
 			return;
 		}
 
