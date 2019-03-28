@@ -124,7 +124,7 @@ public class TypescriptUtility {
 				" * Json objects sent between the server and the client\n" + 
 				JAVA_END + 
 				"export namespace Protocol {\n";
-		String footer = emptyFooter();
+		String footer = "\n" + emptyFooter();
 		
 		String total = header + SchemaIOUtil.linePrefix(contents, "    ") + footer;
 		try {
@@ -208,7 +208,6 @@ public class TypescriptUtility {
 				"import { Messages } from './messages';\n" + 
 				"import { Common } from '../../util/common';\n" + 
 				"import { MessageConnection } from 'vscode-jsonrpc';\n" + 
-				"import { EventEmitter } from 'events';\n" +
 				"\n" + 
 				JAVADOC_START + 
 				" * Server Outgoing\n" + 
@@ -216,16 +215,13 @@ public class TypescriptUtility {
 				"export class Outgoing {\n" + 
 				"\n" + 
 				"    private connection: MessageConnection;\n" + 
-				//"    private emitter: EventEmitter;\n" + 
 				"\n" + 
 				"     /**\n" + 
 				"     * Constructs a new discovery handler\n" + 
 				"     * @param connection message connection to the RSP\n" + 
-				"     * @param emitter event emitter to handle notification events\n" + 
 				"     */\n" + 
-				"    constructor(connection: MessageConnection, emitter: EventEmitter) {\n" + 
+				"    constructor(connection: MessageConnection) {\n" + 
 				"        this.connection = connection;\n" + 
-				//"        this.emitter = emitter;\n" + 
 				"    }\n";
 	}
 	
@@ -266,7 +262,7 @@ public class TypescriptUtility {
 				"     * Subscribes to notifications sent by the server\n" + 
 				"     */\n" + 
 				"    private listen() {\n";
-		String footer = emptyFooter();
+		String footer = "    }";
 		
 		StringBuilder sb = new StringBuilder();
 		try {
@@ -331,7 +327,7 @@ public class TypescriptUtility {
 		boolean isNotification = JavadocUtilities.isNotification(md);
 
 		String standardParams = paramType == null ? "" : "param: " + paramType;
-		String timeoutParams = (standardParams.isEmpty() ? "" : ", ") + "timeout: number = 2000";
+		String timeoutParams = (standardParams.isEmpty() ? "" : ", ") + "timeout: number = Common.DEFAULT_TIMEOUT";
 		String functionDecLine = "    " + methodName + "(" + standardParams + timeoutParams + "): ";
 		if( retTypeName.equals("void")) {
 			functionDecLine += retTypeName + " {\n";
@@ -387,7 +383,7 @@ public class TypescriptUtility {
 					sb.append("    }\n");
 				} else {
 					String requestName = methodNameToRequestName(methodName);
-					sb.append("    on" + capName + "(listener: (arg: " + paramType + ") => Promise<" + retTypeName + ">): void\n    {\n");
+					sb.append("    on" + capName + "(listener: (arg: " + paramType + ") => Promise<" + retTypeName + ">): void {\n");
 					sb.append("        this.connection.onRequest(Messages.Client." + requestName + ".type, listener);\n");
 					sb.append("    }\n");
 				}
