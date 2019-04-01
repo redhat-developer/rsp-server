@@ -11,6 +11,9 @@ package org.jboss.tools.rsp.api.dao;
 public class JobHandle {
 	public String name;
 	public String id;
+	public JobHandle() {
+		
+	}
 	public JobHandle(String name, String id) {
 		this.name = name;
 		this.id = id;

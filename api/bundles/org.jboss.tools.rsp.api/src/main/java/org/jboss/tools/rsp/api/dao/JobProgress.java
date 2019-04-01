@@ -12,6 +12,9 @@ public class JobProgress {
 	private double percent;
 	private JobHandle handle;
 
+	public JobProgress() { 
+		
+	}
 	public JobProgress( JobHandle handle, double percent) {
 		this.handle = handle;
 		this.percent = percent;
