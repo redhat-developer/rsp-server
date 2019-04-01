@@ -12,6 +12,9 @@ public class JobRemoved {
 	private Status status;
 	private JobHandle handle;
 
+	public JobRemoved() {
+		
+	}
 	public JobRemoved( JobHandle handle, Status status) {
 		this.handle = handle;
 		this.status = status;
