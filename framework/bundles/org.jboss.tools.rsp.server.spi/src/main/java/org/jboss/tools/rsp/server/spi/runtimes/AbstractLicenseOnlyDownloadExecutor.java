@@ -134,7 +134,7 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 	 */
 	private String initiateDownloadAndCreateServer(DownloadSingleRuntimeRequest req, DownloadRuntime dlrt, 
 			IRuntimeInstaller installer, File uniqueLoc, File downloads) {
-		String jobName = "Download runtime: " + dlrt.getId();
+		String jobName = "Download runtime: " + dlrt.getName();
 		final MessageContext<RSPClient> client = ClientThreadLocal.getStore().getContext();
 		IStatusRunnableWithProgress task = new IStatusRunnableWithProgress() {
 			
