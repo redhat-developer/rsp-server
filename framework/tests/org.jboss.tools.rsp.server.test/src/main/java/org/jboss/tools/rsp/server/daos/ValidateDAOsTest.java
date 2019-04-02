@@ -8,7 +8,8 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.daos;
 
-import java.io.File;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -17,14 +18,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.List;
 
+import org.jboss.tools.rsp.server.ServerTestActivator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
-import junit.framework.TestCase;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 
 
 /**
@@ -33,10 +34,12 @@ import junit.framework.TestCase;
  * non-static field. 
  */
 @RunWith(value = Parameterized.class)
-public class TestDAOs extends TestCase {
+public class ValidateDAOsTest {
 	@Parameters(name = "{0}")
 	 public static Collection<Object[]> data() throws ClassNotFoundException, IOException {
 		 Class[] c = getClasses("org.jboss.tools.rsp.api.dao");
+		 if( c == null || c.length == 0 ) 
+			 fail("Test should find DAOs.");
 		 ArrayList<Object[]> list = new ArrayList<>();
 		 for( int i = 0; i < c.length; i++ ) {
 			 list.add(new Object[] {c[i]});
@@ -44,44 +47,40 @@ public class TestDAOs extends TestCase {
 		 return list;
 	 }
 
+	 private static Bundle getBundle(BundleContext bundleContext, String symbolicName) {
+		    Bundle result = null;
+		    for (Bundle candidate : bundleContext.getBundles()) {
+		        if (candidate.getSymbolicName().equals(symbolicName)) {
+		            if (result == null || result.getVersion().compareTo(candidate.getVersion()) < 0) {
+		                result = candidate;
+		            }
+		        }
+		    }
+		    return result;
+		}
+	 
 	private static Class[] getClasses(String packageName) throws ClassNotFoundException, IOException {
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		assert classLoader != null;
-		String path = packageName.replace('.', '/');
-		Enumeration<URL> resources = classLoader.getResources(path);
-		List<File> dirs = new ArrayList<>();
-		while (resources.hasMoreElements()) {
-			URL resource = resources.nextElement();
-			dirs.add(new File(resource.getFile()));
-		}
+		Bundle bund = getBundle(ServerTestActivator.getContext(), "org.jboss.tools.rsp.api");
+		String loc = bund.getLocation();
+		Enumeration<URL>  ents = bund.findEntries("org/jboss/tools/rsp/api/dao/", "*", false);
 		ArrayList<Class> classes = new ArrayList<>();
-		for (File directory : dirs) {
-			classes.addAll(findClasses(directory, packageName));
-		}
-		return classes.toArray(new Class[classes.size()]);
-	}
-
-	private static List<Class> findClasses(File directory, String packageName) throws ClassNotFoundException {
-		List<Class> classes = new ArrayList<>();
-		if (!directory.exists()) {
-			return classes;
-		}
-		File[] files = directory.listFiles();
-		for (File file : files) {
-			if (file.isDirectory()) {
-				assert !file.getName().contains(".");
-				classes.addAll(findClasses(file, packageName + "." + file.getName()));
-			} else if (file.getName().endsWith(".class")) {
-				classes.add(
-						Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
+		while(ents.hasMoreElements()) {
+			URL u = ents.nextElement();
+			String p = u.getPath();
+			if( p.endsWith(".class")) {
+				String fName =  p.substring(p.lastIndexOf("/")+1);
+				fName = fName.substring(0, fName.length() - 6);
+				String className = packageName + "." + fName;
+				Class c = Class.forName(className);
+				classes.add(c);
 			}
 		}
-		return classes;
+		return (Class[]) classes.toArray(new Class[classes.size()]);
 	}
 
 	protected Class dao;
 
-	public TestDAOs(Class dao) {
+	public ValidateDAOsTest(Class dao) {
 		this.dao = dao;
 	}
 	
@@ -153,8 +152,7 @@ public class TestDAOs extends TestCase {
 	private Method findGetter(String name, Field f) {
 		Method[] all = dao.getMethods();
 		for( int i = 0; i < all.length; i++ ) {
-			if (all[i].getName().equalsIgnoreCase(name) 
-					&& all[i].getParameterTypes().length == 0
+			if (all[i].getName().equalsIgnoreCase(name) && all[i].getParameterTypes().length == 0
 					&& all[i].getReturnType().equals(f.getType())) {
 				return all[i];
 			}
