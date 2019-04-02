@@ -8,15 +8,15 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.wildfly.servertype.publishing;
 
-import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 
 public interface IJBossPublishController {
 
-	public IStatus canAddDeployable(DeployableReference reference);
+	public IStatus canAddDeployable(DeployableReferenceWithOptions ref);
 	
-	public IStatus canRemoveDeployable(DeployableReference reference);
+	public IStatus canRemoveDeployable(DeployableReferenceWithOptions ref);
 	
 	public IStatus canPublish();
 	
@@ -24,5 +24,5 @@ public interface IJBossPublishController {
 
 	public void publishFinish(int publishType) throws CoreException;
 
-	public int publishModule(DeployableReference reference, int publishType, int modulePublishType) throws CoreException;
+	public int publishModule(DeployableReferenceWithOptions reference, int publishType, int modulePublishType) throws CoreException;
 }

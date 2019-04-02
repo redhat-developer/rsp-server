@@ -26,7 +26,7 @@ import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
-import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
@@ -539,12 +539,12 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 	
 	public CompletableFuture<Status> addDeployable(ModifyDeployableRequest request) {
-		return createCompletableFuture(() -> addDeployableSync(request.getServer(), request.getDeployable()));
+		return createCompletableFuture(() -> addDeployableSync(request.getServer(), request));
 	}
 
-	public Status addDeployableSync(ServerHandle handle, DeployableReference reference) {
+	public Status addDeployableSync(ServerHandle handle, ModifyDeployableRequest req) {
 		IServer server = managementModel.getServerModel().getServer(handle.getId());
-		IStatus stat = managementModel.getServerModel().addDeployable(server, reference);
+		IStatus stat = managementModel.getServerModel().addDeployable(server, req.getDeployable());
 		return StatusConverter.convert(stat);
 	}
 	
@@ -552,7 +552,7 @@ public class ServerManagementServerImpl implements RSPServer {
 		return createCompletableFuture(() -> removeDeployableSync(request.getServer(), request.getDeployable()));
 	}
 
-	public Status removeDeployableSync(ServerHandle handle, DeployableReference reference) {
+	public Status removeDeployableSync(ServerHandle handle, DeployableReferenceWithOptions reference) {
 		IServer server = managementModel.getServerModel().getServer(handle.getId());
 		IStatus stat = managementModel.getServerModel().removeDeployable(server, reference);
 		return StatusConverter.convert(stat);

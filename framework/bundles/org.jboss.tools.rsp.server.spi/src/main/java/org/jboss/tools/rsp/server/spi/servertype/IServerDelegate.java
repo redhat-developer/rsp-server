@@ -11,8 +11,10 @@ package org.jboss.tools.rsp.server.spi.servertype;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
+import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.rsp.api.dao.ServerState;
@@ -253,10 +255,10 @@ public interface IServerDelegate {
 	/**
 	 * Can this deployable be added to this server? 
 	 * @param handle
-	 * @param reference
+	 * @param req
 	 * @return
 	 */
-	public IStatus canAddDeployable(DeployableReference reference);
+	public IStatus canAddDeployable(DeployableReferenceWithOptions ref);
 
 	
 	/**
@@ -264,7 +266,7 @@ public interface IServerDelegate {
 	 * @param reference
 	 * @return
 	 */
-	public IStatus canRemoveDeployable(DeployableReference reference);
+	public IStatus canRemoveDeployable(DeployableReferenceWithOptions reference);
 
 	/**
 	 * A request to publish the server

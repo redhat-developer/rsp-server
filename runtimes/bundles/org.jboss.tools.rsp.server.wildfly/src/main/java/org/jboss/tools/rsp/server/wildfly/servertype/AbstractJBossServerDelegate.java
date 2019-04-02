@@ -12,7 +12,7 @@ import java.io.File;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
-import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
@@ -227,12 +227,12 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	protected abstract IJBossPublishController createPublishController();
 	
 	@Override
-	public IStatus canAddDeployable(DeployableReference reference) {
-		return getOrCreatePublishController().canAddDeployable(reference);
+	public IStatus canAddDeployable(DeployableReferenceWithOptions ref) {
+		return getOrCreatePublishController().canAddDeployable(ref);
 	}
 	
 	@Override
-	public IStatus canRemoveDeployable(DeployableReference reference) {
+	public IStatus canRemoveDeployable(DeployableReferenceWithOptions reference) {
 		return getOrCreatePublishController().canRemoveDeployable(reference);
 	}
 	
@@ -251,11 +251,13 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		super.publishFinish(publishType);
 	}
 
-	protected void publishDeployable(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
-		int syncState = getOrCreatePublishController().publishModule(reference, publishType, modulePublishType);
-		setDeployablePublishState(reference, syncState);
+	protected void publishDeployable(DeployableReferenceWithOptions reference, 
+			int publishRequestType, int modulePublishState) throws CoreException {
+		int syncState = getOrCreatePublishController()
+				.publishModule(reference, publishRequestType, modulePublishState);
+		setDeployablePublishState(reference.getReference(), syncState);
 		
 		// TODO launch a module poller?!
-		setDeployableState(reference, ServerManagementAPIConstants.STATE_STARTED);
+		setDeployableState(reference.getReference(), ServerManagementAPIConstants.STATE_STARTED);
 	}
 }

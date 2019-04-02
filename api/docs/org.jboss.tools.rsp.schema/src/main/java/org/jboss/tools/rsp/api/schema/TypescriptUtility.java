@@ -65,6 +65,7 @@ public class TypescriptUtility {
 		}
 
 		final Settings settings = new Settings();
+		settings.optionalAnnotations.add(org.jboss.tools.rsp.api.dao.util.Optional.class);
 		settings.outputKind = TypeScriptOutputKind.module;
 		settings.jsonLibrary = JsonLibrary.jackson2;
 		String[] clazNames = new String[daoClasses.length];

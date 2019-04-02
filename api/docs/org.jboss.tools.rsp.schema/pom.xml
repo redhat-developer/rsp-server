@@ -32,8 +32,12 @@
 					<configuration>
 						<mainClass>org.jboss.tools.rsp.api.schema.GenerateSchemaMain</mainClass>
 						<arguments>
-						  <argument>${basedir}</argument>
+							<argument>${basedir}</argument>
 						</arguments>
+						<optionalAnnotations>
+							<annotation>org.jboss.tools.rsp.api.dao.util.Optional</annotation>
+						</optionalAnnotations>
+
 					</configuration>
 				</plugin>
 			</plugins>

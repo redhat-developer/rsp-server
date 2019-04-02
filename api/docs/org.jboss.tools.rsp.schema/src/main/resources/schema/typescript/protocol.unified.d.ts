@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2019-03-28 09:53:57.
+// Generated using typescript-generator version 2.2.413 on 2019-04-05 15:09:25.
 
 export interface Attribute {
     type: string;
@@ -31,6 +31,11 @@ export interface CreateServerResponse {
 export interface DeployableReference {
     label: string;
     path: string;
+}
+
+export interface DeployableReferenceWithOptions {
+    reference: DeployableReference;
+    options?: { [index: string]: any };
 }
 
 export interface DeployableState {
@@ -94,7 +99,7 @@ export interface ListDownloadRuntimeResponse {
 
 export interface ModifyDeployableRequest {
     server: ServerHandle;
-    deployable: DeployableReference;
+    deployable: DeployableReferenceWithOptions;
 }
 
 export interface PublishServerRequest {

@@ -13,7 +13,9 @@ import java.io.File;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
+import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
@@ -246,12 +248,12 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 	 */
 	
 	@Override
-	public IStatus canAddDeployable(DeployableReference reference) {
+	public IStatus canAddDeployable(DeployableReferenceWithOptions req) {
 		return Status.CANCEL_STATUS;
 	}
 	
 	@Override
-	public IStatus canRemoveDeployable(DeployableReference reference) {
+	public IStatus canRemoveDeployable(DeployableReferenceWithOptions reference) {
 		return Status.CANCEL_STATUS;
 	}
 

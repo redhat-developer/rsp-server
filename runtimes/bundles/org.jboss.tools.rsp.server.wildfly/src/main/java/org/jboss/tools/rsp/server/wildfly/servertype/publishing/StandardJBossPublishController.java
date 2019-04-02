@@ -10,16 +10,25 @@ package org.jboss.tools.rsp.server.wildfly.servertype.publishing;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
+import org.jboss.tools.rsp.server.spi.servertype.IDeployableResourceDelta;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.wildfly.impl.Activator;
 import org.jboss.tools.rsp.server.wildfly.servertype.AbstractJBossServerDelegate;
@@ -54,41 +63,63 @@ public class StandardJBossPublishController implements IJBossPublishController {
 	private boolean hasSuffix(String path, String suffix) {
 		return path.endsWith(suffix);
 	}
-	private boolean isSupportedDeployable(String path, boolean mustExist) {
+	private boolean isSupportedDeployable(String path, String outputName, boolean mustExist) {
 		if( path == null )
 			return false;
 		
 		File f = new File(path);
 		// When removing a module, there's no reason it must exist
-		if( mustExist ) {
-			if( !f.exists() || !f.isFile()) 
-				return false;
-		}
+		if( mustExist && !f.exists())
+			return false;
+		
+		if( mustExist && !supportsExplodedDeployment() && !f.isFile())
+			return false;
 		
 		for( int i = 0; i < supportedSuffix.length; i++ ) {
-			if( hasSuffix(path, supportedSuffix[i]))
+			if( hasSuffix(outputName, supportedSuffix[i]))
 				return true;
 		}
 		return false;
 	}
 	
+	protected boolean supportsExplodedDeployment() {
+		return true;
+	}
+	
+	protected String getOutputName(DeployableReferenceWithOptions ref) {
+		Map<String, Object> options = ref.getOptions();
+		String def = new File(ref.getReference().getPath()).getName();
+		if( options != null && 
+				options.get(ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME) != null ) {
+			return (String)options.get(ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME);
+		}
+		return def;
+	}
+	
+	protected String getOutputName(DeployableReference ref) {
+		return new File(ref.getPath()).getName();
+	}
 	
 	@Override
-	public IStatus canAddDeployable(DeployableReference reference) {
-		if( isSupportedDeployable(reference.getPath(), true)) {
+	public IStatus canAddDeployable(DeployableReferenceWithOptions ref) {
+		String path = ref.getReference().getPath();
+		if( isSupportedDeployable(path, getOutputName(ref), true)) {
 			return Status.OK_STATUS;
 		}
 		return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
-				NLS.bind("Server {0} cannot add deployable from {1}", server.getName(), reference.getPath()));
+				NLS.bind("Server {0} cannot add deployable from {1}", 
+						server.getName(), path));
 	}
 
 	@Override
-	public IStatus canRemoveDeployable(DeployableReference reference) {
-		if( isSupportedDeployable(reference.getPath(), false)) {
+	public IStatus canRemoveDeployable(DeployableReferenceWithOptions ref) {
+		String path = ref.getReference().getPath();
+		if( isSupportedDeployable(path, getOutputName(ref), false)) {
 			return Status.OK_STATUS;
 		}
 		return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
-				NLS.bind("Server {0} cannot remove deployable from {1}", server.getName(), reference.getPath()));
+				NLS.bind("Server {0} cannot remove deployable from {1}", 
+						server.getName(), path));
 	}
 
 	@Override
@@ -107,12 +138,13 @@ public class StandardJBossPublishController implements IJBossPublishController {
 	}
 
 	@Override
-	public int publishModule(DeployableReference reference, int publishType, int modulePublishType)
-			throws CoreException {
-		if( modulePublishType == ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) {
-			return removeModule(reference, publishType, modulePublishType);
+	public int publishModule(DeployableReferenceWithOptions reference, 
+			int publishRequestType, int modulePublishState) throws CoreException {
+		if( modulePublishState == ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) {
+			// Removal is always complete. No incrementals ;) 
+			return removeModule(reference, publishRequestType, modulePublishState);
 		} else {
-			return copyModule(reference, publishType, modulePublishType);
+			return copyModule(reference, publishRequestType, modulePublishState);
 		}
 	}
 
@@ -124,34 +156,216 @@ public class StandardJBossPublishController implements IJBossPublishController {
 		return p;
 	}
 
-	protected Path getDestinationPath(DeployableReference reference) {
-		File src = new File(reference.getPath());
-		String srcName = src.getName();
-		File dest = getDeploymentFolder().resolve(srcName).toFile();
+	protected Path getDestinationPath(DeployableReferenceWithOptions reference) {
+		File src = new File(reference.getReference().getPath());
+		String outName = src.getName();
+		if( reference.getOptions() != null ) {
+			String optOutputName = (String)reference.getOptions().get(ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME);
+			if( optOutputName != null ) {
+				outName = optOutputName;
+			}
+		}
+		File dest = getDeploymentFolder().resolve(outName).toFile();
 		return dest.toPath();
 	}
-
 		
+	protected int copyModule(DeployableReferenceWithOptions opts, 
+			int serverPublishRequest, int modulePublishState) throws CoreException {
+		// TODO different logic for incremental vs full? 
+		int publishType = getModulePublishType(serverPublishRequest, modulePublishState);
+		if( publishType == ServerManagementAPIConstants.PUBLISH_INCREMENTAL) {
+			return incrementalPublishCopyModule(opts, serverPublishRequest, modulePublishState);
+		} else {
+			return fullPublishCopyModule(opts, serverPublishRequest, modulePublishState);
+		}
+	}
 	
-	protected int copyModule(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
-		File dest = getDestinationPath(reference).toFile();
+	private int incrementalPublishCopyModule(DeployableReferenceWithOptions opts, 
+			int serverPublishRequest, int modulePublishState) throws CoreException {
+		IDeployableResourceDelta delta = getDelegate().getServerPublishModel()
+				.getDeployableResourceDelta(opts.getReference());
+		
+		File src = new File(opts.getReference().getPath());
+		if( src.exists() && src.isFile()) {
+			return fullPublishCopyZippedModule(opts, serverPublishRequest, modulePublishState);
+		}
+
+		if( delta == null )
+			return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
+		
+		if( src.exists() && src.isDirectory()) {
+			return incrementalPublishCopyExplodedModule(opts, delta);
+		}
+		return ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN;
+	}
+
+	protected int getModulePublishType(int serverPublishType, int modulePublishState) {
+		if( serverPublishType == ServerManagementAPIConstants.PUBLISH_CLEAN)
+			return ServerManagementAPIConstants.PUBLISH_FULL;
+		if( serverPublishType == ServerManagementAPIConstants.PUBLISH_FULL)
+			return ServerManagementAPIConstants.PUBLISH_FULL;
+		
+		// if it's PUBLISH_AUTO or PUBLISH_INCREMENTAL, then go by the module
+		if( modulePublishState == ServerManagementAPIConstants.PUBLISH_STATE_ADD)
+			return ServerManagementAPIConstants.PUBLISH_FULL;
+		if( modulePublishState == ServerManagementAPIConstants.PUBLISH_STATE_FULL)
+			return ServerManagementAPIConstants.PUBLISH_FULL;
+		if( modulePublishState == ServerManagementAPIConstants.PUBLISH_STATE_REMOVE)
+			return ServerManagementAPIConstants.PUBLISH_FULL;
+		if( modulePublishState == ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN)
+			return ServerManagementAPIConstants.PUBLISH_FULL;
+		
+//		if( modulePublishState == ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL)
+//			return ServerManagementAPIConstants.PUBLISH_INCREMENTAL;
+//		if( modulePublishState == ServerManagementAPIConstants.PUBLISH_STATE_NONE)
+//			return ServerManagementAPIConstants.PUBLISH_INCREMENTAL;
+		
+		return ServerManagementAPIConstants.PUBLISH_INCREMENTAL;
+	}
+	
+	protected int fullPublishCopyModule(DeployableReferenceWithOptions opts, int publishType, int modulePublishType) throws CoreException {
+		File src = new File(opts.getReference().getPath());
+		if( src.exists() && src.isFile()) {
+			return fullPublishCopyZippedModule(opts, publishType, modulePublishType);
+		}
+		if( src.exists() && src.isDirectory()) {
+			return fullPublishCopyExplodedModule(opts, publishType, modulePublishType);
+		}
+		return ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN;
+	}
+	
+	protected int fullPublishCopyZippedModule(DeployableReferenceWithOptions opts, int publishType, int modulePublishType) throws CoreException {
+		File dest = getDestinationPath(opts).toFile();
+		Path src = new File(opts.getReference().getPath()).toPath();
 		try {
-			Files.copy(new File(reference.getPath()).toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(src, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 		} catch(IOException ioe) {
 			LOG.error("Error publishing module {0} to server {1}", ioe);
-			return delegate.getServerPublishModel().getDeployableState(reference).getPublishState();
+			return delegate.getServerPublishModel().getDeployableState(opts.getReference()).getPublishState();
 		}
 	}
 
-
-	protected int removeModule(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
-		File dest = getDestinationPath(reference).toFile();
-		if( dest != null && dest.exists()) {
-			if( !dest.delete() )
-				return delegate.getServerPublishModel().getDeployableState(reference).getPublishState();
+	protected int fullPublishCopyExplodedModule(DeployableReferenceWithOptions opts, int publishType, int modulePublishType) throws CoreException {
+		File dest = getDestinationPath(opts).toFile();
+		Path src = new File(opts.getReference().getPath()).toPath();
+		try {
+			completeDelete(dest.toPath());
+			dest.mkdirs();
+			Files.walkFileTree(src, new CopyFileVisitor(dest.toPath()));
+			return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
+		} catch(IOException ioe) {
+			LOG.error("Error publishing module {0} to server {1}", ioe);
+			return delegate.getServerPublishModel().getDeployableState(opts.getReference()).getPublishState();
 		}
+	}
+
+	protected int incrementalPublishCopyExplodedModule(DeployableReferenceWithOptions opts,
+			IDeployableResourceDelta delta) throws CoreException {
+		File dest = getDestinationPath(opts).toFile();
+		Path src = new File(opts.getReference().getPath()).toPath();
+		
+		List<String> errors = new ArrayList<String>();
+		Map<Path, Integer> deltaVals = delta.getResourceDeltaMap();
+		for( Path relative : deltaVals.keySet()) {
+			Path fileSrc = src.resolve(relative);
+			Path fileDest = dest.toPath().resolve(relative);
+			int change = deltaVals.get(relative);
+			if( change == IDeployableResourceDelta.DELETED) {
+				fileDest.toFile().delete();
+			} else if( change == IDeployableResourceDelta.CREATED || 
+					change == IDeployableResourceDelta.MODIFIED) {
+				try {
+					Files.copy(fileSrc, fileDest, StandardCopyOption.REPLACE_EXISTING);
+				} catch(IOException ioe) {
+					errors.add("Unable to copy " + fileSrc.toString() + " to " + fileDest.toString());
+				}
+			}
+		}
+		
+		if( errors.size() > 0 ) {
+			String[] arr = (String[]) errors.toArray(new String[errors.size()]);
+			String errorString = String.join("\n", arr);
+			LOG.error("Error publishing module {0} to server {1}:\n{2}", opts.getReference().getLabel(), getServer().getName(), errorString);
+			return delegate.getServerPublishModel().getDeployableState(opts.getReference()).getPublishState();
+		}
+		
 		return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
+	}
+
+	
+	private void completeDelete(Path pathToBeDeleted) throws IOException {
+		if( pathToBeDeleted.toFile().exists()) {
+		    Files.walk(pathToBeDeleted)
+		      .sorted(Comparator.reverseOrder())
+		      .map(Path::toFile)
+		      .forEach(File::delete);
+		}
+	}
+
+	protected int removeFileModule(DeployableReferenceWithOptions reference, 
+			int publishType, int modulePublishType,
+			File destination) throws CoreException {
+		if( destination.delete() )
+			return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
+		return delegate.getServerPublishModel().getDeployableState(
+				reference.getReference()).getPublishState();
+	}
+	
+	protected int removeExplodedModule(DeployableReferenceWithOptions reference, 
+			int publishType, int modulePublishType,
+			File destination) throws CoreException {
+		try {
+			completeDelete(destination.toPath());
+			return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
+		} catch(IOException ioe) {
+			return delegate.getServerPublishModel().getDeployableState(
+					reference.getReference()).getPublishState();
+		}
+	}
+	
+	protected int removeModule(DeployableReferenceWithOptions reference, 
+			int publishRequestType, int modulePublishState) throws CoreException {
+		File dest = getDestinationPath(reference).toFile();
+		if( dest == null || !dest.exists()) {
+			return delegate.getServerPublishModel().getDeployableState(
+					reference.getReference()).getPublishState();
+		}
+		
+		if( dest.isFile()) {
+			return removeFileModule(reference, publishRequestType, modulePublishState, dest);
+		} else {//if( dest.isDirectory()) {
+			return removeExplodedModule(reference, publishRequestType, modulePublishState, dest);
+		}
+	}
+	
+	
+	public class CopyFileVisitor extends SimpleFileVisitor<Path> {
+	    private final Path targetPath;
+	    private Path sourcePath = null;
+	    public CopyFileVisitor(Path targetPath) {
+	        this.targetPath = targetPath;
+	    }
+
+	    @Override
+	    public FileVisitResult preVisitDirectory(final Path dir,
+	    final BasicFileAttributes attrs) throws IOException {
+	        if (sourcePath == null) {
+	            sourcePath = dir;
+	        } else {
+	        Files.createDirectories(targetPath.resolve(sourcePath
+	                    .relativize(dir)));
+	        }
+	        return FileVisitResult.CONTINUE;
+	    }
+
+	    @Override
+	    public FileVisitResult visitFile(final Path file,
+	    final BasicFileAttributes attrs) throws IOException {
+	    Files.copy(file,
+	        targetPath.resolve(sourcePath.relativize(file)));
+	    return FileVisitResult.CONTINUE;
+	    }
 	}
 	
 }
