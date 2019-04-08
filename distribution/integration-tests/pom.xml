@@ -12,7 +12,11 @@
 	<groupId>org.jboss.tools.rsp.distribution</groupId>
 	<artifactId>org.jboss.tools.rsp.distribution.itests</artifactId>
 	<packaging>jar</packaging>
-	
+
+	<properties>
+		<skipITests>true</skipITests>
+	</properties>
+
 	<name>Runtime Server Protocol : Integration Tests</name>
 
 	<build>
@@ -33,6 +37,9 @@
 	<profiles>
 		<profile>
 			<id>integration-tests</id>
+			<properties>
+				<skipITests>false</skipITests>
+			</properties>
 			<build>
 				<pluginManagement>
 					<plugins>
@@ -84,6 +91,9 @@
 						<groupId>com.googlecode.maven-download-plugin</groupId>
 						<artifactId>download-maven-plugin</artifactId>
 						<version>1.4.1</version>
+						<configuration>
+							<skip>${skipITests}</skip>
+						</configuration>
 						<executions>
 							<execution>
 								<id>install-wildfly-14.0.1.Final</id>
@@ -115,9 +125,9 @@
 		<profile>
 			<id>wildfly-15</id>
 			<activation>
-			    <property>
-			        <name>wildfly-15</name>
-			    </property>
+				<property>
+					<name>wildfly-15</name>
+				</property>
 			</activation>
 			<build>
 				<plugins>
@@ -125,6 +135,9 @@
 						<groupId>com.googlecode.maven-download-plugin</groupId>
 						<artifactId>download-maven-plugin</artifactId>
 						<version>1.4.1</version>
+						<configuration>
+							<skip>${skipITests}</skip>
+						</configuration>
 						<executions>
 							<execution>
 								<id>install-wildfly-15.0.1.Final</id>
@@ -147,7 +160,6 @@
 								<server.type.id>org.jboss.ide.eclipse.as.wildfly.150</server.type.id>
 								<server.path>${project.build.directory}/wildfly-15.0.1.Final</server.path>
 								<server.version>15.0.1.Final</server.version>
-								<itests>nondefault</itests>
 							</systemPropertyVariables>
 						</configuration>
 					</plugin>
