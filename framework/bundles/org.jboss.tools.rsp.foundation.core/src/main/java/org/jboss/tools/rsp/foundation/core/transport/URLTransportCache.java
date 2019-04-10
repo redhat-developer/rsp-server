@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Red Hat, Inc.
+ * Copyright (c) 2013-2019 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution,
@@ -27,6 +27,7 @@ import java.net.URLEncoder;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.HashMap;
@@ -71,14 +72,10 @@ public class URLTransportCache {
 	 * This is to ensure multiple clients don't try using 
 	 * two instances with the same basedir, which could lead to corruption of the cache.
 	 */
-	private static final HashMap<IPath, URLTransportCache> cacheDirToCache = new HashMap<IPath, URLTransportCache>();
+	private static final HashMap<IPath, URLTransportCache> cacheDirToCache = new HashMap<>();
 
-	public synchronized static URLTransportCache getCache(IPath root) {
-		URLTransportCache c = cacheDirToCache.get(root);
-		if( c == null ) {
-			c = new URLTransportCache(root);
-			cacheDirToCache.put(root, c);
-		}
+	public static synchronized URLTransportCache getCache(IPath root) {
+		URLTransportCache c = cacheDirToCache.computeIfAbsent(root, path -> new URLTransportCache(root));
 		return c;
 	}
 	
@@ -118,38 +115,34 @@ public class URLTransportCache {
 		if (f == null)
 			return true;
 
-		URL url2 = null;
-		try {
-			url2 = new URL(url);
-		} catch (MalformedURLException murle) {
-			throw new CoreException(new Status(IStatus.ERROR, FoundationCoreActivator.PLUGIN_ID, murle.getMessage(), murle));
-		}
-
+		URL url2 = toURL(url);
 		long remoteModified = getLastModified(url2, monitor);
 
 		// If the remoteModified is -1 but we have a local cache, use that (not outdated)
-		if (remoteModified == -1 ) {
-			if (f.exists())
+		if (remoteModified == -1 
+				&& f.exists()) {
 				return false;
 		}
 		// !!! urlModified == 0 when querying files from github
 		// It means that files from github can not be cached!
-		if (f.exists()) {
-			long modified = f.lastModified();
-			if( remoteModified > modified ) {
-				// The remote file has been updated *after* the local file was created, so, outdated
-				return true;
-			}
-			if( remoteModified == 0 ) {
-				// File comes from github or some other server not keeping accurate timestamps
-				// so, possibly oudated, and must re-fetch 
-				return true;
-			}
-			// Our local copy has a higher timestamp, so was fetched after
-			return false;
+		if (!f.exists()) {
+			// Local file doesn't exist, so, cache is outdated
+			return true;
 		}
-		// Local file doesn't exist, so, cache is outdated
-		return true;
+		long modified = f.lastModified();
+		return // The remote file has been updated *after* the local file was created, so, outdated
+				remoteModified > modified
+				// File comes from github or some other server not keeping accurate timestamps
+				// so, possibly oudated, and must re-fetch 					
+				|| remoteModified == 0;
+	}
+
+	private URL toURL(String url) throws CoreException {
+		try {
+			return new URL(url);
+		} catch (MalformedURLException murle) {
+			throw new CoreException(new Status(IStatus.ERROR, FoundationCoreActivator.PLUGIN_ID, murle.getMessage(), murle));
+		}
 	}
 
 	public File downloadAndCache(String url, String displayName,
@@ -172,12 +165,12 @@ public class URLTransportCache {
 					target.deleteOnExit();	
 				addToCache(url, target);
 				if( existing != null && existing.exists())
-					existing.delete();
+					Files.delete(existing.toPath());
 				return target != null && target.exists() ? target : null;
 			}
 			// Download did not go as planned. Delete the new, return the old
 			if( target != null && target.exists()) {
-				target.delete();
+				Files.delete(target.toPath());
 			}
 			return existing;
 		} catch (IOException ioe) {
@@ -211,23 +204,27 @@ public class URLTransportCache {
 				if( isEmpty(byLine[i]))
 					continue;
 				String[] kv = byLine[i].split("=");
-				if( kv.length == 2 && !isEmpty(kv[0]) && !isEmpty(kv[1])) {
-					try {
-						String decodedUrl = URLDecoder.decode(kv[0],ENCODING);
-						if( new File(kv[1]).exists() )
-							cache.put(decodedUrl,kv[1]);
-					} catch(UnsupportedEncodingException uee) {
-						// Should not be hit
-						LOG.error(uee.getMessage(), uee);
-					}
+				if (kv.length == 2 && !isEmpty(kv[0]) && !isEmpty(kv[1])) {
+					cache(kv);
 				}
 			}
+		}
+	}
+
+	private void cache(String[] kv) {
+		try {
+			String decodedUrl = URLDecoder.decode(kv[0], ENCODING);
+			if (new File(kv[1]).exists())
+				cache.put(decodedUrl,kv[1]);
+		} catch(UnsupportedEncodingException uee) {
+			// Should not be hit
+			LOG.error(uee.getMessage(), uee);
 		}
 	}
 	
 	
 	private boolean isEmpty(String s) {
-		return s == null || "".equals(s);
+		return s == null || s.isEmpty();
 	}
 	
 	private void savePreferences() {
@@ -281,7 +278,7 @@ public class URLTransportCache {
 		try {
 			tmp = DigestUtils.sha1(url);
 		} catch (IOException O_o) {
-		  //That really can't happen
+		  // That really can't happen
 			tmp = url.replaceAll("[\\p{Punct}&&[^_]]", "_");
 		}
 		
@@ -367,40 +364,33 @@ public class URLTransportCache {
 	}
 
 	
-	private IStatus download(String displayName, String url, 
-			FileOutputStream fileOutputStream, int timeout, 
+	private IStatus download(String displayName, String url, FileOutputStream fileOutputStream, int timeout, 
 			IProgressMonitor monitor) throws IOException {
 		int contentLength = contentLength(new URL(url), timeout);
 		return download(displayName, createStream(url), fileOutputStream, timeout, contentLength, monitor);
 	}
 
-	public IStatus download(String displayName, String url, 
-			String user, String pass, 
-			FileOutputStream fileOutputStream, int timeout,
-			IProgressMonitor monitor) throws IOException {
-		HttpURLConnection con = getURLConnection(url, user, pass, timeout);
+	public IStatus download(String displayName, String url, String user, String pass, 
+			FileOutputStream fileOutputStream, int timeout, IProgressMonitor monitor) throws IOException {
+	HttpURLConnection con = getURLConnection(url, user, pass, timeout);
 		return download(displayName, con.getInputStream(), 
 				fileOutputStream, timeout, contentLength(con), monitor);
 	}
 
-	public IStatus download(String name, InputStream istream,
-			FileOutputStream out, int timeout,
-			IProgressMonitor monitor) throws IOException {
-		return download(name, istream, out, timeout, NO_TIMEOUT, monitor);
+	public IStatus download(String name, InputStream istream, FileOutputStream out, int timeout, IProgressMonitor monitor)
+			throws IOException {
+		return download(name, istream, out, timeout, -1, monitor);
 	}
-	public IStatus download(String name, InputStream istream,
-			FileOutputStream out, int timeout, int contentLength,
+
+	public IStatus download(String name, InputStream istream, FileOutputStream out, int timeout, int contentLength,
 			final IProgressMonitor monitor) throws IOException {
 		// TODO respect timeout
 		monitor.beginTask(name, 100);
 		
-		ReadableByteChannel readableByteChannel = null;
-		FileChannel fileChannel = null;
-		final Integer[] worked = new Integer[] {new Integer(0)};
-		try {
-			readableByteChannel = Channels.newChannel(istream);
-			fileChannel = out.getChannel();
-			if( contentLength == -1 ) {
+		final Integer[] worked = new Integer[] { Integer.valueOf(0) };
+		try(ReadableByteChannel readableByteChannel = Channels.newChannel(istream);
+				FileChannel fileChannel = out.getChannel()) {
+			if (contentLength == -1) {
 				fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
 				return Status.OK_STATUS;
 			}
@@ -411,11 +401,11 @@ public class URLTransportCache {
 					if( monitor.isCanceled()) 
 						throw new CancellationException("Operation has been canceled.");
 					int oldWorked = worked[0];
-					int progInt = (int)Math.floor(progress);
+					int progInt = (int) Math.floor(progress);
 					if( progInt > oldWorked ) {
 						int diff = progInt - oldWorked;
 						monitor.worked(diff);
-						worked[0] = new Integer(progInt);
+						worked[0] = Integer.valueOf(progInt);
 					}
 				}
 			};
@@ -430,13 +420,6 @@ public class URLTransportCache {
 			}
 			
 			return Status.OK_STATUS;
-		} finally {
-	        if (readableByteChannel != null) {
-	        	readableByteChannel.close();
-	        }
-	        if (fileChannel != null) {
-	        	fileChannel.close();
-	        }
 		}
 	}
 
@@ -447,6 +430,7 @@ public class URLTransportCache {
 			connection = createConnection(url, timeout);
 			contentLength = connection.getContentLength();
 		} catch (Exception e) {
+			// ignore
 		}
 		return contentLength;
 	}
@@ -456,6 +440,7 @@ public class URLTransportCache {
 		try {
 			contentLength = connection.getContentLength();
 		} catch (Exception e) {
+			// ignore
 		}
 		return contentLength;
 	}
@@ -475,13 +460,12 @@ public class URLTransportCache {
 
 	private HttpURLConnection getURLConnection(URL url, String user, String pass, int timeout) throws IOException {
 		HttpURLConnection urlConnection = createConnection(url, timeout);
+		HttpURLConnection.setFollowRedirects(true);
 		if( user != null && pass != null ) {
 			String authString = user + ":" + pass;
 			byte[] authEncBytes = Base64.getEncoder().encode(authString.getBytes());
 			String authStringEnc = new String(authEncBytes);
-			urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
-			urlConnection.setFollowRedirects(true);
-			
+			urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);			
 		}
 		return urlConnection;
 	}
