@@ -50,6 +50,9 @@ public class URLTransportCache {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(URLTransportCache.class);
 
+	private static final int DEFAULT_CONNECT_TIMEOUT = 1 * 60 * 1000;
+	private static final int DEFAULT_READ_TIMEOUT = 2 * 60 * 1000;
+	private static final int NO_TIMEOUT = -1;
 	
 	/**
 	 * Encoding for this file
@@ -151,7 +154,7 @@ public class URLTransportCache {
 
 	public File downloadAndCache(String url, String displayName,
 			IProgressMonitor monitor) throws CoreException {
-		return downloadAndCache(url, displayName, -1, false, monitor);
+		return downloadAndCache(url, displayName, NO_TIMEOUT, false, monitor);
 	}
 	
 	public File downloadAndCache(String url, String displayName, 
@@ -326,20 +329,28 @@ public class URLTransportCache {
 		}
 	}
 	
-	public long getLastModified(URL url2, IProgressMonitor monitor) {
+	public long getLastModified(URL url, IProgressMonitor monitor) {
+		return getLastModified(url, NO_TIMEOUT, monitor);
+	}
+
+	public long getLastModified(URL url, int timeout, IProgressMonitor monitor) {
 		try {
-			HttpURLConnection con = (HttpURLConnection) url2.openConnection();
+			HttpURLConnection con = createConnection(url, timeout);
 			return getLastModified(con, monitor);
 		} catch (IOException e1) {
-			LOG.error("Could determine modification for url {}", url2);
+			LOG.error("Could determine modification for url {}", url);
 		}
 		return -1;
 	}
 	
 
 	public long getLastModified(URL url, String user, String pass, IProgressMonitor monitor) {
+		return getLastModified(url, user, pass, NO_TIMEOUT, monitor);
+	}
+
+	public long getLastModified(URL url, String user, String pass, int timeout, IProgressMonitor monitor) {
 		try {
-			return getLastModified(getURLConnection(url, user, pass), monitor);
+			return getLastModified(getURLConnection(url, user, pass, timeout), monitor);
 		} catch (IOException e) {
 			LOG.error("Could determine modification for url {}", url);
 		}
@@ -359,7 +370,7 @@ public class URLTransportCache {
 	private IStatus download(String displayName, String url, 
 			FileOutputStream fileOutputStream, int timeout, 
 			IProgressMonitor monitor) throws IOException {
-		int contentLength = contentLength(new URL(url));
+		int contentLength = contentLength(new URL(url), timeout);
 		return download(displayName, createStream(url), fileOutputStream, timeout, contentLength, monitor);
 	}
 
@@ -367,7 +378,7 @@ public class URLTransportCache {
 			String user, String pass, 
 			FileOutputStream fileOutputStream, int timeout,
 			IProgressMonitor monitor) throws IOException {
-		HttpURLConnection con = getURLConnection(url, user, pass);
+		HttpURLConnection con = getURLConnection(url, user, pass, timeout);
 		return download(displayName, con.getInputStream(), 
 				fileOutputStream, timeout, contentLength(con), monitor);
 	}
@@ -375,7 +386,7 @@ public class URLTransportCache {
 	public IStatus download(String name, InputStream istream,
 			FileOutputStream out, int timeout,
 			IProgressMonitor monitor) throws IOException {
-		return download(name, istream, out, timeout, -1, monitor);
+		return download(name, istream, out, timeout, NO_TIMEOUT, monitor);
 	}
 	public IStatus download(String name, InputStream istream,
 			FileOutputStream out, int timeout, int contentLength,
@@ -421,11 +432,11 @@ public class URLTransportCache {
 		}
 	}
 
-	private int contentLength(URL url) {
+	private int contentLength(URL url, int timeout) {
 		HttpURLConnection connection;
 		int contentLength = -1;
 		try {
-			connection = (HttpURLConnection) url.openConnection();
+			connection = createConnection(url, timeout);
 			contentLength = connection.getContentLength();
 		} catch (Exception e) {
 		}
@@ -445,23 +456,36 @@ public class URLTransportCache {
 		return new URL(url).openStream();
 	}
 
-	protected InputStream createStream(String webPage, String user, String pass) throws IOException {
-		return getURLConnection(webPage, user, pass).getInputStream();
+	protected InputStream createStream(String webPage, String user, String pass, int timeout) throws IOException {
+		return getURLConnection(webPage, user, pass, timeout).getInputStream();
 	}
 	
-	private HttpURLConnection getURLConnection(String webPage, String user, String pass) throws IOException {
+	private HttpURLConnection getURLConnection(String webPage, String user, String pass, int timeout) throws IOException {
 		URL url = new URL(webPage);
-		return getURLConnection(url, user, pass);
+		return getURLConnection(url, user, pass, timeout);
 	}
 
-	private HttpURLConnection getURLConnection(URL url, String user, String pass) throws IOException {
-		HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
+	private HttpURLConnection getURLConnection(URL url, String user, String pass, int timeout) throws IOException {
+		HttpURLConnection urlConnection = createConnection(url, timeout);
 		if( user != null && pass != null ) {
 			String authString = user + ":" + pass;
 			byte[] authEncBytes = Base64.getEncoder().encode(authString.getBytes());
 			String authStringEnc = new String(authEncBytes);
 			urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
 			urlConnection.setFollowRedirects(true);
+			
+		}
+		return urlConnection;
+	}
+
+	private HttpURLConnection createConnection(URL url, int timeout) throws IOException {
+		HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
+		if (NO_TIMEOUT == timeout) {
+			urlConnection.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
+			urlConnection.setReadTimeout(DEFAULT_READ_TIMEOUT);
+		} else {
+			urlConnection.setConnectTimeout(timeout);
+			urlConnection.setReadTimeout(timeout);
 		}
 		return urlConnection;
 	}
