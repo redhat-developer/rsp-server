@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Red Hat 
+ * Copyright (c) 2015-2019 Red Hat 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -60,23 +60,29 @@ public class JavaJarRuntimeInstaller implements IRuntimeInstaller {
 	protected DownloadRuntimeOperationUtility createDownloadRuntimeOperationUtility(TaskModel tm) {
 		IDownloadRuntimeConnectionFactory fact = (IDownloadRuntimeConnectionFactory)tm.getObject(
 				IDownloadRuntimeWorkflowConstants.CONNECTION_FACTORY);
-		if( fact == null )
+		if (fact == null) {
 			return new DownloadRuntimeOperationUtility();
-		return new DownloadRuntimeOperationUtility() {
-			protected InputStream createDownloadInputStream(URL url, String user, String pass) {
-				return fact.createConnection(url, user, pass);
-			}
-			protected int getContentLength(URL url, String user, String pass) {
-				return fact.getContentLength(url, user, pass);
-			}
-		};
+		} else {
+			return new DownloadRuntimeOperationUtility() {
+
+				@Override
+				protected InputStream createDownloadInputStream(URL url, String user, String pass) {
+					return fact.createConnection(url, user, pass);
+				}
+
+				@Override
+				protected int getContentLength(URL url, String user, String pass) {
+					return fact.getContentLength(url, user, pass);
+				}
+			};
+		}
 	}
 	@Override
 	public IStatus installRuntime(DownloadRuntime downloadRuntime, String unzipDirectory, String downloadDirectory,
 			boolean deleteOnExit, TaskModel taskModel, IProgressMonitor monitor) {
-		
-		String user = (String)taskModel.getObject(IDownloadRuntimeWorkflowConstants.USERNAME_KEY);
-		String pass = (String)taskModel.getObject(IDownloadRuntimeWorkflowConstants.PASSWORD_KEY);
+
+		String user = (String) taskModel.getObject(IDownloadRuntimeWorkflowConstants.USERNAME_KEY);
+		String pass = (String) taskModel.getObject(IDownloadRuntimeWorkflowConstants.PASSWORD_KEY);
 		
 		monitor.beginTask("Install Runtime '" + downloadRuntime.getName() + "' ...", 100);//$NON-NLS-1$ //$NON-NLS-2$
 		monitor.worked(1);
@@ -85,7 +91,7 @@ public class JavaJarRuntimeInstaller implements IRuntimeInstaller {
 					getDownloadUrl(downloadRuntime, taskModel), deleteOnExit, user, pass, new SubProgressMonitor(monitor, 80));
 						
 			ILaunch launch = createExternalToolsLaunchConfiguration(f, unzipDirectory);
-			if( launch == null ) {
+			if (launch == null) {
 				return new Status(IStatus.ERROR, RuntimeCoreActivator.PLUGIN_ID, "Unable to launch external command java -jar " + f.getAbsolutePath());
 			}
 			IProcess[] processes = launch.getProcesses();
@@ -96,16 +102,22 @@ public class JavaJarRuntimeInstaller implements IRuntimeInstaller {
 					checkFinished &= processes[i].isTerminated();
 				}
 				finished = checkFinished;
-				try { 
-					Thread.sleep(500);
-				} catch(InterruptedException ie) {
-					// Ignore
-				}
+				safeSleep(500);
 			}
 		} catch(CoreException ce) {
 			return ce.getStatus();
 		}
 		return Status.OK_STATUS;
+	}
+
+
+
+	private void safeSleep(long duration) {
+		try { 
+			Thread.sleep(duration);
+		} catch(InterruptedException ie) {
+			// Ignore
+		}
 	}
 
 	private String getDownloadUrl(DownloadRuntime downloadRuntime, TaskModel taskModel) {

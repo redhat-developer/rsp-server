@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Red Hat 
+ * Copyright (c) 2014-2019 Red Hat 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
@@ -100,10 +101,14 @@ public class DownloadRuntimeOperationUtility {
 		return download;
 	}
 	
-	
-	private long getRemoteURLModified(String urlString, String user, String pass, IProgressMonitor monitor) throws CoreException, IOException {
+	private long getRemoteURLModified(String urlString, String user, String pass, IProgressMonitor monitor) {
 		monitor.beginTask("Checking remote timestamp", 100);
-		long l = getCache().getLastModified(new URL(urlString), user, pass, monitor);
+		long l = 0;
+		try {
+			l = getCache().getLastModified(new URL(urlString), user, pass, monitor);
+		} catch(IOException e) {
+			// Ignore error on checking timestamp, may be fluke
+		}
 		monitor.worked(100);
 		monitor.done();
 		return l;
@@ -162,22 +167,16 @@ public class DownloadRuntimeOperationUtility {
 	}
 
 	
-	private File downloadRemoteRuntime(String destinationDirectory, 
-			String urlString, boolean deleteOnExit, String user, String pass, IProgressMonitor monitor) throws CoreException  {
-		monitor.beginTask("Downloading " + urlString, 1000);
+	private File downloadRemoteRuntime(String destinationDirectory, String urlString, boolean deleteOnExit, String user, String pass,
+			IProgressMonitor monitor) throws CoreException  {
+		monitor.beginTask(NLS.bind("Downloading {0}", urlString), 1000);
 		File file = null;
 		try {
 			file = getDestinationFile(destinationDirectory, urlString, deleteOnExit);
 			
 			long urlModified = 0;
 			if( !deleteOnExit ) {
-				try {
-					urlModified = getRemoteURLModified(urlString, user, pass, new SubProgressMonitor(monitor, 100));
-				} catch(IOException ioe) {
-					// Ignore error on checking timestamp, may be fluke
-				} catch(CoreException ce) {
-					// Ignore error on checking timestamp, may be fluke
-				}
+				urlModified = getRemoteURLModified(urlString, user, pass, new SubProgressMonitor(monitor, 100));
 			}
 			boolean download = cacheOutdated(file, deleteOnExit);
 
@@ -188,7 +187,7 @@ public class DownloadRuntimeOperationUtility {
 			if( !result.isOK())
 				throw new CoreException(result);
 			if (monitor.isCanceled()) {
-				file.delete();
+				Files.delete(file.toPath());
 				throw new CoreException(cancel(file));
 			}
 			

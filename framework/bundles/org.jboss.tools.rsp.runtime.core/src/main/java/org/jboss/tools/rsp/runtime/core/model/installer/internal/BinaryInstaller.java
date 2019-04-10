@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2018 Red Hat, Inc. and others.
+ * Copyright (c) 2018-2019 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -46,11 +46,7 @@ public class BinaryInstaller implements IRuntimeInstaller {
 			File dest = new File(unzipDirectory, f.getName());
 			boolean renamed = f.renameTo(dest);
 			if( !renamed ) {
-				try {
-					Files.copy(f.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
-				} catch(IOException ioe) {
-					throw new CoreException(new Status(IStatus.ERROR, RuntimeCoreActivator.PLUGIN_ID, ioe.getMessage(), ioe));
-				}
+				copy(f, dest);
 			}
 			if (!dest.setExecutable(true)) {
 				throw new CoreException(new Status(IStatus.ERROR, RuntimeCoreActivator.PLUGIN_ID, "Can't set executable bit to " + dest.getAbsolutePath()));
@@ -63,19 +59,33 @@ public class BinaryInstaller implements IRuntimeInstaller {
 		return Status.OK_STATUS;
 	}
 
+	private void copy(File f, File dest) throws CoreException {
+		try {
+			Files.copy(f.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		} catch(IOException ioe) {
+			throw new CoreException(new Status(IStatus.ERROR, RuntimeCoreActivator.PLUGIN_ID, ioe.getMessage(), ioe));
+		}
+	}
+
 	protected DownloadRuntimeOperationUtility createDownloadRuntimeOperationUtility(TaskModel tm) {
 		IDownloadRuntimeConnectionFactory fact = (IDownloadRuntimeConnectionFactory)tm.getObject(
 				IDownloadRuntimeWorkflowConstants.CONNECTION_FACTORY);
-		if( fact == null )
+		if( fact == null ) {
 			return new DownloadRuntimeOperationUtility();
-		return new DownloadRuntimeOperationUtility() {
-			protected InputStream createDownloadInputStream(URL url, String user, String pass) {
-				return fact.createConnection(url, user, pass);
-			}
-			protected int getContentLength(URL url, String user, String pass) {
-				return fact.getContentLength(url, user, pass);
-			}
-		};
+		} else {
+			return new DownloadRuntimeOperationUtility() {
+	
+				@Override
+				protected InputStream createDownloadInputStream(URL url, String user, String pass) {
+					return fact.createConnection(url, user, pass);
+				}
+	
+				@Override
+				protected int getContentLength(URL url, String user, String pass) {
+					return fact.getContentLength(url, user, pass);
+				}
+			};
+		}
 	}
 	private String getDownloadUrl(DownloadRuntime downloadRuntime, TaskModel taskModel) {
 		if (downloadRuntime != null) {
