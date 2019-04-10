@@ -24,6 +24,9 @@ class CallbackByteChannel implements ReadableByteChannel {
 	private ReadableByteChannel rbc;
 	private long sizeRead;
 
+	
+	private Exception error = null;
+	
 	CallbackByteChannel(ReadableByteChannel rbc, long expectedSize, ProgressCallBack delegate) {
 		this.delegate = delegate;
 		this.size = expectedSize;
@@ -45,16 +48,30 @@ class CallbackByteChannel implements ReadableByteChannel {
 	public int read(ByteBuffer bb) throws IOException {
 		int n;
 		double progress;
-		if ((n = rbc.read(bb)) > 0) {
-			sizeRead += n;
-			progress = size > 0 ? (double) sizeRead / (double) size * 100.0 : -1.0;
-			try {
-				delegate.callback(this, progress);
-			} catch(CancellationException ce) {
-				close();
-				return n;
+		try {
+			if ((n = rbc.read(bb)) > 0) {
+				sizeRead += n;
+				progress = size > 0 ? (double) sizeRead / (double) size * 100.0 : -1.0;
+				try {
+					delegate.callback(this, progress);
+				} catch(CancellationException ce) {
+					close();
+					return n;
+				}
 			}
+			return n;
+		} catch(IOException ioe) {
+			error = ioe;
+			throw ioe;
 		}
-		return n;
+	}
+	
+	/**
+	 * If this channel's read operations ended in an error, return 
+	 * that error, or null.
+	 * @return
+	 */
+	public Exception getError() {
+		return error;
 	}
 }

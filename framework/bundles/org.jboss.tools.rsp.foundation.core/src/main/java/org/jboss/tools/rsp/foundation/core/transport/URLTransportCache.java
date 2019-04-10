@@ -421,6 +421,14 @@ public class URLTransportCache {
 			};
 			CallbackByteChannel cbbc = new CallbackByteChannel(readableByteChannel, contentLength, progmonCallback);
 			fileChannel.transferFrom(cbbc, 0, Long.MAX_VALUE);
+			
+			if( cbbc.getError() != null ) {
+				monitor.setCanceled(true);
+				return new Status(IStatus.ERROR, 
+						FoundationCoreActivator.PLUGIN_ID, 
+						cbbc.getError().getMessage(), cbbc.getError());
+			}
+			
 			return Status.OK_STATUS;
 		} finally {
 	        if (readableByteChannel != null) {
