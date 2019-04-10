@@ -26,30 +26,34 @@ public class DownloadRuntimeSessionCache   {
 	}
 	
 	public void updateRequestState(long requestId, int workflowStep, Map<String,Object> data) {
-		DownloadManagerSessionState existing = map.get(requestId);
-		if( existing == null ) {
-			existing = new DownloadManagerSessionState();
-			map.put(requestId,  existing);
-			existing.setData(new HashMap<String, Object>());
-		}
+		DownloadManagerSessionState existing = map.computeIfAbsent(requestId,  key -> new DownloadManagerSessionState());
 		existing.setWorkflowStep(workflowStep);
 		existing.getData().putAll(data);
 	}
 	
 	public static class DownloadManagerSessionState {
+
 		private int workflowStep;
 		private Map<String, Object> data;
+
+		public DownloadManagerSessionState() {
+			this(new HashMap<String, Object>());
+		}
+		
+		public DownloadManagerSessionState(Map<String, Object> data) {
+			this.data = data;
+		}
+
 		public int getWorkflowStep() {
 			return workflowStep;
 		}
+
 		public void setWorkflowStep(int workflowStep) {
 			this.workflowStep = workflowStep;
 		}
+
 		public Map<String, Object> getData() {
 			return data;
-		}
-		public void setData(Map<String, Object> data) {
-			this.data = data;
 		}
 		
 	}
