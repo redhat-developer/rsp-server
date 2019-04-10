@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Red Hat 
+ * Copyright (c) 2015-2019 Red Hat 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -44,16 +44,22 @@ public class ExtractionRuntimeInstaller implements IRuntimeInstaller {
 	protected DownloadRuntimeOperationUtility createDownloadRuntimeOperationUtility(TaskModel tm) {
 		IDownloadRuntimeConnectionFactory fact = (IDownloadRuntimeConnectionFactory)tm.getObject(
 				IDownloadRuntimeWorkflowConstants.CONNECTION_FACTORY);
-		if( fact == null )
+		if (fact == null) {
 			return new DownloadRuntimeOperationUtility();
-		return new DownloadRuntimeOperationUtility() {
-			protected InputStream createDownloadInputStream(URL url, String user, String pass) {
-				return fact.createConnection(url, user, pass);
-			}
-			protected int getContentLength(URL url, String user, String pass) {
-				return fact.getContentLength(url, user, pass);
-			}
-		};
+		} else {
+			return new DownloadRuntimeOperationUtility() {
+				
+				@Override
+				protected InputStream createDownloadInputStream(URL url, String user, String pass) {
+					return fact.createConnection(url, user, pass);
+				}
+
+				@Override
+				protected int getContentLength(URL url, String user, String pass) {
+					return fact.getContentLength(url, user, pass);
+				}
+			};
+		}
 	}
 	
 	private String getDownloadUrl(DownloadRuntime downloadRuntime, TaskModel taskModel) {

@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2014 Red Hat, Inc. and others.
+ * Copyright (c) 2014-2019 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -23,50 +23,66 @@ import org.jboss.tools.rsp.runtime.core.extract.internal.UntarUtility;
 import org.jboss.tools.rsp.runtime.core.extract.internal.UnzipUtility;
 
 public class ExtractUtility {
+
 	private static final String ZIP_SUFFIX = "zip"; //$NON-NLS-1$
 	private static final String TAR_SUFFIX = "tar"; //$NON-NLS-1$
 	private static final String TAR_GZ_SUFFIX = "tar.gz"; //$NON-NLS-1$
 	private static final String TGZ_SUFFIX = ".tgz"; //$NON-NLS-1$
 	
+	public static final int FORMAT_UNKNOWN = -1;
 	public static final int FORMAT_ZIP = 1;
 	public static final int FORMAT_TAR = 2;
 	public static final int FORMAT_TGZ = 3;
 	
 	
-	private File file;
-	private IExtractUtility util;
+	private final File file;
+	private final IExtractUtility util;
+
 	public ExtractUtility(File file) {
-		this.file = file;
-		String name = file.getName().toLowerCase();
-		if( name.endsWith(ZIP_SUFFIX)) {
-			util = new UnzipUtility(file);
-		} else if( name.endsWith(TAR_SUFFIX)) {
-			util = new UntarUtility(file);
-		} else if( name.endsWith(TAR_GZ_SUFFIX) || name.endsWith(TGZ_SUFFIX)) {
-			util = new UntarGZUtility(file);
-		}
+		this(file, FORMAT_UNKNOWN);
 	}
+
 	public ExtractUtility(File file, int format) {
 		this.file = file;
-		switch(format) {
-			case FORMAT_ZIP:
-				util = new UnzipUtility(file);
-				break;
-			case FORMAT_TAR:
-				util = new UntarUtility(file);
-				break;
-			case FORMAT_TGZ:
-				util = new UntarGZUtility(file);
-				break;
+		if (FORMAT_UNKNOWN == format) {
+			this.util = getUtil(file);
+		} else {
+			this.util = getUtil(file, format);
 		}
 	}
-	
+
+	private IExtractUtility getUtil(File file, int format) {
+		switch(format) {
+			case FORMAT_ZIP:
+				return new UnzipUtility(file);
+			case FORMAT_TAR:
+				return new UntarUtility(file);
+			case FORMAT_TGZ:
+				return new UntarGZUtility(file);
+			default:
+				return null;
+		}
+	}
+
+	private IExtractUtility getUtil(File file) {
+		String name = file.getName().toLowerCase();
+		if (name.endsWith(ZIP_SUFFIX)) {
+			return new UnzipUtility(file);
+		} else if (name.endsWith(TAR_SUFFIX)) {
+			return new UntarUtility(file);
+		} else if (name.endsWith(TAR_GZ_SUFFIX) || name.endsWith(TGZ_SUFFIX)) {
+			return new UntarGZUtility(file);
+		} else {
+			return null;
+		}
+	}
+
 	public File getOriginalFile() {
 		return file;
 	}
 	
 	public IStatus extract(File destination, IOverwrite overwriteQuery, IProgressMonitor monitor) {
-		if( util != null ) {
+		if (util != null) {
 			try {
 				return util.extract(destination, overwriteQuery, monitor);
 			} catch(CoreException ce) {
@@ -77,7 +93,7 @@ public class ExtractUtility {
 	}
 	
 	public String getExtractedRootFolder(IProgressMonitor monitor) throws CoreException {
-		if( util != null )
+		if (util != null)
 			return util.getRoot(monitor);
 		return null;
 	}

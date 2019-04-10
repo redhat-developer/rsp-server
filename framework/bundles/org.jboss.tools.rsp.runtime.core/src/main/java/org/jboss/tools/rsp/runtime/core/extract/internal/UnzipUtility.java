@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2014 Red Hat, Inc. and others.
+ * Copyright (c) 2014-2019 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -41,11 +41,11 @@ public class UnzipUtility implements IExtractUtility {
 	}
 
 	public IStatus extract(File destination, IOverwrite overwriteQuery, IProgressMonitor monitor) {
-		if( file == null || !file.exists()) {
+		if (file == null || !file.exists()) {
 			return new Status(IStatus.ERROR, RuntimeCoreActivator.PLUGIN_ID, 
 					"Error opening zip file: " + (file == null? 
-							"File not provided." 
-							: file.getAbsolutePath() + "; File does not exist."));
+								"File not provided." 
+								: file.getAbsolutePath() + "; File does not exist."));
 		}
 
 		String possibleRoot = null;
@@ -63,21 +63,22 @@ public class UnzipUtility implements IExtractUtility {
 				String entryName = entry.getName();
 				File entryFile = new File(destination, entryName);
 				monitor.subTask(entry.getName());
-				if (overwrite != IOverwrite.ALL && overwrite != IOverwrite.NO_ALL && entryFile.exists()) {
+				if (overwrite != IOverwrite.ALL 
+						&& overwrite != IOverwrite.NO_ALL
+						&& entryFile.exists()) {
 					overwrite = overwriteQuery.overwrite(entryFile);
-					switch (overwrite) {
-					case IOverwrite.CANCEL:
+					if (overwrite == IOverwrite.CANCEL) {
 						return Status.CANCEL_STATUS;
-					default:
-						break;
 					}
 				}
-				if (!entryFile.exists() || overwrite == IOverwrite.YES || overwrite == IOverwrite.ALL) {
+				if (!entryFile.exists() 
+						|| overwrite == IOverwrite.YES 
+						|| overwrite == IOverwrite.ALL) {
 					createEntry(monitor, zipFile, entry, entryFile);
 				}
 				
 				// Lets check for a possible root, to avoid scanning the archive again later
-				if( !rootEntryImpossible && discoveredRoot == null) {
+				if (!rootEntryImpossible && discoveredRoot == null) {
 					// Check for a root
 					if (entryName == null || entryName.isEmpty() || entryName.startsWith(SEPARATOR) || entryName.indexOf(SEPARATOR) == -1) {
 						rootEntryImpossible = true;
@@ -94,11 +95,11 @@ public class UnzipUtility implements IExtractUtility {
 				}
 			}
 		} catch (IOException e) {
-
 			boolean isZipped = false;
 			try (ZipInputStream test = new ZipInputStream(new FileInputStream(file))) {
 				isZipped = test.getNextEntry() != null;
 			} catch(IOException ioe) {
+				// ignore
 			}
 			
 			String msg = "Error opening zip file " + file.getAbsolutePath();
@@ -118,27 +119,9 @@ public class UnzipUtility implements IExtractUtility {
 			entryFile.mkdirs();
 		} else {
 			entryFile.getParentFile().mkdirs();
-			InputStream in = null;
-			OutputStream out = null;
-			try {
-				in = zipFile.getInputStream(entry);
-				out = new FileOutputStream(entryFile);
+			try(InputStream in = zipFile.getInputStream(entry); 
+					OutputStream out = new FileOutputStream(entryFile)) {
 				copy(in, out);
-			} finally {
-				if (in != null) {
-					try {
-						in.close();
-					} catch (Exception e) {
-						// ignore
-					}
-				}
-				if (out != null) {
-					try {
-						out.close();
-					} catch (Exception e) {
-						// ignore
-					}
-				}
 			}
 		}
 	}
