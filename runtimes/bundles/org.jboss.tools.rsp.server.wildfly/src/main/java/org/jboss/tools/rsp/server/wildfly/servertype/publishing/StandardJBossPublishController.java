@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
@@ -171,7 +172,6 @@ public class StandardJBossPublishController implements IJBossPublishController {
 		
 	protected int copyModule(DeployableReferenceWithOptions opts, 
 			int serverPublishRequest, int modulePublishState) throws CoreException {
-		// TODO different logic for incremental vs full? 
 		int publishType = getModulePublishType(serverPublishRequest, modulePublishState);
 		if( publishType == ServerManagementAPIConstants.PUBLISH_INCREMENTAL) {
 			return incrementalPublishCopyModule(opts, serverPublishRequest, modulePublishState);
@@ -214,11 +214,6 @@ public class StandardJBossPublishController implements IJBossPublishController {
 			return ServerManagementAPIConstants.PUBLISH_FULL;
 		if( modulePublishState == ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN)
 			return ServerManagementAPIConstants.PUBLISH_FULL;
-		
-//		if( modulePublishState == ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL)
-//			return ServerManagementAPIConstants.PUBLISH_INCREMENTAL;
-//		if( modulePublishState == ServerManagementAPIConstants.PUBLISH_STATE_NONE)
-//			return ServerManagementAPIConstants.PUBLISH_INCREMENTAL;
 		
 		return ServerManagementAPIConstants.PUBLISH_INCREMENTAL;
 	}
@@ -265,41 +260,67 @@ public class StandardJBossPublishController implements IJBossPublishController {
 		File dest = getDestinationPath(opts).toFile();
 		Path src = new File(opts.getReference().getPath()).toPath();
 		
-		List<String> errors = new ArrayList<String>();
+		List<String> errors = new ArrayList<>();
 		Map<Path, Integer> deltaVals = delta.getResourceDeltaMap();
-		for( Path relative : deltaVals.keySet()) {
-			Path fileSrc = src.resolve(relative);
-			Path fileDest = dest.toPath().resolve(relative);
-			int change = deltaVals.get(relative);
+		for( Map.Entry<Path, Integer> entry : deltaVals.entrySet()) {
+			int change = entry.getValue();
+			Path fileSrc = src.resolve(entry.getKey());
+			Path fileDest = dest.toPath().resolve(entry.getKey());
+
 			if( change == IDeployableResourceDelta.DELETED) {
 				fileDest.toFile().delete();
 			} else if( change == IDeployableResourceDelta.CREATED || 
 					change == IDeployableResourceDelta.MODIFIED) {
-				try {
-					Files.copy(fileSrc, fileDest, StandardCopyOption.REPLACE_EXISTING);
-				} catch(IOException ioe) {
-					errors.add("Unable to copy " + fileSrc.toString() + " to " + fileDest.toString());
+				incrementalPublishCopySingleFile(fileSrc, fileDest, errors);
+			}
+		}
+
+		return incrementalExplodedPublishResult(opts, errors);
+	}
+	
+	private void incrementalPublishCopySingleFile(Path fileSrc, Path fileDest, List<String> errors) {
+		if( !fileSrc.toFile().exists()) {
+			errors.add("Source path does not exist: " + fileSrc.toString());
+			return;
+		}
+		if(fileSrc.toFile().isDirectory()) {
+			// destination should be a directory to create
+			if( !fileDest.toFile().exists()) {
+				boolean result = fileDest.toFile().mkdirs();
+				if( !result ) {
+					errors.add("Unable to create directory " + fileDest.toString());
 				}
 			}
 		}
-		
-		if( errors.size() > 0 ) {
-			String[] arr = (String[]) errors.toArray(new String[errors.size()]);
+		if( fileSrc.toFile().isFile()) {
+			try {
+				Files.copy(fileSrc, fileDest, StandardCopyOption.REPLACE_EXISTING);
+			} catch(IOException ioe) {
+				errors.add("Unable to copy " + fileSrc.toString() + " to " + fileDest.toString());
+			}
+		}
+	}
+
+	private int incrementalExplodedPublishResult(DeployableReferenceWithOptions opts, List<String> errors) {
+		if( !errors.isEmpty() ) {
+			String[] arr = errors.toArray(new String[errors.size()]);
 			String errorString = String.join("\n", arr);
 			LOG.error("Error publishing module {0} to server {1}:\n{2}", opts.getReference().getLabel(), getServer().getName(), errorString);
+			// TODO maybe throw core exception here?? 
 			return delegate.getServerPublishModel().getDeployableState(opts.getReference()).getPublishState();
 		}
 		
 		return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 	}
-
 	
 	private void completeDelete(Path pathToBeDeleted) throws IOException {
 		if( pathToBeDeleted.toFile().exists()) {
-		    Files.walk(pathToBeDeleted)
-		      .sorted(Comparator.reverseOrder())
-		      .map(Path::toFile)
-		      .forEach(File::delete);
+			try (Stream<Path> paths = Files.walk(pathToBeDeleted)) {
+				paths.sorted(Comparator.reverseOrder())
+			      .map(Path::toFile)
+			      .forEach(File::delete);
+
+			}
 		}
 	}
 

@@ -338,21 +338,7 @@ public class FileWatcherService implements IFileWatcherService {
 		WatchKey key;
 		try {
 			while (watchService != null && (key = watchService.take()) != null) {
-				// Get the list and reset immediately
-				// when the WatchKey instance is returned by either of 
-				// the poll or take APIs, it will not capture more events 
-				// if it’s reset API is not invoked:
-				List<WatchEvent<?>> events = key.pollEvents();
-				key.reset();
-				
-				for (WatchEvent<?> event : events) {
-					Path eventContext = (Path)event.context();
-					if( eventContext != null ) {
-						Path context = ((Path)key.watchable()).resolve((Path)event.context());
-						subscribeToChanges(event, context);
-						fireEvents(key, event);
-					}
-				}
+				handleEvents(key);
 			}
 		} catch (InterruptedException | ClosedWatchServiceException e) {
 			if( !isClosing()) {
@@ -362,6 +348,29 @@ public class FileWatcherService implements IFileWatcherService {
 		setClosing(false);
 	}
 
+	
+	private void handleEvents(WatchKey key) {
+		// Get the list and reset immediately
+		// when the WatchKey instance is returned by either of 
+		// the poll or take APIs, it will not capture more events 
+		// if it’s reset API is not invoked:
+		List<WatchEvent<?>> events = key.pollEvents();
+		key.reset();
+		
+		for (WatchEvent<?> event : events) {
+			Path eventContext = (Path)event.context();
+			if( eventContext != null ) {
+				handleSingleEvent(key, event);
+			}
+		}
+	}
+	
+	protected void handleSingleEvent(WatchKey key, WatchEvent<?> event) {
+		Path context = ((Path)key.watchable()).resolve((Path)event.context());
+		subscribeToChanges(event, context);
+		fireEvents(key, event);
+	}
+	
 	/*
 	 * Subscribe to any newly created folders that are below a recursive 
 	 * subscription. Cleanup any watch keys that are already listening 

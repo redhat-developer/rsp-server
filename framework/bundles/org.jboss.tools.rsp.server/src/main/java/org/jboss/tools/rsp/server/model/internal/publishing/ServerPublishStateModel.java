@@ -69,7 +69,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		deploymentOptions.put(key, withOptions.getOptions());
 		
 		File f = new File(reference.getPath());
-		boolean recursive = (f == null || !f.exists()) ? false : !f.isFile();
+		boolean recursive = f.exists() && f.isDirectory();
 		
 		String path = reference.getPath();
 		if( fileWatcher != null ) {
@@ -118,9 +118,6 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 
 	private String getKey(DeployableReference reference) {
-		if (reference == null) {
-			return null;
-		}
 		return reference.getPath();
 	}
 	
@@ -232,11 +229,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 
 	private void registerSingleDelta(FileWatcherEvent event, DeployableReference reference) {
 		String key = getKey(reference);
-		DeployableDelta dd = deltas.get(key);
-		if( dd == null ) {
-			dd = new DeployableDelta(reference);
-			deltas.put(key, dd);
-		}
+		DeployableDelta dd = deltas.computeIfAbsent(key, k ->  new DeployableDelta(reference));
 		dd.registerChange(event);
 	}
 

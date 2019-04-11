@@ -524,6 +524,10 @@ public class ServerModel implements IServerModel {
 			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
 					"Server " + server.getId() + " not found.");
 		}
+		if( ref.getReference() == null ) {
+			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+					"Deployment request is invalid.");
+		}
 		IStatus canAdd = s.canAddDeployable(ref);
 		if(!canAdd.isOK()) {
 			return canAdd;
@@ -542,6 +546,9 @@ public class ServerModel implements IServerModel {
 		if( s == null ) {
 			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
 					"Server " + server.getId() + " not found.");
+		}
+		if( reference.getOptions() == null || reference.getOptions().isEmpty()) {
+			reference = s.getServerPublishModel().getReferenceOptions(reference.getReference());
 		}
 		IStatus canRemove = s.canRemoveDeployable(reference);
 		if (!canRemove.isOK()) {

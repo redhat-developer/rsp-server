@@ -58,25 +58,25 @@ public class WildFlyPublishController extends StandardJBossPublishController imp
 			// A successful copy / removal... then... 
 			if( modulePublishState != ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) {
 				// An actual copy was performed.
-				boolean isExploded = isExploded(withOptions);
 				boolean fullPublish = getModulePublishType(serverPublishRequest, modulePublishState) == ServerManagementAPIConstants.PUBLISH_FULL;
 				
-				if( isExploded(withOptions) && !fullPublish)
+				if( isExploded(withOptions) && fullPublish)
 					markersToWrite.put(dest.toString(), ".dodeploy");
 			}
 		}
-		// TODO more? 
 		return newStatus;
 	}
 	
 	protected boolean isExploded(DeployableReferenceWithOptions withOptions) {
 		File src = new File(withOptions.getReference().getPath());
-		if( src != null && src.exists()) {
+		if(src.exists()) {
 			if( src.isDirectory())
 				return true;
 		}
 		return false;
 	}
+	
+	@Override
 	protected int removeExplodedModule(DeployableReferenceWithOptions reference, 
 			int publishType, int modulePublishType,
 			File destination) throws CoreException {
@@ -103,7 +103,6 @@ public class WildFlyPublishController extends StandardJBossPublishController imp
 		} catch(IOException ioe) {
 			LOG.error("Error publishing module {0} to server {1}", ioe);
 		}
-		// TODO Auto-generated method stub
 		
 	}
 	public static void touch(File file) throws IOException{

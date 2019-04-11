@@ -88,10 +88,22 @@ public class Server extends SecuredBase implements IServer {
 			IMemento deployables = memento.createChild(MEMENTO_DEPLOYABLES);
 			Iterator<DeployableState> dsIt = deployableState.iterator();
 			while(dsIt.hasNext()) {
-				IMemento deployable = deployables.createChild(MEMENTO_DEPLOYABLE);
 				DeployableState oneState = dsIt.next();
-				deployable.putString(MEMENTO_DEPLOYABLE_LABEL, oneState.getReference().getLabel());
-				deployable.putString(MEMENTO_DEPLOYABLE_PATH, oneState.getReference().getPath());
+				fillMemento(deployables, oneState, pubMod);
+			}
+		}
+	}
+	
+	private void fillMemento(IMemento deployables, DeployableState oneState, IServerPublishModel pubMod) {
+		IMemento deployable = deployables.createChild(MEMENTO_DEPLOYABLE);
+		deployable.putString(MEMENTO_DEPLOYABLE_LABEL, oneState.getReference().getLabel());
+		deployable.putString(MEMENTO_DEPLOYABLE_PATH, oneState.getReference().getPath());
+		IMemento options = deployable.createChild(MEMENTO_DEPLOYABLE_OPTIONS);
+		DeployableReferenceWithOptions withOpts = pubMod == null ? null : pubMod.getReferenceOptions(oneState.getReference());
+		if( pubMod != null && withOpts.getOptions() != null ) {
+			for( String k : withOpts.getOptions().keySet() ) {
+				IMemento oneOptionKV = options.createChild(MEMENTO_DEPLOYABLE_OPTION);
+				oneOptionKV.putString(k, withOpts.getOptions().get(k).toString());
 			}
 		}
 	}
@@ -108,7 +120,7 @@ public class Server extends SecuredBase implements IServer {
 					String label = deployableArray[i].getString(MEMENTO_DEPLOYABLE_LABEL);
 					IMemento opts = deployableArray[i].getChild(MEMENTO_DEPLOYABLE_OPTIONS);
 					IMemento[] options = (opts == null ? null : opts.getChildren(MEMENTO_DEPLOYABLE_OPTION));
-					Map<String, Object> optionMap = new HashMap<String, Object>();
+					Map<String, Object> optionMap = new HashMap<>();
 					if( options != null ) {
 						for( IMemento one : options ) {
 							String k = one.getString(MEMENTO_DEPLOYABLE_KEY);

@@ -415,8 +415,14 @@ public class StandardCommandHandler implements InputHandler {
 						System.out.println("Please enter a filesystem path of your deployment:");
 						String filePath = assistant.nextLine().trim();
 						if( new File(filePath).exists()) {
+							Map<String, Object> opts = new HashMap<>();
+							System.out.println("Please set an output name for this deployment (blank line for default):");
+							String outputName = assistant.nextLine().trim();
+							if( !outputName.isEmpty()) {
+								opts.put(ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME, outputName);
+							}
 							DeployableReference ref = new DeployableReference(filePath, filePath);
-							DeployableReferenceWithOptions withOptions = new DeployableReferenceWithOptions(ref, null);
+							DeployableReferenceWithOptions withOptions = new DeployableReferenceWithOptions(ref, opts);
 							ModifyDeployableRequest req = new ModifyDeployableRequest(server, withOptions);
 							Status ret = launcher.getServerProxy().addDeployable(req).get();
 							System.out.println(ret.toString());
@@ -629,10 +635,8 @@ public class StandardCommandHandler implements InputHandler {
 				return;
 			}
 			String[] cmdline = det.getCmdLine();
-			String wd = det.getWorkingDir();
-			String[] envp = det.getEnvp();
-			
-			System.out.println("Got it.");
+//			String wd = det.getWorkingDir();
+//			String[] envp = det.getEnvp();
 			System.out.println("command: " + String.join(" ", cmdline));
 		}
 

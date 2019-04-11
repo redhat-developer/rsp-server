@@ -18,7 +18,7 @@ public class DeployableDelta implements IDeployableResourceDelta {
 	private Map<Path, Integer> changes;
 	public DeployableDelta(DeployableReference reference) {
 		this.reference = reference;
-		this.changes  = new HashMap<Path, Integer>();
+		this.changes  = new HashMap<>();
 	}
 	
 	/*
@@ -26,7 +26,7 @@ public class DeployableDelta implements IDeployableResourceDelta {
 	 */
 	@Override
 	public Map<Path, Integer> getResourceDeltaMap() {
-		return new HashMap<Path, Integer>(changes);
+		return new HashMap<>(changes);
 	}
 
 	public void registerChange(FileWatcherEvent event) {
@@ -41,18 +41,12 @@ public class DeployableDelta implements IDeployableResourceDelta {
 		} else {
 			// Ok, this file has already been changed... ugh
 			int existingChange = changes.get(relative);
-			if( existingChange == DELETED) {
-				if( currentChangeConverted != DELETED ) {
-					changes.put(relative, MODIFIED);
-				}
-			} else if( existingChange == CREATED ) {
-				if( currentChangeConverted == DELETED ) {
-					changes.remove(relative);
-				}
-			} else if( existingChange == MODIFIED ) {
-				if( currentChangeConverted == DELETED ) {
-					changes.put(relative, DELETED);
-				}
+			if( existingChange == DELETED && currentChangeConverted != DELETED ) {
+				changes.put(relative, MODIFIED);
+			} else if( existingChange == CREATED && currentChangeConverted == DELETED) {
+				changes.remove(relative);
+			} else if( existingChange == MODIFIED && currentChangeConverted == DELETED) {
+				changes.put(relative, DELETED);
 			}
 		}
 	}
