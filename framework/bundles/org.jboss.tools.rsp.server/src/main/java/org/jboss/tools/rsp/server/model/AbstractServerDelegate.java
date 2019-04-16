@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
@@ -25,6 +26,7 @@ import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
+import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.MultiStatus;
@@ -518,4 +520,11 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		setServerState(STATE_STOPPED, true);
 		return Status.OK_STATUS;
 	}
+	
+	@Override
+	public Attributes listDeploymentOptions() {
+		CreateServerAttributesUtility util = new CreateServerAttributesUtility();
+		return util.toPojo();
+	}
+
 }

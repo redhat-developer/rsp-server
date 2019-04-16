@@ -538,6 +538,15 @@ public class ServerManagementServerImpl implements RSPServer {
 		 return managementModel.getServerModel().getDeployables(server);
 	}
 	
+	public CompletableFuture<Attributes> listDeploymentOptions(ServerHandle handle) {
+		return createCompletableFuture(() -> listDeploymentOptionsSync(handle));
+	}
+	
+	public Attributes listDeploymentOptionsSync(ServerHandle handle) {
+		IServer server = managementModel.getServerModel().getServer(handle.getId());
+		return server.getDelegate().listDeploymentOptions();
+	}
+	
 	public CompletableFuture<Status> addDeployable(ModifyDeployableRequest request) {
 		return createCompletableFuture(() -> addDeployableSync(request.getServer(), request));
 	}

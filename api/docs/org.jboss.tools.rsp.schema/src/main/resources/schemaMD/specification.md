@@ -1647,6 +1647,83 @@ export interface ServerType {
     description: string;
 }</pre></td></tr></table>
 
+#### server/listDeploymentOptions
+
+ The `server/listDeploymentOptions` request is sent by the client to list the possible attributes that may be used when adding a new deployment. This can be any set of custom server-defined settings, or standard options, for example, an output name for an archive, whether to zip folders, etc. This request may return null in case of error. @param serverHandle 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "type" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "visibleName" : {
+          "type" : "string"
+        },
+        "description" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface ServerHandle {
+    id: string;
+    type: ServerType;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
+    description: string;
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "attributes" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "defaultVal" : {
+            "type" : "any"
+          },
+          "secret" : {
+            "type" : "boolean"
+          }
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface Attributes {
+    attributes: { [index: string]: Attribute };
+}
+
+export interface Attribute {
+    type: string;
+    description: string;
+    defaultVal: any;
+    secret: boolean;
+}</pre></td></tr></table>
+
 #### server/addDeployable
 
  The `server/addDeployable` request is sent by the client to the server to add a deployable reference to a server's list of deployable items so that it can be published thereafter. @param handle @param reference @return 

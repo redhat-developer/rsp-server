@@ -11,12 +11,14 @@ package org.jboss.tools.rsp.server.wildfly.servertype;
 import java.io.File;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
+import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
@@ -260,4 +262,14 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		// TODO launch a module poller?!
 		setDeployableState(reference.getReference(), ServerManagementAPIConstants.STATE_STARTED);
 	}
+
+	@Override
+	public Attributes listDeploymentOptions() {
+		CreateServerAttributesUtility util = new CreateServerAttributesUtility();
+		util.addAttribute(ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME, 
+				ServerManagementAPIConstants.ATTR_TYPE_STRING,
+				"Customize the output name for this deployment (Leave blank for default)", null);
+		return util.toPojo();
+	}
+
 }

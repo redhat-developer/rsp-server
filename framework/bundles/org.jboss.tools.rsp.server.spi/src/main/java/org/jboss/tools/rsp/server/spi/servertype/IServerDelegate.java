@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.server.spi.servertype;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
@@ -288,7 +289,17 @@ public interface IServerDelegate {
 	 */
 	public IStatus canPublish();
 
+	/**
+	 * Get the publish state for this server
+	 * @return
+	 */
 	int getServerPublishState();
+
+	/**
+	 * List deployment options for this server
+	 * @return
+	 */
+	public Attributes listDeploymentOptions();
 	
 
 }
