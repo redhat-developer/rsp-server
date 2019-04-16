@@ -45,9 +45,9 @@ public class PromptAssistant {
 	public int selectPublishType() {
 		String[] options = new String[] {"Incremental", "Full", "Clean"};
 		List<String> opt2 = Arrays.asList(options);
-		String ret = promptUser(opt2, "Please select a launch mode:");
+		String ret = promptUser(opt2, "Please select a publish mode:");
 		if( ret != null && opt2.contains(ret)) {
-			return opt2.indexOf(ret);
+			return opt2.indexOf(ret) + 1;
 		}
 		System.out.println("Invalid selection.");
 		return -1;

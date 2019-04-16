@@ -26,11 +26,22 @@
     "deployable" : {
       "type" : "object",
       "properties" : {
-        "label" : {
-          "type" : "string"
+        "reference" : {
+          "type" : "object",
+          "properties" : {
+            "label" : {
+              "type" : "string"
+            },
+            "path" : {
+              "type" : "string"
+            }
+          }
         },
-        "path" : {
-          "type" : "string"
+        "options" : {
+          "type" : "object",
+          "additionalProperties" : {
+            "type" : "any"
+          }
         }
       }
     }

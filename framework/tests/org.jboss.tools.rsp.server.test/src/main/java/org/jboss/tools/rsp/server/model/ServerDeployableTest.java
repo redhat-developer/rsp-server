@@ -27,25 +27,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
-import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
-import org.jboss.tools.rsp.eclipse.core.runtime.MultiStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.launching.memento.IMemento;
 import org.jboss.tools.rsp.launching.memento.JSONMemento;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModelListener;
-import org.jboss.tools.rsp.server.spi.model.ServerModelListenerAdapter;
 import org.jboss.tools.rsp.server.spi.servertype.AbstractServerType;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
@@ -111,7 +108,7 @@ public class ServerDeployableTest {
 		ServerModel sm = createServerModel(
 				(IServer server) -> {
 					IServerDelegate spy = spy(new TestServerDelegate(server));
-					doReturn(Status.CANCEL_STATUS).when(spy).canAddDeployable(any(DeployableReference.class));
+					doReturn(Status.CANCEL_STATUS).when(spy).canAddDeployable(any(DeployableReferenceWithOptions.class));
 					return spy;
 				},
 				getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE));
@@ -130,7 +127,7 @@ public class ServerDeployableTest {
 		ServerModel sm = createServerModel(
 				(IServer server) -> {
 					IServerDelegate spy = spy(new TestServerDelegate(server));
-					doReturn(Status.CANCEL_STATUS).when(spy).canRemoveDeployable(any(DeployableReference.class));
+					doReturn(Status.CANCEL_STATUS).when(spy).canRemoveDeployable(any(DeployableReferenceWithOptions.class));
 					return spy;
 				},
 				getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE));
@@ -292,7 +289,7 @@ public class ServerDeployableTest {
 				(IServer server) -> new TestServerDelegate(server) {
 
 					@Override
-					protected void publishDeployable(DeployableReference reference, int publishType,
+					protected void publishDeployable(DeployableReferenceWithOptions reference, int publishType,
 							int deployablemodulePublishType) throws CoreException {
 						int deployable = numOfPublished.incrementAndGet();
 						if (deployable == 2) {
@@ -615,19 +612,24 @@ public class ServerDeployableTest {
 		public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params) {
 			return null;
 		}
-		protected void publishDeployable(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
+		@Override
+		protected void publishDeployable(
+				DeployableReferenceWithOptions reference, 
+				int publishRequestType, int modulePublishState) throws CoreException {
 			new Thread("Test publish") {
 				public void run() {
 					try {
 						startSignal1[0].await();
 					} catch(InterruptedException ie) {}
-					setDeployablePublishState2(reference, ServerManagementAPIConstants.PUBLISH_STATE_NONE);
+					setDeployablePublishState2(reference.getReference(), 
+							ServerManagementAPIConstants.PUBLISH_STATE_NONE);
 					doneSignal1[0].countDown();
 					
 					try {
 						startSignal2[0].await();
 					} catch(InterruptedException ie) {}
-					setDeployableState2(reference, ServerManagementAPIConstants.STATE_STARTED);
+					setDeployableState2(reference.getReference(), 
+							ServerManagementAPIConstants.STATE_STARTED);
 					doneSignal2[0].countDown();
 				}
 			}.start();

@@ -11,20 +11,26 @@ package org.jboss.tools.rsp.server.spi.servertype;
 import java.util.List;
 
 import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 
 public interface IServerPublishModel {
-	
+	/**
+	 * Get a resource delta for the given deployment
+	 * @param reference
+	 * @return
+	 */
+	public IDeployableResourceDelta getDeployableResourceDelta(DeployableReference reference);
 	
 	/**
 	 * Adds a deployable to the list of objects we want published to the server. 
 	 * On the next publish request, a publish of this deployable will be attempted. 
 	 *  
-	 * @param reference
+	 * @param req
 	 * @return IStatus#OK if the deployable was added. IStatus.ERROR otherwise.
 	 */
-	public IStatus addDeployable(DeployableReference reference);
+	public IStatus addDeployable(DeployableReferenceWithOptions ref);
 
 	/**
 	 * Returns {@code true} if the given reference can be added to this model. This
@@ -47,7 +53,7 @@ public interface IServerPublishModel {
 	 * 
 	 * @see #removeDeployable
 	 */
-	public IStatus removeDeployable(DeployableReference reference);
+	public IStatus removeDeployable(DeployableReferenceWithOptions reference);
 
 	/**
 	 * Returns a list of the deployables for this server and their current states
@@ -59,7 +65,7 @@ public interface IServerPublishModel {
 	 * Allows the framework to initialize the model from a data store
 	 * @param references
 	 */
-	public void initialize(List<DeployableReference> references);
+	public void initialize(List<DeployableReferenceWithOptions> references);
 
 	/**
 	 * Sets the publish state for a deployable. 
@@ -88,14 +94,33 @@ public interface IServerPublishModel {
 	 * @return
 	 */
 	public DeployableState getDeployableState(DeployableReference reference);
+	
+	/**
+	 * Get the deployment options for the given reference
+	 * @return
+	 */
+	public DeployableReferenceWithOptions getReferenceOptions(DeployableReference reference);
 
 	/**
 	 * Forces the model to remove the given deployable from its stores entirely.
 	 * @param reference
 	 */
 	public void deployableRemoved(DeployableReference reference);
-
+	
+	
+	/**
+	 * Set the publish state of the entire server, 
+	 * typically based on some union of the individual modules' publish states
+	 * @param state
+	 * @param fire
+	 */
 	public void setServerPublishState(int state, boolean fire);
 
+	/**
+	 * Get the publish state of the entire server, 
+	 * typically based on some union of the individual modules' publish states
+	 * 
+	 * @return
+	 */
 	public int getServerPublishState();
 }

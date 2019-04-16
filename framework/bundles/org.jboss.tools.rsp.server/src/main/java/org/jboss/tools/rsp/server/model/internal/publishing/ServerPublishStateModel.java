@@ -11,12 +11,14 @@ package org.jboss.tools.rsp.server.model.internal.publishing;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
@@ -26,11 +28,15 @@ import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
 import org.jboss.tools.rsp.server.spi.filewatcher.FileWatcherEvent;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherEventListener;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
+import org.jboss.tools.rsp.server.spi.servertype.IDeployableResourceDelta;
 import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
 
 public class ServerPublishStateModel implements IServerPublishModel, IFileWatcherEventListener {
 
 	private final Map<String, DeployableState> state;
+	private final Map<String, Map<String,Object>> deploymentOptions;
+	private final Map<String, DeployableDelta> deltas = new HashMap<>();
+	
 	private AbstractServerDelegate server;
 	private IFileWatcherService fileWatcher;
 	private int publishState = AbstractServerDelegate.PUBLISH_STATE_UNKNOWN;
@@ -39,39 +45,46 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		this.server = delegate;
 		this.fileWatcher = fileWatcher;
 		this.state = new LinkedHashMap<>();
+		this.deploymentOptions = new LinkedHashMap<>();
 	}
 
 	@Override
-	public void initialize(List<DeployableReference> references) {
-		for( DeployableReference reference : references ) {
+	public void initialize(List<DeployableReferenceWithOptions> references) {
+		for( DeployableReferenceWithOptions reference : references ) {
 			addDeployableImpl(reference, ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN);
 		}
 		fireState();
 	}
 	
-	private void addDeployableImpl(DeployableReference reference, int publishState) {
+	private void addDeployableImpl(DeployableReferenceWithOptions withOptions, int publishState) {
+		DeployableReference reference = withOptions.getReference();
 		DeployableState sActual = new DeployableState();
 		sActual.setReference(reference);
 		sActual.setState(ServerManagementAPIConstants.STATE_UNKNOWN);
 		sActual.setPublishState(publishState);
 		sActual.setServer(server.getServerHandle());
-		state.put(getKey(reference), sActual);
 		
-		// TODO Maybe make this recursive if we support exploded deployments
+		String key = getKey(reference);
+		state.put(key, sActual);
+		deploymentOptions.put(key, withOptions.getOptions());
+		
+		File f = new File(reference.getPath());
+		boolean recursive = f.exists() && f.isDirectory();
+		
 		String path = reference.getPath();
 		if( fileWatcher != null ) {
-			fileWatcher.addFileWatcherListener(new File(path).toPath(), this, false);
+			fileWatcher.addFileWatcherListener(new File(path).toPath(), this, recursive);
 		}
 	}
 	
 	@Override
-	public IStatus addDeployable(DeployableReference reference) {
-		if (contains(reference)) {
+	public IStatus addDeployable(DeployableReferenceWithOptions withOptions) {
+		if (contains(withOptions.getReference())) {
 			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, IStatus.ERROR, 
-					NLS.bind("Could not add deploybale with path {0}: it already exists.", getKey(reference)),
-							null);
+					NLS.bind("Could not add deploybale with path {0}: it already exists.", 
+							getKey(withOptions.getReference())), null);
 		}
-		addDeployableImpl(reference, ServerManagementAPIConstants.PUBLISH_STATE_ADD);
+		addDeployableImpl(withOptions, ServerManagementAPIConstants.PUBLISH_STATE_ADD);
 		fireState();
 		return Status.OK_STATUS;
 	}
@@ -82,7 +95,8 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 	
 	@Override
-	public IStatus removeDeployable(DeployableReference reference) {
+	public IStatus removeDeployable(DeployableReferenceWithOptions ref) {
+		DeployableReference reference = ref.getReference();
 		if (!contains(reference)) {
 			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, IStatus.ERROR, 
 					NLS.bind("Could not remove deploybale with path {0}: it doesn't exist", getKey(reference)),
@@ -104,15 +118,14 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 
 	private String getKey(DeployableReference reference) {
-		if (reference == null) {
-			return null;
-		}
 		return reference.getPath();
 	}
 	
 	@Override
 	public void deployableRemoved(DeployableReference reference) {
-		state.remove(getKey(reference));
+		String k = getKey(reference);
+		state.remove(k);
+		deploymentOptions.remove(k);
 	}
 
 	@Override
@@ -146,6 +159,12 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		next.setPublishState(publishState);
 		next.setServer(server.getServerHandle());
 		state.put(getKey(reference), next);
+		if( publishState == ServerManagementAPIConstants.PUBLISH_STATE_NONE) {
+			DeployableDelta delta2 = deltas.get(getKey(reference));
+			if( delta2 != null ) {
+				delta2.clearDelta();
+			}
+		}
 		updateServerPublishStateFromDeployments();
 	}
 
@@ -197,12 +216,23 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 					d.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL);
 					changed = true;
 				}
+				if( currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_NONE ||
+						currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL) {
+					registerSingleDelta(event, d.getReference());
+				}
+
 			}
 		}
 		if( changed ) 
 			fireState();
 	}
-	
+
+	private void registerSingleDelta(FileWatcherEvent event, DeployableReference reference) {
+		String key = getKey(reference);
+		DeployableDelta dd = deltas.computeIfAbsent(key, k ->  new DeployableDelta(reference));
+		dd.registerChange(event);
+	}
+
 	private void fireState() {
 		updateServerPublishStateFromDeployments();
 		
@@ -251,6 +281,19 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 			if( fire ) 
 				fireState();
 		}
+	}
+
+	@Override
+	public DeployableReferenceWithOptions getReferenceOptions(DeployableReference reference) {
+		DeployableReferenceWithOptions ret = new DeployableReferenceWithOptions();
+		ret.setReference(reference);
+		ret.setOptions(deploymentOptions.get(getKey(reference)));
+		return ret;
+	}
+
+	@Override
+	public IDeployableResourceDelta getDeployableResourceDelta(DeployableReference reference) {
+		return deltas.get(getKey(reference));
 	}
 
 }

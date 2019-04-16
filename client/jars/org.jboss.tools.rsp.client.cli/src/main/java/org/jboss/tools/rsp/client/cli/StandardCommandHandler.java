@@ -22,6 +22,7 @@ import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
@@ -414,8 +415,15 @@ public class StandardCommandHandler implements InputHandler {
 						System.out.println("Please enter a filesystem path of your deployment:");
 						String filePath = assistant.nextLine().trim();
 						if( new File(filePath).exists()) {
+							Map<String, Object> opts = new HashMap<>();
+							System.out.println("Please set an output name for this deployment (blank line for default):");
+							String outputName = assistant.nextLine().trim();
+							if( !outputName.isEmpty()) {
+								opts.put(ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME, outputName);
+							}
 							DeployableReference ref = new DeployableReference(filePath, filePath);
-							ModifyDeployableRequest req = new ModifyDeployableRequest(server, ref);
+							DeployableReferenceWithOptions withOptions = new DeployableReferenceWithOptions(ref, opts);
+							ModifyDeployableRequest req = new ModifyDeployableRequest(server, withOptions);
 							Status ret = launcher.getServerProxy().addDeployable(req).get();
 							System.out.println(ret.toString());
 						}
@@ -433,7 +441,8 @@ public class StandardCommandHandler implements InputHandler {
 					if( server != null ) {
 						DeployableReference ref = assistant.chooseDeployment(server);
 						if( ref != null ) {
-							ModifyDeployableRequest req = new ModifyDeployableRequest(server, ref);
+							DeployableReferenceWithOptions withOpts = new DeployableReferenceWithOptions(ref, null);
+							ModifyDeployableRequest req = new ModifyDeployableRequest(server, withOpts);
 							Status ret = launcher.getServerProxy().removeDeployable(req).get();
 							System.out.println(ret.toString());
 						}
@@ -626,10 +635,8 @@ public class StandardCommandHandler implements InputHandler {
 				return;
 			}
 			String[] cmdline = det.getCmdLine();
-			String wd = det.getWorkingDir();
-			String[] envp = det.getEnvp();
-			
-			System.out.println("Got it.");
+//			String wd = det.getWorkingDir();
+//			String[] envp = det.getEnvp();
 			System.out.println("command: " + String.join(" ", cmdline));
 		}
 

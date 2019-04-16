@@ -15,7 +15,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
@@ -24,6 +26,7 @@ import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
+import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.MultiStatus;
@@ -388,12 +391,12 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	}
 
 	@Override
-	public IStatus canAddDeployable(DeployableReference reference) {
+	public IStatus canAddDeployable(DeployableReferenceWithOptions ref) {
 		return Status.OK_STATUS;
 	}
 	
 	@Override
-	public IStatus canRemoveDeployable(DeployableReference reference) {
+	public IStatus canRemoveDeployable(DeployableReferenceWithOptions ref) {
 		return Status.OK_STATUS;
 	}
 	
@@ -436,14 +439,18 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		return ms;
 	}
 
-	protected void publish(int publishType, DeployableState state) throws CoreException {
-		int publishState = state.getPublishState();
-		publishDeployable(state.getReference(), publishType, publishState);
+	protected void publish(int publishRequestType, DeployableState state) throws CoreException {
+		int modulePublishState = state.getPublishState();
+		
+		DeployableReference ref = state.getReference();
+		DeployableReferenceWithOptions refWithOptions = getServerPublishModel().getReferenceOptions(ref);
+		
+		publishDeployable(refWithOptions, publishRequestType, modulePublishState);
 		DeployableState postState = getServerPublishModel().getDeployableState(state.getReference());
 		
 		// If deployable was to be removed, and it was successfully removed, 
 		// clean it from the publish model cache entirely. 
-		if( publishState == ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) {
+		if( modulePublishState == ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) {
 			if( postState != null && postState.getPublishState() == ServerManagementAPIConstants.PUBLISH_STATE_NONE) {
 				getServerPublishModel().deployableRemoved(state.getReference());
 			}
@@ -471,8 +478,10 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		setServerPublishState(maxState);
 	}
 
-	protected void publishDeployable(DeployableReference reference, int publishType, int deployablemodulePublishType) throws CoreException {
+	protected void publishDeployable(DeployableReferenceWithOptions reference2, 
+			int publishRequestType, int modulePublishState) throws CoreException {
 		// Clients should override this default implementation
+		DeployableReference reference = reference2.getReference();
 		setDeployablePublishState(reference, ServerManagementAPIConstants.PUBLISH_STATE_NONE);
 		setDeployableState(reference, ServerManagementAPIConstants.STATE_STARTED);
 	}
@@ -511,4 +520,11 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		setServerState(STATE_STOPPED, true);
 		return Status.OK_STATUS;
 	}
+	
+	@Override
+	public Attributes listDeploymentOptions() {
+		CreateServerAttributesUtility util = new CreateServerAttributesUtility();
+		return util.toPojo();
+	}
+
 }

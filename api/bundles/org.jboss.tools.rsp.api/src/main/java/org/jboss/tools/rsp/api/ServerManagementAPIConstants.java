@@ -139,4 +139,11 @@ public interface ServerManagementAPIConstants {
 	public static final String WORKFLOW_USERNAME_ID = "workflow.username";
 	public static final String WORKFLOW_PASSWORD_ID = "workflow.password";
 
+	
+	
+	/*
+	 * Deployment options 
+	 */
+	public static final String DEPLOYMENT_OPTION_OUTPUT_NAME = "deployment.output.name";
+	
 }

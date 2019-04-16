@@ -1,6 +1,6 @@
 export interface ModifyDeployableRequest {
     server: ServerHandle;
-    deployable: DeployableReference;
+    deployable: DeployableReferenceWithOptions;
 }
 
 export interface ServerHandle {
@@ -8,13 +8,18 @@ export interface ServerHandle {
     type: ServerType;
 }
 
-export interface DeployableReference {
-    label: string;
-    path: string;
+export interface DeployableReferenceWithOptions {
+    reference: DeployableReference;
+    options?: { [index: string]: any };
 }
 
 export interface ServerType {
     id: string;
     visibleName: string;
     description: string;
+}
+
+export interface DeployableReference {
+    label: string;
+    path: string;
 }

@@ -14,7 +14,7 @@ public class DeployableReference {
 
 	private String label;
 	private String path;
-	
+
 	public DeployableReference() {
 	}
 

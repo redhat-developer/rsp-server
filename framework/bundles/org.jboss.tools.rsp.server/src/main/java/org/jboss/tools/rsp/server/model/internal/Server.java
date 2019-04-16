@@ -10,12 +10,14 @@ package org.jboss.tools.rsp.server.model.internal;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
@@ -35,12 +37,16 @@ public class Server extends SecuredBase implements IServer {
 	private static final String MEMENTO_DEPLOYABLE = "deployable";
 	private static final String MEMENTO_DEPLOYABLE_LABEL = "label";
 	private static final String MEMENTO_DEPLOYABLE_PATH = "path";
+	private static final String MEMENTO_DEPLOYABLE_OPTIONS = "options";
+	private static final String MEMENTO_DEPLOYABLE_OPTION = "option";
+	private static final String MEMENTO_DEPLOYABLE_KEY = "key";
+	private static final String MEMENTO_DEPLOYABLE_VAL = "val";
 
 	private IServerDelegate delegate;
 	private IServerType serverType;
 	private IServerManagementModel managementModel;
 	
-	private List<DeployableReference> deployableInitialization;
+	private List<DeployableReferenceWithOptions> deployableInitialization;
 	
 	public Server(File file, IServerManagementModel managementModel) {
 		super(file, managementModel.getSecureStorageProvider());
@@ -82,17 +88,29 @@ public class Server extends SecuredBase implements IServer {
 			IMemento deployables = memento.createChild(MEMENTO_DEPLOYABLES);
 			Iterator<DeployableState> dsIt = deployableState.iterator();
 			while(dsIt.hasNext()) {
-				IMemento deployable = deployables.createChild(MEMENTO_DEPLOYABLE);
 				DeployableState oneState = dsIt.next();
-				deployable.putString(MEMENTO_DEPLOYABLE_LABEL, oneState.getReference().getLabel());
-				deployable.putString(MEMENTO_DEPLOYABLE_PATH, oneState.getReference().getPath());
+				fillMemento(deployables, oneState, pubMod);
+			}
+		}
+	}
+	
+	private void fillMemento(IMemento deployables, DeployableState oneState, IServerPublishModel pubMod) {
+		IMemento deployable = deployables.createChild(MEMENTO_DEPLOYABLE);
+		deployable.putString(MEMENTO_DEPLOYABLE_LABEL, oneState.getReference().getLabel());
+		deployable.putString(MEMENTO_DEPLOYABLE_PATH, oneState.getReference().getPath());
+		IMemento options = deployable.createChild(MEMENTO_DEPLOYABLE_OPTIONS);
+		DeployableReferenceWithOptions withOpts = pubMod == null ? null : pubMod.getReferenceOptions(oneState.getReference());
+		if( pubMod != null && withOpts.getOptions() != null ) {
+			for( String k : withOpts.getOptions().keySet() ) {
+				IMemento oneOptionKV = options.createChild(MEMENTO_DEPLOYABLE_OPTION);
+				oneOptionKV.putString(k, withOpts.getOptions().get(k).toString());
 			}
 		}
 	}
 	
 	@Override
 	protected void loadState(IMemento memento) {
-		List<DeployableReference> references = new ArrayList<>();
+		List<DeployableReferenceWithOptions> references = new ArrayList<>();
 		IMemento deployables = memento.getChild(MEMENTO_DEPLOYABLES);
 		if( deployables != null ) {
 			IMemento[] deployableArray = deployables.getChildren(MEMENTO_DEPLOYABLE);
@@ -100,7 +118,19 @@ public class Server extends SecuredBase implements IServer {
 				for( int i = 0; i < deployableArray.length; i++ ) {
 					String path = deployableArray[i].getString(MEMENTO_DEPLOYABLE_PATH);
 					String label = deployableArray[i].getString(MEMENTO_DEPLOYABLE_LABEL);
-					references.add(new DeployableReference(label, path));
+					IMemento opts = deployableArray[i].getChild(MEMENTO_DEPLOYABLE_OPTIONS);
+					IMemento[] options = (opts == null ? null : opts.getChildren(MEMENTO_DEPLOYABLE_OPTION));
+					Map<String, Object> optionMap = new HashMap<>();
+					if( options != null ) {
+						for( IMemento one : options ) {
+							String k = one.getString(MEMENTO_DEPLOYABLE_KEY);
+							String v = one.getString(MEMENTO_DEPLOYABLE_VAL);
+							optionMap.put(k,v);
+						}
+					}
+					DeployableReference ref = new DeployableReference(label, path); 
+					DeployableReferenceWithOptions withOpts = new DeployableReferenceWithOptions(ref, optionMap);
+					references.add(withOpts);
 				}
 			}
 		}

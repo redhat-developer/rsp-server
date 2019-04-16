@@ -14,6 +14,7 @@ import java.util.Map;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
@@ -78,9 +79,35 @@ public interface IServerModel {
 	void saveServers() throws CoreException;
 	
 	List<DeployableState> getDeployables(IServer server);
+
+	/**
+	 * Add a deployable to the server
+	 * This entry point is no longer used, as this requires a reference with options
+	 * 
+	 * @param server
+	 * @param ref
+	 * @return
+	 * @deprecated
+	 */
+	@Deprecated
+	IStatus addDeployable(IServer server, DeployableReference ref);
 	
-	IStatus addDeployable(IServer server, DeployableReference reference);
+	/**
+	 * Remove a deployable from the server
+	 * This entry point is no longer used, as this requires a reference with options
+	 * 
+	 * @param server
+	 * @param ref
+	 * @return
+	 * @deprecated
+	 */
+	@Deprecated
 	IStatus removeDeployable(IServer server, DeployableReference reference);
+	
+	
+	IStatus addDeployable(IServer server, DeployableReferenceWithOptions reference);
+	IStatus removeDeployable(IServer server, DeployableReferenceWithOptions reference);
 
 	IStatus publish(IServer server, int kind) throws CoreException;
+
 }

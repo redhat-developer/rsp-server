@@ -10,25 +10,30 @@ package org.jboss.tools.rsp.api.dao;
 
 public class ModifyDeployableRequest {
 	private ServerHandle server;
-	private DeployableReference deployable;
-	
+	private DeployableReferenceWithOptions deployable;
+
 	public ModifyDeployableRequest() {
-		
+
 	}
-	public ModifyDeployableRequest(ServerHandle server, DeployableReference deployable) {
+
+	public ModifyDeployableRequest(ServerHandle server, DeployableReferenceWithOptions deployable) {
 		this.server = server;
 		this.deployable = deployable;
 	}
+
 	public ServerHandle getServer() {
 		return server;
 	}
+
 	public void setServer(ServerHandle server) {
 		this.server = server;
 	}
-	public DeployableReference getDeployable() {
+
+	public DeployableReferenceWithOptions getDeployable() {
 		return deployable;
 	}
-	public void setDeployable(DeployableReference deployable) {
+
+	public void setDeployable(DeployableReferenceWithOptions deployable) {
 		this.deployable = deployable;
 	}
 }
