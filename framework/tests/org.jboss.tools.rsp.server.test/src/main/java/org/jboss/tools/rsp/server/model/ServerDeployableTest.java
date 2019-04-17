@@ -32,7 +32,6 @@ import java.util.function.Function;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
-import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerState;
@@ -108,7 +107,7 @@ public class ServerDeployableTest {
 		ServerModel sm = createServerModel(
 				(IServer server) -> {
 					IServerDelegate spy = spy(new TestServerDelegate(server));
-					doReturn(Status.CANCEL_STATUS).when(spy).canAddDeployable(any(DeployableReferenceWithOptions.class));
+					doReturn(Status.CANCEL_STATUS).when(spy).canAddDeployable(any(DeployableReference.class));
 					return spy;
 				},
 				getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE));
@@ -127,7 +126,7 @@ public class ServerDeployableTest {
 		ServerModel sm = createServerModel(
 				(IServer server) -> {
 					IServerDelegate spy = spy(new TestServerDelegate(server));
-					doReturn(Status.CANCEL_STATUS).when(spy).canRemoveDeployable(any(DeployableReferenceWithOptions.class));
+					doReturn(Status.CANCEL_STATUS).when(spy).canRemoveDeployable(any(DeployableReference.class));
 					return spy;
 				},
 				getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE));
@@ -289,7 +288,7 @@ public class ServerDeployableTest {
 				(IServer server) -> new TestServerDelegate(server) {
 
 					@Override
-					protected void publishDeployable(DeployableReferenceWithOptions reference, int publishType,
+					protected void publishDeployable(DeployableReference reference, int publishType,
 							int deployablemodulePublishType) throws CoreException {
 						int deployable = numOfPublished.incrementAndGet();
 						if (deployable == 2) {
@@ -614,21 +613,21 @@ public class ServerDeployableTest {
 		}
 		@Override
 		protected void publishDeployable(
-				DeployableReferenceWithOptions reference, 
+				DeployableReference reference, 
 				int publishRequestType, int modulePublishState) throws CoreException {
 			new Thread("Test publish") {
 				public void run() {
 					try {
 						startSignal1[0].await();
 					} catch(InterruptedException ie) {}
-					setDeployablePublishState2(reference.getReference(), 
+					setDeployablePublishState2(reference, 
 							ServerManagementAPIConstants.PUBLISH_STATE_NONE);
 					doneSignal1[0].countDown();
 					
 					try {
 						startSignal2[0].await();
 					} catch(InterruptedException ie) {}
-					setDeployableState2(reference.getReference(), 
+					setDeployableState2(reference, 
 							ServerManagementAPIConstants.STATE_STARTED);
 					doneSignal2[0].countDown();
 				}

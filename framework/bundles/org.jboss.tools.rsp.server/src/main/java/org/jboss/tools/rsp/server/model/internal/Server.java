@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jboss.tools.rsp.api.dao.DeployableReference;
-import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
@@ -46,7 +45,7 @@ public class Server extends SecuredBase implements IServer {
 	private IServerType serverType;
 	private IServerManagementModel managementModel;
 	
-	private List<DeployableReferenceWithOptions> deployableInitialization;
+	private List<DeployableReference> deployableInitialization;
 	
 	public Server(File file, IServerManagementModel managementModel) {
 		super(file, managementModel.getSecureStorageProvider());
@@ -99,7 +98,7 @@ public class Server extends SecuredBase implements IServer {
 		deployable.putString(MEMENTO_DEPLOYABLE_LABEL, oneState.getReference().getLabel());
 		deployable.putString(MEMENTO_DEPLOYABLE_PATH, oneState.getReference().getPath());
 		IMemento options = deployable.createChild(MEMENTO_DEPLOYABLE_OPTIONS);
-		DeployableReferenceWithOptions withOpts = pubMod == null ? null : pubMod.getReferenceOptions(oneState.getReference());
+		DeployableReference withOpts = pubMod == null ? null : pubMod.fillOptionsFromCache(oneState.getReference());
 		if( pubMod != null && withOpts.getOptions() != null ) {
 			for( String k : withOpts.getOptions().keySet() ) {
 				IMemento oneOptionKV = options.createChild(MEMENTO_DEPLOYABLE_OPTION);
@@ -110,7 +109,7 @@ public class Server extends SecuredBase implements IServer {
 	
 	@Override
 	protected void loadState(IMemento memento) {
-		List<DeployableReferenceWithOptions> references = new ArrayList<>();
+		List<DeployableReference> references = new ArrayList<>();
 		IMemento deployables = memento.getChild(MEMENTO_DEPLOYABLES);
 		if( deployables != null ) {
 			IMemento[] deployableArray = deployables.getChildren(MEMENTO_DEPLOYABLE);
@@ -129,8 +128,8 @@ public class Server extends SecuredBase implements IServer {
 						}
 					}
 					DeployableReference ref = new DeployableReference(label, path); 
-					DeployableReferenceWithOptions withOpts = new DeployableReferenceWithOptions(ref, optionMap);
-					references.add(withOpts);
+					ref.setOptions(optionMap);
+					references.add(ref);
 				}
 			}
 		}

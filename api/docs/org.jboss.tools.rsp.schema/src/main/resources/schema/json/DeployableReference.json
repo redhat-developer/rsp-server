@@ -6,6 +6,12 @@
     },
     "path" : {
       "type" : "string"
+    },
+    "options" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "any"
+      }
     }
   }
 }

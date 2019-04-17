@@ -22,7 +22,6 @@ import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
-import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
@@ -32,10 +31,10 @@ import org.jboss.tools.rsp.api.dao.JobProgress;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
-import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerBean;
+import org.jboss.tools.rsp.api.dao.ServerDeployableReference;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.rsp.api.dao.ServerType;
@@ -422,8 +421,7 @@ public class StandardCommandHandler implements InputHandler {
 								opts.put(ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME, outputName);
 							}
 							DeployableReference ref = new DeployableReference(filePath, filePath);
-							DeployableReferenceWithOptions withOptions = new DeployableReferenceWithOptions(ref, opts);
-							ModifyDeployableRequest req = new ModifyDeployableRequest(server, withOptions);
+							ServerDeployableReference req = new ServerDeployableReference(server, ref);
 							Status ret = launcher.getServerProxy().addDeployable(req).get();
 							System.out.println(ret.toString());
 						}
@@ -441,9 +439,8 @@ public class StandardCommandHandler implements InputHandler {
 					if( server != null ) {
 						DeployableReference ref = assistant.chooseDeployment(server);
 						if( ref != null ) {
-							DeployableReferenceWithOptions withOpts = new DeployableReferenceWithOptions(ref, null);
-							ModifyDeployableRequest req = new ModifyDeployableRequest(server, withOpts);
-							Status ret = launcher.getServerProxy().removeDeployable(req).get();
+							ServerDeployableReference sdRef = new ServerDeployableReference(server, ref);
+							Status ret = launcher.getServerProxy().removeDeployable(sdRef).get();
 							System.out.println(ret.toString());
 						}
 					}

@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
-import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
@@ -49,15 +48,14 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 
 	@Override
-	public void initialize(List<DeployableReferenceWithOptions> references) {
-		for( DeployableReferenceWithOptions reference : references ) {
+	public void initialize(List<DeployableReference> references) {
+		for( DeployableReference reference : references ) {
 			addDeployableImpl(reference, ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN);
 		}
 		fireState();
 	}
 	
-	private void addDeployableImpl(DeployableReferenceWithOptions withOptions, int publishState) {
-		DeployableReference reference = withOptions.getReference();
+	private void addDeployableImpl(DeployableReference reference, int publishState) {
 		DeployableState sActual = new DeployableState();
 		sActual.setReference(reference);
 		sActual.setState(ServerManagementAPIConstants.STATE_UNKNOWN);
@@ -66,7 +64,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		
 		String key = getKey(reference);
 		state.put(key, sActual);
-		deploymentOptions.put(key, withOptions.getOptions());
+		deploymentOptions.put(key, reference.getOptions());
 		
 		File f = new File(reference.getPath());
 		boolean recursive = f.exists() && f.isDirectory();
@@ -78,11 +76,11 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 	
 	@Override
-	public IStatus addDeployable(DeployableReferenceWithOptions withOptions) {
-		if (contains(withOptions.getReference())) {
+	public IStatus addDeployable(DeployableReference withOptions) {
+		if (contains(withOptions)) {
 			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, IStatus.ERROR, 
 					NLS.bind("Could not add deploybale with path {0}: it already exists.", 
-							getKey(withOptions.getReference())), null);
+							getKey(withOptions)), null);
 		}
 		addDeployableImpl(withOptions, ServerManagementAPIConstants.PUBLISH_STATE_ADD);
 		fireState();
@@ -95,8 +93,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 	
 	@Override
-	public IStatus removeDeployable(DeployableReferenceWithOptions ref) {
-		DeployableReference reference = ref.getReference();
+	public IStatus removeDeployable(DeployableReference reference) {
 		if (!contains(reference)) {
 			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, IStatus.ERROR, 
 					NLS.bind("Could not remove deploybale with path {0}: it doesn't exist", getKey(reference)),
@@ -284,11 +281,9 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 
 	@Override
-	public DeployableReferenceWithOptions getReferenceOptions(DeployableReference reference) {
-		DeployableReferenceWithOptions ret = new DeployableReferenceWithOptions();
-		ret.setReference(reference);
-		ret.setOptions(deploymentOptions.get(getKey(reference)));
-		return ret;
+	public DeployableReference fillOptionsFromCache(DeployableReference reference) {
+		reference.setOptions(deploymentOptions.get(getKey(reference)));
+		return reference;
 	}
 
 	@Override

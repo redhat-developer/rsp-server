@@ -1321,6 +1321,12 @@ This endpoint returns the following schema as a return value:
               },
               "path" : {
                 "type" : "string"
+              },
+              "options" : {
+                "type" : "object",
+                "additionalProperties" : {
+                  "type" : "any"
+                }
               }
             }
           },
@@ -1362,6 +1368,7 @@ export interface ServerType {
 export interface DeployableReference {
     label: string;
     path: string;
+    options?: { [index: string]: any };
 }</pre></td></tr></table>
 
 #### server/startServerAsync
@@ -1614,6 +1621,12 @@ This endpoint returns a list of the following schema as a return value:
         },
         "path" : {
           "type" : "string"
+        },
+        "options" : {
+          "type" : "object",
+          "additionalProperties" : {
+            "type" : "any"
+          }
         }
       }
     },
@@ -1639,6 +1652,7 @@ export interface ServerHandle {
 export interface DeployableReference {
     label: string;
     path: string;
+    options?: { [index: string]: any };
 }
 
 export interface ServerType {
@@ -1756,19 +1770,14 @@ This endpoint takes the following json schemas as parameters:
         }
       }
     },
-    "deployable" : {
+    "deployableReference" : {
       "type" : "object",
       "properties" : {
-        "reference" : {
-          "type" : "object",
-          "properties" : {
-            "label" : {
-              "type" : "string"
-            },
-            "path" : {
-              "type" : "string"
-            }
-          }
+        "label" : {
+          "type" : "string"
+        },
+        "path" : {
+          "type" : "string"
         },
         "options" : {
           "type" : "object",
@@ -1779,9 +1788,9 @@ This endpoint takes the following json schemas as parameters:
       }
     }
   }
-}</pre></td><td><pre>export interface ModifyDeployableRequest {
+}</pre></td><td><pre>export interface ServerDeployableReference {
     server: ServerHandle;
-    deployable: DeployableReferenceWithOptions;
+    deployableReference: DeployableReference;
 }
 
 export interface ServerHandle {
@@ -1789,8 +1798,9 @@ export interface ServerHandle {
     type: ServerType;
 }
 
-export interface DeployableReferenceWithOptions {
-    reference: DeployableReference;
+export interface DeployableReference {
+    label: string;
+    path: string;
     options?: { [index: string]: any };
 }
 
@@ -1798,11 +1808,6 @@ export interface ServerType {
     id: string;
     visibleName: string;
     description: string;
-}
-
-export interface DeployableReference {
-    label: string;
-    path: string;
 }</pre></td></tr></table>
 
 This endpoint returns the following schema as a return value: 
@@ -1871,19 +1876,14 @@ This endpoint takes the following json schemas as parameters:
         }
       }
     },
-    "deployable" : {
+    "deployableReference" : {
       "type" : "object",
       "properties" : {
-        "reference" : {
-          "type" : "object",
-          "properties" : {
-            "label" : {
-              "type" : "string"
-            },
-            "path" : {
-              "type" : "string"
-            }
-          }
+        "label" : {
+          "type" : "string"
+        },
+        "path" : {
+          "type" : "string"
         },
         "options" : {
           "type" : "object",
@@ -1894,9 +1894,9 @@ This endpoint takes the following json schemas as parameters:
       }
     }
   }
-}</pre></td><td><pre>export interface ModifyDeployableRequest {
+}</pre></td><td><pre>export interface ServerDeployableReference {
     server: ServerHandle;
-    deployable: DeployableReferenceWithOptions;
+    deployableReference: DeployableReference;
 }
 
 export interface ServerHandle {
@@ -1904,8 +1904,9 @@ export interface ServerHandle {
     type: ServerType;
 }
 
-export interface DeployableReferenceWithOptions {
-    reference: DeployableReference;
+export interface DeployableReference {
+    label: string;
+    path: string;
     options?: { [index: string]: any };
 }
 
@@ -1913,11 +1914,6 @@ export interface ServerType {
     id: string;
     visibleName: string;
     description: string;
-}
-
-export interface DeployableReference {
-    label: string;
-    path: string;
 }</pre></td></tr></table>
 
 This endpoint returns the following schema as a return value: 
@@ -2598,6 +2594,12 @@ This endpoint takes the following json schemas as parameters:
               },
               "path" : {
                 "type" : "string"
+              },
+              "options" : {
+                "type" : "object",
+                "additionalProperties" : {
+                  "type" : "any"
+                }
               }
             }
           },
@@ -2639,6 +2641,7 @@ export interface ServerType {
 export interface DeployableReference {
     label: string;
     path: string;
+    options?: { [index: string]: any };
 }</pre></td></tr></table>
 
 This endpoint returns no value

@@ -26,7 +26,6 @@ import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
-import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
@@ -36,11 +35,11 @@ import org.jboss.tools.rsp.api.dao.JobProgress;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
-import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerBean;
 import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
+import org.jboss.tools.rsp.api.dao.ServerDeployableReference;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
@@ -547,23 +546,23 @@ public class ServerManagementServerImpl implements RSPServer {
 		return server.getDelegate().listDeploymentOptions();
 	}
 	
-	public CompletableFuture<Status> addDeployable(ModifyDeployableRequest request) {
+	public CompletableFuture<Status> addDeployable(ServerDeployableReference request) {
 		return createCompletableFuture(() -> addDeployableSync(request.getServer(), request));
 	}
 
-	public Status addDeployableSync(ServerHandle handle, ModifyDeployableRequest req) {
+	public Status addDeployableSync(ServerHandle handle, ServerDeployableReference req) {
 		IServer server = managementModel.getServerModel().getServer(handle.getId());
-		IStatus stat = managementModel.getServerModel().addDeployable(server, req.getDeployable());
+		IStatus stat = managementModel.getServerModel().addDeployable(server, req.getDeployableReference());
 		return StatusConverter.convert(stat);
 	}
 	
-	public CompletableFuture<Status> removeDeployable(ModifyDeployableRequest request) {
-		return createCompletableFuture(() -> removeDeployableSync(request.getServer(), request.getDeployable()));
+	public CompletableFuture<Status> removeDeployable(ServerDeployableReference request) {
+		return createCompletableFuture(() -> removeDeployableSync(request.getServer(), request));
 	}
 
-	public Status removeDeployableSync(ServerHandle handle, DeployableReferenceWithOptions reference) {
+	public Status removeDeployableSync(ServerHandle handle, ServerDeployableReference reference) {
 		IServer server = managementModel.getServerModel().getServer(handle.getId());
-		IStatus stat = managementModel.getServerModel().removeDeployable(server, reference);
+		IStatus stat = managementModel.getServerModel().removeDeployable(server, reference.getDeployableReference());
 		return StatusConverter.convert(stat);
 	}
 

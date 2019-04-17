@@ -37,7 +37,6 @@ import java.util.function.Function;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
-import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerState;
@@ -383,21 +382,21 @@ public class ServerIncrementalDeployableTest {
 		}
 		@Override
 		protected void publishDeployable(
-				DeployableReferenceWithOptions reference, 
+				DeployableReference reference, 
 				int publishRequestType, int modulePublishState) throws CoreException {
 			new Thread("Test publish") {
 				public void run() {
 					try {
 						publishStartSignal1[0].await();
 					} catch (InterruptedException ie) {	 Thread.currentThread().interrupt();}
-					setDeployablePublishState2(reference.getReference(), 
+					setDeployablePublishState2(reference, 
 							ServerManagementAPIConstants.PUBLISH_STATE_NONE);
 					publishDoneSignal1[0].countDown();
 					
 					try {
 						publishStartSignal2[0].await();
 					} catch (InterruptedException ie) {	 Thread.currentThread().interrupt();}
-					setDeployableState2(reference.getReference(), 
+					setDeployableState2(reference, 
 							ServerManagementAPIConstants.STATE_STARTED);
 					publishDoneSignal2[0].countDown();
 				}

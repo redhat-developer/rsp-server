@@ -26,11 +26,11 @@ import org.jboss.tools.rsp.api.dao.JobProgress;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
-import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerBean;
 import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
+import org.jboss.tools.rsp.api.dao.ServerDeployableReference;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
@@ -320,7 +320,7 @@ public interface RSPServer {
 	 * @return
 	 */
 	@JsonRequest
-	public CompletableFuture<Status> addDeployable(ModifyDeployableRequest req);
+	public CompletableFuture<Status> addDeployable(ServerDeployableReference req);
 
 	/**
 	 * The `server/removeDeployable` request is sent by the client to the server
@@ -332,7 +332,7 @@ public interface RSPServer {
 	 * @return
 	 */
 	@JsonRequest
-	public CompletableFuture<Status> removeDeployable(ModifyDeployableRequest req);
+	public CompletableFuture<Status> removeDeployable(ServerDeployableReference req);
 	/**
 	 * The `server/publish` request is sent by the client to the server
 	 * to instruct the server adapter to publish any changes to the backing runtime.

@@ -23,19 +23,14 @@
         }
       }
     },
-    "deployable" : {
+    "deployableReference" : {
       "type" : "object",
       "properties" : {
-        "reference" : {
-          "type" : "object",
-          "properties" : {
-            "label" : {
-              "type" : "string"
-            },
-            "path" : {
-              "type" : "string"
-            }
-          }
+        "label" : {
+          "type" : "string"
+        },
+        "path" : {
+          "type" : "string"
         },
         "options" : {
           "type" : "object",
