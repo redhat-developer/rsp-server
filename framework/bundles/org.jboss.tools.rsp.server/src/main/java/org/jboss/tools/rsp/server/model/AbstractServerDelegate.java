@@ -17,7 +17,6 @@ import java.util.List;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
-import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
@@ -391,12 +390,12 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	}
 
 	@Override
-	public IStatus canAddDeployable(DeployableReferenceWithOptions ref) {
+	public IStatus canAddDeployable(DeployableReference ref) {
 		return Status.OK_STATUS;
 	}
 	
 	@Override
-	public IStatus canRemoveDeployable(DeployableReferenceWithOptions ref) {
+	public IStatus canRemoveDeployable(DeployableReference ref) {
 		return Status.OK_STATUS;
 	}
 	
@@ -443,7 +442,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		int modulePublishState = state.getPublishState();
 		
 		DeployableReference ref = state.getReference();
-		DeployableReferenceWithOptions refWithOptions = getServerPublishModel().getReferenceOptions(ref);
+		DeployableReference refWithOptions = getServerPublishModel().fillOptionsFromCache(ref);
 		
 		publishDeployable(refWithOptions, publishRequestType, modulePublishState);
 		DeployableState postState = getServerPublishModel().getDeployableState(state.getReference());
@@ -478,10 +477,9 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		setServerPublishState(maxState);
 	}
 
-	protected void publishDeployable(DeployableReferenceWithOptions reference2, 
+	protected void publishDeployable(DeployableReference reference, 
 			int publishRequestType, int modulePublishState) throws CoreException {
 		// Clients should override this default implementation
-		DeployableReference reference = reference2.getReference();
 		setDeployablePublishState(reference, ServerManagementAPIConstants.PUBLISH_STATE_NONE);
 		setDeployableState(reference, ServerManagementAPIConstants.STATE_STARTED);
 	}

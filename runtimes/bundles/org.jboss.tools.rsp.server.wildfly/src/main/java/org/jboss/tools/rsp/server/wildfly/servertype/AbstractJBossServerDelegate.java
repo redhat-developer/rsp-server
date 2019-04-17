@@ -13,7 +13,7 @@ import java.io.File;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
-import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
+import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
@@ -229,12 +229,12 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	protected abstract IJBossPublishController createPublishController();
 	
 	@Override
-	public IStatus canAddDeployable(DeployableReferenceWithOptions ref) {
+	public IStatus canAddDeployable(DeployableReference ref) {
 		return getOrCreatePublishController().canAddDeployable(ref);
 	}
 	
 	@Override
-	public IStatus canRemoveDeployable(DeployableReferenceWithOptions reference) {
+	public IStatus canRemoveDeployable(DeployableReference reference) {
 		return getOrCreatePublishController().canRemoveDeployable(reference);
 	}
 	
@@ -253,14 +253,14 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		super.publishFinish(publishType);
 	}
 
-	protected void publishDeployable(DeployableReferenceWithOptions reference, 
+	protected void publishDeployable(DeployableReference reference, 
 			int publishRequestType, int modulePublishState) throws CoreException {
 		int syncState = getOrCreatePublishController()
 				.publishModule(reference, publishRequestType, modulePublishState);
-		setDeployablePublishState(reference.getReference(), syncState);
+		setDeployablePublishState(reference, syncState);
 		
 		// TODO launch a module poller?!
-		setDeployableState(reference.getReference(), ServerManagementAPIConstants.STATE_STARTED);
+		setDeployableState(reference, ServerManagementAPIConstants.STATE_STARTED);
 	}
 
 	@Override

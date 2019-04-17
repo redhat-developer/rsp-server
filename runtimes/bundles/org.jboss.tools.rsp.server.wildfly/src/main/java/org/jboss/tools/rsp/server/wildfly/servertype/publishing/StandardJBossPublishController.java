@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
-import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
+import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
@@ -87,9 +87,9 @@ public class StandardJBossPublishController implements IJBossPublishController {
 		return true;
 	}
 	
-	protected String getOutputName(DeployableReferenceWithOptions ref) {
+	protected String getOutputName(DeployableReference ref) {
 		Map<String, Object> options = ref.getOptions();
-		String def = new File(ref.getReference().getPath()).getName();
+		String def = new File(ref.getPath()).getName();
 		if( options != null && 
 				options.get(ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME) != null ) {
 			return (String)options.get(ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME);
@@ -97,13 +97,9 @@ public class StandardJBossPublishController implements IJBossPublishController {
 		return def;
 	}
 	
-	protected String getOutputName(DeployableReference ref) {
-		return new File(ref.getPath()).getName();
-	}
-	
 	@Override
-	public IStatus canAddDeployable(DeployableReferenceWithOptions ref) {
-		String path = ref.getReference().getPath();
+	public IStatus canAddDeployable(DeployableReference ref) {
+		String path = ref.getPath();
 		if( isSupportedDeployable(path, getOutputName(ref), true)) {
 			return Status.OK_STATUS;
 		}
@@ -113,8 +109,8 @@ public class StandardJBossPublishController implements IJBossPublishController {
 	}
 
 	@Override
-	public IStatus canRemoveDeployable(DeployableReferenceWithOptions ref) {
-		String path = ref.getReference().getPath();
+	public IStatus canRemoveDeployable(DeployableReference ref) {
+		String path = ref.getPath();
 		if( isSupportedDeployable(path, getOutputName(ref), false)) {
 			return Status.OK_STATUS;
 		}
@@ -139,7 +135,7 @@ public class StandardJBossPublishController implements IJBossPublishController {
 	}
 
 	@Override
-	public int publishModule(DeployableReferenceWithOptions reference, 
+	public int publishModule(DeployableReference reference, 
 			int publishRequestType, int modulePublishState) throws CoreException {
 		if( modulePublishState == ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) {
 			// Removal is always complete. No incrementals ;) 
@@ -157,8 +153,8 @@ public class StandardJBossPublishController implements IJBossPublishController {
 		return p;
 	}
 
-	protected Path getDestinationPath(DeployableReferenceWithOptions reference) {
-		File src = new File(reference.getReference().getPath());
+	protected Path getDestinationPath(DeployableReference reference) {
+		File src = new File(reference.getPath());
 		String outName = src.getName();
 		if( reference.getOptions() != null ) {
 			String optOutputName = (String)reference.getOptions().get(ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME);
@@ -170,7 +166,7 @@ public class StandardJBossPublishController implements IJBossPublishController {
 		return dest.toPath();
 	}
 		
-	protected int copyModule(DeployableReferenceWithOptions opts, 
+	protected int copyModule(DeployableReference opts, 
 			int serverPublishRequest, int modulePublishState) throws CoreException {
 		int publishType = getModulePublishType(serverPublishRequest, modulePublishState);
 		if( publishType == ServerManagementAPIConstants.PUBLISH_INCREMENTAL) {
@@ -180,12 +176,12 @@ public class StandardJBossPublishController implements IJBossPublishController {
 		}
 	}
 	
-	private int incrementalPublishCopyModule(DeployableReferenceWithOptions opts, 
+	private int incrementalPublishCopyModule(DeployableReference opts, 
 			int serverPublishRequest, int modulePublishState) throws CoreException {
 		IDeployableResourceDelta delta = getDelegate().getServerPublishModel()
-				.getDeployableResourceDelta(opts.getReference());
+				.getDeployableResourceDelta(opts);
 		
-		File src = new File(opts.getReference().getPath());
+		File src = new File(opts.getPath());
 		if( src.exists() && src.isFile()) {
 			return fullPublishCopyZippedModule(opts, serverPublishRequest, modulePublishState);
 		}
@@ -218,8 +214,8 @@ public class StandardJBossPublishController implements IJBossPublishController {
 		return ServerManagementAPIConstants.PUBLISH_INCREMENTAL;
 	}
 	
-	protected int fullPublishCopyModule(DeployableReferenceWithOptions opts, int publishType, int modulePublishType) throws CoreException {
-		File src = new File(opts.getReference().getPath());
+	protected int fullPublishCopyModule(DeployableReference opts, int publishType, int modulePublishType) throws CoreException {
+		File src = new File(opts.getPath());
 		if( src.exists() && src.isFile()) {
 			return fullPublishCopyZippedModule(opts, publishType, modulePublishType);
 		}
@@ -229,21 +225,21 @@ public class StandardJBossPublishController implements IJBossPublishController {
 		return ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN;
 	}
 	
-	protected int fullPublishCopyZippedModule(DeployableReferenceWithOptions opts, int publishType, int modulePublishType) throws CoreException {
+	protected int fullPublishCopyZippedModule(DeployableReference opts, int publishType, int modulePublishType) throws CoreException {
 		File dest = getDestinationPath(opts).toFile();
-		Path src = new File(opts.getReference().getPath()).toPath();
+		Path src = new File(opts.getPath()).toPath();
 		try {
 			Files.copy(src, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 		} catch(IOException ioe) {
 			LOG.error("Error publishing module {0} to server {1}", ioe);
-			return delegate.getServerPublishModel().getDeployableState(opts.getReference()).getPublishState();
+			return delegate.getServerPublishModel().getDeployableState(opts).getPublishState();
 		}
 	}
 
-	protected int fullPublishCopyExplodedModule(DeployableReferenceWithOptions opts, int publishType, int modulePublishType) throws CoreException {
+	protected int fullPublishCopyExplodedModule(DeployableReference opts, int publishType, int modulePublishType) throws CoreException {
 		File dest = getDestinationPath(opts).toFile();
-		Path src = new File(opts.getReference().getPath()).toPath();
+		Path src = new File(opts.getPath()).toPath();
 		try {
 			completeDelete(dest.toPath());
 			dest.mkdirs();
@@ -251,14 +247,14 @@ public class StandardJBossPublishController implements IJBossPublishController {
 			return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 		} catch(IOException ioe) {
 			LOG.error("Error publishing module {0} to server {1}", ioe);
-			return delegate.getServerPublishModel().getDeployableState(opts.getReference()).getPublishState();
+			return delegate.getServerPublishModel().getDeployableState(opts).getPublishState();
 		}
 	}
 
-	protected int incrementalPublishCopyExplodedModule(DeployableReferenceWithOptions opts,
+	protected int incrementalPublishCopyExplodedModule(DeployableReference opts,
 			IDeployableResourceDelta delta) throws CoreException {
 		File dest = getDestinationPath(opts).toFile();
-		Path src = new File(opts.getReference().getPath()).toPath();
+		Path src = new File(opts.getPath()).toPath();
 		
 		List<String> errors = new ArrayList<>();
 		Map<Path, Integer> deltaVals = delta.getResourceDeltaMap();
@@ -301,13 +297,13 @@ public class StandardJBossPublishController implements IJBossPublishController {
 		}
 	}
 
-	private int incrementalExplodedPublishResult(DeployableReferenceWithOptions opts, List<String> errors) {
+	private int incrementalExplodedPublishResult(DeployableReference opts, List<String> errors) {
 		if( !errors.isEmpty() ) {
 			String[] arr = errors.toArray(new String[errors.size()]);
 			String errorString = String.join("\n", arr);
-			LOG.error("Error publishing module {0} to server {1}:\n{2}", opts.getReference().getLabel(), getServer().getName(), errorString);
+			LOG.error("Error publishing module {0} to server {1}:\n{2}", opts.getLabel(), getServer().getName(), errorString);
 			// TODO maybe throw core exception here?? 
-			return delegate.getServerPublishModel().getDeployableState(opts.getReference()).getPublishState();
+			return delegate.getServerPublishModel().getDeployableState(opts).getPublishState();
 		}
 		
 		return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
@@ -324,16 +320,16 @@ public class StandardJBossPublishController implements IJBossPublishController {
 		}
 	}
 
-	protected int removeFileModule(DeployableReferenceWithOptions reference, 
+	protected int removeFileModule(DeployableReference reference, 
 			int publishType, int modulePublishType,
 			File destination) throws CoreException {
 		if( destination.delete() )
 			return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 		return delegate.getServerPublishModel().getDeployableState(
-				reference.getReference()).getPublishState();
+				reference).getPublishState();
 	}
 	
-	protected int removeExplodedModule(DeployableReferenceWithOptions reference, 
+	protected int removeExplodedModule(DeployableReference reference, 
 			int publishType, int modulePublishType,
 			File destination) throws CoreException {
 		try {
@@ -341,16 +337,16 @@ public class StandardJBossPublishController implements IJBossPublishController {
 			return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 		} catch(IOException ioe) {
 			return delegate.getServerPublishModel().getDeployableState(
-					reference.getReference()).getPublishState();
+					reference).getPublishState();
 		}
 	}
 	
-	protected int removeModule(DeployableReferenceWithOptions reference, 
+	protected int removeModule(DeployableReference reference, 
 			int publishRequestType, int modulePublishState) throws CoreException {
 		File dest = getDestinationPath(reference).toFile();
 		if( dest == null || !dest.exists()) {
 			return delegate.getServerPublishModel().getDeployableState(
-					reference.getReference()).getPublishState();
+					reference).getPublishState();
 		}
 		
 		if( dest.isFile()) {

@@ -11,7 +11,6 @@ package org.jboss.tools.rsp.server.spi.servertype;
 import java.util.List;
 
 import org.jboss.tools.rsp.api.dao.DeployableReference;
-import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 
@@ -30,7 +29,7 @@ public interface IServerPublishModel {
 	 * @param req
 	 * @return IStatus#OK if the deployable was added. IStatus.ERROR otherwise.
 	 */
-	public IStatus addDeployable(DeployableReferenceWithOptions ref);
+	public IStatus addDeployable(DeployableReference ref);
 
 	/**
 	 * Returns {@code true} if the given reference can be added to this model. This
@@ -53,7 +52,7 @@ public interface IServerPublishModel {
 	 * 
 	 * @see #removeDeployable
 	 */
-	public IStatus removeDeployable(DeployableReferenceWithOptions reference);
+	public IStatus removeDeployable(DeployableReference reference);
 
 	/**
 	 * Returns a list of the deployables for this server and their current states
@@ -65,7 +64,7 @@ public interface IServerPublishModel {
 	 * Allows the framework to initialize the model from a data store
 	 * @param references
 	 */
-	public void initialize(List<DeployableReferenceWithOptions> references);
+	public void initialize(List<DeployableReference> references);
 
 	/**
 	 * Sets the publish state for a deployable. 
@@ -96,10 +95,12 @@ public interface IServerPublishModel {
 	public DeployableState getDeployableState(DeployableReference reference);
 	
 	/**
-	 * Get the deployment options for the given reference
+	 * Ensure the DeployableReference is filled with the options it was originally
+	 * created with.
+	 * 
 	 * @return
 	 */
-	public DeployableReferenceWithOptions getReferenceOptions(DeployableReference reference);
+	public DeployableReference fillOptionsFromCache(DeployableReference reference);
 
 	/**
 	 * Forces the model to remove the given deployable from its stores entirely.

@@ -24,7 +24,6 @@ import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
-import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
@@ -514,19 +513,10 @@ public class ServerModel implements IServerModel {
 
 	@Override
 	public IStatus addDeployable(IServer server, DeployableReference ref) {
-		return addDeployable(server, new DeployableReferenceWithOptions(ref, null));
-	}
-	
-	@Override
-	public IStatus addDeployable(IServer server, DeployableReferenceWithOptions ref) {
 		IServerDelegate s = serverDelegates.get(server.getId());
 		if( s == null ) {
 			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
 					"Server " + server.getId() + " not found.");
-		}
-		if( ref.getReference() == null ) {
-			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
-					"Deployment request is invalid.");
 		}
 		IStatus canAdd = s.canAddDeployable(ref);
 		if(!canAdd.isOK()) {
@@ -537,18 +527,10 @@ public class ServerModel implements IServerModel {
 
 	@Override
 	public IStatus removeDeployable(IServer server, DeployableReference reference) {
-		return removeDeployable(server, new DeployableReferenceWithOptions(reference, null));
-	}
-	
-	@Override
-	public IStatus removeDeployable(IServer server, DeployableReferenceWithOptions reference) {
 		IServerDelegate s = serverDelegates.get(server.getId());
 		if( s == null ) {
 			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
 					"Server " + server.getId() + " not found.");
-		}
-		if( reference.getOptions() == null || reference.getOptions().isEmpty()) {
-			reference = s.getServerPublishModel().getReferenceOptions(reference.getReference());
 		}
 		IStatus canRemove = s.canRemoveDeployable(reference);
 		if (!canRemove.isOK()) {

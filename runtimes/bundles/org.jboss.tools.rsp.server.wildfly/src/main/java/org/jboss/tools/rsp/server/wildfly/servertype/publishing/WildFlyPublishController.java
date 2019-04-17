@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
-import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
+import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
@@ -45,10 +45,10 @@ public class WildFlyPublishController extends StandardJBossPublishController imp
 	}
 	
 	@Override
-	public int publishModule(DeployableReferenceWithOptions withOptions, 
+	public int publishModule(DeployableReference withOptions, 
 			int serverPublishRequest, int modulePublishState)
 			throws CoreException {
-		File src = new File(withOptions.getReference().getPath());
+		File src = new File(withOptions.getPath());
 		File dest = getDestinationPath(withOptions).toFile();
 		if( src == null || !src.exists()) {
 			throw new CoreException(new Status(IStatus.ERROR, Activator.BUNDLE_ID, "Module source does not exist"));
@@ -67,8 +67,8 @@ public class WildFlyPublishController extends StandardJBossPublishController imp
 		return newStatus;
 	}
 	
-	protected boolean isExploded(DeployableReferenceWithOptions withOptions) {
-		File src = new File(withOptions.getReference().getPath());
+	protected boolean isExploded(DeployableReference withOptions) {
+		File src = new File(withOptions.getPath());
 		if(src.exists()) {
 			if( src.isDirectory())
 				return true;
@@ -77,7 +77,7 @@ public class WildFlyPublishController extends StandardJBossPublishController imp
 	}
 	
 	@Override
-	protected int removeExplodedModule(DeployableReferenceWithOptions reference, 
+	protected int removeExplodedModule(DeployableReference reference, 
 			int publishType, int modulePublishType,
 			File destination) throws CoreException {
 		cleanAllMarkers(destination.getAbsolutePath());

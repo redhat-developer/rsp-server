@@ -8,12 +8,19 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.api.dao;
 
+import java.util.Map;
+
 import org.jboss.tools.rsp.api.dao.util.EqualsUtility;
+import org.jboss.tools.rsp.api.dao.util.Optional;
 
 public class DeployableReference {
 
 	private String label;
 	private String path;
+	
+	@Optional
+	private Map<String, Object> options;
+
 
 	public DeployableReference() {
 	}
@@ -38,7 +45,14 @@ public class DeployableReference {
 	public void setPath(String path) {
 		this.path = path;
 	}
-	
+	public Map<String, Object> getOptions() {
+		return options;
+	}
+
+	public void setOptions(Map<String, Object> options) {
+		this.options = options;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -60,4 +74,5 @@ public class DeployableReference {
 		return EqualsUtility.areEqual(label, other.label)
 				&& EqualsUtility.areEqual(path, other.path);
 	}
+
 }

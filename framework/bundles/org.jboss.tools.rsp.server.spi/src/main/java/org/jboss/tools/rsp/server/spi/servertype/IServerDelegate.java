@@ -12,7 +12,6 @@ import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
-import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
@@ -258,7 +257,7 @@ public interface IServerDelegate {
 	 * @param req
 	 * @return
 	 */
-	public IStatus canAddDeployable(DeployableReferenceWithOptions ref);
+	public IStatus canAddDeployable(DeployableReference ref);
 
 	
 	/**
@@ -266,7 +265,7 @@ public interface IServerDelegate {
 	 * @param reference
 	 * @return
 	 */
-	public IStatus canRemoveDeployable(DeployableReferenceWithOptions reference);
+	public IStatus canRemoveDeployable(DeployableReference reference);
 
 	/**
 	 * A request to publish the server

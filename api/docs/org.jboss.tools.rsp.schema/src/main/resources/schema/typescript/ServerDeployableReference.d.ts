@@ -1,8 +1,6 @@
-export interface DeployableState {
+export interface ServerDeployableReference {
     server: ServerHandle;
-    reference: DeployableReference;
-    state: number;
-    publishState: number;
+    deployableReference: DeployableReference;
 }
 
 export interface ServerHandle {

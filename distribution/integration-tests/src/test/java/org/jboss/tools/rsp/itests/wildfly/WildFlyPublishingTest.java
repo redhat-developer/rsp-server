@@ -22,12 +22,11 @@ import java.util.Map;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
-import org.jboss.tools.rsp.api.dao.DeployableReferenceWithOptions;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
-import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
+import org.jboss.tools.rsp.api.dao.ServerDeployableReference;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
@@ -63,7 +62,7 @@ public class WildFlyPublishingTest extends RSPCase {
         ServerHandle handle = new ServerHandle("wildfly6a", wildflyType);
         File war = createWar();
         DeployableReference deployable = new DeployableReference(war.getAbsolutePath(), war.getAbsolutePath());
-        ModifyDeployableRequest req = new ModifyDeployableRequest(handle, new DeployableReferenceWithOptions(deployable, null));
+        ServerDeployableReference req = new ServerDeployableReference(handle, deployable);
         serverProxy.addDeployable(req);
         
         ServerState state = waitForNonNullServerState(5);
@@ -102,8 +101,7 @@ public class WildFlyPublishingTest extends RSPCase {
         assertEquals(ServerManagementAPIConstants.STATE_STARTED, ds1.getState());
 
         
-        ModifyDeployableRequest req2 = new ModifyDeployableRequest(handle, new DeployableReferenceWithOptions(deployable,  null));
-        serverProxy.removeDeployable(req2);
+        serverProxy.removeDeployable(new ServerDeployableReference(handle,  deployable));
         state = waitForNonNullServerState(5);
         assertNotNull(state);
         list = state.getDeployableStates();
