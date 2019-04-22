@@ -69,7 +69,7 @@ public class JBossDefaultLaunchArguments implements IDefaultLaunchArguments, IJB
 	}
 
 	protected String getProgramNameArgs() {
-		String name = server.getName();
+		String name = server.getName().replaceAll("\"", "\\\\\"");
 		String ret = QUOTE + SYSPROP + PROGRAM_NAME_ARG + EQ +  
 			"rsp:" + name + QUOTE + SPACE; //$NON-NLS-1$
 		return ret;
