@@ -579,15 +579,9 @@ public class StandardCommandHandler implements InputHandler {
 		}
 		
 		protected LaunchParameters getLaunchCommandRequest(ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
-			System.out.println("Which server would you like to run?");
-			List<ServerHandle> handles = launcher.getServerProxy().getServerHandles().get();
-			for( ServerHandle sh : handles ) {
-				System.out.println("   " + sh.getId());
-			}
-			String server = assistant.nextLine().trim();
-			ServerHandle handle = findServer(server, launcher);
+			ServerHandle handle = assistant.selectServer();
 			if (handle == null) {
-				System.out.println("Server " + server + " not found.");
+				System.out.println("Server not found.");
 				return null;
 			}
 			String mode = assistant.selectLaunchMode(handle.getType());
