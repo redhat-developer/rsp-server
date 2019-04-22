@@ -8,6 +8,9 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.wildfly.servertype;
 
+import org.jboss.tools.rsp.eclipse.debug.core.DebugException;
+import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
+import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.server.spi.launchers.AbstractJavaLauncher;
@@ -54,6 +57,20 @@ public abstract class AbstractLauncher extends AbstractJavaLauncher implements I
 		return null;
 	}
 
+	protected boolean terminateProcesses(ILaunch launch) {
+		if( launch == null )
+			return false;
+		
+		IProcess[] all = launch.getProcesses();
+		for( int i = 0; i < all.length; i++ ) {
+			try {
+				all[i].terminate();
+			} catch(DebugException de) {
+				return false;
+			}
+		}
+		return true;
+	}
 	@Override
 	protected IVMInstallRegistry getDefaultRegistry() {
 		return new JBossVMRegistryDiscovery().getDefaultRegistry();
