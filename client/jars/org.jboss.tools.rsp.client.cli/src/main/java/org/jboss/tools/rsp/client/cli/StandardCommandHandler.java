@@ -421,6 +421,7 @@ public class StandardCommandHandler implements InputHandler {
 								opts.put(ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME, outputName);
 							}
 							DeployableReference ref = new DeployableReference(filePath, filePath);
+							ref.setOptions(opts);
 							ServerDeployableReference req = new ServerDeployableReference(server, ref);
 							Status ret = launcher.getServerProxy().addDeployable(req).get();
 							System.out.println(ret.toString());
