@@ -97,6 +97,7 @@ public class ServerModel implements IServerModel {
 		listeners.add(l);
 	}
 
+	@Override
 	public void removeServerModelListener(IServerModelListener l) {
 		listeners.remove(l);
 	}
@@ -321,43 +322,47 @@ public class ServerModel implements IServerModel {
 	}
 
 	private void fireServerAdded(IServer server) {
-		for( IServerModelListener l : listeners ) {
+		for( IServerModelListener l : getListeners() ) {
 			l.serverAdded(toHandle(server));
 		}
 	}
 
 	@Override
 	public void fireServerProcessTerminated(IServer server, String processId) {
-		for( IServerModelListener l : listeners ) {
+		for( IServerModelListener l : getListeners() ) {
 			l.serverProcessTerminated(toHandle(server), processId);
 		}
 	}
 
 	@Override
 	public void fireServerProcessCreated(IServer server, String processId) {
-		for( IServerModelListener l : listeners ) {
+		for( IServerModelListener l : getListeners() ) {
 			l.serverProcessCreated(toHandle(server), processId);
 		}
 	}
 
 	@Override
 	public void fireServerStreamAppended(IServer server, String processId, int streamType, String text) {
-		for( IServerModelListener l : listeners ) {
+		for( IServerModelListener l : getListeners() ) {
 			l.serverProcessOutputAppended(toHandle(server), processId, streamType, text);
 		}
 	}
 	
 	@Override
 	public void fireServerStateChanged(IServer server, ServerState state) {
-		for( IServerModelListener l : listeners ) {
+		for( IServerModelListener l : getListeners() ) {
 			l.serverStateChanged(toHandle(server), state);
 		}
 	}
 	
 	private void fireServerRemoved(IServer server) {
-		for( IServerModelListener l : listeners ) {
+		for( IServerModelListener l : getListeners() ) {
 			l.serverRemoved(toHandle(server));
 		}
+	}
+	
+	private List<IServerModelListener> getListeners() {
+		return new ArrayList<IServerModelListener>(listeners);
 	}
 	
 	private ServerHandle toHandle(IServer s) {

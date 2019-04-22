@@ -195,10 +195,22 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	@Override
 	public void shutdown() {
-		managementModel.dispose();
-		launcher.shutdown();
+		final RSPClient rspc = ClientThreadLocal.getActiveClient();
+		new Thread("Shutdown") {
+			public void run() {
+				ClientThreadLocal.setActiveClient(rspc);
+				shutdownSync();
+				ClientThreadLocal.setActiveClient(null);
+			}
+		}.start();
 	}
 
+	private Boolean shutdownSync() {
+		managementModel.dispose();
+		launcher.shutdown();
+		return Boolean.TRUE;
+	}
+	
 	@Override
 	public CompletableFuture<List<ServerHandle>> getServerHandles() {
 		return createCompletableFuture(() -> getServerHandlesSync());

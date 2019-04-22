@@ -9,8 +9,19 @@
 package org.jboss.tools.rsp.server.model;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.jboss.tools.rsp.api.RSPClient;
+import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.ServerHandle;
+import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.eclipse.jdt.launching.VMInstallRegistry;
 import org.jboss.tools.rsp.launching.LaunchingCore;
@@ -30,6 +41,9 @@ import org.jboss.tools.rsp.server.spi.jobs.IJobManager;
 import org.jboss.tools.rsp.server.spi.model.ICapabilityManagement;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
+import org.jboss.tools.rsp.server.spi.model.IServerModelListener;
+import org.jboss.tools.rsp.server.spi.model.ServerModelListenerAdapter;
+import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -171,9 +185,67 @@ public class ServerManagementModel implements IServerManagementModel {
 
 	@Override
 	public void dispose() {
+		shutdownAllServers();
 		if( this.jobManager != null ) {
 			this.jobManager.shutdown();
 		}
 	}
 
+	protected void shutdownAllServers() {
+		if( getNotStoppedServers().isEmpty())
+			return;
+		
+		System.out.println("Shutting down started servers");
+		shutdownServers(getStartedServers(), false);
+		System.out.println("Shutting down all servers");
+		shutdownServers(getNotStoppedServers(), true);
+	}
+	
+	protected void shutdownServers(List<IServer> list, boolean force) {
+		if( list.isEmpty()) 
+			return;
+		
+		ExecutorService threadExecutor = Executors.newFixedThreadPool(list.size());
+		CountDownLatch latch = new CountDownLatch(list.size());
+		Iterator<IServer> it = list.iterator();
+		while(it.hasNext()) {
+			final IServer next = it.next();
+			System.out.println("Shutting down " + next.getId());
+
+			threadExecutor.submit( new Runnable() {
+				@Override
+				public void run() {
+					System.out.println("Shutting down 1 " + next.getId());
+					IServerModelListener l = new ServerModelListenerAdapter() {
+						public void serverStateChanged(ServerHandle server, ServerState state) {
+							if( server.getId().equals(next.getId()) && state.getState() == ServerManagementAPIConstants.STATE_STOPPED) {
+								System.out.println("Shutting down 2 " + next.getId());
+								serverModel.removeServerModelListener(this);
+								latch.countDown();
+							}
+						}
+					};
+					serverModel.addServerModelListener(l);
+					next.getDelegate().stop(force);
+				}
+			});
+			try {
+				latch.await(600000, TimeUnit.MILLISECONDS);
+			} catch(InterruptedException ie) {
+				// Ignore, do not set interrupt state again
+			}
+		}
+		threadExecutor.shutdown();
+	}
+	
+	private List<IServer> getStartedServers() {
+		return serverModel.getServers().values().stream()
+			.filter(s -> s.getDelegate().getServerRunState() == ServerManagementAPIConstants.STATE_STARTED)
+			.collect(Collectors.toList());
+	}
+	private List<IServer> getNotStoppedServers() {
+		return serverModel.getServers().values().stream()
+				.filter(s -> s.getDelegate().getServerRunState() != ServerManagementAPIConstants.STATE_STOPPED)
+				.collect(Collectors.toList());
+	}
 }

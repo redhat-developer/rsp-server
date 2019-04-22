@@ -325,6 +325,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		launches.add(launch2);
 		String ctime = "" + System.currentTimeMillis();
 		IProcess[] all = launch2.getProcesses();
+		
 		for( int i = 0; i < all.length; i++ ) {
 			String pName = getServer().getTypeId() + ":" + getServer().getId()
 					+ ":" + ctime + ":p" + i;
@@ -383,10 +384,6 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 				}
 			}
 		};
-	}
-
-	public ILaunch[] getLaunches() {
-		return launches.toArray(new ILaunch[launches.size()]);
 	}
 
 	@Override

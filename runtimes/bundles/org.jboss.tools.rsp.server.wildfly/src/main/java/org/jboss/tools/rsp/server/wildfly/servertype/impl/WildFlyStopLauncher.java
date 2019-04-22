@@ -11,10 +11,13 @@ package org.jboss.tools.rsp.server.wildfly.servertype.impl;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
+import org.jboss.tools.rsp.eclipse.debug.core.DebugException;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
+import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
+import org.jboss.tools.rsp.server.wildfly.servertype.AbstractJBossServerDelegate;
 import org.jboss.tools.rsp.server.wildfly.servertype.AbstractLauncher;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
 import org.jboss.tools.rsp.server.wildfly.servertype.JBossVMRegistryDiscovery;
@@ -27,8 +30,12 @@ public class WildFlyStopLauncher extends AbstractLauncher implements IServerShut
 	}
 
 	public ILaunch launch(boolean force) throws CoreException {
-		String mode = "run";
-		return launch(mode);
+		IServerDelegate delegate = getDelegate();
+		ILaunch launch = (ILaunch) delegate.getSharedData(AbstractJBossServerDelegate.START_LAUNCH_SHARED_DATA);
+		if( force && terminateProcesses(launch)) {
+			return null;
+		}
+		return launch("run");
 	}
 
 	protected String getWorkingDirectory() {

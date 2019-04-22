@@ -45,8 +45,8 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractJBossServerDelegate.class);
-
-	private ILaunch startLaunch;
+	public static final String START_LAUNCH_SHARED_DATA = "AbstractJBossServerDelegate.startLaunch";
+	
 	private IJBossPublishController publishController;
 	
 	public AbstractJBossServerDelegate(IServer server) {
@@ -106,12 +106,13 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		try {
 			launchPoller(IServerStatePoller.SERVER_STATE.UP);
 			IServerStartLauncher launcher = getStartLauncher();
-			startLaunch = launcher.launch(mode);
+			ILaunch startLaunch2 = launcher.launch(mode);
 			launchedDetails = launcher.getLaunchedDetails();
-			registerLaunch(startLaunch);
+			setStartLaunch(startLaunch2);
+			registerLaunch(startLaunch2);
 		} catch(CoreException ce) {
-			if( startLaunch != null ) {
-				IProcess[] processes = startLaunch.getProcesses();
+			if( getStartLaunch() != null ) {
+				IProcess[] processes = getStartLaunch().getProcesses();
 				for( int i = 0; i < processes.length; i++ ) {
 					try {
 						processes[i].terminate();
@@ -135,7 +136,8 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		launchPoller(IServerStatePoller.SERVER_STATE.DOWN);
 		try {
 			stopLaunch = getStopLauncher().launch(force);
-			registerLaunch(stopLaunch);
+			if( stopLaunch != null)
+				registerLaunch(stopLaunch);
 		} catch(CoreException ce) {
 			// Dead code... but I feel it's not dead?  idk :( 
 //			if( stopLaunch != null ) {
@@ -181,7 +183,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	@Override
 	protected void processTerminated(IProcess p) {
 		ILaunch l = p.getLaunch();
-		if( l == startLaunch ) {
+		if( l == getStartLaunch() ) {
 			IProcess[] all = l.getProcesses();
 			boolean allTerminated = true;
 			for( int i = 0; i < all.length; i++ ) {
@@ -189,12 +191,20 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 			}
 			if( allTerminated ) {
 				setServerState(IServerDelegate.STATE_STOPPED);
-				startLaunch = null;
+				setStartLaunch(null);
 			}
 		}
 		fireServerProcessTerminated(getProcessId(p));
 	}
 
+	protected ILaunch getStartLaunch() {
+		return (ILaunch)getSharedData(START_LAUNCH_SHARED_DATA);
+	}
+	
+	protected void setStartLaunch(ILaunch launch) {
+		putSharedData(START_LAUNCH_SHARED_DATA, launch);
+	}
+	
 	@Override
 	public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params) {
 		try {

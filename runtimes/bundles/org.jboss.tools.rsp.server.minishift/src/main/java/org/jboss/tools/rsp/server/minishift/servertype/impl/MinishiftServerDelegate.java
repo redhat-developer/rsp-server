@@ -151,7 +151,8 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 		//launchPoller(IServerStatePoller.SERVER_STATE.DOWN);
 		try {
 			stopLaunch = getStopLauncher().launch(force);
-			registerLaunch(stopLaunch);
+			if( stopLaunch != null)
+				registerLaunch(stopLaunch);
 		} catch(CoreException ce) {
 			// Dead code... but I feel it's not dead?  idk :( 
 //			if( stopLaunch != null ) {
