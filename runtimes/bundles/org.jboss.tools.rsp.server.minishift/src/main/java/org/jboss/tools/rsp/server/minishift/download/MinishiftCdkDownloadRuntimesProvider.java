@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2018-2019 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v2.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v20.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.rsp.server.minishift.download;
 
 import java.util.List;
@@ -14,8 +24,10 @@ import org.jboss.tools.rsp.stacks.core.model.StacksManager;
 
 public class MinishiftCdkDownloadRuntimesProvider extends AbstractStacksDownloadRuntimesProvider {
 
-	private static final String MINISHIFT_YAML_URL = "https://raw.githubusercontent.com/jboss-developer/jboss-stacks/1.0.0.Final/minishift.yaml";
+	private static final String MINISHIFT_YAML_URL = 
+			"https://raw.githubusercontent.com/jboss-developer/jboss-stacks/1.0.0.Final/minishift.yaml";
 	private IServerManagementModel model;
+
 	public MinishiftCdkDownloadRuntimesProvider(IServerManagementModel model) {
 		this.model = model;
 	}
@@ -64,7 +76,7 @@ public class MinishiftCdkDownloadRuntimesProvider extends AbstractStacksDownload
 		
 		String prop = dr.getProperty(DownloadRuntime.PROPERTY_REQUIRES_CREDENTIALS);
 		
-		if( prop != null && "true".equalsIgnoreCase(prop))
+		if( "true".equalsIgnoreCase(prop))
 			// // Requires credentials is handled by another executor
 			return new CDKDownloadExecutor(dr, model);
 

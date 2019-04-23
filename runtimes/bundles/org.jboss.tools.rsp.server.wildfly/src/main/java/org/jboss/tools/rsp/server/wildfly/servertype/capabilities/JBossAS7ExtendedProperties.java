@@ -16,18 +16,22 @@ import org.jboss.tools.rsp.server.wildfly.servertype.launch.IDefaultLaunchArgume
 import org.jboss.tools.rsp.server.wildfly.servertype.launch.JBoss70DefaultLaunchArguments;
 
 public class JBossAS7ExtendedProperties extends JBossExtendedProperties { //implements IJBossManagerServiceProvider {
+
 	public JBossAS7ExtendedProperties(IServer obj) {
 		super(obj);
 	}
 
+	@Override
 	public boolean runtimeSupportsExposingManagement() {
 		return true;
 	}
 	
+	@Override
 	public int getJMXProviderType() {
 		return JMX_DEFAULT_PROVIDER;
 	}
 
+	@Override
 	public boolean runtimeSupportsBindingToAllInterfaces() {
 		String version = getServerBeanLoader().getFullServerVersion();
 		if( version == null )
@@ -36,14 +40,18 @@ public class JBossAS7ExtendedProperties extends JBossExtendedProperties { //impl
 			return false;
 		return true;
 	}
+
+	@Override
 	public int getMultipleDeployFolderSupport() {
 		return DEPLOYMENT_SCANNER_AS7_MANAGEMENT_SUPPORT;
 	}
 
+	@Override
 	public boolean canVerifyRemoteDeploymentState() {
 		return true;
 	}
 
+	@Override
 	public IDefaultLaunchArguments getDefaultLaunchArguments() {
 		return new JBoss70DefaultLaunchArguments(server);
 	}
@@ -52,6 +60,7 @@ public class JBossAS7ExtendedProperties extends JBossExtendedProperties { //impl
 		return IJBossRuntimeResourceConstants.AS_70_MANAGEMENT_SCRIPT;
 	}
 	
+	@Override
 	public int getFileStructure() {
 		return FILE_STRUCTURE_CONFIG_DEPLOYMENTS;
 	}

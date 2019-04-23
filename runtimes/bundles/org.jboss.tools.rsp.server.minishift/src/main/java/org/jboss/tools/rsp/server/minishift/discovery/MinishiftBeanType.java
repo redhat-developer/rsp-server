@@ -75,10 +75,9 @@ public class MinishiftBeanType extends ServerBeanType {
 	@Override
 	public String getUnderlyingTypeId(File root) {
 		MinishiftVersions props = findOrLoad(root);
-		if( props != null ) {
-			if( props.getCDKVersion() != null ) {
-				return "CDK";
-			}
+		if( props != null 
+				&& props.getCDKVersion() != null ) {
+			return "CDK";
 		}
 		return "MINISHIFT";
 	}
@@ -88,8 +87,9 @@ public class MinishiftBeanType extends ServerBeanType {
 		return MinishiftServerTypes.MINISHIFT_1_12_ID;
 	}
 	
-	// TODO if the user put a folder here, find the right path
+	@Override
 	public ServerBean createServerBean(File rootLocation) {
+		// TODO if the user put a folder here, find the right path
 		if( rootLocation.isDirectory()) {
 			MinishiftDiscovery disc = new MinishiftDiscovery();
 			if( disc.folderContainsMinishiftBinary(rootLocation)) {
@@ -100,9 +100,13 @@ public class MinishiftBeanType extends ServerBeanType {
 		String version = getFullVersion(props);
 		if( version != null ) {
 			ServerBean server = new ServerBean(
-					rootLocation.getPath(), getServerBeanName(rootLocation),
-					getId(), getUnderlyingTypeId(rootLocation), version, 
-					getMajorMinorVersion(version), getServerAdapterTypeId(version));
+					rootLocation.getPath(),
+					getServerBeanName(rootLocation),
+					getId(),
+					getUnderlyingTypeId(rootLocation),
+					version, 
+					getMajorMinorVersion(version),
+					getServerAdapterTypeId(version));
 			return server;
 		}
 		return null;

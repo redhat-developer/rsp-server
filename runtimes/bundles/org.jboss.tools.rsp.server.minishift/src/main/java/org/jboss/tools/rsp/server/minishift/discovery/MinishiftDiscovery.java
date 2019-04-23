@@ -10,7 +10,6 @@ package org.jboss.tools.rsp.server.minishift.discovery;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

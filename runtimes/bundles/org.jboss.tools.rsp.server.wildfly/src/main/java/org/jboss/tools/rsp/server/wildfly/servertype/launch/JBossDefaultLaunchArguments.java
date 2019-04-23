@@ -82,7 +82,7 @@ public class JBossDefaultLaunchArguments implements IDefaultLaunchArguments, IJB
 		IVMInstall install = new JBossVMRegistryDiscovery().findVMInstall(server.getDelegate());
 		if( JavaUtils.supportsServerMode(install))
 			return SERVER_ARG + SPACE;
-		return new String();
+		return "";
 	}
 	
 	protected boolean isLinux() {
@@ -94,7 +94,7 @@ public class JBossDefaultLaunchArguments implements IDefaultLaunchArguments, IJB
 	}
 	
 	protected String getJavaFlags(boolean includeIPVersionFlag) {
-		String ret = new String();
+		String ret = "";
 		if( includeIPVersionFlag )
 			ret += SYSPROP + JAVA_PREFER_IP4_ARG + EQ + !isIP6() + SPACE; 
 		ret += SYSPROP + SUN_CLIENT_GC_ARG + EQ + 3600000 + SPACE;
@@ -131,10 +131,9 @@ public class JBossDefaultLaunchArguments implements IDefaultLaunchArguments, IJB
 		return DEFAULT_MEM_ARGS;
 	}
 	
-	// TODO wtf?
 	@Override
 	public HashMap<String, String> getDefaultRunEnvVars() {
-		HashMap<String, String> envVars = new HashMap<String, String>(1);
+		HashMap<String, String> envVars = new HashMap<>(1);
 		envVars.put("PATH", NATIVE + System.getProperty("path.separator") + "${env_var:PATH}"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return envVars;
 	}
@@ -183,7 +182,7 @@ public class JBossDefaultLaunchArguments implements IDefaultLaunchArguments, IJB
 		
 		String serverUrl = getShutdownServerUrl();
 		
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append(IJBossRuntimeConstants.SHUTDOWN_STOP_ARG );
 		sb.append(IJBossRuntimeConstants.SPACE);
 		sb.append(IJBossRuntimeConstants.SHUTDOWN_SERVER_ARG); 

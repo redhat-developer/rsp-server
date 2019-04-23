@@ -13,10 +13,12 @@ package org.jboss.tools.rsp.server.wildfly.servertype.launch;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
 public class JBoss5xDefaultLaunchArguments extends JBossDefaultLaunchArguments {
+
 	public JBoss5xDefaultLaunchArguments(IServer server) {
 		super(server);
 	}
 
+	@Override
 	protected String getMemoryArgs() {
 		return DEFAULT_MEM_ARGS_AS50;
 	}

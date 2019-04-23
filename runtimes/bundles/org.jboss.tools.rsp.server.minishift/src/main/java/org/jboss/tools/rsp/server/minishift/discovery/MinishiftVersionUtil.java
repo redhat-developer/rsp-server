@@ -77,7 +77,7 @@ public class MinishiftVersionUtil {
 
 	public static boolean matchesMinishift17OrGreater(String version) {
 		if (version.contains("+")) {
-			String prefix = version.substring(0, version.indexOf("+"));
+			String prefix = version.substring(0, version.indexOf('+'));
 			String[] segments = prefix.split("\\.");
 			if ("1".equals(segments[0]) && Integer.parseInt(segments[1]) >= 7) {
 				return true;

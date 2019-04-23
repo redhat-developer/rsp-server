@@ -78,6 +78,7 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 		return new CreateServerValidation(Status.OK_STATUS, null);
 	}
 
+	@Override
 	public IStatus canStart(String launchMode) {
 		if( !modesContains(launchMode)) {
 			return new Status(IStatus.ERROR, Activator.BUNDLE_ID,
@@ -92,13 +93,17 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 			String stateString = null;
 			switch(getServerRunState()) {
 			case IServerDelegate.STATE_STARTED:
-				stateString = "started";break;
+				stateString = "started";
+				break;
 			case IServerDelegate.STATE_STARTING:
-				stateString = "starting";break;
+				stateString = "starting";
+				break;
 			case IServerDelegate.STATE_STOPPED:
-				stateString = "stopped";break;
+				stateString = "stopped";
+				break;
 			case IServerDelegate.STATE_STOPPING:
-				stateString = "stopping";break;
+				stateString = "stopping";
+				break;
 			}
 			return new Status(IStatus.CANCEL, Activator.BUNDLE_ID,
 					"Server cannot be started. It is in state " + stateString);

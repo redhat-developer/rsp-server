@@ -25,7 +25,7 @@ public interface IJBossRuntimeConstants {
 	 *  It is deprecated for now. 
 	 *  It may one day come back, with the value
 	 *     'jboss.server.home.url'
-	 *  Any consumers who may be affected should change now  
+	 *  Any consumers who may be affected should change now
 	 */
 	@Deprecated 
 	public static final String JBOSS_SERVER_HOME_URL = "jboss.server.base.url"; //$NON-NLS-1$

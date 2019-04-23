@@ -17,12 +17,17 @@ import org.jboss.tools.rsp.foundation.core.launchers.CommandTimeoutException;
 import org.jboss.tools.rsp.foundation.core.launchers.ProcessUtility;
 
 public class MinishiftVersionLoader {
-	public static String ERROR_KEY = "properties.load.error";
-	public static String VERSION_KEY = "Minishift version";
-	public static String VERSION_KEY2 = "minishift";
-	public static String CDK_VERSION_KEY = "CDK";
-	public static String CDK_VERSION_KEY_OLD = "CDK Version";
 
+	public static final String ERROR_KEY = "properties.load.error";
+	public static final String VERSION_KEY = "Minishift version";
+	public static final String VERSION_KEY2 = "minishift";
+	public static final String CDK_VERSION_KEY = "CDK";
+	public static final String CDK_VERSION_KEY_OLD = "CDK Version";
+
+	private MinishiftVersionLoader() {
+		// inhibit instantiation
+	}
+	
 	public static MinishiftVersions getVersionProperties(String commandPath) {
 		Properties ret = new Properties();
 		try {

@@ -13,6 +13,7 @@ import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
 public class MinishiftServerType extends BaseMinishiftServerType {
+
 	public MinishiftServerType(String id, String name, String desc) {
 		super(id, name, desc);
 	}

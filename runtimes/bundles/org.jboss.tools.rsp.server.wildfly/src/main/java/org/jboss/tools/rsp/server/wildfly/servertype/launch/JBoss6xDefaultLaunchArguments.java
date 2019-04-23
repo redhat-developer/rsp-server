@@ -20,6 +20,7 @@ public class JBoss6xDefaultLaunchArguments extends JBoss5xDefaultLaunchArguments
 		super(server);
 	}
 
+	@Override
 	protected String getShutdownServerUrl() {
 		return "service:jmx:rmi:///jndi/rmi://" + getHost() + ":" + getJMXRMIPort() + "/jmxrmi"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
@@ -28,6 +29,7 @@ public class JBoss6xDefaultLaunchArguments extends JBoss5xDefaultLaunchArguments
 		return 1090;
 	}
 
+	@Override
 	protected String getJBossJavaFlags() {
 		String ret = super.getJBossJavaFlags();
 		

@@ -13,18 +13,23 @@ package org.jboss.tools.rsp.server.wildfly.servertype.launch;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
 public class JBossEAP70DefaultLaunchArguments extends JBoss71DefaultLaunchArguments {
+
 	public JBossEAP70DefaultLaunchArguments(IServer s) {
 		super(s);
 	}
+
+	@Override
 	public String getStartDefaultVMArgs() {
 		return super.getStartDefaultVMArgs() 
 				+ "-Dorg.jboss.logmanager.nocolor=true "; //$NON-NLS-1$
 	}
 
+	@Override
 	protected String getMemoryArgs() {
 		return "-Xms1303m -Xmx1303m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m "; //$NON-NLS-1$
 	}
 	
+	@Override
 	protected String getJaxpProvider() {
 		return ""; //$NON-NLS-1$
 	}

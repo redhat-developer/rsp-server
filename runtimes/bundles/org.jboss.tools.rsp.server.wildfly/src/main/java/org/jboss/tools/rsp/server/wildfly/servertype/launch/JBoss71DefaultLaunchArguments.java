@@ -20,9 +20,10 @@ public class JBoss71DefaultLaunchArguments extends JBoss70DefaultLaunchArguments
 	@Override
 	protected String getLoggingProgramArg() {
 		// logging params removed
-		return new String();
+		return "";
 	}
 	
+	@Override
 	protected String getJBossJavaFlags() {
 		return "-Djboss.modules.system.pkgs=org.jboss.byteman " + //$NON-NLS-1$
 				super.getJBossJavaFlags();

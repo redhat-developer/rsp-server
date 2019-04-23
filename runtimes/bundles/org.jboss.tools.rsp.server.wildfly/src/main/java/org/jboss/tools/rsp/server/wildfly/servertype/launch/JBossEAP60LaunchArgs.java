@@ -11,9 +11,12 @@ package org.jboss.tools.rsp.server.wildfly.servertype.launch;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
 public class JBossEAP60LaunchArgs extends JBoss71DefaultLaunchArguments {
+
 	public JBossEAP60LaunchArgs(IServer rt) {
 		super(rt);
 	}
+
+	@Override
 	protected String getMemoryArgs() {
 		return "-Xms1303m -Xmx1303m -XX:MaxPermSize=256m "; //$NON-NLS-1$
 	}

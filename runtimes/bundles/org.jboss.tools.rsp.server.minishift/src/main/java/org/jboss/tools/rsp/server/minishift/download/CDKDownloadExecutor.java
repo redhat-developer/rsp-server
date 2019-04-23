@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2018-2019 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v2.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v20.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.rsp.server.minishift.download;
 
 import java.io.File;
@@ -9,12 +19,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
-import org.jboss.tools.rsp.api.dao.Attribute;
-import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
-import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.foundation.core.tasks.TaskModel;
@@ -25,15 +32,15 @@ import org.jboss.tools.rsp.server.minishift.discovery.MinishiftDiscovery;
 import org.jboss.tools.rsp.server.minishift.impl.Activator;
 import org.jboss.tools.rsp.server.minishift.servertype.IMinishiftServerAttributes;
 import org.jboss.tools.rsp.server.minishift.servertype.impl.MinishiftServerTypes;
-import org.jboss.tools.rsp.server.spi.SPIActivator;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.runtimes.AbstractStacksDownloadRuntimesProvider;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 import org.jboss.tools.rsp.server.wildfly.runtimes.download.AbstractDownloadManagerExecutor;
 
 public class CDKDownloadExecutor extends AbstractDownloadManagerExecutor {
-	protected static int STEP_ATTRIBUTES = 4;
-	protected static int STEP_DOWNLOAD = 5;
+
+	protected static final int STEP_ATTRIBUTES = 4;
+	protected static final int STEP_DOWNLOAD = 5;
 
 	public CDKDownloadExecutor(DownloadRuntime dlrt, IServerManagementModel model) {
 		super(dlrt, model);
@@ -82,6 +89,7 @@ public class CDKDownloadExecutor extends AbstractDownloadManagerExecutor {
 		return StatusConverter.convert(response.getStatus());
 	}
 
+	@Override
 	protected WorkflowResponse handleLicense(DownloadSingleRuntimeRequest req) {
 		WorkflowResponse r = super.handleLicense(req);
 		if( r == null ) {
@@ -92,6 +100,7 @@ public class CDKDownloadExecutor extends AbstractDownloadManagerExecutor {
 
 	}
 	
+	@Override
 	protected WorkflowResponse executeAdditionalSteps(DownloadSingleRuntimeRequest req) {
 		DownloadManagerSessionState state = null;
 		if (req.getRequestId() != 0) {
@@ -100,9 +109,11 @@ public class CDKDownloadExecutor extends AbstractDownloadManagerExecutor {
 		if (state.getWorkflowStep() == STEP_ATTRIBUTES) {
 			String wtpRuntimeId = getRuntime().getProperty(AbstractStacksDownloadRuntimesProvider.PROP_WTP_RUNTIME);
 			String serverType = MinishiftServerTypes.RUNTIME_TO_SERVER.get(wtpRuntimeId);
-			List<String> list = Arrays.asList(new String[] {
-					IMinishiftServerAttributes.MINISHIFT_BINARY, IMinishiftServerAttributes.MINISHIFT_REG_USERNAME, IMinishiftServerAttributes.MINISHIFT_REG_PASSWORD
-			});
+			List<String> list = Arrays.asList(
+					IMinishiftServerAttributes.MINISHIFT_BINARY,
+					IMinishiftServerAttributes.MINISHIFT_REG_USERNAME, 
+					IMinishiftServerAttributes.MINISHIFT_REG_PASSWORD
+			);
 			WorkflowResponse resp = convertAttributes(serverType, req, list);
 			SESSION_STATE.updateRequestState(
 					req.getRequestId(), STEP_DOWNLOAD, req.getData());

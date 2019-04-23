@@ -28,6 +28,7 @@ public class DataVirtualization6ServerBeanType extends ServerBeanTypeUnknownAS72
 		return "JBoss Data Virtualization " + getFullVersion(root, null);
 	}
 	
+	@Override
 	public String getFullVersion(File location, File systemJarFile) {
 		String productSlot = getSlot(location);
 		boolean hasDV = "dv".equalsIgnoreCase(productSlot);

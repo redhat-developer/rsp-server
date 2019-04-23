@@ -25,9 +25,10 @@ public class JBossASStartLauncher extends WildFlyStartLauncher {
 		return "org.jboss.Main";
 	}
 
+	@Override
 	protected String[] getClasspath() {
 		String serverHome = getDelegate().getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String) null);
 		String runJar = new Path(serverHome).append("bin").append("run.jar").toOSString();
-		return addJreClasspathEntries(Arrays.asList(new String[] {runJar}));
+		return addJreClasspathEntries(Arrays.asList(runJar));
 	}
 }

@@ -13,10 +13,12 @@ package org.jboss.tools.rsp.server.wildfly.servertype.launch;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
 public class JBossEAP72DefaultLaunchArguments extends JBossEAP70DefaultLaunchArguments {
+
 	public JBossEAP72DefaultLaunchArguments(IServer s) {
 		super(s);
 	}
 
+	@Override
 	public String getStartDefaultVMArgs() {
 		return super.getStartDefaultVMArgs() 
 		        + getJava9VMArgs();

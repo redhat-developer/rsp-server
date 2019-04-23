@@ -34,10 +34,15 @@ import org.jboss.tools.rsp.server.wildfly.impl.Activator;
  * verify if the downloadRuntime is set to be downloaded.
  */
 public class DownloadManagerWorkflowUtility {
+
 	public static final int AUTHORIZED = 1;
 	public static final int CREDENTIALS_FAILED = 2;
 	public static final int WORKFLOW_FAILED = 3;
 
+	private DownloadManagerWorkflowUtility() {
+		// inhibit instantiation
+	}
+	
 	/**
 	 * Get one of three statuses via a header request on a jboss/redhat download URL
 	 * with credentials.
@@ -55,7 +60,8 @@ public class DownloadManagerWorkflowUtility {
 		if (response == 401) {
 			// 401 means bad credentials, change nothing
 			return CREDENTIALS_FAILED;
-		} else if (response == 403 || response == 200) {
+		} else if (response == 403
+				|| response == 200) {
 			// 403 means workflow incomplete / forbidden, need a child page
 			return WORKFLOW_FAILED;
 		} else if (response == 302) {
@@ -76,7 +82,7 @@ public class DownloadManagerWorkflowUtility {
 	}
 
 	private static int headerOnlyStatusCode(DownloadRuntime dr, String userS, String passS)
-			throws CoreException, IOException {
+			throws IOException {
 		return headerOnlyStatusCode(dr.getUrl(), userS, passS);
 	}
 	

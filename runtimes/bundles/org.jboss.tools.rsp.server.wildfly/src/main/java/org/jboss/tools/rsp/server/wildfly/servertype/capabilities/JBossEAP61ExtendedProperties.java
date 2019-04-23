@@ -19,10 +19,12 @@ public class JBossEAP61ExtendedProperties extends JBossAS710ExtendedProperties {
 		super(obj);
 	}
 	
+	@Override
 	public String getRuntimeTypeVersionString() {
 		return "6.1+"; //$NON-NLS-1$
 	}
 	
+	@Override
 	public IDefaultLaunchArguments getDefaultLaunchArguments() {
 		return new JBoss72Eap61DefaultLaunchArguments(server);
 	}

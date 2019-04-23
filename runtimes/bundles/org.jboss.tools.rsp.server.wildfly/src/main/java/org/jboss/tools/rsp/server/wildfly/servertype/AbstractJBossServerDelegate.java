@@ -47,6 +47,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractJBossServerDelegate.class);
 
 	private ILaunch startLaunch;
+	private IJBossPublishController publishController;
 	
 	public AbstractJBossServerDelegate(IServer server) {
 		super(server);
@@ -57,7 +58,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	protected abstract IServerShutdownLauncher getStopLauncher();
 
 	protected abstract String getPollURL(IServer server);
-	
+
 	@Override
 	public CreateServerValidation validate() {
 		String home = getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
@@ -77,6 +78,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		return new CreateServerValidation(Status.OK_STATUS, null);
 	}
 
+	@Override
 	public IStatus canStart(String launchMode) {
 		if( !modesContains(launchMode)) {
 			return new Status(IStatus.ERROR, Activator.BUNDLE_ID,
@@ -217,8 +219,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		setServerState(STATE_STARTED, true);
 		return Status.OK_STATUS;
 	}
-	
-	private IJBossPublishController publishController;
+
 	protected IJBossPublishController getOrCreatePublishController() {
 		if( publishController == null ) {
 			publishController = createPublishController();
@@ -238,21 +239,23 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		return getOrCreatePublishController().canRemoveDeployable(reference);
 	}
 	
-	
+	@Override
 	public IStatus canPublish() {
 		return getOrCreatePublishController().canPublish();
 	}
-	
 
+	@Override
 	protected void publishStart(int publishType) throws CoreException {
 		getOrCreatePublishController().publishStart(publishType);
 	}
 
+	@Override
 	protected void publishFinish(int publishType) throws CoreException {
 		getOrCreatePublishController().publishFinish(publishType);
 		super.publishFinish(publishType);
 	}
 
+	@Override
 	protected void publishDeployable(DeployableReference reference, 
 			int publishRequestType, int modulePublishState) throws CoreException {
 		int syncState = getOrCreatePublishController()

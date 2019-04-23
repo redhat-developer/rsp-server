@@ -26,7 +26,6 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.foundation.core.tasks.TaskModel;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
-import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
 import org.jboss.tools.rsp.runtime.core.util.DownloadRuntimeSessionCache;
 import org.jboss.tools.rsp.runtime.core.util.DownloadRuntimeSessionCache.DownloadManagerSessionState;
 import org.jboss.tools.rsp.server.minishift.discovery.MinishiftDiscovery;
@@ -39,7 +38,9 @@ import org.jboss.tools.rsp.server.spi.runtimes.AbstractStacksDownloadRuntimesPro
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 
 public class MinishiftLicenseOnlyDownloadExecutor extends AbstractLicenseOnlyDownloadExecutor {
+
 	protected static final DownloadRuntimeSessionCache SESSION_STATE = new DownloadRuntimeSessionCache();
+
 	private static final int STEP_ATTR = 2;
 	private static final int STEP_DOWNLOAD = 3;
 	
@@ -116,9 +117,11 @@ public class MinishiftLicenseOnlyDownloadExecutor extends AbstractLicenseOnlyDow
 		if (state.getWorkflowStep() == STEP_ATTR) {
 			String wtpRuntimeId = getRuntime().getProperty(AbstractStacksDownloadRuntimesProvider.PROP_WTP_RUNTIME);
 			String serverType = MinishiftServerTypes.RUNTIME_TO_SERVER.get(wtpRuntimeId);
-			List<String> list = Arrays.asList(new String[] {
-					IMinishiftServerAttributes.MINISHIFT_BINARY, IMinishiftServerAttributes.MINISHIFT_REG_USERNAME, IMinishiftServerAttributes.MINISHIFT_REG_PASSWORD
-			});
+			List<String> list = Arrays.asList(
+					IMinishiftServerAttributes.MINISHIFT_BINARY,
+					IMinishiftServerAttributes.MINISHIFT_REG_USERNAME,
+					IMinishiftServerAttributes.MINISHIFT_REG_PASSWORD
+			);
 			WorkflowResponse resp = convertAttributes(serverType, req, list);
 			SESSION_STATE.updateRequestState(
 					req.getRequestId(), STEP_DOWNLOAD, req.getData());
