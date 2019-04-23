@@ -197,6 +197,7 @@ public class ServerManagementServerImpl implements RSPServer {
 	public void shutdown() {
 		final RSPClient rspc = ClientThreadLocal.getActiveClient();
 		new Thread("Shutdown") {
+			@Override
 			public void run() {
 				ClientThreadLocal.setActiveClient(rspc);
 				shutdownSync();
@@ -205,10 +206,9 @@ public class ServerManagementServerImpl implements RSPServer {
 		}.start();
 	}
 
-	private Boolean shutdownSync() {
+	private void shutdownSync() {
 		managementModel.dispose();
 		launcher.shutdown();
-		return Boolean.TRUE;
 	}
 	
 	@Override
