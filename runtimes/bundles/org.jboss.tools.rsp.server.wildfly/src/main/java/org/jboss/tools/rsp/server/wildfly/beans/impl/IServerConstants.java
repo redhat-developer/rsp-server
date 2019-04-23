@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public interface IServerConstants {
+
 	public static final String AS_SERVER_PREFIX = "org.jboss.ide.eclipse.as."; //$NON-NLS-1$
 	public static final String WF_SERVER_PREFIX = "org.jboss.ide.eclipse.as.wildfly."; //$NON-NLS-1$
 	public static final String EAP_SERVER_PREFIX = "org.jboss.ide.eclipse.as.eap."; //$NON-NLS-1$

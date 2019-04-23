@@ -11,6 +11,11 @@ package org.jboss.tools.rsp.server.minishift.servertype;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
 public class MinishiftPropertyUtility {
+
+	private MinishiftPropertyUtility() {
+		// inhibit instantiation
+	}
+
 	public static String getMinishiftCommand(IServer server) {
 		return server.getAttribute(IMinishiftServerAttributes.MINISHIFT_BINARY, (String) null);
 	}

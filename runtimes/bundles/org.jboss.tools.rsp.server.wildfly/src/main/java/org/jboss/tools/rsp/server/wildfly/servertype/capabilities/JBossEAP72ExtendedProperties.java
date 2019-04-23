@@ -29,7 +29,7 @@ public class JBossEAP72ExtendedProperties extends JBossAS710ExtendedProperties {
 	}
 	@Override
 	public String getJMXUrl() {
-			return getJMXUrl(9990, "service:jmx:remote+http"); //$NON-NLS-1$
+			return getJMXUrl(getManagementPort(), "service:jmx:remote+http"); //$NON-NLS-1$
 	}
 	
 	@Override

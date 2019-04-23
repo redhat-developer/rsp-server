@@ -29,12 +29,17 @@ public class JBossAS710ExtendedProperties extends JBossAS7ExtendedProperties { /
 		return "7.1"; //$NON-NLS-1$
 	}
 
+	@Override
 	public int getJMXProviderType() {
 		return JMX_OVER_AS_MANAGEMENT_PORT_PROVIDER;
 	}
+
+	@Override
 	public boolean runtimeSupportsBindingToAllInterfaces() {
 		return true;
 	}
+
+	@Override
 	public IDefaultLaunchArguments getDefaultLaunchArguments() {
 		if( server != null) {
 			ServerBeanLoader l = new ServerBeanLoader(getServerHomeFile(), server.getServerManagementModel());
@@ -65,8 +70,8 @@ public class JBossAS710ExtendedProperties extends JBossAS7ExtendedProperties { /
 	/**
 	 * @since 3.0
 	 */
-	protected String getJMXUrl(int defaultPort, String jmxScheme) {
-		String ret = URLUtil.createSafeURLString(jmxScheme, getHost(), getManagementPort(), null);
+	protected String getJMXUrl(int port, String jmxScheme) {
+		String ret = URLUtil.createSafeURLString(jmxScheme, getHost(), port, null);
 		return ret;
 	}
 	

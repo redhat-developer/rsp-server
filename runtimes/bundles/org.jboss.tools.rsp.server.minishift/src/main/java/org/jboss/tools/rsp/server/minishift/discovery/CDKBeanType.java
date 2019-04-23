@@ -17,6 +17,7 @@ public class CDKBeanType extends MinishiftBeanType {
 		super("CDK", "CDK 3.x");
 	}
 
+	@Override
 	protected boolean isSupported(MinishiftVersions vers) {
 		return vers.getCDKVersion() != null;
 	}
@@ -25,12 +26,14 @@ public class CDKBeanType extends MinishiftBeanType {
 	public String getServerAdapterTypeId(String version) {
 		return MinishiftServerTypes.CDK_3X_ID;
 	}
-	
+
+	@Override
 	protected String getFullVersion(MinishiftVersions props) {
-		if( props != null ) {
-			if( isSupported(props) && props.getMinishiftVersion() != null && props.getCDKVersion() != null) {
-				return props.getCDKVersion();
-			}
+		if (props != null
+				&& isSupported(props)
+				&& props.getMinishiftVersion() != null
+				&& props.getCDKVersion() != null) {
+			return props.getCDKVersion();
 		}
 		return null;
 	}

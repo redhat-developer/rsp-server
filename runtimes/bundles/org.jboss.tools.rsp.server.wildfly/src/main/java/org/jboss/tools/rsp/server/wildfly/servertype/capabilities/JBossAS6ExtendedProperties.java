@@ -25,6 +25,7 @@ public class JBossAS6ExtendedProperties extends JBossExtendedProperties {
 	}
 
 	
+	@Override
 	public IDefaultLaunchArguments getDefaultLaunchArguments() {
 		return new JBoss6xDefaultLaunchArguments(server);
 	}

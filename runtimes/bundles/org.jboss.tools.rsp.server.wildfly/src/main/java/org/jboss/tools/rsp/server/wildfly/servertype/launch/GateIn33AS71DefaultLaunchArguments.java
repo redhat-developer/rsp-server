@@ -14,6 +14,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
 public class GateIn33AS71DefaultLaunchArguments extends JBoss71DefaultLaunchArguments {
+
 	public GateIn33AS71DefaultLaunchArguments(IServer s) {
 		super(s);
 	}
@@ -33,9 +34,10 @@ public class GateIn33AS71DefaultLaunchArguments extends JBoss71DefaultLaunchArgu
 	@Override
 	protected String getLoggingProgramArg() {
 		// logging params removed
-		return new String();
+		return "";
 	}
 	
+	@Override
 	protected String getJBossJavaFlags() {
 		IPath basedir = getBaseDirectory();
 		IPath gateInConfig = 

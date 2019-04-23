@@ -14,6 +14,7 @@ import java.util.Map;
 import org.jboss.tools.rsp.server.minishift.servertype.BaseMinishiftServerType;
 
 public class MinishiftServerTypes {
+	
 	public static final String MINISHIFT_1_12_ID = "org.jboss.tools.openshift.cdk.server.type.minishift.v1_12";
 	public static final String MINISHIFT_1_12_NAME = "Minishift 1.12+";
 	public static final String MINISHIFT_1_12_DESC = "A server adapter capable of controlling a Minishift 1.12+ runtime instance.";
@@ -34,4 +35,9 @@ public class MinishiftServerTypes {
 		put("org.jboss.tools.openshift.cdk.server.runtime.type.cdk.30", CDK_3X_ID);
 		put("org.jboss.tools.openshift.cdk.server.runtime.type.cdk.32", CDK_3X_ID);
 	}};
+
+	private MinishiftServerTypes() {
+		// inhibit instantiation
+	}
+
 }

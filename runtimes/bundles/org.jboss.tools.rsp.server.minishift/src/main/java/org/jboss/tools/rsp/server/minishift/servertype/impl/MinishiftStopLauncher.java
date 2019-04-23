@@ -23,6 +23,7 @@ public class MinishiftStopLauncher extends AbstractLauncher implements IServerSh
 		String mode = "run";
 		return launch(mode);
 	}
+
 	public String getProgramArguments() {
 		return "stop";
 	}

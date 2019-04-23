@@ -15,15 +15,12 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
-import org.jboss.tools.rsp.api.dao.Attribute;
-import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
 import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
@@ -50,9 +47,9 @@ public abstract class AbstractDownloadManagerExecutor
 	protected static final DownloadRuntimeSessionCache SESSION_STATE = new DownloadRuntimeSessionCache();
 	
 	
-	protected static int STEP_CREDENTIALS = 1;
-	protected static int STEP_TC = 2;
-	protected static int STEP_LICENSE = 3;
+	protected static final int STEP_CREDENTIALS = 1;
+	protected static final int STEP_TC = 2;
+	protected static final int STEP_LICENSE = 3;
 	
 	protected static final String KEY_INTERNAL_CREDENTIAL_VALIDATION = "internal.credential.validation";
 	
@@ -128,7 +125,8 @@ public abstract class AbstractDownloadManagerExecutor
 		}
 		if (((Integer) workflowStep).intValue() == DownloadManagerWorkflowUtility.WORKFLOW_FAILED) {
 			String rtUrl = getRuntime().getUrl();
-			String msg = NLS.bind("You have not yet signed the Terms and Conditions of the 0-dollar Subscription. Please go to {0} to accept and begin your download.", rtUrl);;
+			String msg = NLS.bind("You have not yet signed the Terms and Conditions of the 0-dollar Subscription. "
+					+ "Please go to {0} to accept and begin your download.", rtUrl);
 			return quickResponse(IStatus.ERROR, msg, req);
 		}
 		

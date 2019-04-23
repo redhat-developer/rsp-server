@@ -32,6 +32,10 @@ public class IP6Util {
       }
     }
 
+    private IP6Util() {
+    	// inhibit instantiation
+    }
+
 	public static boolean matchesIP4t(String ipAddress) {
 		Matcher m1 = VALID_IPV4_PATTERN.matcher(ipAddress);
 		return m1.matches();
