@@ -362,7 +362,7 @@ public class ServerModel implements IServerModel {
 	}
 	
 	private List<IServerModelListener> getListeners() {
-		return new ArrayList<IServerModelListener>(listeners);
+		return new ArrayList<>(listeners);
 	}
 	
 	private ServerHandle toHandle(IServer s) {

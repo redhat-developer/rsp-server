@@ -195,9 +195,7 @@ public class ServerManagementModel implements IServerManagementModel {
 		if( getNotStoppedServers().isEmpty())
 			return;
 		
-		System.out.println("Shutting down started servers");
 		shutdownServers(getStartedServers(), false);
-		System.out.println("Shutting down all servers");
 		shutdownServers(getNotStoppedServers(), true);
 	}
 	
@@ -210,33 +208,33 @@ public class ServerManagementModel implements IServerManagementModel {
 		Iterator<IServer> it = list.iterator();
 		while(it.hasNext()) {
 			final IServer next = it.next();
-			System.out.println("Shutting down " + next.getId());
-
-			threadExecutor.submit( new Runnable() {
-				@Override
-				public void run() {
-					System.out.println("Shutting down 1 " + next.getId());
-					IServerModelListener l = new ServerModelListenerAdapter() {
-						public void serverStateChanged(ServerHandle server, ServerState state) {
-							if( server.getId().equals(next.getId()) && state.getState() == ServerManagementAPIConstants.STATE_STOPPED) {
-								System.out.println("Shutting down 2 " + next.getId());
-								serverModel.removeServerModelListener(this);
-								latch.countDown();
-							}
-						}
-					};
-					serverModel.addServerModelListener(l);
-					next.getDelegate().stop(force);
-				}
-			});
+			submitShutdownServerRequest(next, force, threadExecutor, latch);
 			try {
-				latch.await(600000, TimeUnit.MILLISECONDS);
+				latch.await(60000, TimeUnit.MILLISECONDS);
 			} catch(InterruptedException ie) {
 				// Ignore, do not set interrupt state again
 			}
 		}
 		threadExecutor.shutdown();
 	}
+	
+	private void submitShutdownServerRequest(IServer next, boolean force, 
+			ExecutorService threadExecutor, CountDownLatch latch) {
+		threadExecutor.submit(() -> {
+			IServerModelListener l = new ServerModelListenerAdapter() {
+				@Override
+				public void serverStateChanged(ServerHandle server, ServerState state) {
+					if( server.getId().equals(next.getId()) && state.getState() == ServerManagementAPIConstants.STATE_STOPPED) {
+						serverModel.removeServerModelListener(this);
+						latch.countDown();
+					}
+				}
+			};
+			serverModel.addServerModelListener(l);
+			next.getDelegate().stop(force);
+		});
+	}
+	
 	
 	private List<IServer> getStartedServers() {
 		return serverModel.getServers().values().stream()
