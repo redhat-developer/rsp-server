@@ -37,7 +37,6 @@
 						<optionalAnnotations>
 							<annotation>org.jboss.tools.rsp.api.dao.util.Optional</annotation>
 						</optionalAnnotations>
-
 					</configuration>
 				</plugin>
 			</plugins>
@@ -59,9 +58,8 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.0.0-M3</version>
 			</plugin>
-      </plugins>
+		</plugins>
 	</build>
 
 	<dependencies>
