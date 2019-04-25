@@ -8,8 +8,8 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.model.internal.publishing;
 
-import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.util.HashMap;
@@ -39,13 +39,24 @@ public class DeployableDelta implements IDeployableResourceDelta {
 	}
 
 	/**
+	 * Returns the DeployableReference for this delta.
+	 * 
+	 * @return the deployable reference
+	 * 
+	 * @see DeployableReference
+	 */
+	public DeployableReference getReference() {
+		return reference;
+	}
+	
+	/**
 	 * Registers a change for the given file watcher event.
 	 * 
 	 * @param event the event to register the change for
 	 */
 	public void registerChange(FileWatcherEvent event) {
 		Path changedFile = event.getPath();
-		Path referenceBase = new File(reference.getPath()).toPath();
+		Path referenceBase = Paths.get(reference.getPath());
 		Path relative = referenceBase.relativize(changedFile);
 		
 		int currentChangeConverted = convert(event.getKind());

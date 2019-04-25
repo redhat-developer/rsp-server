@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * Copyright (c) 2019 Red Hat, Inc. Distributed under license by Red Hat, Inc.
  * All rights reserved. This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v20.html
@@ -30,6 +30,15 @@ public class DeployableDeltaTest {
 
 	private DeployableReference deployable = new DeployableReference(null, DEPLOYABLE_PATH.toString());
 	private DeployableDelta delta = new DeployableDelta(deployable);
+
+	@Test
+	public void shouldRegisterReference() {
+		// given
+		// when
+		DeployableReference reference = delta.getReference();
+		// then
+		assertThat(reference).isEqualTo(this.deployable);
+	}
 
 	@Test
 	public void shouldRegisterNewFolder() {
@@ -95,6 +104,21 @@ public class DeployableDeltaTest {
 		// then
 		assertThat(delta.getResourceDeltaMap())
 			.containsExactly(MapEntry.entry(BATMANS_CAPE, IDeployableResourceDelta.MODIFIED));
+	}
+
+	@Test
+	public void shouldRegister2ndChange() {
+		// given
+		delta.registerChange(
+				new FileWatcherEvent(DEPLOYABLE_PATH.resolve(BATMAN), StandardWatchEventKinds.ENTRY_CREATE));
+		// when
+		delta.registerChange(
+				new FileWatcherEvent(DEPLOYABLE_PATH.resolve(BATMANS_CAPE), StandardWatchEventKinds.ENTRY_CREATE));
+		// then
+		assertThat(delta.getResourceDeltaMap())
+			.containsOnly(
+					MapEntry.entry(BATMAN, IDeployableResourceDelta.CREATED),
+					MapEntry.entry(BATMANS_CAPE, IDeployableResourceDelta.CREATED));
 	}
 
 	@Test
