@@ -32,14 +32,14 @@ public interface IServerPublishModel {
 	public IStatus addDeployable(DeployableReference ref);
 
 	/**
-	 * Returns {@code true} if the given reference can be added to this model. This
-	 * is the case if this model does not contain a DeployableReference with the
-	 * same id.
+	 * Returns {@code true} if the given reference is contained in this model. This
+	 * is the case if the deployable was previously added. Deployables are
+	 * identified by their path.
 	 * 
 	 * @param reference
-	 * @return true if the given reference can be added
+	 * @return true if the given reference is contained in this model
 	 * 
-	 * @see DeployableReference#getId
+	 * @see DeployableReference#getPath
 	 */
 	public boolean contains(DeployableReference reference);
 

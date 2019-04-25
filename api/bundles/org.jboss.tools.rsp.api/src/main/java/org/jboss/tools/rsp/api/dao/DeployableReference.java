@@ -42,9 +42,6 @@ public class DeployableReference {
 		return path;
 	}
 
-	public void setPath(String path) {
-		this.path = path;
-	}
 	public Map<String, Object> getOptions() {
 		return options;
 	}

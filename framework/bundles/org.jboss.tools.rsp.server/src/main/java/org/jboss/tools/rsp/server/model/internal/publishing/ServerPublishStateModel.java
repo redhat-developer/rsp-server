@@ -32,18 +32,18 @@ import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
 
 public class ServerPublishStateModel implements IServerPublishModel, IFileWatcherEventListener {
 
-	private final Map<String, DeployableState> state;
+	private final Map<String, DeployableState> states;
 	private final Map<String, Map<String,Object>> deploymentOptions;
 	private final Map<String, DeployableDelta> deltas = new HashMap<>();
 	
-	private AbstractServerDelegate server;
+	private AbstractServerDelegate delegate;
 	private IFileWatcherService fileWatcher;
 	private int publishState = AbstractServerDelegate.PUBLISH_STATE_UNKNOWN;
 	
 	public ServerPublishStateModel(AbstractServerDelegate delegate, IFileWatcherService fileWatcher) {
-		this.server = delegate;
+		this.delegate = delegate;
 		this.fileWatcher = fileWatcher;
-		this.state = new LinkedHashMap<>();
+		this.states = new LinkedHashMap<>();
 		this.deploymentOptions = new LinkedHashMap<>();
 	}
 
@@ -56,16 +56,26 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 	
 	private void addDeployableImpl(DeployableReference reference, int publishState) {
-		DeployableState sActual = new DeployableState();
-		sActual.setReference(reference);
-		sActual.setState(ServerManagementAPIConstants.STATE_UNKNOWN);
-		sActual.setPublishState(publishState);
-		sActual.setServer(server.getServerHandle());
+		DeployableState deployableState = 
+				createDeployableState(reference, publishState, ServerManagementAPIConstants.STATE_UNKNOWN);
 		
 		String key = getKey(reference);
-		state.put(key, sActual);
-		deploymentOptions.put(key, reference.getOptions());
-		
+		getStates().put(key, deployableState);
+		deploymentOptions.put(getKey(reference), reference.getOptions());
+
+		registerFileWatcher(reference);
+	}
+
+	private DeployableState createDeployableState(DeployableReference reference, int publishState, int state) {
+		DeployableState deployableState = new DeployableState();
+		deployableState.setPublishState(publishState);
+		deployableState.setState(state);
+		deployableState.setReference(reference);
+		deployableState.setServer(delegate.getServerHandle());
+		return deployableState;
+	}
+	
+	private void registerFileWatcher(DeployableReference reference) {
 		File f = new File(reference.getPath());
 		boolean recursive = f.exists() && f.isDirectory();
 		
@@ -74,7 +84,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 			fileWatcher.addFileWatcherListener(new File(path).toPath(), this, recursive);
 		}
 	}
-	
+
 	/**
 	 * Adds the given deployable to this model.
 	 * 
@@ -92,98 +102,97 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		return Status.OK_STATUS;
 	}
 
-	/**
-	 * Returns {@code true} if the given deployable is present in this model.
-	 * 
-	 * @param reference the deployable to be checked for
-	 */
 	@Override
 	public boolean contains(DeployableReference reference) {
-		return state.containsKey(getKey(reference));
+		return getStates().containsKey(getKey(reference));
 	}
-	
+
 	@Override
 	public IStatus removeDeployable(DeployableReference reference) {
-		if (!contains(reference)) {
+		DeployableState ds = getStates().get(getKey(reference));
+		if (ds == null) {
 			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, IStatus.ERROR, 
 					NLS.bind("Could not remove deploybale with path {0}: it doesn't exist", getKey(reference)),
 							null);
 		}
-			
-		DeployableState ds = state.get(getKey(reference));
-		if( ds.getPublishState() == ServerManagementAPIConstants.PUBLISH_STATE_ADD) { 
+		if (ds.getPublishState() == ServerManagementAPIConstants.PUBLISH_STATE_ADD) {
 			// It hasn't been added / published yet, so we can remove it immediately
 			deployableRemoved(reference);
 		}
 		ds.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_REMOVE);
 		String path = reference.getPath();
-		if( fileWatcher != null ) {
+		if (fileWatcher != null) {
 			fileWatcher.removeFileWatcherListener(new File(path).toPath(), this);
 		}
 		fireState();
 		return Status.OK_STATUS;
 	}
 
-	private String getKey(DeployableReference reference) {
+	protected String getKey(DeployableReference reference) {
+		if (reference == null) {
+			return null;
+		} 
 		return reference.getPath();
 	}
 	
 	@Override
 	public void deployableRemoved(DeployableReference reference) {
 		String k = getKey(reference);
-		state.remove(k);
+		getStates().remove(k);
 		deploymentOptions.remove(k);
 	}
 
 	@Override
 	public List<DeployableState> getDeployableStates() {
-		return new ArrayList<>(state.values());
+		return new ArrayList<>(getStates().values());
 	}
-	
+
 	@Override
 	public DeployableState getDeployableState(DeployableReference reference) {
-		if (reference == null) {
-			return null;
-		}
-		DeployableState ds = state.get(getKey(reference));
+		DeployableState ds = getStates().get(getKey(reference));
 		if (ds == null) {
 			return null;
 		}
-		DeployableState ret = new DeployableState();
-		ret.setPublishState(ds.getPublishState());
-		ret.setState(ds.getState());
-		ret.setReference(reference);
-		ret.setServer(server.getServerHandle());
-		return ret;
+		return createDeployableState(reference, ds.getPublishState(), ds.getState());
+	}
+
+	/**
+	 * for testing purposes
+	 */
+	protected Map<String, DeployableState> getStates() {
+		return states;
 	}
 
 	@Override
 	public void setDeployablePublishState(DeployableReference reference, int publishState) {
-		DeployableState ds = state.get(getKey(reference));
-		DeployableState next = new DeployableState();
-		next.setReference(reference);
-		next.setState(ds.getState());
-		next.setPublishState(publishState);
-		next.setServer(server.getServerHandle());
-		state.put(getKey(reference), next);
+		DeployableState ds = getDeployableState(reference);
+		if (ds == null) {
+			return;
+		}
+		DeployableState next = createDeployableState(reference, publishState, ds.getState());
+		String key = getKey(reference);
+		getStates().put(key, next);
 		if( publishState == ServerManagementAPIConstants.PUBLISH_STATE_NONE) {
-			DeployableDelta delta2 = deltas.get(getKey(reference));
-			if( delta2 != null ) {
-				delta2.clear();
-			}
+			clearDelta(key);
 		}
 		updateServerPublishStateFromDeployments();
 	}
 
+	private void clearDelta(String key) {
+		DeployableDelta delta2 = deltas.get(key);
+		if( delta2 != null ) {
+			delta2.clear();
+		}
+	}
+
 	@Override
 	public void setDeployableState(DeployableReference reference, int runState) {
-		DeployableState ds = state.get(getKey(reference));
-		DeployableState next = new DeployableState();
-		next.setReference(reference);
-		next.setState(runState);
-		next.setPublishState(ds.getPublishState());
-		next.setServer(server.getServerHandle());
-		state.put(getKey(reference), next);
+		DeployableState ds = getStates().get(getKey(reference));
+		if (ds == null) {
+			return;
+		}
+		DeployableState next = createDeployableState(reference, ds.getPublishState(), runState);
+		getStates().put(getKey(reference), next);
 	}
 
 	/*
@@ -213,7 +222,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	@Override
 	public void fileChanged(FileWatcherEvent event) {
 		Path affected = event.getPath();
-		List<DeployableState> ds = new ArrayList<>(state.values());
+		List<DeployableState> ds = new ArrayList<>(getStates().values());
 		boolean changed = false;
 		for( DeployableState d : ds ) {
 			Path deploymentPath = new File(d.getReference().getPath()).toPath();
@@ -242,21 +251,23 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 
 	private void fireState() {
 		updateServerPublishStateFromDeployments();
-		
+
 		// Feels strange to allow this class to fire the event
 		// but whatever. This feels so dirty. 
-		if( server != null && server.getServer() != null && server.getServer().getServerManagementModel() != null 
-				&& server.getServer().getServerManagementModel().getServerModel() != null ) {
-			server.getServer().getServerManagementModel().getServerModel().fireServerStateChanged(server.getServer(), server.getServerState());
+		if( delegate != null && delegate.getServer() != null 
+				&& delegate.getServer().getServerManagementModel() != null 
+				&& delegate.getServer().getServerManagementModel().getServerModel() != null ) {
+			delegate.getServer().getServerManagementModel().getServerModel()
+				.fireServerStateChanged(delegate.getServer(), delegate.getServerState());
 		}
 	}
 	
 	private void updateServerPublishStateFromDeployments() {
-		ArrayList<DeployableState> vals = new ArrayList<>(state.values());
+		List<DeployableState> vals = new ArrayList<>(getStates().values());
 		int newState = ServerManagementAPIConstants.PUBLISH_STATE_NONE;
-		
+
 		if( deployableExists(ServerManagementAPIConstants.PUBLISH_STATE_ADD, vals) || 
-				 deployableExists(ServerManagementAPIConstants.PUBLISH_STATE_REMOVE, vals) ||
+				deployableExists(ServerManagementAPIConstants.PUBLISH_STATE_REMOVE, vals) ||
 				deployableExists(ServerManagementAPIConstants.PUBLISH_STATE_FULL, vals)) {
 			newState = ServerManagementAPIConstants.PUBLISH_STATE_FULL;
 		} else {
@@ -271,17 +282,17 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		setServerPublishState(newState, false);
 	}
 	
-	private boolean deployableExists(int publishState, List<DeployableState> list) {
-		for( DeployableState i : list ) {
-			if( i.getPublishState() == publishState ) 
-				return true;
-		}
-		return false;
+	private boolean deployableExists(int publishState, List<DeployableState> deployableStates) {
+		return deployableStates.stream()
+				.anyMatch(deployState -> deployState.getPublishState() == publishState);
 	}
-	
+
+	@Override
 	public int getServerPublishState() {
 		return this.publishState;
 	}
+
+	@Override
 	public void setServerPublishState(int state, boolean fire) {
 		if( state != this.publishState) {
 			this.publishState = state;
@@ -292,6 +303,9 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 
 	@Override
 	public DeployableReference fillOptionsFromCache(DeployableReference reference) {
+		if (reference == null) {
+			return null;
+		}
 		reference.setOptions(deploymentOptions.get(getKey(reference)));
 		return reference;
 	}
