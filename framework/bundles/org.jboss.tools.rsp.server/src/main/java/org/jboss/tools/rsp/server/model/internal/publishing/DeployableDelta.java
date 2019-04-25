@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v2.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v20.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.rsp.server.model.internal.publishing;
 
 import java.io.File;
@@ -13,22 +21,28 @@ import org.jboss.tools.rsp.server.spi.servertype.IDeployableResourceDelta;
 
 public class DeployableDelta implements IDeployableResourceDelta {
 	
+	private static final int UNKNOWN_KIND = -1;
 	private DeployableReference reference;
-
 	private Map<Path, Integer> changes;
+
 	public DeployableDelta(DeployableReference reference) {
 		this.reference = reference;
 		this.changes  = new HashMap<>();
 	}
-	
-	/*
-	 * Get a map of relative paths and their change type
+
+	/**
+	 * Returns a map of relative paths and their change type
 	 */
 	@Override
 	public Map<Path, Integer> getResourceDeltaMap() {
 		return new HashMap<>(changes);
 	}
 
+	/**
+	 * Registers a change for the given file watcher event.
+	 * 
+	 * @param event the event to register the change for
+	 */
 	public void registerChange(FileWatcherEvent event) {
 		Path changedFile = event.getPath();
 		Path referenceBase = new File(reference.getPath()).toPath();
@@ -36,7 +50,11 @@ public class DeployableDelta implements IDeployableResourceDelta {
 		
 		int currentChangeConverted = convert(event.getKind());
 		
-		if( changes.get(relative) == null ) {
+		if (UNKNOWN_KIND == currentChangeConverted) {
+			return;
+		}
+
+		if(!changes.containsKey(relative)) {
 			changes.put(relative, currentChangeConverted);
 		} else {
 			// Ok, this file has already been changed... ugh
@@ -51,18 +69,22 @@ public class DeployableDelta implements IDeployableResourceDelta {
 		}
 	}
 	
-	public void clearDelta() {
+	/**
+	 * Clears all the changes that were registered in this delta.
+	 */
+	public void clear() {
 		changes.clear();
 	}
 	
 	private int convert(WatchEvent.Kind<?> kind) {
 		if( kind == StandardWatchEventKinds.ENTRY_CREATE)
 			return CREATED;
-		if( kind == StandardWatchEventKinds.ENTRY_MODIFY)
+		else if( kind == StandardWatchEventKinds.ENTRY_MODIFY)
 			return MODIFIED;
-		if( kind == StandardWatchEventKinds.ENTRY_DELETE)
+		else if( kind == StandardWatchEventKinds.ENTRY_DELETE)
 			return DELETED;
-		return -1;
+		else
+			return UNKNOWN_KIND;
 	}
 
 }

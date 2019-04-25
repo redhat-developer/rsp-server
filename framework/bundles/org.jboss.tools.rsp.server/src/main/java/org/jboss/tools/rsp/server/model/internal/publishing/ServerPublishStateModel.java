@@ -75,6 +75,11 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		}
 	}
 	
+	/**
+	 * Adds the given deployable to this model.
+	 * 
+	 * @param withOptions the deployable to add.
+	 */
 	@Override
 	public IStatus addDeployable(DeployableReference withOptions) {
 		if (contains(withOptions)) {
@@ -87,8 +92,13 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		return Status.OK_STATUS;
 	}
 
+	/**
+	 * Returns {@code true} if the given deployable is present in this model.
+	 * 
+	 * @param reference the deployable to be checked for
+	 */
 	@Override
-	public boolean contains(DeployableReference reference ) {
+	public boolean contains(DeployableReference reference) {
 		return state.containsKey(getKey(reference));
 	}
 	
@@ -159,7 +169,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		if( publishState == ServerManagementAPIConstants.PUBLISH_STATE_NONE) {
 			DeployableDelta delta2 = deltas.get(getKey(reference));
 			if( delta2 != null ) {
-				delta2.clearDelta();
+				delta2.clear();
 			}
 		}
 		updateServerPublishStateFromDeployments();
