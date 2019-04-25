@@ -18,7 +18,7 @@ public interface IDeployableResourceDelta {
 	public static final int DELETED = 3;
 	
 	/**
-	 * Get a map of changed resources within this deployable.
+	 * Returns a map of changed resources within this deployable.
 	 * The key is a relative path to the deployment's source directory.
 	 * The value is one of CREATED, MODIFIED, or DELETED. 
 	 * @return
