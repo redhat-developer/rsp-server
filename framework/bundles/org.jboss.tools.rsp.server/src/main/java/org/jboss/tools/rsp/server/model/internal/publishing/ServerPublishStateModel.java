@@ -261,8 +261,8 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 				.fireServerStateChanged(delegate.getServer(), delegate.getServerState());
 		}
 	}
-	
-	private void updateServerPublishStateFromDeployments() {
+
+	protected void updateServerPublishStateFromDeployments() {
 		List<DeployableState> vals = new ArrayList<>(getStates().values());
 		int newState = ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 

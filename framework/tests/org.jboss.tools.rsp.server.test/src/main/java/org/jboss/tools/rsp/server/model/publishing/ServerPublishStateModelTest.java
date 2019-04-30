@@ -21,6 +21,7 @@ import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -31,11 +32,18 @@ import java.util.stream.Collectors;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
+import org.jboss.tools.rsp.api.dao.ServerState;
+import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
+import org.jboss.tools.rsp.server.model.ServerModel;
 import org.jboss.tools.rsp.server.model.internal.publishing.ServerPublishStateModel;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherEventListener;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
+import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
+import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
+import org.jboss.tools.rsp.server.util.TestServerDelegate;
+import org.jboss.tools.rsp.server.util.TestServerUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -435,7 +443,6 @@ public class ServerPublishStateModelTest {
 		assertThat(state.getReference()).isEqualTo(directoryState.getReference());
 		assertThat(state.getState()).isEqualTo(directoryState.getState());
 		assertThat(state.getPublishState()).isEqualTo(ServerManagementAPIConstants.PUBLISH_STATE_FULL);
-		
 	}
 
 	@Test
@@ -451,6 +458,38 @@ public class ServerPublishStateModelTest {
 		assertThat(model.getServerPublishState()).isEqualTo(ServerManagementAPIConstants.PUBLISH_STATE_NONE);
 	}
 	
+	@Test
+	public void shouldFirePublishBasedOnDeployments() throws IOException, CoreException {
+		// given
+		final String serverType = "firingServer";
+		final String serverId = serverType + "_1";
+		final Path serversDir = Files.createTempDirectory("servers");
+		final String serverFilename = "firingServer";
+		IServerManagementModel managementModel = mock(IServerManagementModel.class);
+		ServerModel serverModel = spy(TestServerUtils.createServerModel(
+				serverFilename, 
+				serversDir,
+				TestServerUtils.getServerWithDeployablesString(serverId, serverType),
+				TestServerDelegate::new,
+				serverType,
+				managementModel,
+				null));
+		doReturn(serverModel).when(managementModel).getServerModel();
+		TestServerDelegate delegate = (TestServerDelegate) serverModel.getServer(serverId).getDelegate();
+		IServerPublishModel model = delegate.getServerPublishModel();
+		// publish state evaluated from the deployments
+		int state = model.getServerPublishState();
+		// when
+		model.setServerPublishState(ServerManagementAPIConstants.PUBLISH_STATE_REMOVE, true);
+		// then
+		ArgumentCaptor<ServerState> stateCaptor = ArgumentCaptor.forClass(ServerState.class);
+		verify(serverModel).fireServerStateChanged(any(), stateCaptor.capture());
+		assertThat(stateCaptor.getValue().getPublishState())
+			// will not fire ServerManagementAPIConstants.PUBLISH_STATE_REMOVE 
+			// but evaluated based on the deployments
+			.isEqualTo(state);
+	}
+
 	private ServerPublishStateModel fakeDeployableStates(int publishState, DeployableReference deployable) {
 		DeployableState deployableState = mockDeployableState(publishState, deployable);
 		return fakeDeployableStates(new DeployableStateEntry(deployableState));
@@ -550,7 +589,6 @@ public class ServerPublishStateModelTest {
 		public String getKey(DeployableReference deployable) {
 			return super.getKey(deployable);
 		}
-
 	}
 }
 
