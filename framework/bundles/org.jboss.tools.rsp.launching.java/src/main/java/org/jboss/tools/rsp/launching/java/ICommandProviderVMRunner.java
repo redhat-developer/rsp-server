@@ -14,7 +14,7 @@ import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.jboss.tools.rsp.launching.utils.LaunchingCommandLineDetails;
 
-public interface ICommandProvider {
+public interface ICommandProviderVMRunner {
 	/**
 	 * Returns the command line, envp, and working directory details 
 	 * needed to launch a Java VM as specified in the given configuration,

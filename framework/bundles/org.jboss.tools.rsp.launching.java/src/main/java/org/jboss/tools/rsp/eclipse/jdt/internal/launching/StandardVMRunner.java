@@ -380,6 +380,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 		return vmargs;
 	}
 
+	@Override
 	public LaunchingCommandLineDetails getCommandLineDetails(VMRunnerConfiguration config, ILaunch launch, IProgressMonitor subMonitor) throws CoreException {
 		String program= constructProgramString(config);
 
@@ -441,9 +442,13 @@ public class StandardVMRunner extends AbstractVMRunner {
 	public void run(VMRunnerConfiguration config, ILaunch launch, IProgressMonitor monitor) throws CoreException {
 		run(config, launch, false, monitor);
 	}
-	protected void run(VMRunnerConfiguration config, ILaunch launch, boolean destroyAtEnd, IProgressMonitor monitor) throws CoreException {
-
-
+	
+	@Override
+	public LaunchingCommandLineDetails runWithDetails(VMRunnerConfiguration config, ILaunch launch, IProgressMonitor monitor) throws CoreException {
+		return run(config, launch, false, monitor);
+	}
+	
+	protected LaunchingCommandLineDetails run(VMRunnerConfiguration config, ILaunch launch, boolean destroyAtEnd, IProgressMonitor monitor) throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
@@ -453,7 +458,12 @@ public class StandardVMRunner extends AbstractVMRunner {
 		subMonitor.subTask(StandardVMRunner_Constructing_command_line____2);
 		
 		LaunchingCommandLineDetails det = getCommandLineDetails(config, launch, subMonitor);
-
+		launchProcess(det, launch, destroyAtEnd, subMonitor);
+		return det;
+	}
+	
+	private void launchProcess(LaunchingCommandLineDetails det, ILaunch launch, 
+			boolean destroyAtEnd, IProgressMonitor subMonitor) throws CoreException {
 		Process p= null;
 		File workingDir = (det.getWorkingDir() == null ? null : new File(det.getWorkingDir()));
 		p= exec(det.getCmdLine(), workingDir, det.getEnvp());
@@ -462,7 +472,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 		}
 
 		// check for cancellation
-		if (monitor.isCanceled()) {
+		if (subMonitor.isCanceled()) {
 			p.destroy();
 			return;
 		}
