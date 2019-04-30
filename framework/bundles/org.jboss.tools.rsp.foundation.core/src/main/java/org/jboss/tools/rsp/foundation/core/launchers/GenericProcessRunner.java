@@ -36,15 +36,21 @@ public class GenericProcessRunner {
 	}
 
 	public void run(ILaunch launch, IProgressMonitor monitor) throws CoreException {
+		runWithDetails(launch, monitor);
+	}
+	
+	public CommandLineDetails runWithDetails(ILaunch launch, IProgressMonitor monitor) throws CoreException {
 		CommandConfig det = getTemporaryDetails();
 		ProcessUtility util = new ProcessUtility();
 		try {
 			Process p = util.callProcess(det.getCommand(), det.getParsedArgs(), det.getWorkingDir(), det.getEnvironment());
 			IProcess process = util.createIProcess(launch, p, det.toDetails());
 			launch.addProcess(process);
+			return det.toDetails();
 		} catch(IOException ioe) {
 			abort("Failed to launch process", ioe, 0);
 		}
+		return null;
 	}
 
 	protected void abort(String message, Throwable exception, int code) throws CoreException {

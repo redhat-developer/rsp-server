@@ -24,7 +24,7 @@ import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.rsp.eclipse.jdt.core.JavaCore;
 import org.jboss.tools.rsp.eclipse.jdt.core.JavaCoreConstants;
-import org.jboss.tools.rsp.launching.java.ICommandProvider;
+import org.jboss.tools.rsp.launching.java.ICommandProviderVMRunner;
 import org.jboss.tools.rsp.launching.utils.ExecUtil;
 import org.jboss.tools.rsp.launching.utils.OSUtils;
 
@@ -36,7 +36,7 @@ import org.jboss.tools.rsp.launching.utils.OSUtils;
  * @see IVMRunner
  * @since 2.0
  */
-public abstract class AbstractVMRunner implements IVMRunner, ICommandProvider {
+public abstract class AbstractVMRunner implements IVMRunner, ICommandProviderVMRunner {
 	public static final String AbstractVMRunner_0="An IProcess could not be created for the launch";
 
 	/**

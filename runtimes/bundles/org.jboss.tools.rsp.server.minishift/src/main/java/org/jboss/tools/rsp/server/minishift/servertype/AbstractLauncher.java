@@ -46,7 +46,7 @@ public abstract class AbstractLauncher implements IServerStartLauncher {
 	public ILaunch launch(String mode) throws CoreException {
 		getLaunchCommand(mode);
 		configureRunner();
-		runner.run(launch, new NullProgressMonitor());
+		launchedDetails = runner.runWithDetails(launch, new NullProgressMonitor());
 		return launch;
 	}
 

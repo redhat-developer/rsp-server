@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.server.model;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -238,14 +239,26 @@ public class ServerModel implements IServerModel {
 					getInvalidAttributeKeys(validAttributes));
 		}
 		
+		File serverFile = getServerFile(id);
+		if( !canCreateFile(serverFile)) {
+			return new CreateServerResponse(
+					StatusConverter.convert(
+							new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+									"Server id is invalid for this filesystem")), 
+									Collections.EMPTY_LIST);
+		}
 		Server server = createServer2(type, id, attributes);
 		IServerDelegate del = server.getDelegate();
 		CreateServerValidation valid = del.validate();
 		if( !valid.getStatus().isOK()) {
 			return valid.toDao();
 		}
+		try {
+			server.save(new NullProgressMonitor());
+		} catch(CoreException ce) {
+			
+		}
 		addServer(server, del);
-		server.save(new NullProgressMonitor());
 		return valid.toDao();
 	}
 	
@@ -305,6 +318,11 @@ public class ServerModel implements IServerModel {
 	}
 
 	private Server createServer2(IServerType serverType, String id, Map<String, Object> attributes) {
+		File serverFile = getServerFile(id);
+		return new Server(serverFile, serverType, id, attributes, managementModel);
+	}
+	
+	private File getServerFile(String id) {
 		File data = LaunchingCore.getDataLocation();
 		File serversDirectory = new File(data, SERVERS_DIRECTORY);
 		if( !serversDirectory.exists()) {
@@ -312,7 +330,21 @@ public class ServerModel implements IServerModel {
 		}
 		// TODO check for duplicates
 		File serverFile = new File(serversDirectory, id);
-		return new Server(serverFile, serverType, id, attributes, managementModel);
+		return serverFile;
+	}
+
+	private boolean canCreateFile(File file) {
+		if (file.exists()) {
+			return file.canWrite();
+		} else {
+			try {
+				file.createNewFile();
+				file.delete();
+				return true;
+			} catch (Exception e) {
+				return false;
+			}
+		}
 	}
 
 	protected void addServer(IServer server, IServerDelegate del) {

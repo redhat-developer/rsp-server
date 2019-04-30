@@ -26,7 +26,7 @@ import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMRunner;
 import org.jboss.tools.rsp.eclipse.jdt.launching.VMRunnerConfiguration;
-import org.jboss.tools.rsp.launching.java.ICommandProvider;
+import org.jboss.tools.rsp.launching.java.ICommandProviderVMRunner;
 import org.jboss.tools.rsp.launching.java.VMInstallClasspath;
 import org.jboss.tools.rsp.launching.utils.LaunchingCommandLineDetails;
 import org.jboss.tools.rsp.launching.utils.NativeEnvironmentUtils;
@@ -53,7 +53,7 @@ public abstract class AbstractJavaLauncher implements IServerStartLauncher {
 	
 	public ILaunch launch(String mode) throws CoreException {
 		getLaunchCommand(mode);
-		runner.run(runConfig, launch, new NullProgressMonitor());
+		launchedDetails = convert(runner.runWithDetails(runConfig, launch, new NullProgressMonitor()));
 		return launch;
 	}
 
@@ -64,8 +64,8 @@ public abstract class AbstractJavaLauncher implements IServerStartLauncher {
 
 		launch = createLaunch(mode);
 		runConfig = configureRunner();
-		if (runner instanceof ICommandProvider) {
-			LaunchingCommandLineDetails det1 = ((ICommandProvider) runner).getCommandLineDetails(runConfig, launch,
+		if (runner instanceof ICommandProviderVMRunner) {
+			LaunchingCommandLineDetails det1 = ((ICommandProviderVMRunner) runner).getCommandLineDetails(runConfig, launch,
 					new NullProgressMonitor());
 			launchedDetails = convert(det1);
 			return launchedDetails;

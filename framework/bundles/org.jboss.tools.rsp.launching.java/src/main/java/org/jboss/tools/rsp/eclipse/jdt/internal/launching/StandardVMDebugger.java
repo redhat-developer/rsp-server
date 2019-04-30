@@ -75,15 +75,7 @@ public class StandardVMDebugger extends StandardVMRunner {
 	public StandardVMDebugger(IVMInstall vmInstance) {
 		super(vmInstance);
 	}
-
-	/* (non-Javadoc)
-	 * @see org.jboss.tools.rsp.eclipse.jdt.launching.IVMRunner#run(org.jboss.tools.rsp.eclipse.jdt.launching.VMRunnerConfiguration, org.jboss.tools.rsp.eclipse.debug.core.ILaunch, org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor)
-	 */
-	@Override
-	public void run(VMRunnerConfiguration config, ILaunch launch, IProgressMonitor monitor) throws CoreException {
-		run(config, launch, false, monitor);
-	}
-
+	
 	@Override
 	public LaunchingCommandLineDetails getCommandLineDetails(VMRunnerConfiguration config, ILaunch launch, IProgressMonitor subMonitor) throws CoreException {
 		// TODO maybe make these adjustable?  idk
