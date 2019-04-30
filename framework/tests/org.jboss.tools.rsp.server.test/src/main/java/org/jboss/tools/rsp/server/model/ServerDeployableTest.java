@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
@@ -41,13 +40,12 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.launching.memento.IMemento;
 import org.jboss.tools.rsp.launching.memento.JSONMemento;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
-import org.jboss.tools.rsp.server.spi.model.IServerModelListener;
-import org.jboss.tools.rsp.server.spi.servertype.AbstractServerType;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
-import org.jboss.tools.rsp.server.spi.servertype.IServerType;
 import org.jboss.tools.rsp.server.util.DataLocationSysProp;
+import org.jboss.tools.rsp.server.util.TestServerDelegate;
+import org.jboss.tools.rsp.server.util.TestServerUtils;
 import org.jboss.tools.rsp.server.util.generation.DeploymentGeneration;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -93,10 +91,11 @@ public class ServerDeployableTest {
 	@Before
 	public void before() throws IOException {
 		this.serversDir = Files.createTempDirectory(SERVERS_DIR);
-		this.war = createWar();
+		this.war = new DeploymentGeneration().createWar(WAR_FILENAME, DEPLOYMENTS_DIR);
 		this.sm = new ServerModel(mock(IServerManagementModel.class));
-		this.sm.addServerType(mockServerType(SERVER_TYPE, TestServerDelegate::new));
-		this.serverFile = createServerFile(SERVER_FILENAME, getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE));
+		this.sm.addServerType(TestServerUtils.createServerType(SERVER_TYPE, TestServerDelegate::new));
+		this.serverFile = TestServerUtils.createServerFile(SERVER_FILENAME,serversDir,
+				TestServerUtils.getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE));
 		this.sm.loadServers(serversDir.toFile());
 		this.server = sm.getServer(SERVER_ID);
 		this.deployable = new DeployableReference(DEPLOYABLE_LABEL, DEPLOYABLE_PATH);
@@ -104,44 +103,45 @@ public class ServerDeployableTest {
 
 	@Test
 	public void testCannotAddDeployable() {
-		ServerModel sm = createServerModel(
+		ServerModel sm = TestServerUtils.createServerModel(SERVER_FILENAME, serversDir,
+				TestServerUtils.getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE),
 				(IServer server) -> {
 					IServerDelegate spy = spy(new TestServerDelegate(server));
 					doReturn(Status.CANCEL_STATUS).when(spy).canAddDeployable(any(DeployableReference.class));
 					return spy;
 				},
-				getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE));
+				SERVER_TYPE
+		);
 
 		IServer server = sm.getServer(SERVER_ID);
 		assertTrue(sm.getDeployables(server).isEmpty());
 		DeployableReference reference = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
 		IStatus added = sm.addDeployable(server, reference);
-		assertNotNull(added);
-		assertFalse(added.isOK());
+		assertFalse(TestServerUtils.isOk(added));
 		assertTrue(sm.getDeployables(server).isEmpty());
 	}
 
 	@Test
 	public void testCannotRemoveDeployable() {
-		ServerModel sm = createServerModel(
+		ServerModel sm = TestServerUtils.createServerModel(
+				SERVER_FILENAME, serversDir,
+				TestServerUtils.getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE),
 				(IServer server) -> {
 					IServerDelegate spy = spy(new TestServerDelegate(server));
 					doReturn(Status.CANCEL_STATUS).when(spy).canRemoveDeployable(any(DeployableReference.class));
 					return spy;
 				},
-				getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE));
+				SERVER_TYPE);
 
 		IServer server = sm.getServer(SERVER_ID);
 		assertTrue(sm.getDeployables(server).isEmpty());
 		DeployableReference reference = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
 		IStatus added = sm.addDeployable(server, reference);
-		assertNotNull(added);
-		assertTrue(added.isOK());
+		assertTrue(TestServerUtils.isOk(added));
 		assertEquals(1, sm.getDeployables(server).size());
 
 		IStatus removed = sm.removeDeployable(server, reference);
-		assertNotNull(removed);
-		assertFalse(removed.isOK());
+		assertFalse(TestServerUtils.isOk(removed));
 		assertEquals(1, sm.getDeployables(server).size());
 	}
 
@@ -150,15 +150,13 @@ public class ServerDeployableTest {
 		assertTrue(sm.getDeployables(server).isEmpty());
 		DeployableReference reference = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
 		IStatus added = sm.addDeployable(server, reference);
-		assertNotNull(added);
-		assertTrue(added.isOK());
+		assertTrue(TestServerUtils.isOk(added));
 		assertNotNull(sm.getDeployables(server));
 		assertEquals(1, sm.getDeployables(server).size());
 
 		DeployableReference reference2 = new DeployableReference(DEPLOYABLE_LABEL, "/smurfette/in/da/woods");
 		added = sm.addDeployable(server, reference2);
-		assertNotNull(added);
-		assertTrue(added.isOK());
+		assertTrue(TestServerUtils.isOk(added));
 		assertEquals(2, sm.getDeployables(server).size());
 	}
 
@@ -167,21 +165,18 @@ public class ServerDeployableTest {
 		assertTrue(sm.getDeployables(server).isEmpty());
 		DeployableReference reference = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
 		IStatus added = sm.addDeployable(server, reference);
-		assertNotNull(added);
-		assertTrue(added.isOK());
+		assertTrue(TestServerUtils.isOk(added));
 		assertNotNull(sm.getDeployables(server));
 		assertEquals(1, sm.getDeployables(server).size());
 
 		DeployableReference reference2 = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
 		added = sm.addDeployable(server, reference2);
-		assertNotNull(added);
-		assertFalse(added.isOK());
+		assertFalse(TestServerUtils.isOk(added));
 		assertEquals(1, sm.getDeployables(server).size());
 
 		reference2 = new DeployableReference("papa-smurf", war.getAbsolutePath());
 		added = sm.addDeployable(server, reference2);
-		assertNotNull(added);
-		assertFalse(added.isOK());
+		assertFalse(TestServerUtils.isOk(added));
 		assertEquals(1, sm.getDeployables(server).size());
 	}
 
@@ -190,21 +185,18 @@ public class ServerDeployableTest {
 		assertTrue(sm.getDeployables(server).isEmpty());
 		DeployableReference reference = new DeployableReference(DEPLOYABLE_LABEL, "/gargamel/in/da/castle");
 		IStatus added = sm.addDeployable(server, reference);
-		assertNotNull(added);
-		assertTrue(added.isOK());
+		assertTrue(TestServerUtils.isOk(added));
 		assertNotNull(sm.getDeployables(server));
 		assertEquals(1, sm.getDeployables(server).size());
 
 		DeployableReference reference2 = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
 		IStatus removed = sm.removeDeployable(server, reference2);
-		assertNotNull(removed);
-		assertFalse(removed.isOK());
+		assertFalse(TestServerUtils.isOk(removed));
 		assertEquals(1, sm.getDeployables(server).size());
 
 		reference2 = new DeployableReference("papa-smurf", war.getAbsolutePath());
 		removed = sm.removeDeployable(server, reference2);
-		assertNotNull(removed);
-		assertFalse(removed.isOK());
+		assertFalse(TestServerUtils.isOk(removed));
 		assertEquals(1, sm.getDeployables(server).size());
 	}
 
@@ -216,14 +208,14 @@ public class ServerDeployableTest {
 
 		DeployableReference reference = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
 		IStatus added = sm.addDeployable(server, reference);
-		assertTrue(isOk(added));
+		assertTrue(TestServerUtils.isOk(added));
 
 		deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
 		assertEquals(1, deployables.size());
 
 		IStatus removed = sm.removeDeployable(server, reference);
-		assertTrue(isOk(removed));
+		assertTrue(TestServerUtils.isOk(removed));
 
 		deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
@@ -232,25 +224,29 @@ public class ServerDeployableTest {
 
 	@Test
 	public void testWontPublishIfCannotPublish() throws CoreException {
-		ServerModel sm = createServerModel(
+		ServerModel sm = TestServerUtils.createServerModel(
+				SERVER_FILENAME, serversDir,
+				TestServerUtils.getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE),
 				(IServer server) -> {
 					IServerDelegate spy = spy(new TestServerDelegate(server));
 					doReturn(Status.CANCEL_STATUS).when(spy).canPublish();
 					return spy;
 				},
-				getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE));
+				SERVER_TYPE);
 		IStatus added = sm.addDeployable(server, deployable);
-		assertTrue(added != null && added.isOK());
+		assertTrue(TestServerUtils.isOk(added));
 
 		IServer server = sm.getServer(SERVER_ID);
 		IStatus published = sm.publish(server, ServerManagementAPIConstants.PUBLISH_FULL);
-		assertFalse(isOk(published));
+		assertFalse(TestServerUtils.isOk(published));
 	}
 
 	@Test
 	public void testCallsPublishStartAndPublishFinish() throws CoreException {
 		final List<String> startFinishInvocation = new ArrayList<>();
-		ServerModel sm = createServerModel(
+		ServerModel sm = TestServerUtils.createServerModel(
+				SERVER_FILENAME, serversDir,
+				TestServerUtils.getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE),
 				(IServer server) -> new TestServerDelegate(server) {
 
 					@Override
@@ -268,14 +264,14 @@ public class ServerDeployableTest {
 						// Do nothing
 					}
 				},
-				getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE));
+				SERVER_TYPE);
 		IStatus added = sm.addDeployable(server, deployable);
-		assertTrue(isOk(added));
+		assertTrue(TestServerUtils.isOk(added));
 		assertEquals(1, sm.getDeployables(server).size());
 		
 		IServer server = sm.getServer(SERVER_ID);
 		IStatus published = sm.publish(server, ServerManagementAPIConstants.PUBLISH_FULL);
-		assertTrue(isOk(published));
+		assertTrue(TestServerUtils.isOk(published));
 		assertEquals(2, startFinishInvocation.size());
 		assertEquals("start", startFinishInvocation.get(0));
 		assertEquals("finish", startFinishInvocation.get(1));
@@ -284,7 +280,9 @@ public class ServerDeployableTest {
 	@Test
 	public void testPublishes3DeployablesEvenIfOneThrows() throws CoreException {
 		AtomicInteger numOfPublished = new AtomicInteger();
-		ServerModel sm = createServerModel(
+		ServerModel sm = TestServerUtils.createServerModel(
+				SERVER_FILENAME, serversDir,
+				TestServerUtils.getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE),
 				(IServer server) -> new TestServerDelegate(server) {
 
 					@Override
@@ -297,7 +295,7 @@ public class ServerDeployableTest {
 					}
 					
 				},
-				getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE));
+				SERVER_TYPE);
 		sm.addDeployable(server, deployable);
 		sm.addDeployable(server, new DeployableReference("gargamel", "/in/the/woods"));
 		sm.addDeployable(server, new DeployableReference("azrael", "/in/the/mousehole"));
@@ -310,11 +308,11 @@ public class ServerDeployableTest {
 		assertEquals(3, numOfPublished.get());
 
 		// assert status
-		assertFalse(isOk(published));
+		assertFalse(TestServerUtils.isOk(published));
 		IStatus[] deployableStates = published.getChildren();
 		// contains just the errors
 		assertEquals(1, deployableStates.length);
-		assertFalse(isOk(deployableStates[0]));
+		assertFalse(TestServerUtils.isOk(deployableStates[0]));
 	}
 
 	@Test
@@ -379,7 +377,11 @@ public class ServerDeployableTest {
 
 	@Test
 	public void testDeployablesLoadFromData() {
-		ServerModel sm = createServerModel(TestServerDelegate::new, getServerWithDeployablesString(SERVER_ID, SERVER_TYPE));
+		ServerModel sm = TestServerUtils.createServerModel(
+				SERVER_FILENAME, serversDir,
+				TestServerUtils.getServerWithDeployablesString(SERVER_ID, SERVER_TYPE),
+				TestServerUtils.createServerType(SERVER_TYPE, TestServerDelegate::new), 
+				null);
 		IServer server = sm.getServer(SERVER_ID);
 		
 		List<DeployableState> deployables = sm.getDeployables(server);
@@ -397,8 +399,7 @@ public class ServerDeployableTest {
 	public void testDefaultPublishImplementation() {
 		DeployableReference reference = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
 		IStatus added = sm.addDeployable(server, reference);
-		assertNotNull(added);
-		assertTrue(added.isOK());
+		assertTrue(TestServerUtils.isOk(added));
 
 		List<DeployableState> deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
@@ -433,8 +434,7 @@ public class ServerDeployableTest {
 		// Test remove
 		
 		IStatus removed = sm.removeDeployable(server, reference);
-		assertNotNull(added);
-		assertTrue(added.isOK());
+		assertTrue(TestServerUtils.isOk(removed));
 		
 		ss = server.getDelegate().getServerState();
 		dState = ss.getDeployableStates();
@@ -466,7 +466,11 @@ public class ServerDeployableTest {
 
 	@Test
 	public void testDefaultPublishImplementationWithDelay() {
-		ServerModel sm = createServerModel(TestServerDelegateWithDelay::new, getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE));
+		ServerModel sm = TestServerUtils.createServerModel(
+				SERVER_FILENAME, serversDir, 
+				TestServerUtils.getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE),
+				TestServerUtils.createServerType(SERVER_TYPE, TestServerDelegateWithDelay::new),
+				null);
 		defaultPublishImplementationWithDelayInternal(sm);
 	}
 	
@@ -475,8 +479,7 @@ public class ServerDeployableTest {
 
 		DeployableReference reference = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
 		IStatus added = sm.addDeployable(server, reference);
-		assertNotNull(added);
-		assertTrue(added.isOK());
+		assertTrue(TestServerUtils.isOk(added));
 
 		List<DeployableState> deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
@@ -599,10 +602,6 @@ public class ServerDeployableTest {
 //		assertEquals(dds.getPublishState(), ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL);
 //	}
 
-	private IServerType mockServerType(String typeId, Function<IServer, IServerDelegate> delegateProvider) {
-		return new TestServerType(typeId, typeId + ".name", typeId + ".desc", delegateProvider);
-	}
-
 	private class TestServerDelegateWithDelay extends AbstractServerDelegate {
 		public TestServerDelegateWithDelay(IServer server) {
 			super(server);
@@ -645,105 +644,4 @@ public class ServerDeployableTest {
 			setDeployableState(reference, runState);
 		}
 	}
-
-	public class TestServerDelegate extends AbstractServerDelegate {
-
-		public TestServerDelegate(IServer server) {
-			super(server);
-		}
-
-		@Override
-		public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params) {
-			return null;
-		}
-		@Override
-		protected void fireStateChanged(ServerState state) {
-			// Do nothing
-		}
-	}
-	
-	public class TestServerType extends AbstractServerType {
-
-		private Function<IServer, IServerDelegate> delegateProvider;
-
-		public TestServerType(String id, String name, String desc, Function<IServer, IServerDelegate> delegateProvider) {
-			super(id, name, desc);
-			this.delegateProvider = delegateProvider;
-		}
-
-		@Override
-		public IServerDelegate createServerDelegate(IServer server) {
-			return delegateProvider.apply(server);
-		}
-	}
-
-	protected File createWar() {
-		Path deployments = null;
-		File war = null;
-		try {
-			deployments = Files.createTempDirectory(DEPLOYMENTS_DIR);
-			war = deployments.resolve(WAR_FILENAME).toFile();
-			if (!(new DeploymentGeneration().createWar(war))) {
-				fail();
-			}
-		} catch (IOException e) {}
-		return war != null && war.exists() && war.isFile() ? war : null;
-	}
-
-	protected File createServerFile(String filename, String initial) {
-		Path s1 = null;
-		try {
-			s1 = serversDir.resolve(filename);
-			Files.write(s1, initial.getBytes());
-		} catch (IOException e) {
-			if (s1 != null && s1.toFile().exists()) {
-				s1.toFile().delete();
-				s1.toFile().getParentFile().delete();
-			}
-			fail();
-		}
-		return s1.toFile();
-	}
-
-	private ServerModel createServerModel(Function<IServer, IServerDelegate> serverDelegateProvider, String serverString) {
-		return createServerModel(serverDelegateProvider, serverString, null);
-	}
-	private ServerModel createServerModel(Function<IServer, IServerDelegate> serverDelegateProvider, String serverString, IServerModelListener listener) {
-		ServerModel sm = new ServerModel(mock(IServerManagementModel.class));
-		if( listener != null)
-			sm.addServerModelListener(listener);
-		sm.addServerType(mockServerType(SERVER_TYPE, serverDelegateProvider));
-		createServerFile(SERVER_FILENAME, serverString);
-		sm.loadServers(serversDir.toFile());
-		return sm;
-	}
-
-	
-	private String getServerWithoutDeployablesString(String name, String type) {
-		String contents = "{id:\"" + name + "\", id-set:\"true\", " 
-				+ "org.jboss.tools.rsp.server.typeId=\"" + type
-				+ "\"}\n";
-		return contents;
-	}
-
-	private String getServerWithDeployablesString(String name, String type) {
-		String contents = "{\n" + 
-				"  \"id-set\": \"true\",\n" + 
-				"  \"org.jboss.tools.rsp.server.typeId\": \"" + type  + "\",\n" + 
-				"  \"id\": \"" + name + "\",\n" + 
-				"  \"deployables\": {\n" + 
-				"    \"deployable\": {\n" + 
-				"      \"label\": \"some.name\",\n" + 
-				"      \"path\": \"/tmp/serverdeployabletest_deployments1557855048044620815/hello-world-war-1.0.0.war\"\n" + 
-				"    }\n" + 
-				"  }\n" + 
-				"}\n" + 
-				"";
-		return contents;
-	}
-
-	private boolean isOk(IStatus status) {
-		return status != null && status.isOK();
-	}
-	
 }

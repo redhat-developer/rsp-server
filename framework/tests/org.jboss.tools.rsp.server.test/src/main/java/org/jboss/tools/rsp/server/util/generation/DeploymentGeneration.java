@@ -8,6 +8,8 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.util.generation;
 
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,9 +21,26 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class DeploymentGeneration {
+
+	public File createWar(String filename, String directory) {
+		Path deployments = null;
+		File war2 = null;
+		try {
+			deployments = Files.createTempDirectory(directory);
+			war2 = deployments.resolve(filename).toFile();
+			if (!createWar(war2, false)) {
+				fail();
+			}
+		} catch (IOException e) {
+			fail(e.getMessage());
+		}
+		return war2 != null && war2.exists() && war2.isDirectory() ? war2 : null;
+	}
+
 	public boolean createWar(File destination) {
 		return createWar(destination, true);
 	}
+
 	public boolean createWar(File destination, boolean zip) {
 		String webxml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
 				"<web-app version=\"2.5\" xmlns=\"http://java.sun.com/xml/ns/javaee\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 

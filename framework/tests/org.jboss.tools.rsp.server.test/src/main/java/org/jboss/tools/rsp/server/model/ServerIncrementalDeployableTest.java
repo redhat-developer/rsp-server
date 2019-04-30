@@ -22,6 +22,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +33,6 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.function.Function;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
@@ -43,20 +43,17 @@ import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.server.filewatcher.FileWatcherService;
+import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
-import org.jboss.tools.rsp.server.spi.model.IServerModelListener;
-import org.jboss.tools.rsp.server.spi.servertype.AbstractServerType;
 import org.jboss.tools.rsp.server.spi.servertype.IDeployableResourceDelta;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
-import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
-import org.jboss.tools.rsp.server.spi.servertype.IServerType;
 import org.jboss.tools.rsp.server.util.DataLocationSysProp;
+import org.jboss.tools.rsp.server.util.TestServerUtils;
 import org.jboss.tools.rsp.server.util.generation.DeploymentGeneration;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 public class ServerIncrementalDeployableTest {
 
@@ -66,7 +63,6 @@ public class ServerIncrementalDeployableTest {
 	private static final String SERVER_TYPE = "wonka6";
 	private static final String DEPLOYMENTS_DIR = SERVERS_DIR + "_deployments";
 	private static final String DEPLOYABLE_LABEL = "some.name";
-	private static final String DEPLOYABLE_PATH = "/papa-smurf/in/da/house";
 	private static final String WAR_FILENAME = "hello-world-war-1.0.0.war";
 
 	private static final DataLocationSysProp dataLocation = new DataLocationSysProp();
@@ -84,18 +80,21 @@ public class ServerIncrementalDeployableTest {
 	private ServerModel sm;
 	private File war;
 	private Path serversDir;
-	private File serverFile;
 	private IServer server;
-	private DeployableReference deployable;
 	private CustomFileWatcherService watcherService;
 	
 	@Before
 	public void before() throws IOException {
 		this.serversDir = Files.createTempDirectory(SERVERS_DIR);
-		this.war = createWar();
-		this.sm = createServerModel(TestServerDelegateWithDelay::new, getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE), null);
+		this.war = new DeploymentGeneration().createWar(WAR_FILENAME, DEPLOYMENTS_DIR);
+		this.watcherService = new CustomFileWatcherService();
+		IServerManagementModel managementModel = createServerManagementModel(watcherService);
+		this.sm = TestServerUtils.createServerModel(
+				SERVER_FILENAME, serversDir, 
+				TestServerUtils.getServerWithoutDeployablesString(SERVER_ID, SERVER_TYPE),
+				TestServerDelegateWithDelay::new, SERVER_TYPE, 
+				managementModel, null);
 		this.server = sm.getServer(SERVER_ID);
-		this.deployable = new DeployableReference(DEPLOYABLE_LABEL, DEPLOYABLE_PATH);
 	}
 
 	private CountDownLatch[] fileWatcherStartSignal1 = new CountDownLatch[1];
@@ -281,8 +280,7 @@ public class ServerIncrementalDeployableTest {
 
 		DeployableReference reference = new DeployableReference(DEPLOYABLE_LABEL, war.getAbsolutePath());
 		IStatus added = sm.addDeployable(server, reference);
-		assertNotNull(added);
-		assertTrue(added.isOK());
+		assertTrue(TestServerUtils.isOk(added));
 
 		List<DeployableState> deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
@@ -366,11 +364,6 @@ public class ServerIncrementalDeployableTest {
 		assertEquals(postPublishState, oneState.getPublishState());
 		assertEquals(postRunState, oneState.getState());
 	}
-	
-	
-	private IServerType mockServerType(String typeId, Function<IServer, IServerDelegate> delegateProvider) {
-		return new TestServerType(typeId, typeId + ".name", typeId + ".desc", delegateProvider);
-	}
 
 	private class TestServerDelegateWithDelay extends AbstractServerDelegate {
 		public TestServerDelegateWithDelay(IServer server) {
@@ -413,68 +406,6 @@ public class ServerIncrementalDeployableTest {
 		protected void setDeployableState2(DeployableReference reference, int runState) {
 			setDeployableState(reference, runState);
 		}
-	}
-
-	public class TestServerDelegate extends AbstractServerDelegate {
-
-		public TestServerDelegate(IServer server) {
-			super(server);
-		}
-
-		@Override
-		public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params) {
-			return null;
-		}
-		@Override
-		protected void fireStateChanged(ServerState state) {
-			// Do nothing
-		}
-	}
-	
-	public class TestServerType extends AbstractServerType {
-
-		private Function<IServer, IServerDelegate> delegateProvider;
-
-		public TestServerType(String id, String name, String desc, Function<IServer, IServerDelegate> delegateProvider) {
-			super(id, name, desc);
-			this.delegateProvider = delegateProvider;
-		}
-
-		@Override
-		public IServerDelegate createServerDelegate(IServer server) {
-			return delegateProvider.apply(server);
-		}
-	}
-
-	protected File createWar() {
-		Path deployments = null;
-		File war2 = null;
-		try {
-			deployments = Files.createTempDirectory(DEPLOYMENTS_DIR);
-			war2 = deployments.resolve(WAR_FILENAME).toFile();
-			if (!(new DeploymentGeneration().createWar(war2, false))) {
-				fail();
-			}
-		} catch (IOException e) {
-			fail(e.getMessage());
-		}
-		return war2 != null && war2.exists() && war2.isDirectory() ? war2 : null;
-	}
-
-	protected File createServerFile(String filename, String initial) {
-		Path s1 = null;
-		try {
-			s1 = serversDir.resolve(filename);
-			Files.write(s1, initial.getBytes());
-			return s1.toFile();
-		} catch (IOException e) {
-			if (s1 != null && s1.toFile().exists()) {
-				s1.toFile().delete();
-				s1.toFile().getParentFile().delete();
-			}
-			fail();
-		}
-		return null; // never reached but sonar didnt like just fail()
 	}
 
 	private class CustomFileWatcherService extends FileWatcherService {
@@ -522,26 +453,11 @@ public class ServerIncrementalDeployableTest {
 			return expectedKind;
 		}
 	}
-	
-	private ServerModel createServerModel(Function<IServer, IServerDelegate> serverDelegateProvider, String serverString, IServerModelListener listener) {
-		IServerManagementModel mgmtModel = mock(IServerManagementModel.class);
-		watcherService = new CustomFileWatcherService();
-		watcherService.start();
-		Mockito.when(mgmtModel.getFileWatcherService()).thenReturn(watcherService);
-		ServerModel sm1 = new ServerModel(mgmtModel);
-		if( listener != null)
-			sm1.addServerModelListener(listener);
-		sm1.addServerType(mockServerType(SERVER_TYPE, serverDelegateProvider));
-		createServerFile(SERVER_FILENAME, serverString);
-		sm1.loadServers(serversDir.toFile());
-		return sm1;
-	}
 
-	
-	private String getServerWithoutDeployablesString(String name, String type) {
-		return "{id:\"" + name + "\", id-set:\"true\", " 
-				+ "org.jboss.tools.rsp.server.typeId=\"" + type
-				+ "\"}\n";
+	private IServerManagementModel createServerManagementModel(IFileWatcherService service) {
+		IServerManagementModel model = mock(IServerManagementModel.class);
+		service.start();
+		when(model.getFileWatcherService()).thenReturn(service);
+		return model; 
 	}
-
 }
