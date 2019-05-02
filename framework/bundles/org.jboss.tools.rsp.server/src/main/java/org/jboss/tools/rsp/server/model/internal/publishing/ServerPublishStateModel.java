@@ -52,6 +52,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		for( DeployableReference reference : references ) {
 			addDeployableImpl(reference, ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN);
 		}
+		updateServerPublishStateFromDeployments();
 		fireState();
 	}
 	
@@ -98,6 +99,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 							getKey(withOptions)), null);
 		}
 		addDeployableImpl(withOptions, ServerManagementAPIConstants.PUBLISH_STATE_ADD);
+		updateServerPublishStateFromDeployments();
 		fireState();
 		return Status.OK_STATUS;
 	}
@@ -124,6 +126,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		if (fileWatcher != null) {
 			fileWatcher.removeFileWatcherListener(new File(path).toPath(), this);
 		}
+		updateServerPublishStateFromDeployments();
 		fireState();
 		return Status.OK_STATUS;
 	}
@@ -245,6 +248,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 				}
 			}
 		}
+		updateServerPublishStateFromDeployments();
 		if( changed ) 
 			fireState();
 	}
@@ -256,8 +260,6 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 
 	private void fireState() {
-		updateServerPublishStateFromDeployments();
-
 		// Feels strange to allow this class to fire the event
 		// but whatever. This feels so dirty. 
 		if( delegate != null && delegate.getServer() != null 
@@ -268,7 +270,11 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		}
 	}
 
-	protected void updateServerPublishStateFromDeployments() {
+	public void updateServerPublishStateFromDeployments() {
+		updateServerPublishStateFromDeployments(false);
+	}
+	
+	public void updateServerPublishStateFromDeployments(boolean fireEvent) {
 		List<DeployableState> vals = new ArrayList<>(getStates().values());
 		int newState = ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 
@@ -285,7 +291,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 				newState = ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 			}
 		}
-		setServerPublishState(newState, false);
+		setServerPublishState(newState, fireEvent);
 	}
 	
 	private boolean deployableExists(int publishState, List<DeployableState> deployableStates) {
