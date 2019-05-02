@@ -185,7 +185,7 @@ public class ServerIncrementalDeployableTest {
 		// Publish and verify the states are accurately matching expectations
 		runPublishAssertStates(PUBLISH_INCREMENTAL, 
 				PUBLISH_STATE_INCREMENTAL, STATE_STARTED,
-				PUBLISH_STATE_INCREMENTAL, STATE_STARTED, PUBLISH_STATE_NONE,
+				PUBLISH_STATE_NONE, STATE_STARTED, PUBLISH_STATE_NONE,
 				PUBLISH_STATE_NONE, STATE_STARTED);
 
 
