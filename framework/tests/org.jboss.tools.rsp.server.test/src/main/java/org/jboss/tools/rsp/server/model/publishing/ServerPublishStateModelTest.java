@@ -472,7 +472,7 @@ public class ServerPublishStateModelTest {
 	}
 	
 	@Test
-	public void shouldFirePublishBasedOnDeployments() throws IOException, CoreException {
+	public void shouldSetPublishState() throws IOException, CoreException {
 		// given
 		final String serverType = "firingServer";
 		final String serverId = serverType + "_1";
@@ -490,18 +490,15 @@ public class ServerPublishStateModelTest {
 		doReturn(serverModel).when(managementModel).getServerModel();
 		TestServerDelegate delegate = (TestServerDelegate) serverModel.getServer(serverId).getDelegate();
 		IServerPublishModel model = delegate.getServerPublishModel();
-		// publish state evaluated from the deployments
-		int state = model.getServerPublishState();
 
 		// when
 		model.setServerPublishState(ServerManagementAPIConstants.PUBLISH_STATE_REMOVE, true);
+
 		// then
 		ArgumentCaptor<ServerState> stateCaptor = ArgumentCaptor.forClass(ServerState.class);
 		verify(serverModel).fireServerStateChanged(any(), stateCaptor.capture());
 		assertThat(stateCaptor.getValue().getPublishState())
-			// will not fire ServerManagementAPIConstants.PUBLISH_STATE_REMOVE 
-			// but evaluated based on the deployments
-			.isEqualTo(state);
+			.isEqualTo(ServerManagementAPIConstants.PUBLISH_STATE_REMOVE);
 	}
 
 	@Test
