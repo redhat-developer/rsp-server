@@ -31,7 +31,7 @@ public class GenerateSchemaMain {
 	}
 
 	private static void validateDaos(Class<?>[] daos) {
-		ArrayList<Class<?>> invalid = new ArrayList<Class<?>>();
+		ArrayList<Class<?>> invalid = new ArrayList<>();
 		for( int i = 0; i < daos.length; i++ ) {
 			Constructor<?>[] constructors = daos[i].getConstructors();
 			boolean zeroArgFound = false;
@@ -43,9 +43,9 @@ public class GenerateSchemaMain {
 				invalid.add(daos[i]);
 			}
 		}
-		if(invalid.size() > 0 ) {
+		if(!invalid.isEmpty() ) {
 			System.out.println("Invalid DAOs found: Missing 0-arg constructor");
-			for( Class c : invalid ) {
+			for( Class<?> c : invalid ) {
 				System.out.println(c.getName());
 			}
 			System.exit(1);
