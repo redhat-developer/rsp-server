@@ -48,16 +48,6 @@ pipeline {
                 		    }
                 		}
                 	
-                		stage('Coverage Report') {
-                			when {
-                				expression { params.CODECOV }
-                			}
-                			steps {
-                				sh '''#!/bin/bash
-                					bash <(curl -s https://codecov.io/bash) -f target/jacoco-report/jacoco.xml || echo "Codecov did not collect coverage reports"
-                				'''
-                			}
-                		}
     	            }
                 	post {
                 	    always {
