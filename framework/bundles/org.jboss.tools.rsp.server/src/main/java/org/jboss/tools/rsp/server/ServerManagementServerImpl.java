@@ -65,6 +65,7 @@ import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
+import org.jboss.tools.rsp.server.spi.util.AlphanumComparator;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 
 public class ServerManagementServerImpl implements RSPServer {
@@ -330,7 +331,8 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	private List<ServerType> getServerTypesSync() {
 		ServerType[] types = managementModel.getServerModel().getAccessibleServerTypes();
-		return Arrays.asList(types);
+		Comparator<ServerType> c = (h1,h2) -> new AlphanumComparator().compare(h1.getVisibleName(), h2.getVisibleName()); 
+		return Arrays.asList(types).stream().sorted(c).collect(Collectors.toList());
 	}
 
 	@Override
@@ -611,8 +613,10 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	private ListDownloadRuntimeResponse listDownloadableRuntimesInternal() {
 		Map<String, DownloadRuntime> map = managementModel.getDownloadRuntimeModel().getOrLoadDownloadRuntimes(new NullProgressMonitor());
-		List<DownloadRuntimeDescription> list = map.values().stream().sorted(
-				Comparator.comparing(DownloadRuntime::getName))
+		AlphanumComparator comp = new AlphanumComparator();
+		Comparator<DownloadRuntimeDescription> alphanumComp = (drd1,drd2) -> comp.compare(drd1.getName(), drd2.getName());
+		List<DownloadRuntimeDescription> list = map.values().stream()
+				.sorted(alphanumComp)
 				.map(dlrt -> dlrt.toDao())
 				.collect(Collectors.toList());
 		ListDownloadRuntimeResponse resp = new ListDownloadRuntimeResponse();

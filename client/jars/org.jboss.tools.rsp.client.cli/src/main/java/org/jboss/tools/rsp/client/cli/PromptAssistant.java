@@ -68,7 +68,7 @@ public class PromptAssistant {
 	public ServerType chooseServerType() {
 		try {
 			List<ServerType> types = launcher.getServerProxy().getServerTypes().get();
-			List<String> typeList = types.stream().map(ServerType::getId).collect(Collectors.toList());
+			List<String> typeList = types.stream().map(ServerType::getVisibleName).collect(Collectors.toList());
 			String ret = promptUser(typeList, "Please select a server type:");
 			if( ret != null && typeList.contains(ret)) {
 				int ind = typeList.indexOf(ret);
