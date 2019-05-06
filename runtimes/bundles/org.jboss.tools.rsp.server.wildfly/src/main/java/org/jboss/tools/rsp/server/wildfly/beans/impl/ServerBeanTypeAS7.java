@@ -29,9 +29,9 @@ public class ServerBeanTypeAS7 extends JBossServerBeanType {
 
 	@Override
 	public String getServerAdapterTypeId(String version) {
-		if( version.equals("7.0")) return IServerConstants.SERVER_AS_70;
-		if( version.equals("7.1")) return IServerConstants.SERVER_AS_71;
-		if( version.equals("7.2")) return IServerConstants.SERVER_AS_71;
+		if( version.startsWith("7.0.")) return IServerConstants.SERVER_AS_70;
+		if( version.startsWith("7.1.")) return IServerConstants.SERVER_AS_71;
+		if( version.startsWith("7.2.")) return IServerConstants.SERVER_AS_71;
 		return null;
 	}
 }
