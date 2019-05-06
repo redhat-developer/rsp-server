@@ -19,10 +19,20 @@ import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
 public class JBossVMRegistryDiscovery {
+
 	public IVMInstall findVMInstall(IServerDelegate delegate) {
-		String vmPath = delegate == null ? null : delegate.getServer().getAttribute(IJBossServerAttributes.VM_INSTALL_PATH, (String)null);
+		String vmPath = getVMPath(delegate);
 		return findVMInstall(vmPath);
 	}
+
+	private String getVMPath(IServerDelegate delegate) {
+		if (delegate == null
+				|| delegate.getServer() == null) {
+			return null;
+		}
+		return delegate.getServer().getAttribute(IJBossServerAttributes.VM_INSTALL_PATH, (String) null);
+	}
+
 	public IVMInstall findVMInstall(String vmPath) {
 		IVMInstallRegistry reg = getDefaultRegistry();
 	
@@ -47,10 +57,13 @@ public class JBossVMRegistryDiscovery {
 	}
 	
 	public IVMInstallRegistry getDefaultRegistry() {
-		return LauncherSingleton.getDefault() == null ? null : 
-			LauncherSingleton.getDefault().getLauncher() == null ? null :
-				LauncherSingleton.getDefault().getLauncher().getModel() == null ? null :
-					LauncherSingleton.getDefault().getLauncher().getModel().getVMInstallModel();
+		IVMInstallRegistry registry = null;
+		if (LauncherSingleton.getDefault() != null
+				&& LauncherSingleton.getDefault().getLauncher() != null
+				&& LauncherSingleton.getDefault().getLauncher().getModel() != null) {
+					registry = LauncherSingleton.getDefault().getLauncher().getModel().getVMInstallModel();
+		}
+		return registry;
 	}
 	
 	public boolean ensureVMInstallAdded(IServer server) {
@@ -58,6 +71,7 @@ public class JBossVMRegistryDiscovery {
 		IVMInstallRegistry reg = LauncherSingleton.getDefault().getLauncher().getModel().getVMInstallModel();
 		return ensureVMInstallAdded(vmi, reg);
 	}
+
 	public boolean ensureVMInstallAdded(String vmPath, IVMInstallRegistry reg) {
 		File fVMI = vmPath == null ? null : new File(vmPath);
 		if( fVMI == null ) {

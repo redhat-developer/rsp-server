@@ -15,6 +15,7 @@ import org.jboss.tools.rsp.server.wildfly.servertype.launch.IDefaultLaunchArgume
 import org.jboss.tools.rsp.server.wildfly.servertype.launch.JBoss72Eap61DefaultLaunchArguments;
 
 public class JBossEAP61ExtendedProperties extends JBossAS710ExtendedProperties {
+
 	public JBossEAP61ExtendedProperties(IServer obj) {
 		super(obj);
 	}

@@ -15,9 +15,11 @@ import org.jboss.tools.rsp.server.wildfly.servertype.launch.IDefaultLaunchArgume
 import org.jboss.tools.rsp.server.wildfly.servertype.launch.JBossEAP70DefaultLaunchArguments;
 
 public class JBossEAP70ExtendedProperties extends JBossAS710ExtendedProperties {
+
 	public JBossEAP70ExtendedProperties(IServer obj) {
 		super(obj);
 	}
+
 	@Override
 	public String getRuntimeTypeVersionString() {
 		return "7.0"; //$NON-NLS-1$

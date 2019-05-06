@@ -11,7 +11,6 @@ package org.jboss.tools.rsp.server.wildfly.beans.impl;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.jar.Attributes;
@@ -22,6 +21,10 @@ import java.util.zip.ZipFile;
 import org.jboss.tools.rsp.launching.utils.FileUtil;
 
 public class ManifestUtility {
+
+	protected ManifestUtility() {
+		// prevent instantiation 
+	}
 
 	/**
 	 * Scans the jars in the folder until a jar with a 
@@ -39,9 +42,7 @@ public class ManifestUtility {
 	 */
 	public static boolean scanFolderJarsForManifestProp(File location, String mainFolder, String property, String propPrefix) {
 		String value = getManifestPropFromFolderJars(location, mainFolder, property);
-		if( value != null && value.trim().startsWith(propPrefix))
-			return true;
-		return false;
+		return value != null && value.trim().startsWith(propPrefix);
 	}
 
 	public static String getManifestPropFromFolderJars(File location, String mainFolder, String property) {
@@ -59,24 +60,13 @@ public class ManifestUtility {
 
 	
 	public static FileFilter jarFilter() {
-		return new FileFilter() {
-			public boolean accept(File pathname) {
-				if( pathname.isFile() && pathname.getName().endsWith(".jar")) {
-					return true;
-				}
-				return false;
-			} 
-		};
+		return (File pathname) -> 
+				pathname.isFile() && pathname.getName().endsWith(".jar");
 	}
+
 	public static FileFilter manifestFilter() {
-		return new FileFilter() {
-			public boolean accept(File pathname) {
-				if( pathname.isFile() && pathname.getName().toLowerCase().equals("manifest.mf")) {
-					return true;
-				}
-				return false;
-			} 
-		};
+		return (File pathname) -> 
+				pathname.isFile() && pathname.getName().equalsIgnoreCase("manifest.mf");
 	}
 	
 	/**
@@ -92,9 +82,7 @@ public class ManifestUtility {
 	 */
 	public static String getJarProperty(File systemJarFile, String propertyName) {
 		if (systemJarFile.canRead()) {
-			ZipFile jar = null;
-			try {
-				jar = new ZipFile(systemJarFile);
+			try(ZipFile jar = new ZipFile(systemJarFile)) {
 				ZipEntry manifest = jar.getEntry("META-INF/MANIFEST.MF");//$NON-NLS-1$
 				Properties props = new Properties();
 				props.load(jar.getInputStream(manifest));
@@ -103,15 +91,6 @@ public class ManifestUtility {
 			} catch (IOException e) {
 				// Intentionally empty
 				return null; 
-			} finally {
-				if (jar != null) {
-					try {
-						jar.close();
-					} catch (IOException e) {
-						// Intentionally empty
-						return null;
-					}
-				}
 			}
 		} 
 		return null;
@@ -137,22 +116,15 @@ public class ManifestUtility {
 	public static String getFullServerVersionFromZipLegacy(File systemJarFile, String[] manifestAttributes) {
 
 		if (systemJarFile.isDirectory()) {
-			File[] files = systemJarFile.listFiles(new FilenameFilter() {
-				
-				public boolean accept(File dir, String name) {
-					return name.endsWith(".jar"); //$NON-NLS-1$
-				}
-			});
+			File[] files = systemJarFile.listFiles((File dir, String name) -> name.endsWith(".jar"));
 			if (files != null && files.length == 1) {
 				systemJarFile = files[0];
 			}
 		}
-		
+
 		String version = null;
-		ZipFile jar = null;
 		if(systemJarFile.canRead()) {
-			try {
-				jar = new ZipFile(systemJarFile);
+			try(ZipFile jar = new ZipFile(systemJarFile)) {
 				ZipEntry manifest = jar.getEntry("META-INF/MANIFEST.MF");//$NON-NLS-1$
 				Properties props = new Properties();
 				props.load(jar.getInputStream(manifest));
@@ -171,14 +143,6 @@ public class ManifestUtility {
 				// It's already null, and would fall through to return null,
 				// but hudson doesn't like empty catch blocks.
 				return null;  
-			} finally {
-				if (jar != null) {
-					try {
-						jar.close();
-					} catch (IOException e) {
-						// ignore
-					}
-				}
 			}
 		}
 		return version;

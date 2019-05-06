@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ManifestUtility;
 
 public class JBossManifestUtility extends ManifestUtility {
+
 	/*
 	 * Specific to as/wfly
 	 */
@@ -24,6 +25,7 @@ public class JBossManifestUtility extends ManifestUtility {
 		slot = (slot == null ? "main" : slot);
 		return getFiles(modulesFolder, Paths.get(slashed, slot).toString(), filter);
 	}
+
 	public static File[] getFiles(File modulesFolder, String moduleRelativePath, FileFilter filter) {
 		File[] layeredPaths = LayeredModulePathFactory.resolveLayeredModulePath(modulesFolder);
 		for( int i = 0; i < layeredPaths.length; i++ ) {
@@ -38,23 +40,21 @@ public class JBossManifestUtility extends ManifestUtility {
 
 	
 	public static File[] getFilesFrom(File layeredPath, FileFilter filter) {
-		ArrayList<File> list = new ArrayList<File>();
+		ArrayList<File> list = new ArrayList<>();
 		File[] children = layeredPath.listFiles();
 		for( int i = 0; i < children.length; i++ ) {
 			if( filter.accept(children[i])) {
 				list.add(new File(children[i].getAbsolutePath()));
 			}
 		}
-		return (File[]) list.toArray(new File[list.size()]);
+		return list.toArray(new File[list.size()]);
 	}
 	
 
 
 	public static boolean scanManifestPropFromJBossModulesFolder(File[] moduleRoots, String moduleId, String slot, String property, String propPrefix) {
 		String value = getManifestPropFromJBossModulesFolder(moduleRoots, moduleId, slot, property);
-		if( value != null && value.trim().startsWith(propPrefix))
-			return true;
-		return false;
+		return value != null && value.trim().startsWith(propPrefix);
 	}
 	
 	public static String getManifestPropFromJBossModulesFolder(File[] moduleRoots, String moduleId, String slot, String property) {

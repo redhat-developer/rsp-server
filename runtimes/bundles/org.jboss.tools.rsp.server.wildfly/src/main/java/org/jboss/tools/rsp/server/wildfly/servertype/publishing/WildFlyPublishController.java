@@ -105,6 +105,7 @@ public class WildFlyPublishController extends StandardJBossPublishController imp
 		}
 		
 	}
+
 	public static void touch(File file) throws IOException{
 	    long timestamp = System.currentTimeMillis();
 	    touch(file, timestamp);
@@ -117,10 +118,18 @@ public class WildFlyPublishController extends StandardJBossPublishController imp
 
 	    file.setLastModified(timestamp);
 	}
+
 	private static final String[] MARKER_FILES = {
-		".dodeploy", ".skipdeploy", ".isdeploying", ".deployed", ".failed", 
-		".isundeploying", ".undeployed", ".pending" 
+		".dodeploy",
+		".skipdeploy",
+		".isdeploying",
+		".deployed",
+		".failed",
+		".isundeploying",
+		".undeployed",
+		".pending" 
 	};
+
 	private void cleanAllMarkers(String modulePath) {
 		for( String k : MARKER_FILES) {
 			File f = new File(modulePath + k);

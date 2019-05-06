@@ -47,30 +47,38 @@ public abstract class AbstractJavaLauncher implements IServerStartLauncher {
 	protected IServerDelegate getDelegate() {
 		return delegate;
 	}
+
+	@Override
 	public IServer getServer() {
 		return delegate.getServer();
 	}
 	
+	@Override
 	public ILaunch launch(String mode) throws CoreException {
 		getLaunchCommand(mode);
 		launchedDetails = convert(runner.runWithDetails(runConfig, launch, new NullProgressMonitor()));
 		return launch;
 	}
 
+	@Override
 	public CommandLineDetails getLaunchCommand(String mode) throws CoreException {
 		IStatus preReqs = checkPrereqs(mode);
 		if (!preReqs.isOK())
 			throw new CoreException(preReqs);
 
-		launch = createLaunch(mode);
-		runConfig = configureRunner();
-		if (runner instanceof ICommandProviderVMRunner) {
-			LaunchingCommandLineDetails det1 = ((ICommandProviderVMRunner) runner).getCommandLineDetails(runConfig, launch,
-					new NullProgressMonitor());
-			launchedDetails = convert(det1);
-			return launchedDetails;
+		this.launch = createLaunch(mode);
+		this.runConfig = configureRunner();
+		this.launchedDetails = createLaunchedDetails();
+		return launchedDetails;
+	}
+
+	protected CommandLineDetails createLaunchedDetails() throws CoreException {
+		if (!(runner instanceof ICommandProviderVMRunner)) {
+			return null;
 		}
-		return null;
+		LaunchingCommandLineDetails details = 
+				((ICommandProviderVMRunner) runner).getCommandLineDetails(runConfig, launch, new NullProgressMonitor());
+		return convert(details);
 	}
 	
 	private CommandLineDetails convert(LaunchingCommandLineDetails det) {
@@ -82,10 +90,12 @@ public abstract class AbstractJavaLauncher implements IServerStartLauncher {
 		return ret;
 	}
 
+	@Override
 	public CommandLineDetails getLaunchedDetails() {
 		return launchedDetails;
 	}
 
+	@Override
 	public ILaunch getLaunch() {
 		return launch;
 	}
@@ -173,7 +183,7 @@ public abstract class AbstractJavaLauncher implements IServerStartLauncher {
 	protected String[] addJreClasspathEntries(List<String> current) {
 		ArrayList<String> ret = new ArrayList<>(Arrays.asList(getJREClasspath()));
 		ret.addAll(current);
-		return (String[]) ret.toArray(new String[ret.size()]);
+		return ret.toArray(new String[ret.size()]);
 	}
 
 	protected String[] getEnvironment() {
@@ -186,7 +196,7 @@ public abstract class AbstractJavaLauncher implements IServerStartLauncher {
 	}
 
 	protected Map<String, String> getEnvironmentFromServer() {
-		return new HashMap<String, String>(System.getenv());
+		return new HashMap<>(System.getenv());
 	}
 	
 }

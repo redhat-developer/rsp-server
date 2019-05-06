@@ -15,9 +15,11 @@ import org.jboss.tools.rsp.server.wildfly.servertype.launch.IDefaultLaunchArgume
 import org.jboss.tools.rsp.server.wildfly.servertype.launch.JBossEAP70DefaultLaunchArguments;
 
 public class JBossEAP72ExtendedProperties extends JBossAS710ExtendedProperties {
+
 	public JBossEAP72ExtendedProperties(IServer obj) {
 		super(obj);
 	}
+
 	@Override
 	public String getRuntimeTypeVersionString() {
 		return "7.2"; //$NON-NLS-1$
@@ -27,6 +29,7 @@ public class JBossEAP72ExtendedProperties extends JBossAS710ExtendedProperties {
 	public IDefaultLaunchArguments getDefaultLaunchArguments() {
 		return new JBossEAP70DefaultLaunchArguments(server);
 	}
+
 	@Override
 	public String getJMXUrl() {
 			return getJMXUrl(getManagementPort(), "service:jmx:remote+http"); //$NON-NLS-1$

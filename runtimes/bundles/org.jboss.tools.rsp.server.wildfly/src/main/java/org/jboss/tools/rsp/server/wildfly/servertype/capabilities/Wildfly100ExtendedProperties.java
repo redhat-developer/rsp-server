@@ -15,9 +15,11 @@ import org.jboss.tools.rsp.server.wildfly.servertype.launch.IDefaultLaunchArgume
 import org.jboss.tools.rsp.server.wildfly.servertype.launch.Wildfly100DefaultLaunchArguments;
 
 public class Wildfly100ExtendedProperties extends JBossAS710ExtendedProperties {
+
 	public Wildfly100ExtendedProperties(IServer obj) {
 		super(obj);
 	}
+
 	@Override
 	public String getRuntimeTypeVersionString() {
 		return "10.x"; //$NON-NLS-1$
@@ -32,6 +34,8 @@ public class Wildfly100ExtendedProperties extends JBossAS710ExtendedProperties {
 	public String getJMXUrl() {
 			return getJMXUrl(getManagementPort(), "service:jmx:remote+http"); //$NON-NLS-1$
 	}
+
+	@Override
 	protected int getManagementPort() {
 		return 9990;
 	}

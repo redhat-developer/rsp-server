@@ -54,6 +54,7 @@ public class JBossDefaultLaunchArguments implements IDefaultLaunchArguments, IJB
 		return new Path(serverHome);
 	}
 
+	@Override
 	public String getStartDefaultProgramArgs() {
 		String s1 = STARTUP_ARG_CONFIG_LONG + "=" + IJBossRuntimeResourceConstants.CONFIG_DEFAULT + SPACE;  //$NON-NLS-1$
 		if( PortalUtil.getServerPortalType(server) == PortalUtil.TYPE_GATE_IN) {
@@ -62,6 +63,7 @@ public class JBossDefaultLaunchArguments implements IDefaultLaunchArguments, IJB
 		return s1;
 	}
 
+	@Override
 	public String getStartDefaultVMArgs() {
 		return getProgramNameArgs() + getServerFlagArgs() +   
 				"-Djava.awt.headless=true " + //$NON-NLS-1$

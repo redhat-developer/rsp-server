@@ -15,9 +15,11 @@ import org.jboss.tools.rsp.server.wildfly.servertype.launch.IDefaultLaunchArgume
 import org.jboss.tools.rsp.server.wildfly.servertype.launch.Wildfly100DefaultLaunchArguments;
 
 public class Wildfly110ExtendedProperties extends JBossAS710ExtendedProperties {
+
 	public Wildfly110ExtendedProperties(IServer obj) {
 		super(obj);
 	}
+
 	@Override
 	public String getRuntimeTypeVersionString() {
 		return "11.0"; //$NON-NLS-1$
