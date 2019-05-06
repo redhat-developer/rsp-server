@@ -91,7 +91,7 @@ public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider {
 	public static final ServerBeanType FSW6 = new ServerBeanTypeFSW6();
 	public static final ServerBeanType EAP61 = new ServerBeanTypeEAP61();
 	public static final ServerBeanType UNKNOWN_AS71_PRODUCT = new ServerBeanTypeUnknownAS71Product();	
-	public static final ServerBeanType SOA6 = new ServerBeanTypeSOA6();; 
+	public static final ServerBeanType SOA6 = new ServerBeanTypeSOA6(); 
 	public static final ServerBeanType SOAP = new ServerBeanTypeSOAP(); 
 	public static final ServerBeanType SOAP_STD = new ServerBeanTypeSOAPStandalone();
 	public static final ServerBeanType EWP = new ServerBeanTypeEWP();
@@ -108,8 +108,10 @@ public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider {
 	public static final ServerBeanType[] KNOWN_TYPES =
 		{
 		AS,  EAP70, EAP71, EAP72,
-		WILDFLY90,  WILDFLY90_WEB, WILDFLY100, WILDFLY100_WEB,
-		WILDFLY110, WILDFLY110_WEB, WILDFLY120, WILDFLY120_WEB,
+		WILDFLY90,  WILDFLY90_WEB, 
+		WILDFLY100, WILDFLY100_WEB,
+		WILDFLY110, WILDFLY110_WEB,
+		WILDFLY120, WILDFLY120_WEB,
 		WILDFLY130, WILDFLY130_WEB,
 		WILDFLY140, WILDFLY140_WEB,
 		WILDFLY150, WILDFLY150_WEB,
@@ -123,8 +125,6 @@ public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider {
 		SOAP, SOAP_STD, 
 		EPP, EAP,  EWP
 	};
-
-	
 	
 	@Override
 	public ServerBeanType[] getServerBeanTypes() {

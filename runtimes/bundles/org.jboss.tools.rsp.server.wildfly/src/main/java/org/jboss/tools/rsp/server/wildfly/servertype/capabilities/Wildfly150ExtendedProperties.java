@@ -24,6 +24,7 @@ public class Wildfly150ExtendedProperties extends Wildfly130ExtendedProperties {
 	public String getRuntimeTypeVersionString() {
 		return "15.0"; //$NON-NLS-1$
 	}
+
 	@Override
 	public IDefaultLaunchArguments getDefaultLaunchArguments() {
 		return new Wildfly150DefaultLaunchArguments(server);

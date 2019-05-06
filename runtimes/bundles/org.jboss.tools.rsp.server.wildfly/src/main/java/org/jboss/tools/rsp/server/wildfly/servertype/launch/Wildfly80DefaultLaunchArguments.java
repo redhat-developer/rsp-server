@@ -15,17 +15,23 @@ import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
 public class Wildfly80DefaultLaunchArguments extends
 		JBoss71DefaultLaunchArguments {
+
 	public Wildfly80DefaultLaunchArguments(IServer s) {
 		super(s);
 	}
+
+	@Override
 	public String getStartDefaultVMArgs() {
 		return super.getStartDefaultVMArgs() 
 				+ "-Dorg.jboss.logmanager.nocolor=true "; //$NON-NLS-1$
 	}
+
+	@Override
 	protected String getMemoryArgs() {
 		return "-Xms64m -Xmx512m -XX:MaxPermSize=256m "; //$NON-NLS-1$
 	}
 	
+	@Override
 	public String getDefaultStopVMArgs() {
 		IPath home = getServerHome();
 		IPath loggingProp = home.append("bin").append("jboss-cli-logging.properties");

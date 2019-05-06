@@ -17,18 +17,21 @@ public class Wildfly150DefaultLaunchArguments extends JBoss71DefaultLaunchArgume
 		super(s);
 	}
 
+	@Override
 	protected String getMemoryArgs() {
-		return "-Xms64m -Xmx512m "; //$NON-NLS-1$
+		return "-Xms64m -Xmx512m ";
 	}
 
+	@Override
 	public String getStartDefaultVMArgs() {
 		return super.getStartDefaultVMArgs() 
 				+ "-Dorg.jboss.logmanager.nocolor=true -Djboss.bind.address.management=localhost"
 		        + getJava9VMArgs();
 	}
 
+	@Override
 	protected String getJaxpProvider() {
-		return ""; //$NON-NLS-1$
+		return "";
 	}
 	
 

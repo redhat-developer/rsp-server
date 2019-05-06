@@ -15,9 +15,11 @@ import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.wildfly.impl.util.IJBossRuntimeResourceConstants;
 
 public class JBoss70DefaultLaunchArguments extends JBossDefaultLaunchArguments {
+
 	public JBoss70DefaultLaunchArguments(IServer s) {
 		super(s);
 	}
+
 	@Override
 	public String getStartDefaultProgramArgs() {
 		String ret = DASH + JB7_MP_ARG + SPACE + QUOTE 

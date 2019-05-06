@@ -60,16 +60,10 @@ public class JBossAS710ExtendedProperties extends JBossAS7ExtendedProperties { /
 		return IJBossRuntimeResourceConstants.AS_71_MANAGEMENT_SCRIPT;
 	}
 	
-	/**
-	 * @since 3.0
-	 */
 	public String getJMXUrl() {
 		return getJMXUrl(getManagementPort(), "service:jmx:remoting-jmx"); //$NON-NLS-1$
 	}
 	
-	/**
-	 * @since 3.0
-	 */
 	protected String getJMXUrl(int port, String jmxScheme) {
 		String ret = URLUtil.createSafeURLString(jmxScheme, getHost(), port, null);
 		return ret;
