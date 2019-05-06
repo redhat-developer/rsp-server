@@ -68,16 +68,17 @@ public class AlphanumComparator implements Comparator<String> {
 			int result = 0;
 			if (isDigit(thisChunk.charAt(0)) && isDigit(thatChunk.charAt(0))) {
 				// Simple chunk comparison by length.
-				int thisChunkLength = thisChunk.length();
-				result = thisChunkLength - thatChunk.length();
-				// If equal, the first different number counts
-				if (result == 0) {
-					for (int i = 0; i < thisChunkLength; i++) {
-						result = thisChunk.charAt(i) - thatChunk.charAt(i);
-						if (result != 0) {
-							return result;
-						}
-					}
+				long thisLong = Long.parseLong(thisChunk);
+				long thatLong = Long.parseLong(thatChunk);
+				if( thisLong != thatLong ) {
+					// If they're different numbers, fine
+					return thisLong - thatLong > 0 ? 1 : -1;
+				} else {
+					// They're basically the same number, but could have 
+					// rogue zeroes there. 
+					if( thisChunk.length() == thatChunk.length() )
+						return 0; // same number, same size, equal
+					return thatChunk.length() - thisChunk.length();
 				}
 			} else {
 				result = thisChunk.compareTo(thatChunk);
