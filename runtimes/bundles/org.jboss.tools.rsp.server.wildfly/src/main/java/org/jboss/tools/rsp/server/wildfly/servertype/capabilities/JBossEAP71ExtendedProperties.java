@@ -51,4 +51,11 @@ public class JBossEAP71ExtendedProperties extends JBossAS710ExtendedProperties {
 //	public String getManagerServiceId() {
 //		return IJBoss7ManagerService.WILDFLY_VERSION_110;
 //	}
+	public String getMinimumJavaVersionString() {
+		return "1.8.";
+	}
+	public String getMaximumJavaVersionString() {
+		return "1.8.";
+	}
+
 }

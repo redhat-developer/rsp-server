@@ -49,4 +49,12 @@ public class JBossEAP61ExtendedProperties extends JBossAS710ExtendedProperties {
 		return allowExplodedDeploymentsInWarLibs();
 	}
 
+	
+	public String getMinimumJavaVersionString() {
+		return "1.6.";
+	}
+	public String getMaximumJavaVersionString() {
+		return "1.8.";
+	}
+	
 }

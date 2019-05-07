@@ -59,4 +59,11 @@ public class Wildfly100ExtendedProperties extends JBossAS710ExtendedProperties {
 	public boolean allowExplodedDeploymentsInEars() {
 		return true;
 	}
+	public String getMinimumJavaVersionString() {
+		return "1.8.";
+	}
+	public String getMaximumJavaVersionString() {
+		return "11.0.";
+	}
+
 }

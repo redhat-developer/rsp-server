@@ -50,4 +50,13 @@ public class JBossEAP60ExtendedProperties extends JBossAS710ExtendedProperties {
 		else
 			return true;
 	}
+
+	
+	public String getMinimumJavaVersionString() {
+		return "1.6.";
+	}
+	public String getMaximumJavaVersionString() {
+		return "1.8.";
+	}
+	
 }

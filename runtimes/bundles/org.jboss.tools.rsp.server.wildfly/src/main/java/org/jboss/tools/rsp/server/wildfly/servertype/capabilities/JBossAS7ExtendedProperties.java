@@ -65,6 +65,17 @@ public class JBossAS7ExtendedProperties extends JBossExtendedProperties { //impl
 		return FILE_STRUCTURE_CONFIG_DEPLOYMENTS;
 	}
 	
+
+	
+	public String getMinimumJavaVersionString() {
+		return "1.6.";
+	}
+	public String getMaximumJavaVersionString() {
+		return "9.0.";
+	}
+	
+	
+	
 //	public IServerModuleStateVerifier getModuleStateVerifier() {
 //		try {
 //			IControllableServerBehavior beh = JBossServerBehaviorUtils.getControllableBehavior(server);
