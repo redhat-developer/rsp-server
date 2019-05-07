@@ -12,12 +12,14 @@ package org.jboss.tools.rsp.server.wildfly.servertype.capabilities;
 
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.wildfly.servertype.launch.IDefaultLaunchArguments;
-import org.jboss.tools.rsp.server.wildfly.servertype.launch.JBossEAP70DefaultLaunchArguments;
+import org.jboss.tools.rsp.server.wildfly.servertype.launch.JBossEAP72DefaultLaunchArguments;
 
 public class JBossEAP72ExtendedProperties extends JBossAS710ExtendedProperties {
+
 	public JBossEAP72ExtendedProperties(IServer obj) {
 		super(obj);
 	}
+
 	@Override
 	public String getRuntimeTypeVersionString() {
 		return "7.2"; //$NON-NLS-1$
@@ -25,8 +27,9 @@ public class JBossEAP72ExtendedProperties extends JBossAS710ExtendedProperties {
 	
 	@Override
 	public IDefaultLaunchArguments getDefaultLaunchArguments() {
-		return new JBossEAP70DefaultLaunchArguments(server);
+		return new JBossEAP72DefaultLaunchArguments(server);
 	}
+
 	@Override
 	public String getJMXUrl() {
 			return getJMXUrl(getManagementPort(), "service:jmx:remote+http"); //$NON-NLS-1$
@@ -41,6 +44,7 @@ public class JBossEAP72ExtendedProperties extends JBossAS710ExtendedProperties {
 	public boolean allowExplodedDeploymentsInWarLibs() {
 		return true;
 	}
+
 	@Override
 	public boolean allowExplodedDeploymentsInEars() {
 		return true;
