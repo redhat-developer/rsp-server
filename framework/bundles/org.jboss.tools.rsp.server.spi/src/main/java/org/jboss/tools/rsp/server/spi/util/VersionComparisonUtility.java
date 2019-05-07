@@ -37,6 +37,9 @@ public class VersionComparisonUtility {
 		if( vmiMajor > testMajor ) return false;
 		if( vmiMajor < testMajor ) return true;
 		
+		if( splitTest.length <= 1 || splitTest[1].isEmpty())
+			return true;
+
 		// Majors are equal. 
 		int vmiMinor = Integer.parseInt(splitVmi[1]);
 		int testMinor = Integer.parseInt(splitTest[1]);

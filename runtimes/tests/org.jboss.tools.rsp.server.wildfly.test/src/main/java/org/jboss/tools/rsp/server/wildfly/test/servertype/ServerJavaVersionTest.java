@@ -41,8 +41,8 @@ public class ServerJavaVersionTest {
 			assertTrue(props instanceof JBossExtendedProperties);
 			JBossExtendedProperties t = (JBossExtendedProperties) props;
 
-			assertNotNull(t.getMinimumJavaVersionString());
-			assertNotNull(t.getMaximumJavaVersionString());
+			assertNotNull("Servertype " + serverType + " has no minimum java", t.getMinimumJavaVersionString());
+			assertNotNull("Servertype " + serverType + " has no maximum java", t.getMaximumJavaVersionString());
 
 		}
 	}
@@ -61,13 +61,16 @@ public class ServerJavaVersionTest {
 		
 		// Bad code but want to make lines shorter
 		VersionComparisonUtility v = new VersionComparisonUtility(); 
-		
-		for( int i = 0; i < fails.length; i++ ) {
-			assertFalse(v.isJavaCompatible(fails[i], min, max));
-		}
-
-		for( int i = 0; i < success.length; i++ ) {
-			assertTrue(v.isJavaCompatible(success[i], min, max));
+		try {
+			for( int i = 0; i < fails.length; i++ ) {
+				assertFalse(fails[i] + " should not be within " + min + " and " + max, v.isJavaCompatible(fails[i], min, max));
+			}
+	
+			for( int i = 0; i < success.length; i++ ) {
+				assertTrue(success[i] + " should be within " + min + " and " + max, v.isJavaCompatible(success[i], min, max));
+			}
+		} catch(ArrayIndexOutOfBoundsException aaah) {
+			aaah.printStackTrace();
 		}
 	}
 	
@@ -108,8 +111,8 @@ public class ServerJavaVersionTest {
 	@Test
 	public void test__AS_50() {
 		serverTypeTest(IServerConstants.SERVER_AS_50, 
-				new String[] {JAVA_4,JAVA_5}, 
-				new String[] {JAVA_2, JAVA_3, JAVA_7, JAVA_6, JAVA_8});
+				new String[] {JAVA_5, JAVA_6}, 
+				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_7, JAVA_8});
 	}
 
 	@Test
@@ -206,15 +209,15 @@ public class ServerJavaVersionTest {
 	@Test
 	public void test__EAP_43() {
 		serverTypeTest(IServerConstants.SERVER_EAP_43, 
-				new String[] {JAVA_6, JAVA_7}, 
-				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_5, JAVA_8});
+				new String[] {JAVA_4, JAVA_5}, 
+				new String[] {JAVA_2, JAVA_3, JAVA_6, JAVA_7, JAVA_8});
 	}
 
 	@Test
 	public void test__EAP_50() {
 		serverTypeTest(IServerConstants.SERVER_EAP_50, 
-				new String[] {JAVA_6, JAVA_7}, 
-				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_5, JAVA_8});
+				new String[] {JAVA_6, JAVA_7, JAVA_8}, 
+				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_5, JAVA_9});
 	}
 
 	@Test
@@ -247,7 +250,7 @@ public class ServerJavaVersionTest {
 
 	@Test
 	public void test__EAP_72() {
-		serverTypeTest(IServerConstants.SERVER_EAP_71, 
+		serverTypeTest(IServerConstants.SERVER_EAP_72, 
 				new String[] {JAVA_8,JAVA_9, JAVA_10, JAVA_11}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_6,JAVA_7,JAVA_12});
 	}

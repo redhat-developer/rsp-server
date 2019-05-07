@@ -153,6 +153,8 @@ public class JBossExtendedProperties extends ServerExtendedProperties {
 			case IServerConstants.SERVER_AS_50:
 			case IServerConstants.SERVER_AS_51:
 				return "1.5.";
+			case IServerConstants.SERVER_EAP_43:
+				return "1.4.";
 			case IServerConstants.SERVER_EAP_50:
 				return "1.6.";
 			default:
@@ -168,6 +170,8 @@ public class JBossExtendedProperties extends ServerExtendedProperties {
 			case IServerConstants.SERVER_AS_50:
 			case IServerConstants.SERVER_AS_51:
 				return "1.6.";
+			case IServerConstants.SERVER_EAP_43:
+				return "1.5.";
 			case IServerConstants.SERVER_EAP_50:
 				return "1.7.";
 			default:
