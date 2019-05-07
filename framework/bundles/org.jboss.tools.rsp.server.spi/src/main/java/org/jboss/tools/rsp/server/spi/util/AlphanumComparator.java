@@ -14,10 +14,6 @@ public class AlphanumComparator implements Comparator<String> {
 	public AlphanumComparator() {
 	}
 
-	private final boolean isDigit(char ch) {
-		return ((ch >= 48) && (ch <= 57));
-	}
-
 	/**
 	 * Length of string is passed in for improved efficiency (only need to calculate
 	 * it once)
@@ -27,10 +23,10 @@ public class AlphanumComparator implements Comparator<String> {
 		char c = s.charAt(marker);
 		chunk.append(c);
 		marker++;
-		if (isDigit(c)) {
+		if (Character.isDigit(c)) {
 			while (marker < slength) {
 				c = s.charAt(marker);
-				if (!isDigit(c))
+				if (!Character.isDigit(c))
 					break;
 				chunk.append(c);
 				marker++;
@@ -38,7 +34,7 @@ public class AlphanumComparator implements Comparator<String> {
 		} else {
 			while (marker < slength) {
 				c = s.charAt(marker);
-				if (isDigit(c))
+				if (Character.isDigit(c))
 					break;
 				chunk.append(c);
 				marker++;
@@ -66,7 +62,7 @@ public class AlphanumComparator implements Comparator<String> {
 
 			// If both chunks contain numeric characters, sort them numerically
 			int result = 0;
-			if (isDigit(thisChunk.charAt(0)) && isDigit(thatChunk.charAt(0))) {
+			if (Character.isDigit(thisChunk.charAt(0)) && Character.isDigit(thatChunk.charAt(0))) {
 				// Simple chunk comparison by length.
 				long thisLong = Long.parseLong(thisChunk);
 				long thatLong = Long.parseLong(thatChunk);
