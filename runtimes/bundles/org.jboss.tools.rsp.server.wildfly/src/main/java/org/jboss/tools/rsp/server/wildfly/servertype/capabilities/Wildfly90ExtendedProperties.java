@@ -56,7 +56,7 @@ public class Wildfly90ExtendedProperties extends JBossAS710ExtendedProperties {
 		return "1.6.";
 	}
 	public String getMaximumJavaVersionString() {
-		return "1.8.";
+		return "9.";
 	}
 
 //	@Override
