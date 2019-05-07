@@ -57,7 +57,7 @@ public class JBossEAP72ExtendedProperties extends JBossAS710ExtendedProperties {
 		return "1.8.";
 	}
 	public String getMaximumJavaVersionString() {
-		return "11.0.";
+		return "11.";
 	}
 
 }

@@ -71,7 +71,7 @@ public class JBossAS7ExtendedProperties extends JBossExtendedProperties { //impl
 		return "1.6.";
 	}
 	public String getMaximumJavaVersionString() {
-		return "9.0.";
+		return "9.";
 	}
 	
 	

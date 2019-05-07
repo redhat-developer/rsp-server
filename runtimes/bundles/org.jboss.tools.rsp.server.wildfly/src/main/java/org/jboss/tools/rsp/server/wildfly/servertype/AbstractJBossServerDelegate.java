@@ -37,6 +37,7 @@ import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
+import org.jboss.tools.rsp.server.spi.util.VersionComparisonUtility;
 import org.jboss.tools.rsp.server.wildfly.impl.Activator;
 import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.ExtendedServerPropertiesAdapterFactory;
 import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.JBossExtendedProperties;
@@ -105,44 +106,9 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		return null;
 	}
 
+
 	protected boolean isJavaCompatible(String vmiVersion, String min, String max) {
-		return isGreaterThanOrEqualTo(vmiVersion, min) && 
-				isLessThanOrEqualTo(vmiVersion, max);
-	}
-	
-	private boolean isGreaterThanOrEqualTo(String vmi, String test) {
-		if( test == null )
-			return true;
-		String[] splitVmi = vmi.split("\\.");
-		String[] splitTest = test.split("\\.");
-		int vmiMajor = Integer.parseInt(splitVmi[0]);
-		int testMajor = Integer.parseInt(splitTest[0]);
-		if( vmiMajor < testMajor ) return false;
-		if( vmiMajor > testMajor ) return true;
-		
-		// Majors are equal. 
-		int vmiMinor = Integer.parseInt(splitVmi[1]);
-		int testMinor = Integer.parseInt(splitTest[1]);
-		if( vmiMinor < testMinor ) return false;
-		return true;
-	}
-
-	private boolean isLessThanOrEqualTo(String vmi, String test) {
-		if( test == null )
-			return true;
-
-		String[] splitVmi = vmi.split("\\.");
-		String[] splitTest = test.split("\\.");
-		int vmiMajor = Integer.parseInt(splitVmi[0]);
-		int testMajor = Integer.parseInt(splitTest[0]);
-		if( vmiMajor > testMajor ) return false;
-		if( vmiMajor < testMajor ) return true;
-		
-		// Majors are equal. 
-		int vmiMinor = Integer.parseInt(splitVmi[1]);
-		int testMinor = Integer.parseInt(splitTest[1]);
-		if( vmiMinor > testMinor ) return false;
-		return true;
+		return VersionComparisonUtility.isJavaCompatible(vmiVersion, min, max);
 	}
 
 	@Override

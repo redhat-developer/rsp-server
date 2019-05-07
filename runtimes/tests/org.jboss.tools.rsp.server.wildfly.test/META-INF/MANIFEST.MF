@@ -5,7 +5,8 @@ Bundle-SymbolicName: org.jboss.tools.rsp.server.wildfly.test
 Automatic-Module-Name: org.jboss.tools.rsp.server.wildfly.test
 Bundle-Version: 0.15.1.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Import-Package: org.eclipse.lsp4j.jsonrpc,
+Import-Package: org.assertj.core.api,
+ org.eclipse.lsp4j.jsonrpc,
  org.eclipse.lsp4j.jsonrpc.json,
  org.eclipse.lsp4j.jsonrpc.json.adapters,
  org.eclipse.lsp4j.jsonrpc.messages,
@@ -26,14 +27,14 @@ Import-Package: org.eclipse.lsp4j.jsonrpc,
  org.jboss.tools.rsp.server,
  org.jboss.tools.rsp.server.discovery,
  org.jboss.tools.rsp.server.discovery.serverbeans,
- org.jboss.tools.rsp.server.spi.launchers,
  org.jboss.tools.rsp.server.model,
  org.jboss.tools.rsp.server.spi.discovery,
+ org.jboss.tools.rsp.server.spi.launchers,
  org.jboss.tools.rsp.server.spi.model,
  org.jboss.tools.rsp.server.spi.model.polling,
  org.jboss.tools.rsp.server.spi.servertype,
- org.osgi.framework,
- org.assertj.core.api
+ org.jboss.tools.rsp.server.spi.util,
+ org.osgi.framework
 Require-Bundle: org.jboss.tools.rsp.server,
  org.jboss.tools.rsp.server.wildfly,
  org.junit,
