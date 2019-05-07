@@ -142,13 +142,39 @@ public class JBossExtendedProperties extends ServerExtendedProperties {
 //		return false;
 	}
 
-	/*
-	 * support for execution environment was removed:
-	 * IExecutionEnvironment getDefaultExecutionEnvironment()
-	 * IExecutionEnvironment getMinimumExecutionEnvironment()
-	 * IExecutionEnvironment getMaximumExecutionEnvironment()
-	 */
-
+	
+	public String getMinimumJavaVersionString() {
+		switch(server.getServerType().getId()) {
+			case IServerConstants.SERVER_AS_32:
+				return "1.3.";
+			case IServerConstants.SERVER_AS_40:
+				return "1.4.";
+			case IServerConstants.SERVER_AS_42:
+			case IServerConstants.SERVER_AS_50:
+			case IServerConstants.SERVER_AS_51:
+				return "1.5.";
+			case IServerConstants.SERVER_EAP_50:
+				return "1.6.";
+			default:
+				return null;
+		}
+	}
+	public String getMaximumJavaVersionString() {
+		switch(server.getServerType().getId()) {
+			case IServerConstants.SERVER_AS_32:
+			case IServerConstants.SERVER_AS_40:
+				return "1.5.";
+			case IServerConstants.SERVER_AS_42:
+			case IServerConstants.SERVER_AS_50:
+			case IServerConstants.SERVER_AS_51:
+				return "1.6.";
+			case IServerConstants.SERVER_EAP_50:
+				return "1.7.";
+			default:
+				return null;
+		}
+	}
+	
 	public boolean requiresJDK() {
 		return false;
 	}

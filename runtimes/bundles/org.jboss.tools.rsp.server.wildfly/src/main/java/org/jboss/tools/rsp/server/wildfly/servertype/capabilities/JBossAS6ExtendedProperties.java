@@ -29,4 +29,13 @@ public class JBossAS6ExtendedProperties extends JBossExtendedProperties {
 	public IDefaultLaunchArguments getDefaultLaunchArguments() {
 		return new JBoss6xDefaultLaunchArguments(server);
 	}
+
+	
+	public String getMinimumJavaVersionString() {
+		return "1.6.";
+	}
+	public String getMaximumJavaVersionString() {
+		return "1.8.";
+	}
+	
 }

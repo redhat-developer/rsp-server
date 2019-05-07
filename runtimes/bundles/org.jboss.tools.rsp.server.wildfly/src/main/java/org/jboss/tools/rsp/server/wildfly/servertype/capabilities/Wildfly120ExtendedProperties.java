@@ -55,7 +55,13 @@ public class Wildfly120ExtendedProperties extends JBossAS710ExtendedProperties {
 		return true;
 	}
 	
-	
+	public String getMinimumJavaVersionString() {
+		return "1.8.";
+	}
+	public String getMaximumJavaVersionString() {
+		return "11.0.";
+	}
+
 //	@Override
 //	public String getManagerServiceId() {
 //		return IJBoss7ManagerService.WILDFLY_VERSION_110;

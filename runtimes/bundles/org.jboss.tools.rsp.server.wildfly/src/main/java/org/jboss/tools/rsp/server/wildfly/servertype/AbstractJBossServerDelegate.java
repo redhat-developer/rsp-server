@@ -38,6 +38,9 @@ import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 import org.jboss.tools.rsp.server.wildfly.impl.Activator;
+import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.ExtendedServerPropertiesAdapterFactory;
+import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.JBossExtendedProperties;
+import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.ServerExtendedProperties;
 import org.jboss.tools.rsp.server.wildfly.servertype.publishing.IJBossPublishController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,12 +73,76 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 			return validationErrorResponse("Server home must exist", IJBossServerAttributes.SERVER_HOME, Activator.BUNDLE_ID);
 		}
 		
+		String javaCompatibilityError = getJavaCompatibilityError();
+		if( javaCompatibilityError != null ) {
+			return validationErrorResponse(javaCompatibilityError, IJBossServerAttributes.VM_INSTALL_PATH, Activator.BUNDLE_ID);
+		}
+		return new CreateServerValidation(Status.OK_STATUS, null);
+	}
+
+	public String getJavaCompatibilityError() {
 		IVMInstall vmi = new JBossVMRegistryDiscovery().findVMInstall(this);
 		if( vmi == null ) {
 			String msg = "Server " + getServer().getId() + " can not find a valid virtual machine to use.";
-			return validationErrorResponse(msg, IJBossServerAttributes.VM_INSTALL_PATH, Activator.BUNDLE_ID);
+			return msg;
 		}
-		return new CreateServerValidation(Status.OK_STATUS, null);
+
+		ServerExtendedProperties props = new ExtendedServerPropertiesAdapterFactory()
+				.getExtendedProperties(getServer());
+		if( props == null || !(props instanceof JBossExtendedProperties )) {
+			String msg = "Server " + getServer().getId() + " experiencing internal error.";
+			return msg;
+		}
+
+		JBossExtendedProperties props2 = (JBossExtendedProperties) props;
+		String min = props2.getMinimumJavaVersionString();
+		String max = props2.getMaximumJavaVersionString();
+		String vmiVersion = vmi.getJavaVersion();
+		if( !isJavaCompatible(vmiVersion, min, max)) {
+			String msg = "Server " + getServer().getId() + " not compatible with discovered java version " + vmiVersion;
+			return msg;
+		}
+		return null;
+	}
+
+	protected boolean isJavaCompatible(String vmiVersion, String min, String max) {
+		return isGreaterThanOrEqualTo(vmiVersion, min) && 
+				isLessThanOrEqualTo(vmiVersion, max);
+	}
+	
+	private boolean isGreaterThanOrEqualTo(String vmi, String test) {
+		if( test == null )
+			return true;
+		String[] splitVmi = vmi.split("\\.");
+		String[] splitTest = test.split("\\.");
+		int vmiMajor = Integer.parseInt(splitVmi[0]);
+		int testMajor = Integer.parseInt(splitTest[0]);
+		if( vmiMajor < testMajor ) return false;
+		if( vmiMajor > testMajor ) return true;
+		
+		// Majors are equal. 
+		int vmiMinor = Integer.parseInt(splitVmi[1]);
+		int testMinor = Integer.parseInt(splitTest[1]);
+		if( vmiMinor < testMinor ) return false;
+		return true;
+	}
+
+	private boolean isLessThanOrEqualTo(String vmi, String test) {
+		if( test == null )
+			return true;
+
+		String[] splitVmi = vmi.split("\\.");
+		String[] splitTest = test.split("\\.");
+		int vmiMajor = Integer.parseInt(splitVmi[0]);
+		int testMajor = Integer.parseInt(splitTest[0]);
+		if( vmiMajor > testMajor ) return false;
+		if( vmiMajor < testMajor ) return true;
+		
+		// Majors are equal. 
+		int vmiMinor = Integer.parseInt(splitVmi[1]);
+		int testMinor = Integer.parseInt(splitTest[1]);
+		if( vmiMinor > testMinor ) return false;
+		return true;
 	}
 
 	@Override
@@ -83,6 +150,11 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		if( !modesContains(launchMode)) {
 			return new Status(IStatus.ERROR, Activator.BUNDLE_ID,
 					"Server may not be launched in mode " + launchMode);
+		}
+		String javaCompatError = getJavaCompatibilityError();
+		if( javaCompatError != null ) {
+			return new Status(IStatus.ERROR, Activator.BUNDLE_ID,
+					"Server can not be started: " + javaCompatError);
 		}
 		if( getServerRunState() == IServerDelegate.STATE_STOPPED ) {
 			IStatus v = validate().getStatus();
