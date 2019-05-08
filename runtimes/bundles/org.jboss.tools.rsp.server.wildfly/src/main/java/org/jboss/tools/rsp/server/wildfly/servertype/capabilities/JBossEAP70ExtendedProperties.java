@@ -57,9 +57,11 @@ public class JBossEAP70ExtendedProperties extends JBossAS710ExtendedProperties {
 	}
 
 	
+	@Override
 	public String getMinimumJavaVersionString() {
 		return "1.8.";
 	}
+	@Override
 	public String getMaximumJavaVersionString() {
 		return "1.8.";
 	}

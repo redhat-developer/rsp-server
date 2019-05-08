@@ -1,7 +1,10 @@
 package org.jboss.tools.rsp.server.spi.util;
 
 public class VersionComparisonUtility {
-
+	private VersionComparisonUtility() {
+		
+	}
+	
 	public static boolean isJavaCompatible(String vmiVersion, String min, String max) {
 		return isGreaterThanOrEqualTo(vmiVersion, min) && 
 				isLessThanOrEqualTo(vmiVersion, max);

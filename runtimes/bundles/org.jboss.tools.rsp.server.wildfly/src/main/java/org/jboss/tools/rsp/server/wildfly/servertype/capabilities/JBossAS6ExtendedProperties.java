@@ -31,9 +31,11 @@ public class JBossAS6ExtendedProperties extends JBossExtendedProperties {
 	}
 
 	
+	@Override
 	public String getMinimumJavaVersionString() {
 		return "1.6.";
 	}
+	@Override
 	public String getMaximumJavaVersionString() {
 		return "1.8.";
 	}

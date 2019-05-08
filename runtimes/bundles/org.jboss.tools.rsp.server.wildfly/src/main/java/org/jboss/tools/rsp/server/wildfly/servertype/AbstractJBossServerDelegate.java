@@ -26,6 +26,7 @@ import org.jboss.tools.rsp.eclipse.debug.core.DebugException;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
+import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
@@ -84,15 +85,15 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	public String getJavaCompatibilityError() {
 		IVMInstall vmi = new JBossVMRegistryDiscovery().findVMInstall(this);
 		if( vmi == null ) {
-			String msg = "Server " + getServer().getId() + " can not find a valid virtual machine to use.";
-			return msg;
+			String msg = "Server {0} can not find a valid virtual machine to use.";
+			return NLS.bind(msg, getServer().getId());
 		}
 
 		ServerExtendedProperties props = new ExtendedServerPropertiesAdapterFactory()
 				.getExtendedProperties(getServer());
-		if( props == null || !(props instanceof JBossExtendedProperties )) {
-			String msg = "Server " + getServer().getId() + " experiencing internal error.";
-			return msg;
+		if( !(props instanceof JBossExtendedProperties )) {
+			String msg = "Server {0} experienced an internal error.";
+			return NLS.bind(msg, getServer().getId());
 		}
 
 		JBossExtendedProperties props2 = (JBossExtendedProperties) props;
@@ -100,8 +101,8 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		String max = props2.getMaximumJavaVersionString();
 		String vmiVersion = vmi.getJavaVersion();
 		if( !isJavaCompatible(vmiVersion, min, max)) {
-			String msg = "Server " + getServer().getId() + " not compatible with discovered java version " + vmiVersion;
-			return msg;
+			String msg = "Server {0} is not compatible with discovered java version {1}";
+			return NLS.bind(msg, getServer().getId(), vmiVersion);
 		}
 		return null;
 	}
