@@ -60,18 +60,23 @@ public class ServerJavaVersionTest {
 		String max = t.getMaximumJavaVersionString();
 		
 		// Bad code but want to make lines shorter
-		VersionComparisonUtility v = new VersionComparisonUtility(); 
 		try {
 			for( int i = 0; i < fails.length; i++ ) {
-				assertFalse(fails[i] + " should not be within " + min + " and " + max, v.isJavaCompatible(fails[i], min, max));
+				assertFalse(fails[i] + " should not be within " + min + " and " 
+						+ max, isJavaCompatible(fails[i], min, max));
 			}
 	
 			for( int i = 0; i < success.length; i++ ) {
-				assertTrue(success[i] + " should be within " + min + " and " + max, v.isJavaCompatible(success[i], min, max));
+				assertTrue(success[i] + " should be within " + min + " and " 
+						+ max, isJavaCompatible(success[i], min, max));
 			}
 		} catch(ArrayIndexOutOfBoundsException aaah) {
 			aaah.printStackTrace();
 		}
+	}
+	
+	private boolean isJavaCompatible(String test, String min, String max) {
+		return 	VersionComparisonUtility.isJavaCompatible(test, min, max);
 	}
 	
 	private static final String JAVA_2 = "1.2.6";
@@ -87,14 +92,14 @@ public class ServerJavaVersionTest {
 	private static final String JAVA_12 = "12.6.0";
 	
 	
-	public void test__AS_32() {
+	public void testAS_32() {
 		serverTypeTest(IServerConstants.SERVER_AS_32, 
 				new String[] {JAVA_3, JAVA_4, JAVA_5}, 
 				new String[] {JAVA_2, JAVA_6});
 	}
 
 	@Test
-	public void test__AS_40() {
+	public void testAS_40() {
 		serverTypeTest(IServerConstants.SERVER_AS_40, 
 				new String[] {JAVA_4, JAVA_5}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_6});
@@ -102,154 +107,154 @@ public class ServerJavaVersionTest {
 	}
 
 	@Test
-	public void test__AS_42() {
+	public void testAS_42() {
 		serverTypeTest(IServerConstants.SERVER_AS_42, 
 				new String[] {JAVA_5,JAVA_6}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_7, JAVA_8});
 	}
 
 	@Test
-	public void test__AS_50() {
+	public void testAS_50() {
 		serverTypeTest(IServerConstants.SERVER_AS_50, 
 				new String[] {JAVA_5, JAVA_6}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_7, JAVA_8});
 	}
 
 	@Test
-	public void test__AS_51() {
+	public void testAS_51() {
 		serverTypeTest(IServerConstants.SERVER_AS_51, 
 				new String[] {JAVA_5,JAVA_6}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_7, JAVA_8});
 	}
 
 	@Test
-	public void test__AS_60() {
+	public void testAS_60() {
 		serverTypeTest(IServerConstants.SERVER_AS_60, 
 				new String[] {JAVA_6,JAVA_7,JAVA_8}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_9});
 	}
 
 	@Test
-	public void test__AS_70() {
+	public void testAS_70() {
 		serverTypeTest(IServerConstants.SERVER_AS_70, 
 				new String[] {JAVA_6,JAVA_7,JAVA_8,JAVA_9}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_10});
 	}
 
 	@Test
-	public void test__AS_71() {
+	public void testAS_71() {
 		serverTypeTest(IServerConstants.SERVER_AS_71, 
 				new String[] {JAVA_6,JAVA_7,JAVA_8,JAVA_9}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_10});
 	}
 
 	@Test
-	public void test__WILDFLY_80() {
+	public void testWildFly80() {
 		serverTypeTest(IServerConstants.SERVER_WILDFLY_80, 
 				new String[] {JAVA_6,JAVA_7,JAVA_8,JAVA_9}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_10, JAVA_11});
 	}
 
 	@Test
-	public void test__WILDFLY_90() {
+	public void testWildFly90() {
 		serverTypeTest(IServerConstants.SERVER_WILDFLY_90, 
 				new String[] {JAVA_6,JAVA_7,JAVA_8,JAVA_9}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_10, JAVA_11});
 	}
 
 	@Test
-	public void test__WILDFLY_100() {
+	public void testWildFly100() {
 		serverTypeTest(IServerConstants.SERVER_WILDFLY_100, 
 				new String[] {JAVA_8,JAVA_9, JAVA_10, JAVA_11}, 
 				new String[] {JAVA_6, JAVA_7, JAVA_12});
 	}
 
 	@Test
-	public void test__WILDFLY_110() {
+	public void testWildFly110() {
 		serverTypeTest(IServerConstants.SERVER_WILDFLY_110, 
 				new String[] {JAVA_8,JAVA_9, JAVA_10, JAVA_11}, 
 				new String[] {JAVA_6, JAVA_7, JAVA_12});
 	}
 
 	@Test
-	public void test__WILDFLY_120() {
+	public void testWildFly120() {
 		serverTypeTest(IServerConstants.SERVER_WILDFLY_120, 
 				new String[] {JAVA_8,JAVA_9, JAVA_10, JAVA_11}, 
 				new String[] {JAVA_6, JAVA_7, JAVA_12});
 	}
 
 	@Test
-	public void test__WILDFLY_130() {
+	public void testWildFly130() {
 		serverTypeTest(IServerConstants.SERVER_WILDFLY_130, 
 				new String[] {JAVA_8,JAVA_9, JAVA_10, JAVA_11}, 
 				new String[] {JAVA_6, JAVA_7, JAVA_12});
 	}
 
 	@Test
-	public void test__WILDFLY_140() {
+	public void testWildFly140() {
 		serverTypeTest(IServerConstants.SERVER_WILDFLY_140, 
 				new String[] {JAVA_8,JAVA_9, JAVA_10, JAVA_11}, 
 				new String[] {JAVA_6, JAVA_7, JAVA_12});
 	}
 
 	@Test
-	public void test__WILDFLY_150() {
+	public void testWildFly150() {
 		serverTypeTest(IServerConstants.SERVER_WILDFLY_150, 
 				new String[] {JAVA_8,JAVA_9, JAVA_10, JAVA_11}, 
 				new String[] {JAVA_6, JAVA_7, JAVA_12});
 	}
 
 	@Test
-	public void test__WILDFLY_160() {
+	public void testWildFly160() {
 		serverTypeTest(IServerConstants.SERVER_WILDFLY_160, 
 				new String[] {JAVA_8,JAVA_9, JAVA_10, JAVA_11}, 
 				new String[] {JAVA_6, JAVA_7, JAVA_12});
 	}
 
 	@Test
-	public void test__EAP_43() {
+	public void testEAP43() {
 		serverTypeTest(IServerConstants.SERVER_EAP_43, 
 				new String[] {JAVA_4, JAVA_5}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_6, JAVA_7, JAVA_8});
 	}
 
 	@Test
-	public void test__EAP_50() {
+	public void testEAP50() {
 		serverTypeTest(IServerConstants.SERVER_EAP_50, 
 				new String[] {JAVA_6, JAVA_7, JAVA_8}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_5, JAVA_9});
 	}
 
 	@Test
-	public void test__EAP_60() {
+	public void testEAP60() {
 		serverTypeTest(IServerConstants.SERVER_EAP_60, 
 				new String[] {JAVA_6,JAVA_7,JAVA_8}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_9, JAVA_10, JAVA_11});
 	}
 
 	@Test
-	public void test__EAP_61() {
+	public void testEAP61() {
 		serverTypeTest(IServerConstants.SERVER_EAP_61, 
 				new String[] {JAVA_6,JAVA_7,JAVA_8}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_9, JAVA_10, JAVA_11});
 	}
 
 	@Test
-	public void test__EAP_70() {
+	public void testEAP70() {
 		serverTypeTest(IServerConstants.SERVER_EAP_70, 
 				new String[] {JAVA_8}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_6,JAVA_7, JAVA_9, JAVA_10, JAVA_11});
 	}
 
 	@Test
-	public void test__EAP_71() {
+	public void testEAP71() {
 		serverTypeTest(IServerConstants.SERVER_EAP_71, 
 				new String[] {JAVA_8}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_6,JAVA_7, JAVA_9, JAVA_10, JAVA_11});
 	}
 
 	@Test
-	public void test__EAP_72() {
+	public void testEAP72() {
 		serverTypeTest(IServerConstants.SERVER_EAP_72, 
 				new String[] {JAVA_8,JAVA_9, JAVA_10, JAVA_11}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_6,JAVA_7,JAVA_12});
