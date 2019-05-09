@@ -281,7 +281,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		CreateServerAttributesUtility util = new CreateServerAttributesUtility();
 		util.addAttribute(ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME, 
 				ServerManagementAPIConstants.ATTR_TYPE_STRING,
-				"Customize the output name for this deployment (Leave blank for default)", null);
+				"Customize the output name including extension for this deployment. Example: sample.war (Leave blank for default)", null);
 		return util.toPojo();
 	}
 
