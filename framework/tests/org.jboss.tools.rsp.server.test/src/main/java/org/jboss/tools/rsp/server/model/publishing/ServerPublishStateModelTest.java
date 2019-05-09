@@ -9,6 +9,10 @@
 package org.jboss.tools.rsp.server.model.publishing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
@@ -27,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -357,12 +362,27 @@ public class ServerPublishStateModelTest {
 		// when
 		List<DeployableState> states = modelSpy.getDeployableStates();
 		// then
-		assertThat(states).containsOnly(
-				danglingState,
-				fileState,
-				directoryState);
+		assertEquals(states.size(), 3);
+		assertTrue(listContains(states, danglingState));
+		assertTrue(listContains(states, fileState));
+		assertTrue(listContains(states, directoryState));
 	}
 
+	private boolean listContains(List<DeployableState> list, DeployableState state) {
+		for( DeployableState ds : list ) {
+			if( ds.getPublishState() != state.getPublishState())
+				continue;
+			if( ds.getState() != state.getState())
+				continue;
+			if( !(ds.getReference().getLabel().equals(state.getReference().getLabel())))
+				continue;
+			if( !(ds.getReference().getPath().equals(state.getReference().getPath())))
+				continue;
+			return true;
+		}
+		return false;
+	}
+	
 	@Test
 	public void shouldReturnSpecificDeployableState() {
 		// given
@@ -567,7 +587,7 @@ public class ServerPublishStateModelTest {
 		assertThat(modelSpy.getDeltas()).hasSize(1);
 		DeployableDelta delta = modelSpy.getDeltas().get(modelSpy.getKey(deployableDirectory));
 		assertThat(delta).isNotNull();
-		assertThat(delta.getReference()).isEqualTo(deployableDirectory);
+		assertThat(delta.getReference()).isEqualToComparingFieldByField(deployableDirectory);
 	}
 
 	@Test
@@ -592,7 +612,7 @@ public class ServerPublishStateModelTest {
 		assertThat(modelSpy.getDeltas()).hasSize(1);
 		DeployableDelta delta = modelSpy.getDeltas().get(modelSpy.getKey(deployableDirectory));
 		assertThat(delta).isNotNull();
-		assertThat(delta.getReference()).isEqualTo(deployableDirectory);
+		assertThat(delta.getReference()).isEqualToComparingFieldByField(deployableDirectory);
 		
 		// when 2nd change
 		modelSpy.fileChanged(new FileWatcherEvent(
@@ -606,6 +626,59 @@ public class ServerPublishStateModelTest {
 		assertThat(delta.getReference()).isEqualTo(deployableDirectory);
 	}
 
+	
+	@Test
+	public void testOrphanedModelObject() {
+		AbstractServerDelegate delegate = mock(AbstractServerDelegate.class);
+		this.model = new TestableServerPublishStateModel(delegate, null);
+		
+		// Create a new ref
+		String originalLabelAndPath = deployableFile.getLabel();
+		DeployableReference ref = new DeployableReference(originalLabelAndPath,originalLabelAndPath);
+		// Add it to the model
+		model.addDeployable(ref);
+		
+		// Now change it!  
+		ref.setLabel("BLAHBLAH");
+		ref.setPath(deployableDirectory.getPath());
+		
+		// Now check the ACTUAL model and verify the model still has 
+		// the original values that were added to the model directly
+		Map<String, DeployableState> inModel = model.getStates();
+		assertFalse(inModel.containsKey("BLAHBLAH"));
+		assertTrue(inModel.size() == 1);
+		List<DeployableState> vals = new ArrayList<>(inModel.values());
+		assertTrue(vals.size() == 1);
+		DeployableState ds = vals.get(0);
+		assertFalse(ds.getReference().getLabel().equals("BLAHBLAH"));
+		assertFalse(ds.getReference().getPath().equals(deployableDirectory.getPath()));
+		
+		
+		// Now let's get a reference to that actual DeployableState via it's REAL API
+		// ie not model.getStates (which is for testing only) but model.getDeployableStates()
+		List<DeployableState> allStates = model.getDeployableStates();
+		assertTrue(allStates.size() == 1);
+		ds = allStates.get(0);
+		assertNotEquals("BLAHBLAH", ds.getReference().getLabel());
+		
+		// Now let's try changing the details of the deployable state they gave us
+		// from the REAL api, and make sure changing the returned values 
+		// doesn't change the model
+		ds.getReference().setLabel("BLAHBLAH");
+		ds.getReference().setPath(deployableDirectory.getPath());
+
+		// verify
+		inModel = model.getStates();
+		assertFalse(inModel.containsKey("BLAHBLAH"));
+		assertTrue(inModel.size() == 1);
+		vals = new ArrayList<>(inModel.values());
+		assertTrue(vals.size() == 1);
+		ds = vals.get(0);
+		assertFalse(ds.getReference().getLabel().equals("BLAHBLAH"));
+		assertFalse(ds.getReference().getPath().equals(deployableDirectory.getPath()));
+		
+	}
+	
 	private ServerPublishStateModel fakeDeployableStates(int publishState, DeployableReference deployable) {
 		DeployableState deployableState = mockDeployableState(publishState, deployable);
 		return fakeDeployableStates(deployableState);
@@ -638,9 +711,7 @@ public class ServerPublishStateModelTest {
 	}
 
 	private DeployableReference createDeployableReference(String path) {
-		DeployableReference deployable = mock(DeployableReference.class);
-		doReturn(path).when(deployable).getPath();
-		return deployable;
+		return new DeployableReference(path, path);
 	}
 
 	private File createTempFile(String prefix) throws IOException {

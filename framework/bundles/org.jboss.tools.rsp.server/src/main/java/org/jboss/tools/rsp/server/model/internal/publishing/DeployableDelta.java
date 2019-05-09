@@ -29,6 +29,11 @@ public class DeployableDelta implements IDeployableResourceDelta {
 		this.reference = reference;
 		this.changes  = new HashMap<>();
 	}
+	
+	public DeployableDelta(DeployableReference reference, Map<Path, Integer> ch) {
+		this.reference = reference;
+		this.changes = ch;
+	}
 
 	/**
 	 * Returns a map of relative paths and their change type

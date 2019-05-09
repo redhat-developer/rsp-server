@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
@@ -67,11 +68,15 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		registerFileWatcher(reference);
 	}
 
+	private DeployableState cloneDeployableState(DeployableReference reference, DeployableState state) {
+		return createDeployableState(reference, state.getPublishState(), state.getState());
+	}
+	
 	private DeployableState createDeployableState(DeployableReference reference, int publishState, int state) {
 		DeployableState deployableState = new DeployableState();
 		deployableState.setPublishState(publishState);
 		deployableState.setState(state);
-		deployableState.setReference(reference);
+		deployableState.setReference(new DeployableReference(reference.getLabel(), reference.getPath()));
 		deployableState.setServer(delegate.getServerHandle());
 		return deployableState;
 	}
@@ -147,7 +152,10 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 
 	@Override
 	public List<DeployableState> getDeployableStates() {
-		return new ArrayList<>(getStates().values());
+		List<DeployableState> ret = getStates().values().stream().
+				map(element -> cloneDeployableState(element.getReference(), element))
+				.collect(Collectors.toList());
+		return new ArrayList<>(ret);
 	}
 
 	@Override
@@ -156,7 +164,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		if (ds == null) {
 			return null;
 		}
-		return createDeployableState(reference, ds.getPublishState(), ds.getState());
+		return cloneDeployableState(reference, ds);
 	}
 
 	/**
@@ -255,7 +263,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 
 	private void registerSingleDelta(FileWatcherEvent event, DeployableReference reference) {
 		String key = getKey(reference);
-		DeployableDelta dd = getDeltas().computeIfAbsent(key, k ->  new DeployableDelta(reference));
+		DeployableDelta dd = getDeltas().computeIfAbsent(key, k ->  new DeployableDelta(new DeployableReference(reference.getLabel(), reference.getPath())));
 		dd.registerChange(event);
 	}
 
@@ -324,7 +332,17 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 
 	@Override
 	public IDeployableResourceDelta getDeployableResourceDelta(DeployableReference reference) {
-		return deltas.get(getKey(reference));
+		return cloneDelta(deltas.get(getKey(reference)));
+	}
+	
+	private IDeployableResourceDelta cloneDelta(DeployableDelta delta) {
+		if( delta == null )
+			return null;
+		DeployableReference ref = cloneReference(delta.getReference());
+		return new DeployableDelta(ref, delta.getResourceDeltaMap());
+	}
+	private DeployableReference cloneReference(DeployableReference ref) {
+		return ref == null ? null : new DeployableReference(ref.getLabel(), ref.getPath());
 	}
 
 }
