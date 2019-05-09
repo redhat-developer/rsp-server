@@ -22,10 +22,11 @@ public class JBossEAP5ExtendedProperties extends JBossExtendedProperties {
 		return "5.x"; //$NON-NLS-1$
 	}
 
-	
+	@Override
 	public String getMinimumJavaVersionString() {
 		return "1.6.";
 	}
+	@Override
 	public String getMaximumJavaVersionString() {
 		return "1.8.";
 	}
