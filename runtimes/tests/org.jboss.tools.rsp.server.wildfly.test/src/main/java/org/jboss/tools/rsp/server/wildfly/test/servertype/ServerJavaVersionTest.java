@@ -92,14 +92,14 @@ public class ServerJavaVersionTest {
 	private static final String JAVA_12 = "12.6.0";
 	
 	
-	public void testAS_32() {
+	public void testAS32() {
 		serverTypeTest(IServerConstants.SERVER_AS_32, 
 				new String[] {JAVA_3, JAVA_4, JAVA_5}, 
 				new String[] {JAVA_2, JAVA_6});
 	}
 
 	@Test
-	public void testAS_40() {
+	public void testAS40() {
 		serverTypeTest(IServerConstants.SERVER_AS_40, 
 				new String[] {JAVA_4, JAVA_5}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_6});
@@ -107,42 +107,42 @@ public class ServerJavaVersionTest {
 	}
 
 	@Test
-	public void testAS_42() {
+	public void testAS42() {
 		serverTypeTest(IServerConstants.SERVER_AS_42, 
 				new String[] {JAVA_5,JAVA_6}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_7, JAVA_8});
 	}
 
 	@Test
-	public void testAS_50() {
+	public void testAS50() {
 		serverTypeTest(IServerConstants.SERVER_AS_50, 
 				new String[] {JAVA_5, JAVA_6}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_7, JAVA_8});
 	}
 
 	@Test
-	public void testAS_51() {
+	public void testAS51() {
 		serverTypeTest(IServerConstants.SERVER_AS_51, 
 				new String[] {JAVA_5,JAVA_6}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_7, JAVA_8});
 	}
 
 	@Test
-	public void testAS_60() {
+	public void testAS60() {
 		serverTypeTest(IServerConstants.SERVER_AS_60, 
 				new String[] {JAVA_6,JAVA_7,JAVA_8}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_9});
 	}
 
 	@Test
-	public void testAS_70() {
+	public void testAS70() {
 		serverTypeTest(IServerConstants.SERVER_AS_70, 
 				new String[] {JAVA_6,JAVA_7,JAVA_8,JAVA_9}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_10});
 	}
 
 	@Test
-	public void testAS_71() {
+	public void testAS71() {
 		serverTypeTest(IServerConstants.SERVER_AS_71, 
 				new String[] {JAVA_6,JAVA_7,JAVA_8,JAVA_9}, 
 				new String[] {JAVA_2, JAVA_3, JAVA_4, JAVA_10});
