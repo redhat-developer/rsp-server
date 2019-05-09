@@ -110,6 +110,8 @@ public class TypescriptUtility {
 	}
 
 	public void generateTypescriptClient(String dir) {
+		Path generatedDir = new File(dir).toPath().resolve(BASE_GEN_DIRECTORY);
+		generatedDir.toFile().mkdirs();
 		generateProtocolTs(dir);
 		generateMessageTs(dir);
 		generateIncomingTs(dir);

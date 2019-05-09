@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2019-04-24 11:53:44.
+// Generated using typescript-generator version 2.2.413 on 2019-05-09 13:45:23.
 
 export interface Attribute {
     type: string;

@@ -12,6 +12,7 @@ package org.jboss.tools.rsp.api.schema;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 public class GenerateSchemaMain {
@@ -27,7 +28,7 @@ public class GenerateSchemaMain {
 		JSONUtility json = generateJson(baseDir, daos);
 		TypescriptUtility ts = generateTypescript(baseDir, daos);
 		generateSpecifications(baseDir, json, ts);
-		generateTypescriptClient(ts);
+		generateTypescriptClient(baseDir, ts);
 	}
 
 	private static void validateDaos(Class<?>[] daos) {
@@ -52,11 +53,24 @@ public class GenerateSchemaMain {
 		}
 	}
 
-	private static void generateTypescriptClient(TypescriptUtility ts) {
+	private static void generateTypescriptClient(String baseDir, TypescriptUtility ts) {
+		String localClientLocation = getJsonClientFolder(baseDir).toFile().getAbsolutePath();
+		if (exists(localClientLocation)) {
+			ts.generateTypescriptClient(localClientLocation);
+		}
+		
+		
 		String clientDir = System.getProperty(TYPESCRIPT_CLIENT_DIR);
 		if (exists(clientDir)) {
 			ts.generateTypescriptClient(clientDir);
 		}
+	}
+	
+
+    private static Path getJsonClientFolder(String baseDir) {
+		return new File(baseDir).toPath()
+				.resolve("src").resolve("main").resolve("resources")
+				.resolve("client").resolve("typescript");
 	}
 
 	private static boolean exists(String clientDir) {
