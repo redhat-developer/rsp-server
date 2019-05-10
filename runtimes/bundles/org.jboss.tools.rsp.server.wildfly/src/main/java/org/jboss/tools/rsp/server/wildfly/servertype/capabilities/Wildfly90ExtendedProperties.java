@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Red Hat, Inc.
+ * Copyright (c) 2015-2019 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution,
@@ -11,59 +11,12 @@
 package org.jboss.tools.rsp.server.wildfly.servertype.capabilities;
 
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
-import org.jboss.tools.rsp.server.wildfly.servertype.launch.IDefaultLaunchArguments;
 import org.jboss.tools.rsp.server.wildfly.servertype.launch.Wildfly80DefaultLaunchArguments;
 
-public class Wildfly90ExtendedProperties extends JBossAS710ExtendedProperties {
-	public Wildfly90ExtendedProperties(IServer obj) {
-		super(obj);
-	}
-	@Override
-	public String getRuntimeTypeVersionString() {
-		return "9.x"; //$NON-NLS-1$
-	}
-	
-	@Override
-	public String getJMXUrl() {
-			return getJMXUrl(getManagementPort(), "service:jmx:remote+http"); //$NON-NLS-1$
-	}
-	
-	@Override
-	public int getManagementPort() {
-		return 9990;
-	}
+public class Wildfly90ExtendedProperties extends AbstractWildflyExtendedProperties {
 
-	@Override
-	public IDefaultLaunchArguments getDefaultLaunchArguments() {
-		return new Wildfly80DefaultLaunchArguments(server);
+	public Wildfly90ExtendedProperties(IServer server) {
+		super("9.x", "1.7", "1.8", "service:jmx:remote+http", new Wildfly80DefaultLaunchArguments(server), server);
 	}
 	
-	@Override
-	public boolean requiresJDK() {
-		return true;
-	}
-
-	@Override
-	public boolean allowExplodedDeploymentsInWarLibs() {
-		return true;
-	}
-	
-	@Override
-	public boolean allowExplodedDeploymentsInEars() {
-		return true;
-	}
-	@Override
-	public String getMinimumJavaVersionString() {
-		return "1.6.";
-	}
-	@Override
-	public String getMaximumJavaVersionString() {
-		return "9.";
-	}
-
-//	@Override
-//	public String getManagerServiceId() {
-//		return IJBoss7ManagerService.WILDFLY_VERSION_900;
-//	}
-//	
 }

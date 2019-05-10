@@ -13,8 +13,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import java.util.Collections;
-
 import org.jboss.tools.rsp.server.spi.discovery.IServerBeanTypeManager;
 import org.jboss.tools.rsp.server.spi.discovery.ServerBeanType;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;

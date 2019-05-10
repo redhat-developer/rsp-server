@@ -24,7 +24,8 @@ public class Wildfly100DefaultLaunchArguments extends JBoss71DefaultLaunchArgume
 
 	@Override
 	public String getStartDefaultVMArgs() {
-		return super.getStartDefaultVMArgs() + "-Dorg.jboss.logmanager.nocolor=true -Djboss.bind.address.management=localhost"; //$NON-NLS-1$
+		return super.getStartDefaultVMArgs() 
+				+ "-Dorg.jboss.logmanager.nocolor=true -Djboss.bind.address.management=localhost"; //$NON-NLS-1$
 	}
 
 	@Override

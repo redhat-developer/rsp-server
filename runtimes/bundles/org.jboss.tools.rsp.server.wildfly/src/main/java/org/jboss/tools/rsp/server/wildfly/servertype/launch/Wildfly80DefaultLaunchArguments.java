@@ -13,8 +13,7 @@ package org.jboss.tools.rsp.server.wildfly.servertype.launch;
 import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
-public class Wildfly80DefaultLaunchArguments extends
-		JBoss71DefaultLaunchArguments {
+public class Wildfly80DefaultLaunchArguments extends JBoss71DefaultLaunchArguments {
 
 	public Wildfly80DefaultLaunchArguments(IServer s) {
 		super(s);
