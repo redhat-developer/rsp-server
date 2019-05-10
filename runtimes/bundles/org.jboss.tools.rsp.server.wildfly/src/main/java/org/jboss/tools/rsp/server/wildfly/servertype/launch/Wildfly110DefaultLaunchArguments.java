@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 - 2013 Red Hat, Inc.
+ * Copyright (c) 2007 - 2019 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution,
@@ -12,27 +12,15 @@ package org.jboss.tools.rsp.server.wildfly.servertype.launch;
 
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
-public class Wildfly150DefaultLaunchArguments extends JBoss71DefaultLaunchArguments {
-	public Wildfly150DefaultLaunchArguments(IServer s) {
+public class Wildfly110DefaultLaunchArguments extends Wildfly100DefaultLaunchArguments {
+	public Wildfly110DefaultLaunchArguments(IServer s) {
 		super(s);
-	}
-
-	@Override
-	protected String getMemoryArgs() {
-		return "-Xms64m -Xmx512m ";
 	}
 
 	@Override
 	public String getStartDefaultVMArgs() {
 		return super.getStartDefaultVMArgs() 
-				+ "-Dorg.jboss.logmanager.nocolor=true -Djboss.bind.address.management=localhost"
 		        + getJava9VMArgs();
 	}
-
-	@Override
-	protected String getJaxpProvider() {
-		return "";
-	}
-	
 
 }

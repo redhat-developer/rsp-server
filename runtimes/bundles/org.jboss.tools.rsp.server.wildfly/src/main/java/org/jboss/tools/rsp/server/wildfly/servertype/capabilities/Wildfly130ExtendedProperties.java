@@ -11,66 +11,12 @@
 package org.jboss.tools.rsp.server.wildfly.servertype.capabilities;
 
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
-import org.jboss.tools.rsp.server.wildfly.servertype.launch.IDefaultLaunchArguments;
-import org.jboss.tools.rsp.server.wildfly.servertype.launch.Wildfly100DefaultLaunchArguments;
+import org.jboss.tools.rsp.server.wildfly.servertype.launch.Wildfly110DefaultLaunchArguments;
 
-public class Wildfly130ExtendedProperties extends JBossAS710ExtendedProperties {
+public class Wildfly130ExtendedProperties extends AbstractWildflyExtendedProperties {
 
-	public Wildfly130ExtendedProperties(IServer obj) {
-		super(obj);
-	}
-
-	@Override
-	public String getRuntimeTypeVersionString() {
-		return "13.0"; //$NON-NLS-1$
+	public Wildfly130ExtendedProperties(IServer server) {
+		super("13.0", "1.8", "11.0", "service:jmx:remote+http", new Wildfly110DefaultLaunchArguments(server), server);
 	}
 
-	@Override
-	public IDefaultLaunchArguments getDefaultLaunchArguments() {
-		return new Wildfly100DefaultLaunchArguments(server);
-	}
-
-	@Override
-	public String getJMXUrl() {
-			return getJMXUrl(getManagementPort(), "service:jmx:remote+http"); //$NON-NLS-1$
-	}
-	
-	@Override
-	public int getManagementPort() {
-		return 9990;
-	}
-
-	@Override
-	public boolean requiresJDK() {
-		return true;
-	}
-
-	@Override
-	public boolean allowExplodedDeploymentsInWarLibs() {
-		return true;
-	}
-	
-	@Override
-	public boolean allowExplodedDeploymentsInEars() {
-		return true;
-	}
-	
-	@Override
-	public String getMinimumJavaVersionString() {
-		return "1.8.";
-	}
-	@Override
-	public String getMaximumJavaVersionString() {
-		return "11.";
-	}
-
-//	@Override
-//	public String getManagerServiceId() {
-//		return IJBoss7ManagerService.WILDFLY_VERSION_110;
-//	}
-//	@Override
-//	public IDefaultLaunchArguments getDefaultLaunchArguments() {
-//		return new Wildfly100DefaultLaunchArguments(server);
-//	}
-//
 }

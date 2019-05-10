@@ -72,7 +72,7 @@ public class JBossAS7ExtendedProperties extends JBossExtendedProperties { //impl
 	}
 	@Override
 	public String getMaximumJavaVersionString() {
-		return "9.";
+		return "8.";
 	}
 	
 	
