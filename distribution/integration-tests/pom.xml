@@ -82,7 +82,7 @@
 			<id>wildfly-14</id>
 			<activation>
 				<property>
-					<name>!wildfly-15</name>
+					<name>wildfly-14</name>
 				</property>
 			</activation>
 			<build>
@@ -126,7 +126,7 @@
 			<id>wildfly-15</id>
 			<activation>
 				<property>
-					<name>wildfly-15</name>
+					<name>!wildfly-14</name>
 				</property>
 			</activation>
 			<build>
