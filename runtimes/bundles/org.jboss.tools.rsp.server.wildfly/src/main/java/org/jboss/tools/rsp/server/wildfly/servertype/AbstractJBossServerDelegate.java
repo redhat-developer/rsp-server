@@ -75,10 +75,6 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 			return validationErrorResponse("Server home must exist", IJBossServerAttributes.SERVER_HOME, Activator.BUNDLE_ID);
 		}
 		
-		String javaCompatibilityError = getJavaCompatibilityError();
-		if( javaCompatibilityError != null ) {
-			return validationErrorResponse(javaCompatibilityError, IJBossServerAttributes.VM_INSTALL_PATH, Activator.BUNDLE_ID);
-		}
 		return new CreateServerValidation(Status.OK_STATUS, null);
 	}
 
