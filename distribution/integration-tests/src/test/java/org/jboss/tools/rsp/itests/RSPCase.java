@@ -12,12 +12,15 @@ import static org.junit.Assert.fail;
 
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.jboss.tools.rsp.api.RSPServer;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerBean;
+import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.itests.util.DummyClientLauncher;
@@ -85,4 +88,16 @@ public abstract class RSPCase {
 		ServerAttributes serverAttr = new ServerAttributes(bean.getServerAdapterTypeId(), id, attr);
 		return serverProxy.createServer(serverAttr).get().getStatus();
 	}
+
+	protected void deleteServer(String id) throws Exception {
+		CompletableFuture<List<ServerHandle>> handles = serverProxy.getServerHandles();
+		ServerHandle handle = handles.get().stream()
+			.filter(server -> id.equals(server.getId()))
+			.findFirst().orElse(null);
+		if (handle == null) {
+			return;
+		}
+		serverProxy.deleteServer(handle);
+	}
+
 }
