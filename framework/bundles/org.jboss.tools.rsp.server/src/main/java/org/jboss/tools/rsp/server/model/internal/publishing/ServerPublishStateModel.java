@@ -49,7 +49,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 
 	@Override
-	public void initialize(List<DeployableReference> references) {
+	public synchronized void initialize(List<DeployableReference> references) {
 		for( DeployableReference reference : references ) {
 			addDeployableImpl(reference, ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN);
 		}
@@ -97,7 +97,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	 * @param withOptions the deployable to add.
 	 */
 	@Override
-	public IStatus addDeployable(DeployableReference withOptions) {
+	public synchronized IStatus addDeployable(DeployableReference withOptions) {
 		if (contains(withOptions)) {
 			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, IStatus.ERROR, 
 					NLS.bind("Could not add deploybale with path {0}: it already exists.", 
@@ -110,12 +110,12 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 
 	@Override
-	public boolean contains(DeployableReference reference) {
+	public synchronized boolean contains(DeployableReference reference) {
 		return getStates().containsKey(getKey(reference));
 	}
 
 	@Override
-	public IStatus removeDeployable(DeployableReference reference) {
+	public synchronized IStatus removeDeployable(DeployableReference reference) {
 		DeployableState ds = getStates().get(getKey(reference));
 		if (ds == null) {
 			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, IStatus.ERROR, 
@@ -144,14 +144,14 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 	
 	@Override
-	public void deployableRemoved(DeployableReference reference) {
+	public synchronized void deployableRemoved(DeployableReference reference) {
 		String k = getKey(reference);
 		getStates().remove(k);
 		deploymentOptions.remove(k);
 	}
 
 	@Override
-	public List<DeployableState> getDeployableStates() {
+	public synchronized List<DeployableState> getDeployableStates() {
 		List<DeployableState> ret = getStates().values().stream().
 				map(element -> cloneDeployableState(element.getReference(), element))
 				.collect(Collectors.toList());
@@ -159,7 +159,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 
 	@Override
-	public DeployableState getDeployableState(DeployableReference reference) {
+	public synchronized DeployableState getDeployableState(DeployableReference reference) {
 		DeployableState ds = getStates().get(getKey(reference));
 		if (ds == null) {
 			return null;
@@ -182,7 +182,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 
 	@Override
-	public void setDeployablePublishState(DeployableReference reference, int publishState) {
+	public synchronized void setDeployablePublishState(DeployableReference reference, int publishState) {
 		DeployableState ds = getDeployableState(reference);
 		if (ds == null) {
 			return;
@@ -204,7 +204,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 
 	@Override
-	public void setDeployableState(DeployableReference reference, int runState) {
+	public synchronized void setDeployableState(DeployableReference reference, int runState) {
 		DeployableState ds = getStates().get(getKey(reference));
 		if (ds == null) {
 			return;
@@ -238,7 +238,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	 * 
 	 */
 	@Override
-	public void fileChanged(FileWatcherEvent event) {
+	public synchronized void fileChanged(FileWatcherEvent event) {
 		Path affected = event.getPath();
 		List<DeployableState> ds = new ArrayList<>(getStates().values());
 		boolean changed = false;
@@ -278,11 +278,11 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		}
 	}
 
-	public void updateServerPublishStateFromDeployments() {
+	public synchronized void updateServerPublishStateFromDeployments() {
 		updateServerPublishStateFromDeployments(false);
 	}
 	
-	public void updateServerPublishStateFromDeployments(boolean fireEvent) {
+	public synchronized void updateServerPublishStateFromDeployments(boolean fireEvent) {
 		List<DeployableState> vals = new ArrayList<>(getStates().values());
 		int newState = ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 
@@ -308,12 +308,12 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 
 	@Override
-	public int getServerPublishState() {
+	public synchronized int getServerPublishState() {
 		return this.publishState;
 	}
 
 	@Override
-	public void setServerPublishState(int state, boolean fire) {
+	public synchronized void setServerPublishState(int state, boolean fire) {
 		if( state != this.publishState) {
 			this.publishState = state;
 			if( fire ) 
@@ -322,7 +322,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 
 	@Override
-	public DeployableReference fillOptionsFromCache(DeployableReference reference) {
+	public synchronized DeployableReference fillOptionsFromCache(DeployableReference reference) {
 		if (reference == null) {
 			return null;
 		}
@@ -331,7 +331,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 
 	@Override
-	public IDeployableResourceDelta getDeployableResourceDelta(DeployableReference reference) {
+	public synchronized IDeployableResourceDelta getDeployableResourceDelta(DeployableReference reference) {
 		return cloneDelta(deltas.get(getKey(reference)));
 	}
 	
