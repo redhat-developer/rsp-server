@@ -8,9 +8,18 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.itests.wildfly;
 
+import static org.jboss.tools.rsp.itests.util.ServerStateUtil.waitForServerState;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
@@ -26,7 +35,6 @@ import org.jboss.tools.rsp.itests.RSPCase;
 import org.jboss.tools.rsp.itests.util.DummyClient;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
 
 /**
  *
@@ -37,9 +45,6 @@ public class WildFlyLaunchingTest extends RSPCase {
     private static final String MODE_DEBUG = "debug";
 	private static final String MODE_RUN = "run";
 	private static final String STATUS_MESSAGE_OK = "ok";
-	private static final String STATE_STOPPED = "stopped";
-	private static final String STATE_STARTED = "started";
-	private static final long WAIT_FOR_SERVERSTATE = 3000;
 
 	private final DummyClient client = launcher.getClient();
 
@@ -238,10 +243,10 @@ public class WildFlyLaunchingTest extends RSPCase {
         
         assertEquals(0, response.getStatus().getSeverity());
         assertEquals(STATUS_MESSAGE_OK, response.getStatus().getMessage());
-        waitForServerState(STATE_STARTED, 10);
+        waitForServerState(ServerManagementAPIConstants.STATE_STARTED, 10, client);
         
         serverProxy.stopServerAsync(new StopServerAttributes("wildfly3", true)).get();
-        waitForServerState(STATE_STOPPED, 10);
+        waitForServerState(ServerManagementAPIConstants.STATE_STOPPED, 10, client);
     }
 
     @Test
@@ -254,13 +259,13 @@ public class WildFlyLaunchingTest extends RSPCase {
                 new ServerAttributes(wildflyType.getId(), "wildfly4", attr), MODE_RUN);
         
         serverProxy.startServerAsync(params).get();
-        waitForServerState(STATE_STARTED, 10);
+        waitForServerState(ServerManagementAPIConstants.STATE_STARTED, 10, client);
         StartServerResponse response = serverProxy.startServerAsync(params).get();
         
         assertEquals(Status.CANCEL, response.getStatus().getSeverity());
         
         serverProxy.stopServerAsync(new StopServerAttributes("wildfly4", true)).get();
-        waitForServerState(STATE_STOPPED, 10);
+        waitForServerState(ServerManagementAPIConstants.STATE_STOPPED, 10, client);
     }
 
     @Test
@@ -272,10 +277,10 @@ public class WildFlyLaunchingTest extends RSPCase {
                 new ServerAttributes(wildflyType.getId(), "wildfly5", attr), MODE_RUN);
         
         serverProxy.startServerAsync(params).get();
-        waitForServerState(STATE_STARTED, 10);
+        waitForServerState(ServerManagementAPIConstants.STATE_STARTED, 10, client);
         
         Status status = serverProxy.stopServerAsync(new StopServerAttributes("wildfly5", false)).get();
-        waitForServerState(STATE_STOPPED, 10);
+        waitForServerState(ServerManagementAPIConstants.STATE_STOPPED, 10, client);
         
         assertEquals(Status.OK, status.getSeverity());
         assertEquals(STATUS_MESSAGE_OK, status.getMessage());
@@ -308,16 +313,4 @@ public class WildFlyLaunchingTest extends RSPCase {
         assertEquals(Status.ERROR, status.getSeverity());
     }
     
-    private void waitForServerState(String serverState, int tries) throws Exception {
-        int remaining = tries;
-
-		while (remaining > 0) {
-			remaining--;
-            if (serverState.equals(client.getStateString())) {
-                return;
-            }
-            Thread.sleep(WAIT_FOR_SERVERSTATE);
-        }
-        throw new AssertionError("Waiting for server state to change to " + serverState + " timed out");
-    }
 }
