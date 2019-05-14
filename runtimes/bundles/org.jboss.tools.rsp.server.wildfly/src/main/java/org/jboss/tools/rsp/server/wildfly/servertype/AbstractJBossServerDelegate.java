@@ -281,7 +281,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	
 	@Override
 	public IStatus canRemoveDeployable(DeployableReference reference) {
-		return getOrCreatePublishController().canRemoveDeployable(reference);
+		return getOrCreatePublishController().canRemoveDeployable(getServerPublishModel().fillOptionsFromCache(reference));
 	}
 	
 	@Override
