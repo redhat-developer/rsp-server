@@ -8,19 +8,23 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.itests.wildfly;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.jboss.tools.rsp.api.dao.Attribute;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.Status;
+import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.itests.RSPCase;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  *
@@ -128,13 +132,14 @@ public class WildFlyServerModelTest extends RSPCase {
     
     @Test
     public void testCreateServer() throws Exception {
-        Status status = createServer(WILDFLY_ROOT, "wfly");
+    	String serverName = createUniqueName("wfly");
+    	Status status = createServer(WILDFLY_ROOT, serverName);
                 
-        assertEquals(0, status.getSeverity());
+        assertEquals(IStatus.OK, status.getSeverity());
         assertEquals("ok", status.getMessage());
         
         List<ServerHandle> handles = serverProxy.getServerHandles().get();
-        ServerHandle expected = new ServerHandle("wfly", wildflyType);
+        ServerHandle expected = new ServerHandle(serverName, wildflyType);
         assertTrue(handles.contains(expected));
     }
     
@@ -143,7 +148,7 @@ public class WildFlyServerModelTest extends RSPCase {
         ServerAttributes attr = new ServerAttributes("UNKNOWN", "fly", null);
         Status status = serverProxy.createServer(attr).get().getStatus();
         
-        assertEquals(Status.ERROR, status.getSeverity());
+        assertEquals(IStatus.ERROR, status.getSeverity());
         assertEquals("Server Type UNKNOWN not found", status.getMessage());
     }
     
@@ -151,19 +156,20 @@ public class WildFlyServerModelTest extends RSPCase {
     public void testCreateServerNull() throws Exception {
         Status status = serverProxy.createServer(null).get().getStatus();
         
-        assertEquals(Status.ERROR, status.getSeverity());
+        assertEquals(IStatus.ERROR, status.getSeverity());
         assertEquals(INVALID_PARAM, status.getMessage());
     }
     
     @Test
     public void testCreateServerTwice() throws Exception {
-        Status status1 = createServer(WILDFLY_ROOT, "wfly1");
-        Status status2 = createServer(WILDFLY_ROOT, "wfly1");
+    	String serverName = createUniqueName("wfly1");
+    	Status status1 = createServer(WILDFLY_ROOT, serverName);
+        Status status2 = createServer(WILDFLY_ROOT, serverName);
         
-        assertEquals(0, status1.getSeverity());
+        assertEquals(IStatus.OK, status1.getSeverity());
         assertEquals("ok", status1.getMessage());
-        assertEquals(Status.ERROR, status2.getSeverity());
-        assertEquals("Server with id wfly1 already exists.", status2.getMessage());
+        assertEquals(IStatus.ERROR, status2.getSeverity());
+        assertTrue(status2.getMessage().contains("already exists"));
     }
     
     @Test
@@ -173,7 +179,7 @@ public class WildFlyServerModelTest extends RSPCase {
         ServerHandle handle = new ServerHandle("wfly2", wildflyType);
         Status status = serverProxy.deleteServer(handle).get();
         
-        assertEquals(0, status.getSeverity());
+        assertEquals(IStatus.OK, status.getSeverity());
         assertEquals("ok", status.getMessage());
     }
     
@@ -182,7 +188,7 @@ public class WildFlyServerModelTest extends RSPCase {
         ServerHandle handle = new ServerHandle("wfly3", wildflyType);
         Status status = serverProxy.deleteServer(handle).get();
         
-        assertEquals(Status.ERROR, status.getSeverity());
+        assertEquals(IStatus.ERROR, status.getSeverity());
         assertEquals("Server not removed: wfly3", status.getMessage());
     }
     
@@ -191,7 +197,7 @@ public class WildFlyServerModelTest extends RSPCase {
         ServerHandle handle = new ServerHandle("wfly4", new ServerType("foo", "foo", "foo"));
         Status status = serverProxy.deleteServer(handle).get();
         
-        assertEquals(Status.ERROR, status.getSeverity());
+        assertEquals(IStatus.ERROR, status.getSeverity());
         assertEquals("Server not removed: wfly4", status.getMessage());
     }
     
@@ -199,7 +205,7 @@ public class WildFlyServerModelTest extends RSPCase {
     public void testDeleteServerNull() throws Exception {
         Status status = serverProxy.deleteServer(null).get();
         
-        assertEquals(Status.ERROR, status.getSeverity());
+        assertEquals(IStatus.ERROR, status.getSeverity());
         assertEquals(INVALID_PARAM, status.getMessage());
     }
     
@@ -212,5 +218,9 @@ public class WildFlyServerModelTest extends RSPCase {
         
         assertTrue(handles.contains(new ServerHandle("wfly5", wildflyType)));
         assertTrue(handles.contains(new ServerHandle("wfly6", wildflyType)));
+    }
+    
+    private static String createUniqueName(String prefix) {
+    	return prefix + System.currentTimeMillis();
     }
 }
