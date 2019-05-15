@@ -21,6 +21,7 @@
    <bundle id="org.jboss.tools.rsp.runtime.core"/>
    <bundle id="org.jboss.tools.rsp.server.spi"/>
    <bundle id="org.jboss.tools.rsp.server"/>
+   <bundle id="org.jboss.tools.rsp.server.redhat.download"/>
    <bundle id="org.jboss.tools.rsp.server.wildfly"/>
    <bundle id="org.jboss.tools.rsp.server.minishift"/>
 </site>
