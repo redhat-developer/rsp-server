@@ -8,7 +8,7 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.rsp.server.wildfly.runtimes.download;
+package org.jboss.tools.rsp.server.redhat.download;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -32,10 +32,10 @@ import org.jboss.tools.rsp.server.minishift.discovery.MinishiftDiscovery;
 import org.jboss.tools.rsp.server.minishift.impl.Activator;
 import org.jboss.tools.rsp.server.minishift.servertype.IMinishiftServerAttributes;
 import org.jboss.tools.rsp.server.minishift.servertype.impl.MinishiftServerTypes;
+import org.jboss.tools.rsp.server.redhat.download.AbstractDownloadManagerExecutor;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.runtimes.AbstractStacksDownloadRuntimesProvider;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
-import org.jboss.tools.rsp.server.wildfly.runtimes.download.AbstractDownloadManagerExecutor;
 
 public class CDKDownloadExecutor extends AbstractDownloadManagerExecutor {
 
