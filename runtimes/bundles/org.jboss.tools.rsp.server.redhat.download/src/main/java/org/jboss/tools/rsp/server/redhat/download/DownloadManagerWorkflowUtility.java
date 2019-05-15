@@ -9,7 +9,7 @@
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
 
-package org.jboss.tools.rsp.server.wildfly.runtimes.download;
+package org.jboss.tools.rsp.server.redhat.download;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -28,7 +28,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.launching.memento.IMemento;
 import org.jboss.tools.rsp.launching.memento.XMLMemento;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
-import org.jboss.tools.rsp.server.wildfly.impl.Activator;
+import org.jboss.tools.rsp.server.redhat.download.impl.Activator;
 /**
  * A utility class for running the remote download-manager header commands to
  * verify if the downloadRuntime is set to be downloaded.

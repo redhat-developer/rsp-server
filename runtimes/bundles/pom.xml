@@ -14,6 +14,7 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>org.jboss.tools.rsp.server.redhat.download</module>
     <module>org.jboss.tools.rsp.server.minishift</module>
     <module>org.jboss.tools.rsp.server.wildfly</module>
   </modules>
