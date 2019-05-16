@@ -21,6 +21,8 @@
 		<server.type.id>org.jboss.ide.eclipse.as.wildfly.160</server.type.id>
 		<server.version>16.0.0.Final</server.version>
 		<server.path>${project.build.directory}/wildfly-${server.version}</server.path>
+		<!-- Sonar report property for code coverage -->
+		<sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 
 	<name>Runtime Server Protocol : Integration Tests</name>
@@ -102,6 +104,21 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- Aggregate coverage report by default -->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+				<executions>
+					<execution>
+						<id>aggregate-report</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report-aggregate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -123,24 +140,6 @@
 								<groupId>${project.groupId}</groupId>
 							</systemPropertyVariables>
 						</configuration>
-					</plugin>
-					<plugin>
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId>
-						<version>${jacoco.version}</version>
-						<executions>
-							<execution>
-								<id>jacoco-site</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>report-aggregate</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${jacoco.reportRoot}/jacoco-report</outputDirectory>
-									<title>RSP Code Coverage</title>
-								</configuration>
-							</execution>
-						</executions>
 					</plugin>
 				</plugins>
 			</build>
