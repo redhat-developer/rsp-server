@@ -43,6 +43,7 @@ public class AlphanumComparator implements Comparator<String> {
 		return chunk.toString();
 	}
 
+	@Override
 	public int compare(String s1, String s2) {
 		if ((s1 == null) || (s2 == null)) {
 			return 0;
@@ -73,8 +74,9 @@ public class AlphanumComparator implements Comparator<String> {
 					// They're basically the same number, but could have 
 					// rogue zeroes there. 
 					if( thisChunk.length() == thatChunk.length() )
-						return 0; // same number, same size, equal
-					return thatChunk.length() - thisChunk.length();
+						result = 0; // same number, same size, equal
+					else 
+						return thatChunk.length() - thisChunk.length();
 				}
 			} else {
 				result = thisChunk.compareTo(thatChunk);

@@ -42,6 +42,19 @@ public class AlphanumComparatorTest {
 		testSorted(pre,post);
 	}
 
+	
+	@Test
+	public void testCDKStrings() {
+		// This is a tough one to decide how to implement, but, 
+		// if two segments are essentially the same (ie 0100 vs 100) 
+		// then there must be leading zeros. In this case, the longer 
+		// one is marked as smaller, as it would be if there was a string comparison
+		// instead of a numeric comparison. 
+		String[] pre = new String[] { "cdk v3.7.0", "cdk v3.2.0", "cdk v3.4.2", "cdk v3.4.1", "cdk v3.4.7"};
+		String[] post = new String[] { "cdk v3.2.0", "cdk v3.4.1", "cdk v3.4.2", "cdk v3.4.7", "cdk v3.7.0"};
+		testSorted(pre,post);
+	}
+
 	private void testSorted(String[] preSort, String[] expected) {
 		AlphanumComparator c = new AlphanumComparator();
 		List<String> l = Arrays.asList(preSort);
