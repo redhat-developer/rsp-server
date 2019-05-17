@@ -132,11 +132,14 @@ public class DownloadRuntimeOperationUtility {
 	public File download(String unzipDirectoryPath, String downloadDirectoryPath, 
 			String urlString, boolean deleteOnExit, String user, String pass, IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask("Download runtime from url " + urlString, 500);
+		File downloadedFile = null;
 		try {
 			validateInputs(downloadDirectoryPath, unzipDirectoryPath);
-			File downloadedFile = downloadRemoteRuntime(downloadDirectoryPath, 
-					urlString, deleteOnExit, user, pass, new SubProgressMonitor(monitor, 500));
+			downloadedFile = downloadRemoteRuntime(downloadDirectoryPath, urlString, deleteOnExit, user, pass, new SubProgressMonitor(monitor, 450));
 			return downloadedFile;
+		} catch(CoreException ce) {
+			new File(unzipDirectoryPath).delete();
+			throw new CoreException( new Status(ce.getStatus().getSeverity(), RuntimeCoreActivator.PLUGIN_ID, NLS.bind("Error while retrieving runtime from {0}", urlString), ce));  //$NON-NLS-1$
 		} finally {
 			monitor.done();
 		}
