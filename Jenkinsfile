@@ -35,7 +35,7 @@ pipeline {
                 		
                         stage('Integration tests') {
                 			steps {
-                				sh 'mvn verify -B -Pintegration-tests -Dwildfly-14 -DskipTests=true -Dmaven.test.failure.ignore=true'
+                				sh 'mvn verify -B -Pintegration-tests -DskipTests=true -Dmaven.test.failure.ignore=true'
                 			}
                         }
                 		
