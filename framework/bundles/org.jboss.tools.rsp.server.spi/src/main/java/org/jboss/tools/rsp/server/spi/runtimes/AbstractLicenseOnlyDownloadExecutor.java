@@ -117,11 +117,8 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 		if( !installations.exists())
 			installations.mkdirs();
 		
-		String uniqueName = getUniqueInstallLocation(dlrt.getId(), installations);
-		File uniqueLoc = new File(installations, uniqueName);
-		
 		// Kick off a download in a new thread
-		String jobId = initiateDownloadAndCreateServer(req, dlrt, installer, uniqueLoc, downloads);
+		String jobId = initiateDownloadAndCreateServer(req, dlrt, installer, installations, downloads);
 		
 		// License is approved. Send a response about it.
 		WorkflowResponse rsp = quickResponse(IStatus.OK,  "Download In Progress", req);
@@ -132,14 +129,18 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 	/*
 	 * Initiate the download, and return the job id
 	 */
-	private String initiateDownloadAndCreateServer(DownloadSingleRuntimeRequest req, DownloadRuntime dlrt, 
-			IRuntimeInstaller installer, File uniqueLoc, File downloads) {
+	private String initiateDownloadAndCreateServer(DownloadSingleRuntimeRequest req, 
+			DownloadRuntime dlrt, IRuntimeInstaller installer, File installations, File downloads) {
 		String jobName = "Download runtime: " + dlrt.getName();
 		final MessageContext<RSPClient> client = ClientThreadLocal.getStore().getContext();
 		IStatusRunnableWithProgress task = new IStatusRunnableWithProgress() {
 			
 			@Override
 			public IStatus run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+				String uniqueName = getUniqueInstallLocation(dlrt.getId(), installations);
+				File uniqueLoc = new File(installations, uniqueName);
+				
+				
 				final MessageContext<RSPClient> prev = ClientThreadLocal.getStore().getContext();
 				ClientThreadLocal.getStore().setContext(client);
 				// TODO, implement a progress monitor that can update progress
@@ -148,7 +149,6 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 				TaskModel tm2 = createDownloadTaskModel(req);
 				IStatus ret = installer.installRuntime(dlrt, uniqueLoc.getAbsolutePath(), downloads.getAbsolutePath(), 
 						true, tm2, sub.split(90));
-				
 				if( !ret.isOK()) {
 					return ret;
 				}

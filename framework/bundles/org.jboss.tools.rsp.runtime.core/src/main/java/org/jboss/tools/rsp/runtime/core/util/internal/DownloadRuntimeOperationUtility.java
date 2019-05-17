@@ -147,9 +147,16 @@ public class DownloadRuntimeOperationUtility {
 	public IStatus downloadAndUnzip(String unzipDirectoryPath, String downloadDirectoryPath, 
 			String urlString, boolean deleteOnExit, String user, String pass, TaskModel tm, IProgressMonitor monitor) {
 		monitor.beginTask("Configuring runtime from url " + urlString, 500);
+		File downloadedFile = null;
 		try {
 			validateInputs(downloadDirectoryPath, unzipDirectoryPath);
-			File downloadedFile = downloadRemoteRuntime(downloadDirectoryPath, urlString, deleteOnExit, user, pass, new SubProgressMonitor(monitor, 450));
+			downloadedFile = downloadRemoteRuntime(downloadDirectoryPath, urlString, deleteOnExit, user, pass, new SubProgressMonitor(monitor, 450));
+		} catch(CoreException ce) {
+			new File(unzipDirectoryPath).delete();
+			return new Status(ce.getStatus().getSeverity(), RuntimeCoreActivator.PLUGIN_ID, NLS.bind("Error while retrieving runtime from {0}", urlString), ce);  //$NON-NLS-1$
+		}
+		
+		try {
 			ExtractUtility extractUtil = new ExtractUtility(downloadedFile);
 			IOverwrite ow = (IOverwrite)tm.getObject(IDownloadRuntimeWorkflowConstants.OVERWRITE);
 			if( ow == null ) {
@@ -184,13 +191,12 @@ public class DownloadRuntimeOperationUtility {
 			if (download) {
 				result = downloadFileFromRemoteUrl(file, new URL(urlString), urlModified, user, pass, new SubProgressMonitor(monitor, 900));
 			}
-			if( !result.isOK())
-				throw new CoreException(result);
 			if (monitor.isCanceled()) {
 				Files.delete(file.toPath());
 				throw new CoreException(cancel(file));
 			}
-			
+			if( !result.isOK())
+				throw new CoreException(result);
 			return file;
 		} catch (IOException  e) {
 			cancel(file);
