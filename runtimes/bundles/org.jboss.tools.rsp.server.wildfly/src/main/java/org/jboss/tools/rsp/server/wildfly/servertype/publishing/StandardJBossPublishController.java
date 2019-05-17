@@ -63,23 +63,29 @@ public class StandardJBossPublishController implements IJBossPublishController {
 	private boolean hasSuffix(String path, String suffix) {
 		return path.endsWith(suffix);
 	}
-	private boolean isSupportedDeployable(String path, String outputName, boolean mustExist) {
+	
+	private IStatus validateSupportedDeployable(String path, String outputName, boolean mustExist) {
 		if( path == null )
-			return false;
+			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
+					NLS.bind("Server {0} does not support deployment with null path.", server));
 		
 		File f = new File(path);
 		// When removing a module, there's no reason it must exist
 		if( mustExist && !f.exists())
-			return false;
-		
+			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
+					NLS.bind("Server {0} does not support deployments that do not exist in the filesystem.", server));
+
 		if( mustExist && !supportsExplodedDeployment() && !f.isFile())
-			return false;
+			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
+					NLS.bind("Server {0} does not support exploded deployment, and deployment path is a directory.", server));
 		
 		for( int i = 0; i < supportedSuffix.length; i++ ) {
 			if( hasSuffix(outputName, supportedSuffix[i]))
-				return true;
+				return Status.OK_STATUS;
 		}
-		return false;
+		return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
+				NLS.bind("Server {0} does not support deployment of resources without an approved suffix. " + 
+		"Use the " + ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME + " deployment option to override the output name.", server));
 	}
 	
 	protected boolean supportsExplodedDeployment() {
@@ -99,23 +105,21 @@ public class StandardJBossPublishController implements IJBossPublishController {
 	@Override
 	public IStatus canAddDeployable(DeployableReference ref) {
 		String path = ref.getPath();
-		if( isSupportedDeployable(path, getOutputName(ref), true)) {
+		IStatus valid = validateSupportedDeployable(path, getOutputName(ref), false);
+		if(valid.isOK()) {
 			return Status.OK_STATUS;
 		}
-		return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
-				NLS.bind("Server {0} cannot add deployable from {1}", 
-						server.getName(), path));
+		return valid;
 	}
 
 	@Override
 	public IStatus canRemoveDeployable(DeployableReference ref) {
 		String path = ref.getPath();
-		if( isSupportedDeployable(path, getOutputName(ref), false)) {
+		IStatus valid = validateSupportedDeployable(path, getOutputName(ref), false);
+		if(valid.isOK()) {
 			return Status.OK_STATUS;
 		}
-		return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
-				NLS.bind("Server {0} cannot remove deployable from {1}", 
-						server.getName(), path));
+		return valid;
 	}
 
 	@Override
