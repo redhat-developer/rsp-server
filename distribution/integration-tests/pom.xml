@@ -15,23 +15,94 @@
 
 	<properties>
 		<skipITests>true</skipITests>
+		<server.id>install-wildfly-16.0.0.Final</server.id>
+		<server.url>http://download.jboss.org/wildfly/16.0.0.Final/wildfly-16.0.0.Final.zip</server.url>
+		<server.sha1>b55ed374ab4f8534c2343ac9a283c71fa6d22dfe</server.sha1>
+		<server.type.id>org.jboss.ide.eclipse.as.wildfly.160</server.type.id>
+		<server.version>16.0.0.Final</server.version>
+		<server.path>${project.build.directory}/wildfly-${server.version}</server.path>
 	</properties>
 
 	<name>Runtime Server Protocol : Integration Tests</name>
 
 	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<configuration>
-						<!-- skip integration tests if not in integration-tests profile -->
-						<skipTests>true</skipTests>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<!-- skip integration tests if not in integration-tests profile -->
+					<skipTests>true</skipTests>
+					<systemPropertyVariables>
+						<server.type.id>${server.type.id}</server.type.id>
+						<server.version>${server.version}</server.version>
+						<server.path>${server.path}</server.path>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
+			<!-- display active profile in compile phase -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-help-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>show-profiles</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>active-profiles</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- display values of maven defined properties-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.1</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<echo>Displaying value of properties</echo>
+								<echo>[server.id] ${server.id}</echo>
+								<echo>[server.url] ${server.url}</echo>
+								<echo>[server.sha1] ${server.sha1}</echo>
+								<echo>[server.type.id] ${server.type.id}</echo>
+								<echo>[server.version] ${server.version}</echo>
+								<echo>[server.path] ${server.path}</echo>
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.googlecode.maven-download-plugin</groupId>
+				<artifactId>download-maven-plugin</artifactId>
+				<version>1.4.1</version>
+				<configuration>
+					<skip>${skipITests}</skip>
+				</configuration>
+				<executions>
+					<execution>
+						<id>${server.id}</id>
+						<phase>test-compile</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>${server.url}</url>
+							<sha1>${server.sha1}</sha1>
+							<unpack>true</unpack>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 	</build>
 
 	<profiles>
@@ -41,22 +112,18 @@
 				<skipITests>false</skipITests>
 			</properties>
 			<build>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-surefire-plugin</artifactId>
-							<configuration>
-								<skipTests>false</skipTests>
-								<systemPropertyVariables>
-									<rsp-distribution.filename>${rsp-distribution.filename}</rsp-distribution.filename>
-									<groupId>${project.groupId}</groupId>
-								</systemPropertyVariables>
-							</configuration>
-						</plugin>
-					</plugins>
-				</pluginManagement>
 				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skipTests>false</skipTests>
+							<systemPropertyVariables>
+								<rsp-distribution.filename>${rsp-distribution.filename}</rsp-distribution.filename>
+								<groupId>${project.groupId}</groupId>
+							</systemPropertyVariables>
+						</configuration>
+					</plugin>
 					<plugin>
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
@@ -85,86 +152,43 @@
 					<name>wildfly-14</name>
 				</property>
 			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>com.googlecode.maven-download-plugin</groupId>
-						<artifactId>download-maven-plugin</artifactId>
-						<version>1.4.1</version>
-						<configuration>
-							<skip>${skipITests}</skip>
-						</configuration>
-						<executions>
-							<execution>
-								<id>install-wildfly-14.0.1.Final</id>
-								<phase>test-compile</phase>
-								<goals>
-									<goal>wget</goal>
-								</goals>
-								<configuration>
-									<url>http://download.jboss.org/wildfly/14.0.1.Final/wildfly-14.0.1.Final.zip</url>
-									<md5>61a1279e0549089dc95519fced661999</md5>
-									<unpack>true</unpack>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<systemPropertyVariables>
-								<server.type.id>org.jboss.ide.eclipse.as.wildfly.140</server.type.id>
-								<server.path>${project.build.directory}/wildfly-14.0.1.Final</server.path>
-								<server.version>14.0.1.Final</server.version>
-							</systemPropertyVariables>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
+			<properties>
+				<server.id>install-wildfly-14.0.1.Final</server.id>
+				<server.url>http://download.jboss.org/wildfly/14.0.1.Final/wildfly-14.0.1.Final.zip</server.url>
+				<server.sha1>a6bafc5c8c6c148648d9229c2066f041f8dc656c</server.sha1>
+				<server.type.id>org.jboss.ide.eclipse.as.wildfly.140</server.type.id>
+				<server.version>14.0.1.Final</server.version>
+			</properties>
 		</profile>
 		<profile>
 			<id>wildfly-15</id>
 			<activation>
 				<property>
-					<name>!wildfly-14</name>
+					<name>wildfly-15</name>
 				</property>
 			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>com.googlecode.maven-download-plugin</groupId>
-						<artifactId>download-maven-plugin</artifactId>
-						<version>1.4.1</version>
-						<configuration>
-							<skip>${skipITests}</skip>
-						</configuration>
-						<executions>
-							<execution>
-								<id>install-wildfly-15.0.1.Final</id>
-								<phase>test-compile</phase>
-								<goals>
-									<goal>wget</goal>
-								</goals>
-								<configuration>
-									<url>http://download.jboss.org/wildfly/15.0.1.Final/wildfly-15.0.1.Final.zip</url>
-									<md5>be42a899ba01a797ec5c097e3c5737c4</md5>
-									<unpack>true</unpack>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<systemPropertyVariables>
-								<server.type.id>org.jboss.ide.eclipse.as.wildfly.150</server.type.id>
-								<server.path>${project.build.directory}/wildfly-15.0.1.Final</server.path>
-								<server.version>15.0.1.Final</server.version>
-							</systemPropertyVariables>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
+			<properties>
+				<server.id>install-wildfly-15.0.1.Final</server.id>
+				<server.url>http://download.jboss.org/wildfly/15.0.1.Final/wildfly-15.0.1.Final.zip</server.url>
+				<server.sha1>d30d603b3f25a0d2b080f94dd5af11869b81663b</server.sha1>
+				<server.type.id>org.jboss.ide.eclipse.as.wildfly.150</server.type.id>
+				<server.version>15.0.1.Final</server.version>
+			</properties>
+		</profile>
+		<profile>
+			<id>wildfly-16</id>
+			<activation>
+				<property>
+					<name>wildfly-16</name>
+				</property>
+			</activation>
+			<properties>
+				<server.id>install-wildfly-16.0.0.Final</server.id>
+				<server.url>http://download.jboss.org/wildfly/16.0.0.Final/wildfly-16.0.0.Final.zip</server.url>
+				<server.sha1>b55ed374ab4f8534c2343ac9a283c71fa6d22dfe</server.sha1>
+				<server.type.id>org.jboss.ide.eclipse.as.wildfly.160</server.type.id>
+				<server.version>16.0.0.Final</server.version>
+			</properties>
 		</profile>
 	</profiles>
 
