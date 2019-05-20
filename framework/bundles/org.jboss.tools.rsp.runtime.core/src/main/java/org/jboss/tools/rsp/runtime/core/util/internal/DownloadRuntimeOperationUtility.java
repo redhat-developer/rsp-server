@@ -256,7 +256,7 @@ public class DownloadRuntimeOperationUtility {
 			IStatus result = null;
 			InputStream override = createDownloadInputStream(url, user, pass);
 			if( override == null ) {
-				result = getCache().download(toFile.getName(), url.toExternalForm(), user, pass, out, -1, monitor);	
+				result = getCache().download(toFile.getName(), url.toExternalForm(), user, pass, out, -1, monitor);
 			} else {
 				int cLength = getContentLength(url, user, pass);
 				result = getCache().download(toFile.getName(), override, out, -1, cLength, monitor);
@@ -264,6 +264,9 @@ public class DownloadRuntimeOperationUtility {
 			out.flush();
 			if (remoteUrlModified > 0) {
 				toFile.setLastModified(remoteUrlModified);
+			}
+			if( result.isOK()) {
+				getCache().addToCache(url.toString(), toFile);
 			}
 			return result;
 		}
@@ -300,10 +303,14 @@ public class DownloadRuntimeOperationUtility {
 	
 	private URLTransportCache getCache() {
 		if( cache == null ) {
-			File data = LaunchingCore.getDataLocation();
-			File stacks = new File(data, "downloadruntimescache");
-			cache = URLTransportCache.getCache(new Path(stacks.getAbsolutePath()));
+			cache = getDefaultDownloadRuntimeCache();
 		}
 		return cache;
+	}
+	
+	public static final URLTransportCache getDefaultDownloadRuntimeCache() {
+		File data = LaunchingCore.getDataLocation();
+		File transportCache = new File(data, "runtimes");
+		return URLTransportCache.getCache(new Path(transportCache.getAbsolutePath()));
 	}
 }

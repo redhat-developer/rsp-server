@@ -158,28 +158,37 @@ public class URLTransportCache {
 		File existing = getExistingRemoteFileCacheLocation(url);
 		File target = createNewRemoteFileCacheLocation(url);
 		try (FileOutputStream os = new FileOutputStream(target)){
-			IStatus s = download(displayName, url, os, timeout, monitor);
-			if (s.isOK()) {
-				// Download completed successfully, add to cache, delete old copy
-				if (deleteOnExit)
-					target.deleteOnExit();	
-				addToCache(url, target);
-				if( existing != null && existing.exists())
-					Files.delete(existing.toPath());
-				return target != null && target.exists() ? target : null;
-			}
-			// Download did not go as planned. Delete the new, return the old
-			if( target != null && target.exists()) {
-				Files.delete(target.toPath());
-			}
-			return existing;
+			IStatus dlStatus = download(displayName, url, os, timeout, monitor);
+			return postDownloadCaching(dlStatus, deleteOnExit, url, target, existing);
 		} catch (IOException ioe) {
 			LOG.error(ioe.getMessage(), ioe);
 		}
 		return null;
 	}
 
-	private void addToCache(String url, File target) {
+	private File postDownloadCaching(IStatus dlStatus, boolean deleteOnExit, 
+			String url, File target, File existing) throws IOException {
+		if (dlStatus.isOK()) {
+			// Download completed successfully, add to cache, delete old copy
+			if (deleteOnExit)
+				target.deleteOnExit();
+			else 
+				// Only add to cache if we are NOT deleting on exit
+				// Otherwise cache ends up with stale reference on next restart
+				addToCache(url, target);
+			
+			if( existing != null && existing.exists())
+				Files.delete(existing.toPath());
+			return target != null && target.exists() ? target : null;
+		}
+		// Download did not go as planned. Delete the new, return the old
+		if( target != null && target.exists()) {
+			Files.delete(target.toPath());
+		}
+		return existing;
+	}
+	
+	public void addToCache(String url, File target) {
 		cache.put(url, target.getAbsolutePath());
 		savePreferences();
 	}

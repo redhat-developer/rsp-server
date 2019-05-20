@@ -8,10 +8,6 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.wildfly.impl;
 
-import java.util.Map;
-
-import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
-import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.rsp.server.LauncherSingleton;
 import org.jboss.tools.rsp.server.ServerManagementServerLauncher;
 
@@ -25,8 +21,6 @@ public class WildflyServerMain extends ServerManagementServerLauncher {
 		WildflyServerMain instance = new WildflyServerMain();
 		LauncherSingleton.getDefault().setLauncher(instance);
 		instance.launch(args[0]);
-		
-		Map<String, DownloadRuntime> test = instance.getModel().getDownloadRuntimeModel().getOrLoadDownloadRuntimes(new NullProgressMonitor());
 		instance.shutdownOnInput();
 	}
 	
