@@ -83,9 +83,10 @@ public class StandardJBossPublishController implements IJBossPublishController {
 			if( hasSuffix(outputName, supportedSuffix[i]))
 				return Status.OK_STATUS;
 		}
-		return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
-				NLS.bind("Server {0} does not support deployment of resources without an approved suffix. " + 
-		"Use the " + ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME + " deployment option to override the output name.", server));
+		return new Status(IStatus.ERROR, Activator.BUNDLE_ID, NLS.bind(
+				"Server {0} does not support deployment of resources without an approved suffix. " + 
+				"Use the {1} deployment option to override the output name.", 
+				server.getName(), ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME));
 	}
 	
 	protected boolean supportsExplodedDeployment() {
