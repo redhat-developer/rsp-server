@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
+import org.jboss.tools.rsp.api.dao.ServerState;
+import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
@@ -29,6 +31,7 @@ import org.jboss.tools.rsp.server.spi.filewatcher.FileWatcherEvent;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherEventListener;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
 import org.jboss.tools.rsp.server.spi.servertype.IDeployableResourceDelta;
+import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
 
 public class ServerPublishStateModel implements IServerPublishModel, IFileWatcherEventListener {
@@ -40,6 +43,8 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	private AbstractServerDelegate delegate;
 	private IFileWatcherService fileWatcher;
 	private int publishState = AbstractServerDelegate.PUBLISH_STATE_UNKNOWN;
+	
+	private AutoPublishThread autoPublish;
 	
 	public ServerPublishStateModel(AbstractServerDelegate delegate, IFileWatcherService fileWatcher) {
 		this.delegate = delegate;
@@ -106,6 +111,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		addDeployableImpl(withOptions, ServerManagementAPIConstants.PUBLISH_STATE_ADD);
 		updateServerPublishStateFromDeployments();
 		fireState();
+		kickAutoPublisher();
 		return Status.OK_STATUS;
 	}
 
@@ -133,6 +139,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		}
 		updateServerPublishStateFromDeployments();
 		fireState();
+		kickAutoPublisher();
 		return Status.OK_STATUS;
 	}
 
@@ -194,6 +201,8 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 			clearDelta(key);
 		}
 		updateServerPublishStateFromDeployments();
+		kickAutoPublisher();
+
 	}
 
 	private void clearDelta(String key) {
@@ -259,6 +268,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		updateServerPublishStateFromDeployments();
 		if( changed ) 
 			fireState();
+		kickAutoPublisher();
 	}
 
 	private void registerSingleDelta(FileWatcherEvent event, DeployableReference reference) {
@@ -270,11 +280,8 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	private void fireState() {
 		// Feels strange to allow this class to fire the event
 		// but whatever. This feels so dirty. 
-		if( delegate != null && delegate.getServer() != null 
-				&& delegate.getServer().getServerManagementModel() != null 
-				&& delegate.getServer().getServerManagementModel().getServerModel() != null ) {
-			delegate.getServer().getServerManagementModel().getServerModel()
-				.fireServerStateChanged(delegate.getServer(), delegate.getServerState());
+		if( delegate != null ) {
+			delegate.fireServerStateChanged();
 		}
 	}
 
@@ -345,4 +352,74 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		return ref == null ? null : new DeployableReference(ref.getLabel(), ref.getPath());
 	}
 
+	private void kickAutoPublisher() {
+		if( isAutoPublisherEnabled()) {
+			kickAutoPublisherImpl();
+		}
+	}
+	
+	protected boolean isAutoPublisherEnabled() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	private void kickAutoPublisherImpl() {
+		if( this.autoPublish != null ) {
+			this.autoPublish.stopThread();
+		}
+		// TODO For now we will hard-code an autopublish time
+		// But it would be better to let it customize on the server property
+		this.autoPublish = new AutoPublishThread(delegate.getServer(), 5000);
+		this.autoPublish.start();
+	}
+	
+	private static class AutoPublishThread extends Thread {
+		private boolean stop = false;
+		private int time = 0;
+		private IServer server;
+		public AutoPublishThread(IServer server, int time) {
+			super("Automatic Publishing for server " + server.getName());
+			this.time = time;
+			setDaemon(true);
+			setPriority(Thread.MIN_PRIORITY + 1);
+		}
+		
+		public synchronized void stopThread() {
+			this.stop = true;
+		}
+		
+		public synchronized boolean getStop() {
+			return stop;
+		}
+		
+		public void run() {
+			if( getStop() ) 
+				return;
+			
+			try {
+				sleep(time * 1000);
+			} catch(InterruptedException ie) {
+				// ignore
+			}
+			
+			ServerState state = server.getDelegate().getServerState(); 
+			int runState = state.getState(); 
+			if(  runState != ServerManagementAPIConstants.STATE_STARTED) 
+				return;
+			
+			int publishState = state.getPublishState();
+			if( publishState == ServerManagementAPIConstants.PUBLISH_STATE_NONE) 
+				return;
+			
+			if( getStop() ) 
+				return;
+			
+			try {
+				server.getServerModel().publish(server, ServerManagementAPIConstants.PUBLISH_INCREMENTAL);
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 }

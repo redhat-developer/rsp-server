@@ -11,6 +11,7 @@ package org.jboss.tools.rsp.server.spi.servertype;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
+import org.jboss.tools.rsp.server.spi.model.IServerModel;
 
 public interface IServer extends IServerAttributes {
 	
@@ -29,5 +30,7 @@ public interface IServer extends IServerAttributes {
 	void delete() throws CoreException;
 
 	IServerManagementModel getServerManagementModel();
-	
+
+	IServerModel getServerModel();
+
 }

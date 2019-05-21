@@ -514,4 +514,10 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		return util.toPojo();
 	}
 
+	public void fireServerStateChanged() {
+		if(getServer() != null && getServer().getServerModel() != null ) {
+			getServer().getServerModel().fireServerStateChanged(getServer(), getServerState());
+		}
+	}
+
 }

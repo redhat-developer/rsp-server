@@ -745,6 +745,11 @@ public class ServerPublishStateModelTest {
 		public String getKey(DeployableReference deployable) {
 			return super.getKey(deployable);
 		}
+		@Override
+		protected boolean isAutoPublisherEnabled() {
+			return false;
+		}
+
 	}
 }
 
