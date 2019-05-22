@@ -359,70 +359,123 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 	
 	protected boolean isAutoPublisherEnabled() {
-		// TODO Auto-generated method stub
+		// TODO Can eventually be overridden with a setting on a server? 
 		return true;
 	}
 
 	private void kickAutoPublisherImpl() {
 		if( this.autoPublish != null ) {
-			this.autoPublish.stopThread();
+			synchronized(this.autoPublish) {
+				if( this.autoPublish.isDone() || this.autoPublish.getPublishBegan()) {
+					// we need a new thread
+					startNewAutoPublishThread();
+				} else {
+					this.autoPublish.setLastUpdated();
+				}
+			}
+		} else {
+			startNewAutoPublishThread();
 		}
+	}
+	
+	private void startNewAutoPublishThread() {
 		// TODO For now we will hard-code an autopublish time
 		// But it would be better to let it customize on the server property
 		this.autoPublish = new AutoPublishThread(delegate.getServer(), 5);
 		this.autoPublish.start();
 	}
 	
+	
 	private static class AutoPublishThread extends Thread {
-		private boolean stop = false;
 		private int time = 0;
 		private IServer server;
+		private boolean publishBegan;
+		private boolean done;
+		private long lastUpdated;
 		public AutoPublishThread(IServer server, int time) {
 			super("Automatic Publishing for server " + server.getName());
 			this.server = server;
 			this.time = time;
+			this.publishBegan = false;
+			this.done = false;
+			this.lastUpdated = System.currentTimeMillis();
 			setDaemon(true);
 			setPriority(Thread.MIN_PRIORITY + 1);
 		}
 		
-		public synchronized void stopThread() {
-			this.stop = true;
-		}
-		
-		public synchronized boolean getStop() {
-			return stop;
-		}
-		
 		public void run() {
-			if( getStop() ) 
-				return;
-			
-			try {
-				sleep(time * 1000);
-			} catch(InterruptedException ie) {
-				// ignore
+			while( !getPublishBegan()) {
+				
+				lastUpdated = sleepExpectedDuration();
+				
+				ServerState state = server.getDelegate().getServerState(); 
+				int runState = state.getState(); 
+				if(  runState != ServerManagementAPIConstants.STATE_STARTED) {
+					setDone();
+					return;
+				}				
+				
+				int publishState = state.getPublishState();
+				if( publishState == ServerManagementAPIConstants.PUBLISH_STATE_NONE) {
+					setDone();
+					return;
+				}
+				synchronized ( this ) {
+					if( getLastUpdated() != lastUpdated ) {
+						// While we slept, someone updated another file, 
+						// which means we need to wait longer
+						continue;
+					}
+					setPublishBegan();
+				}
 			}
-			
-			if( getStop() ) 
-				return;
-			
-			ServerState state = server.getDelegate().getServerState(); 
-			int runState = state.getState(); 
-			if(  runState != ServerManagementAPIConstants.STATE_STARTED) 
-				return;
-			
-			int publishState = state.getPublishState();
-			if( publishState == ServerManagementAPIConstants.PUBLISH_STATE_NONE) 
-				return;
-			
-			if( getStop() ) 
-				return;
 			
 			try {
 				server.getServerModel().publish(server, ServerManagementAPIConstants.PUBLISH_INCREMENTAL);
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
+			setDone();
+		}
+		
+		/**
+		 * Sleep the duration expected to reach our cutoff for filesystem silence.
+		 * Return the timestamp of when the last fs change was received.
+		 * @return
+		 */
+		protected long sleepExpectedDuration() {
+			long lastUpdated = getLastUpdated();
+			try {
+				long curTime = System.currentTimeMillis();
+				long awakenTime = lastUpdated + (time * 1000);
+				if( awakenTime > curTime) {
+					sleep(awakenTime - curTime);
+				}
+			} catch(InterruptedException ie) {
+				// ignore
+			}
+			return lastUpdated;
+		}
+		
+		public synchronized void setLastUpdated() {
+			this.lastUpdated = System.currentTimeMillis();
+		}
+
+		public synchronized long getLastUpdated() {
+			return this.lastUpdated;
+		}
+
+		private synchronized void setPublishBegan() {
+			this.publishBegan = true;
+		}
+		private synchronized boolean getPublishBegan() {
+			return this.publishBegan;
+		}
+		private synchronized void setDone() {
+			this.done = true;
+		}
+		private synchronized boolean isDone() {
+			return this.done;
 		}
 	}
 	
