@@ -369,7 +369,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		}
 		// TODO For now we will hard-code an autopublish time
 		// But it would be better to let it customize on the server property
-		this.autoPublish = new AutoPublishThread(delegate.getServer(), 5000);
+		this.autoPublish = new AutoPublishThread(delegate.getServer(), 5);
 		this.autoPublish.start();
 	}
 	
@@ -379,6 +379,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		private IServer server;
 		public AutoPublishThread(IServer server, int time) {
 			super("Automatic Publishing for server " + server.getName());
+			this.server = server;
 			this.time = time;
 			setDaemon(true);
 			setPriority(Thread.MIN_PRIORITY + 1);
@@ -401,6 +402,9 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 			} catch(InterruptedException ie) {
 				// ignore
 			}
+			
+			if( getStop() ) 
+				return;
 			
 			ServerState state = server.getDelegate().getServerState(); 
 			int runState = state.getState(); 
