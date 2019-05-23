@@ -20,8 +20,6 @@ import java.util.stream.Collectors;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
-import org.jboss.tools.rsp.api.dao.ServerState;
-import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
@@ -31,10 +29,12 @@ import org.jboss.tools.rsp.server.spi.filewatcher.FileWatcherEvent;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherEventListener;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
 import org.jboss.tools.rsp.server.spi.servertype.IDeployableResourceDelta;
-import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServerPublishStateModel implements IServerPublishModel, IFileWatcherEventListener {
+	static final Logger LOG = LoggerFactory.getLogger(ServerPublishStateModel.class);
 
 	private final Map<String, DeployableState> states;
 	private final Map<String, Map<String,Object>> deploymentOptions;
@@ -111,7 +111,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		addDeployableImpl(withOptions, ServerManagementAPIConstants.PUBLISH_STATE_ADD);
 		updateServerPublishStateFromDeployments();
 		fireState();
-		kickAutoPublisher();
+		launchOrUpdateAutopublishThread();
 		return Status.OK_STATUS;
 	}
 
@@ -139,7 +139,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		}
 		updateServerPublishStateFromDeployments();
 		fireState();
-		kickAutoPublisher();
+		launchOrUpdateAutopublishThread();
 		return Status.OK_STATUS;
 	}
 
@@ -201,7 +201,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 			clearDelta(key);
 		}
 		updateServerPublishStateFromDeployments();
-		kickAutoPublisher();
+		launchOrUpdateAutopublishThread();
 
 	}
 
@@ -268,7 +268,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		updateServerPublishStateFromDeployments();
 		if( changed ) 
 			fireState();
-		kickAutoPublisher();
+		launchOrUpdateAutopublishThread();
 	}
 
 	private void registerSingleDelta(FileWatcherEvent event, DeployableReference reference) {
@@ -352,131 +352,34 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		return ref == null ? null : new DeployableReference(ref.getLabel(), ref.getPath());
 	}
 
-	private void kickAutoPublisher() {
-		if( isAutoPublisherEnabled()) {
-			kickAutoPublisherImpl();
-		}
-	}
-	
 	protected boolean isAutoPublisherEnabled() {
 		// TODO Can eventually be overridden with a setting on a server? 
 		return true;
 	}
 
-	private void kickAutoPublisherImpl() {
-		if( this.autoPublish != null ) {
-			synchronized(this.autoPublish) {
-				if( this.autoPublish.isDone() || this.autoPublish.getPublishBegan()) {
-					// we need a new thread
-					startNewAutoPublishThread();
+	private void launchOrUpdateAutopublishThread() {
+		if (isAutoPublisherEnabled()) {
+			synchronized (this.autoPublish) {
+				if (this.autoPublish != null) {
+					if (this.autoPublish.isDone() || this.autoPublish.getPublishBegan()) {
+						// we need a new thread
+						this.autoPublish = createNewAutoPublishThread();
+						this.autoPublish.start();
+					} else {
+						this.autoPublish.updateInactivityCounter();
+					}
 				} else {
-					this.autoPublish.setLastUpdated();
+					this.autoPublish = createNewAutoPublishThread();
+					this.autoPublish.start();
 				}
 			}
-		} else {
-			startNewAutoPublishThread();
 		}
 	}
 	
-	private void startNewAutoPublishThread() {
+	private AutoPublishThread createNewAutoPublishThread() {
 		// TODO For now we will hard-code an autopublish time
 		// But it would be better to let it customize on the server property
-		this.autoPublish = new AutoPublishThread(delegate.getServer(), 5);
-		this.autoPublish.start();
-	}
-	
-	
-	private static class AutoPublishThread extends Thread {
-		private int time = 0;
-		private IServer server;
-		private boolean publishBegan;
-		private boolean done;
-		private long lastUpdated;
-		public AutoPublishThread(IServer server, int time) {
-			super("Automatic Publishing for server " + server.getName());
-			this.server = server;
-			this.time = time;
-			this.publishBegan = false;
-			this.done = false;
-			this.lastUpdated = System.currentTimeMillis();
-			setDaemon(true);
-			setPriority(Thread.MIN_PRIORITY + 1);
-		}
-		
-		public void run() {
-			while( !getPublishBegan()) {
-				
-				lastUpdated = sleepExpectedDuration();
-				
-				ServerState state = server.getDelegate().getServerState(); 
-				int runState = state.getState(); 
-				if(  runState != ServerManagementAPIConstants.STATE_STARTED) {
-					setDone();
-					return;
-				}				
-				
-				int publishState = state.getPublishState();
-				if( publishState == ServerManagementAPIConstants.PUBLISH_STATE_NONE) {
-					setDone();
-					return;
-				}
-				synchronized ( this ) {
-					if( getLastUpdated() != lastUpdated ) {
-						// While we slept, someone updated another file, 
-						// which means we need to wait longer
-						continue;
-					}
-					setPublishBegan();
-				}
-			}
-			
-			try {
-				server.getServerModel().publish(server, ServerManagementAPIConstants.PUBLISH_INCREMENTAL);
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
-			setDone();
-		}
-		
-		/**
-		 * Sleep the duration expected to reach our cutoff for filesystem silence.
-		 * Return the timestamp of when the last fs change was received.
-		 * @return
-		 */
-		protected long sleepExpectedDuration() {
-			long lastUpdated = getLastUpdated();
-			try {
-				long curTime = System.currentTimeMillis();
-				long awakenTime = lastUpdated + (time * 1000);
-				if( awakenTime > curTime) {
-					sleep(awakenTime - curTime);
-				}
-			} catch(InterruptedException ie) {
-				// ignore
-			}
-			return lastUpdated;
-		}
-		
-		public synchronized void setLastUpdated() {
-			this.lastUpdated = System.currentTimeMillis();
-		}
-
-		public synchronized long getLastUpdated() {
-			return this.lastUpdated;
-		}
-
-		private synchronized void setPublishBegan() {
-			this.publishBegan = true;
-		}
-		private synchronized boolean getPublishBegan() {
-			return this.publishBegan;
-		}
-		private synchronized void setDone() {
-			this.done = true;
-		}
-		private synchronized boolean isDone() {
-			return this.done;
-		}
+		return new AutoPublishThread(delegate.getServer(), 5000);
 	}
 	
 }
