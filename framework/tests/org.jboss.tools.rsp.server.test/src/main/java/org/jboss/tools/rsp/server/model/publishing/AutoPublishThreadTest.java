@@ -112,7 +112,9 @@ public class AutoPublishThreadTest {
 	private void wait(int duration) {
 		try {
 			Thread.sleep(duration);
-		} catch(InterruptedException ie) {}
+		} catch(InterruptedException ie) {
+			Thread.interrupted();
+		}
 	}
 	
 	private static class AutoPublishTestThread extends AutoPublishThread {
@@ -152,10 +154,10 @@ public class AutoPublishThreadTest {
 		protected ServerState getServerState() {
 			return state;
 		}
-		public void setDone() {
+		public synchronized void setDone() {
 			super.setDone();
 		}
-		public boolean isDone() {
+		public synchronized boolean isDone() {
 			return super.isDone();
 		}
 		public void switchState2() {

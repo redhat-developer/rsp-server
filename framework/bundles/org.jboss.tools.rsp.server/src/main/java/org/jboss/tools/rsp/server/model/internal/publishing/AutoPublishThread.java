@@ -109,7 +109,7 @@ public class AutoPublishThread extends Thread {
 				sleep(nextSleep);
 			}
 		} catch(InterruptedException ie) {
-			// ignore
+			Thread.interrupted();
 		}
 	}
 	
