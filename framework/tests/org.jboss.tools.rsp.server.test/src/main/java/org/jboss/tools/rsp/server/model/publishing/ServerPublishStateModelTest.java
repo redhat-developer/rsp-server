@@ -751,5 +751,72 @@ public class ServerPublishStateModelTest {
 		}
 
 	}
+	
+	
+	
+	@Test
+	public void testAddDeployableLaunchesAutoPublish() {
+		AbstractServerDelegate delegate = mock(AbstractServerDelegate.class);
+		this.model = new TestableServerPublishStateModelWithAutoPublisher(delegate, null);
+		TestableServerPublishStateModelWithAutoPublisher model2 = (TestableServerPublishStateModelWithAutoPublisher)model;
+		// Create a new ref
+		String originalLabelAndPath = deployableFile.getLabel();
+		DeployableReference ref = new DeployableReference(originalLabelAndPath,originalLabelAndPath);
+		
+		assertFalse((model2).getPublishThreadCalled());
+		// Add it to the model
+		model2.addDeployable(ref);
+		assertTrue((model2).getPublishThreadCalled());
+
+		// Now try to change the file
+		model2.resetPublishThreadCalled();
+		assertFalse((model2).getPublishThreadCalled());
+		// Add it to the model
+		Path deployablePath = new File(deployableFile.getPath()).toPath();
+		model2.fileChanged(new FileWatcherEvent(deployablePath, StandardWatchEventKinds.ENTRY_MODIFY));
+		assertTrue((model2).getPublishThreadCalled());
+
+		// Now try to delete the file
+		model2.resetPublishThreadCalled();
+		assertFalse((model2).getPublishThreadCalled());
+		// Add it to the model
+		model2.fileChanged(new FileWatcherEvent(deployablePath, StandardWatchEventKinds.ENTRY_DELETE));
+		assertTrue((model2).getPublishThreadCalled());
+
+		// Now try to create the file
+		model2.resetPublishThreadCalled();
+		assertFalse((model2).getPublishThreadCalled());
+		// Add it to the model
+		model2.fileChanged(new FileWatcherEvent(deployablePath, StandardWatchEventKinds.ENTRY_CREATE));
+		assertTrue((model2).getPublishThreadCalled());
+
+		model2.resetPublishThreadCalled();
+		assertFalse((model2).getPublishThreadCalled());
+		// Add it to the model
+		model2.removeDeployable(ref);
+		assertTrue((model2).getPublishThreadCalled());
+	}
+	
+	public class TestableServerPublishStateModelWithAutoPublisher extends TestableServerPublishStateModel {
+		private boolean publishThreadCalled = false;
+		public TestableServerPublishStateModelWithAutoPublisher(AbstractServerDelegate delegate, IFileWatcherService fileWatcher) {
+			super(delegate, fileWatcher);
+		}
+		@Override
+		protected boolean isAutoPublisherEnabled() {
+			return true;
+		}
+		protected void launchOrUpdateAutopublishThreadImpl() {
+			publishThreadCalled = true;
+		}
+		public boolean getPublishThreadCalled() {
+			return publishThreadCalled;
+		}
+
+		public void resetPublishThreadCalled() {
+			publishThreadCalled = false;
+		}
+	}
+	
 }
 

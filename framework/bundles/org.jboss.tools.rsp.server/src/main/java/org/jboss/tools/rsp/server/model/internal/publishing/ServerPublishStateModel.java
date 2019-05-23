@@ -357,21 +357,24 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		return true;
 	}
 
-	private void launchOrUpdateAutopublishThread() {
+	protected void launchOrUpdateAutopublishThread() {
 		if (isAutoPublisherEnabled()) {
-			synchronized (this.autoPublish) {
-				if (this.autoPublish != null) {
-					if (this.autoPublish.isDone() || this.autoPublish.getPublishBegan()) {
-						// we need a new thread
-						this.autoPublish = createNewAutoPublishThread();
-						this.autoPublish.start();
-					} else {
-						this.autoPublish.updateInactivityCounter();
-					}
-				} else {
+			launchOrUpdateAutopublishThreadImpl();
+		}
+	}
+	protected void launchOrUpdateAutopublishThreadImpl() {
+		synchronized (this) {
+			if (this.autoPublish != null) {
+				if (this.autoPublish.isDone() || this.autoPublish.getPublishBegan()) {
+					// we need a new thread
 					this.autoPublish = createNewAutoPublishThread();
 					this.autoPublish.start();
+				} else {
+					this.autoPublish.updateInactivityCounter();
 				}
+			} else {
+				this.autoPublish = createNewAutoPublishThread();
+				this.autoPublish.start();
 			}
 		}
 	}
