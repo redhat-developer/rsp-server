@@ -71,6 +71,17 @@ public abstract class BaseJBossServerType implements IServerType{
 			attrs.addAttribute(IJBossServerAttributes.VM_INSTALL_PATH, 
 					ServerManagementAPIConstants.ATTR_TYPE_STRING, 
 					"A string representation pointing to a java home. If not set, java.home will be used instead.", null);
+
+			attrs.addAttribute(IJBossServerAttributes.AUTOPUBLISH_ENABLEMENT, 
+					ServerManagementAPIConstants.ATTR_TYPE_BOOL, 
+					"Enable the autopublisher.", 
+					IJBossServerAttributes.AUTOPUBLISH_ENABLEMENT_DEFAULT);
+
+			attrs.addAttribute(IJBossServerAttributes.AUTOPUBLISH_INACTIVITY_LIMIT, 
+					ServerManagementAPIConstants.ATTR_TYPE_INT, 
+					"Set the inactivity limit before the autopublisher runs.", 
+					IJBossServerAttributes.AUTOPUBLISH_INACTIVITY_LIMIT_DEFAULT);
+
 			optional = attrs.toPojo();
 		}
 		return optional;

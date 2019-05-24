@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.jboss.tools.rsp.api.DefaultServerAttributes;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
@@ -353,8 +354,15 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 
 	protected boolean isAutoPublisherEnabled() {
-		// TODO Can eventually be overridden with a setting on a server? 
-		return true;
+		return delegate.getServer().getAttribute(
+				DefaultServerAttributes.AUTOPUBLISH_ENABLEMENT, 
+				DefaultServerAttributes.AUTOPUBLISH_ENABLEMENT_DEFAULT);
+	}
+	
+	protected int getInactivityTimeout() {
+		return delegate.getServer().getAttribute(
+				DefaultServerAttributes.AUTOPUBLISH_INACTIVITY_LIMIT, 
+				DefaultServerAttributes.AUTOPUBLISH_INACTIVITY_LIMIT_DEFAULT);
 	}
 
 	protected void launchOrUpdateAutopublishThread() {
@@ -367,22 +375,20 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 			if (this.autoPublish != null) {
 				if (this.autoPublish.isDone() || this.autoPublish.getPublishBegan()) {
 					// we need a new thread
-					this.autoPublish = createNewAutoPublishThread();
+					this.autoPublish = createNewAutoPublishThread( getInactivityTimeout());
 					this.autoPublish.start();
 				} else {
 					this.autoPublish.updateInactivityCounter();
 				}
 			} else {
-				this.autoPublish = createNewAutoPublishThread();
+				this.autoPublish = createNewAutoPublishThread( getInactivityTimeout());
 				this.autoPublish.start();
 			}
 		}
 	}
 	
-	private AutoPublishThread createNewAutoPublishThread() {
-		// TODO For now we will hard-code an autopublish time
-		// But it would be better to let it customize on the server property
-		return new AutoPublishThread(delegate.getServer(), 5000);
+	protected AutoPublishThread createNewAutoPublishThread(int timeout) {
+		return new AutoPublishThread(delegate.getServer(), timeout);
 	}
 	
 }

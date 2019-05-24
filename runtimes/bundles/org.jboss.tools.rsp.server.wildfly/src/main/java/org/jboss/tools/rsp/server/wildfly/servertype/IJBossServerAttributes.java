@@ -8,13 +8,13 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.wildfly.servertype;
 
-import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.DefaultServerAttributes;
 
-public interface IJBossServerAttributes {
+public interface IJBossServerAttributes extends DefaultServerAttributes {
 	/*
 	 * Required attributes
 	 */
-	public static final String SERVER_HOME = ServerManagementAPIConstants.SERVER_HOME_DIR;
+	public static final String SERVER_HOME = DefaultServerAttributes.SERVER_HOME_DIR;
 	
 	
 	
@@ -22,8 +22,7 @@ public interface IJBossServerAttributes {
 	 * Optional Attributes
 	 */
 	public static final String VM_INSTALL_PATH = "vm.install.path";
-	
-	
+
 	/*
 	 * Launch attributes
 	 */

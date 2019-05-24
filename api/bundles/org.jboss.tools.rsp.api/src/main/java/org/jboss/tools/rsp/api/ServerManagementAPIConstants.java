@@ -8,7 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.api;
 
-public interface ServerManagementAPIConstants {
+public interface ServerManagementAPIConstants extends DefaultServerAttributes {
 
 	public static final int STREAM_TYPE_SYSERR = 1;
 	public static final int STREAM_TYPE_SYSOUT = 2;
@@ -123,13 +123,6 @@ public interface ServerManagementAPIConstants {
 	
 	public static final String DEBUG_DETAILS_TYPE = "debug.details.type";
 	
-	/*
-	 * Standardized server property keys 
-	 */
-	public static final String SERVER_HOME_DIR = "server.home.dir";
-
-	public static final String SERVER_HOME_FILE = "server.home.file";
-	
 	
 	
 	public static final String WORKFLOW_LICENSE_TEXT_ID = "workflow.license";
@@ -139,11 +132,4 @@ public interface ServerManagementAPIConstants {
 	public static final String WORKFLOW_USERNAME_ID = "workflow.username";
 	public static final String WORKFLOW_PASSWORD_ID = "workflow.password";
 
-	
-	
-	/*
-	 * Deployment options 
-	 */
-	public static final String DEPLOYMENT_OPTION_OUTPUT_NAME = "deployment.output.name";
-	
 }
