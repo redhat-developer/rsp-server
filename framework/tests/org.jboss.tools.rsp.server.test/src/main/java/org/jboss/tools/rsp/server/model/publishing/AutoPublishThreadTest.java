@@ -120,13 +120,15 @@ public class AutoPublishThreadTest {
 	private static class AutoPublishTestThread extends AutoPublishThread {
 		
 		private boolean publishCalled = false;
-		private ServerState s1, s2, state;
+		private ServerState s1;
+		private ServerState s2;
+		private ServerState state;
 		public AutoPublishTestThread(IServer server, int ms, 
 				ServerState s1, ServerState s2) {
 			super(server, ms);
 			this.s1 = s1;
 			this.s2 = s2;
-			this.state = s1;
+			this.state = this.s1;
 		}
 
 		public AutoPublishTestThread(IServer server, int ms, 
@@ -136,27 +138,30 @@ public class AutoPublishThreadTest {
 			this.state = s1;
 		}
 
+		@Override
 		protected synchronized void publishImpl() {
-			System.out.println("Publish called");
 			publishCalled = true;
 		}
 		public synchronized boolean getPublishCalled() {
 			return publishCalled;
 		}
-
+		@Override
 		public synchronized long getLastUpdated() {
 			return super.getLastUpdated();
 		}
-
+		@Override
 		public long getAwakenTime() {
 			return super.getAwakenTime();
 		}
+		@Override
 		protected ServerState getServerState() {
 			return state;
 		}
+		@Override
 		public synchronized void setDone() {
 			super.setDone();
 		}
+		@Override
 		public synchronized boolean isDone() {
 			return super.isDone();
 		}
@@ -166,30 +171,29 @@ public class AutoPublishThreadTest {
 	}
 	
 	private ServerState startedAndIncremental() {
-		ServerState ss = new ServerState();
-		ss.setState(ServerManagementAPIConstants.STATE_STARTED);
-		ss.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL);
-		return ss;
+		return createServerState(ServerManagementAPIConstants.STATE_STARTED,
+				ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL);
 	}
 
 	private ServerState stoppedAndIncremental() {
-		ServerState ss = new ServerState();
-		ss.setState(ServerManagementAPIConstants.STATE_STOPPED);
-		ss.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL);
-		return ss;
+		return createServerState(ServerManagementAPIConstants.STATE_STOPPED,
+				ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL);
 	}
 
 	private ServerState startedAndNone() {
-		ServerState ss = new ServerState();
-		ss.setState(ServerManagementAPIConstants.STATE_STARTED);
-		ss.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_NONE);
-		return ss;
+		return createServerState(ServerManagementAPIConstants.STATE_STARTED,
+				ServerManagementAPIConstants.PUBLISH_STATE_NONE);
 	}
 
 	private ServerState stoppedAndNone() {
+		return createServerState(ServerManagementAPIConstants.STATE_STOPPED,
+				ServerManagementAPIConstants.PUBLISH_STATE_NONE);
+	}
+
+	private ServerState createServerState(int runState, int pubState) {
 		ServerState ss = new ServerState();
-		ss.setState(ServerManagementAPIConstants.STATE_STARTED);
-		ss.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_NONE);
+		ss.setState(runState);
+		ss.setPublishState(pubState);
 		return ss;
 	}
 }

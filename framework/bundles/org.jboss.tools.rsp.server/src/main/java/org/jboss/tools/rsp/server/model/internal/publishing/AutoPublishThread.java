@@ -31,7 +31,8 @@ public class AutoPublishThread extends Thread {
 		setDaemon(true);
 		setPriority(Thread.MIN_PRIORITY + 1);
 	}
-	
+
+	@Override
 	public void run() {
 		boolean shouldPublish = awaitInactivity();
 		if( shouldPublish) {
@@ -81,14 +82,12 @@ public class AutoPublishThread extends Thread {
 	protected boolean shouldAbort() {
 		ServerState state = getServerState(); 
 		int runState = state.getState(); 
-		if(  runState != ServerManagementAPIConstants.STATE_STARTED) {
+		int publishState = state.getPublishState();
+		if(  runState != ServerManagementAPIConstants.STATE_STARTED
+				|| publishState == ServerManagementAPIConstants.PUBLISH_STATE_NONE) {
 			return true;
 		}				
 		
-		int publishState = state.getPublishState();
-		if( publishState == ServerManagementAPIConstants.PUBLISH_STATE_NONE) {
-			return true;
-		}
 		return false;
 	}
 	
@@ -122,8 +121,7 @@ public class AutoPublishThread extends Thread {
 	}
 
 	protected long getAwakenTime() {
-		long awakenTime = getLastUpdated() + maxInactive;
-		return awakenTime;
+		return getLastUpdated() + maxInactive;
 	}
 	
 	protected synchronized void setPublishBegan() {
