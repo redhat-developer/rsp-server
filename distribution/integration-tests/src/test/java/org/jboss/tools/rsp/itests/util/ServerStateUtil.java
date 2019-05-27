@@ -11,6 +11,11 @@ package org.jboss.tools.rsp.itests.util;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.ServerState;
 
+/**
+ * Utility class for server state manipulation.
+ * @author adietish, odockal
+ *
+ */
 public class ServerStateUtil {
 
 	private static final long WAIT_FOR_SERVERSTATE = 3000;
@@ -52,13 +57,33 @@ public class ServerStateUtil {
 			if (s != null) {
 				if (expected == NO_STATE
 						|| expected == s.getState()) {
-					client.clearState();
 					return s;
 				}
 			}
-            System.out.println("Server state: " + ServerStateUtil.toStateString(s));
             Thread.sleep(WAIT_FOR_SERVERSTATE);
         }
         throw new AssertionError("Waiting for server state to change to " + expected + " timed out");
     }
+    
+    public static ServerState waitForDeployables(int attempts, DummyClient client) throws Exception {
+        return waitForDeployablePublishState(NO_STATE, attempts, client);
+    }
+    
+    public static ServerState waitForDeployablePublishState(int expected, int attempts, DummyClient client) throws Exception {
+        int tries = attempts;
+        
+        while(tries > 0) {
+            tries--;
+            ServerState s = client.getStateObject();
+			if (s != null) {
+				if (s.getDeployableStates().size() > 0 && 
+						(expected == s.getDeployableStates().get(0).getPublishState() || expected == NO_STATE)) {
+					return s;
+				}
+			}
+            Thread.sleep(WAIT_FOR_SERVERSTATE);
+        }
+        throw new AssertionError("Waiting for server publish state to change to " + expected + " timed out");
+    }
+    
 }

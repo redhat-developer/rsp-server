@@ -23,6 +23,10 @@
 		<server.path>${project.build.directory}/wildfly-${server.version}</server.path>
 		<!-- Sonar report property for code coverage -->
 		<sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+		<!-- Quickstarts properties -->
+		<quickstarts.server>wildfly</quickstarts.server>
+		<quickstarts.url>https://github.com/wildfly/quickstart/archive/16.0.0.Final.zip</quickstarts.url>
+		<quickstarts.dir>quickstart-16.0.0.Final</quickstarts.dir>
 	</properties>
 
 	<name>Runtime Server Protocol : Integration Tests</name>
@@ -39,6 +43,7 @@
 						<server.type.id>${server.type.id}</server.type.id>
 						<server.version>${server.version}</server.version>
 						<server.path>${server.path}</server.path>
+						<quickstarts.server>${quickstarts.server}</quickstarts.server>
 					</systemPropertyVariables>
 				</configuration>
 			</plugin>
@@ -77,6 +82,7 @@
 								<echo>[server.type.id] ${server.type.id}</echo>
 								<echo>[server.version] ${server.version}</echo>
 								<echo>[server.path] ${server.path}</echo>
+								<echo>[quickstarts.server] ${quickstarts.server}</echo>
 							</tasks>
 						</configuration>
 					</execution>
@@ -103,6 +109,48 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.googlecode.maven-download-plugin</groupId>
+				<artifactId>download-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>download-${quickstarts.dir}</id>
+						<phase>test-compile</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>${quickstarts.url}</url>
+							<unpack>true</unpack>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-invoker-plugin</artifactId>
+			 	<version>3.2.0</version>
+			 	<configuration>
+				 	<cloneProjectsTo>${project.build.directory}/quickstarts</cloneProjectsTo>
+				 	<projectsDirectory>target/${quickstarts.dir}/</projectsDirectory>
+					<pomIncludes>
+						<pomInclude>kitchensink/pom.xml</pomInclude>
+						<pomInclude>kitchensink-ear/pom.xml</pomInclude>
+						<pomInclude>ejb-in-war/pom.xml</pomInclude>
+						<pomInclude>ejb-in-ear/pom.xml</pomInclude>
+					</pomIncludes>
+				</configuration>
+			  	<executions>
+			    	<execution>
+				      	<id>build-quickstart</id>
+				      	<phase>test-compile</phase>
+				      	<goals>
+				        	<goal>install</goal>
+				        	<goal>run</goal>
+				      	</goals>
+			    	</execution>
+			  	</executions>
 			</plugin>
 			<!-- Aggregate coverage report by default -->
 			<plugin>
@@ -148,7 +196,8 @@
 			<id>wildfly-14</id>
 			<activation>
 				<property>
-					<name>wildfly-14</name>
+					<name>wildfly</name>
+					<value>14</value>
 				</property>
 			</activation>
 			<properties>
@@ -163,7 +212,8 @@
 			<id>wildfly-15</id>
 			<activation>
 				<property>
-					<name>wildfly-15</name>
+					<name>wildfly</name>
+					<value>15</value>
 				</property>
 			</activation>
 			<properties>
@@ -178,7 +228,8 @@
 			<id>wildfly-16</id>
 			<activation>
 				<property>
-					<name>wildfly-16</name>
+					<name>wildfly</name>
+					<value>16</value>
 				</property>
 			</activation>
 			<properties>
@@ -187,6 +238,32 @@
 				<server.sha1>b55ed374ab4f8534c2343ac9a283c71fa6d22dfe</server.sha1>
 				<server.type.id>org.jboss.ide.eclipse.as.wildfly.160</server.type.id>
 				<server.version>16.0.0.Final</server.version>
+			</properties>
+		</profile>
+		<profile>
+			<id>wildfly-quickstarts</id>
+			<activation>
+				<property>
+					<name>wildfly</name>
+				</property>
+			</activation>
+			<properties>
+				<quickstarts.server>wildfly</quickstarts.server>
+				<quickstarts.dir>quickstart-16.0.0.Final</quickstarts.dir>
+				<quickstarts.url>https://github.com/wildfly/quickstart/archive/16.0.0.Final.zip</quickstarts.url>
+			</properties>
+		</profile>
+		<profile>
+			<id>eap-quickstarts</id>
+			<activation>
+				<property>
+					<name>eap</name>
+				</property>
+			</activation>
+			<properties>
+				<quickstarts.server>eap</quickstarts.server>
+				<quickstarts.dir>jboss-eap-7.2.1.GA-quickstarts</quickstarts.dir>
+				<quickstarts.url>http://download.eng.brq.redhat.com/released/JBoss-middleware/eap7/7.2.1/jboss-eap-7.2.1-quickstarts.zip</quickstarts.url>
 			</properties>
 		</profile>
 	</profiles>
