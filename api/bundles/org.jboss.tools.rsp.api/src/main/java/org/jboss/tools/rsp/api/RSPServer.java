@@ -299,9 +299,9 @@ public interface RSPServer {
 	
 	/**
 	 * The `server/listDeploymentOptions` request is sent by the client to list the
-	 * possible attributes that may be used when adding a new deployment. 
-	 * This can be any set of custom server-defined settings, or standard options, 
-	 * for example, an output name for an archive, whether to zip folders, etc. 
+	 * possible attributes that may be used when adding a new deployment.
+	 * This can be any set of custom server-defined settings, or standard options,
+	 * for example, an output name for an archive, whether to zip folders, etc.
 	 * This request may return null in case of error.
 	 * 
 	 * @param serverHandle
