@@ -47,9 +47,4 @@ public class DummyClient extends ServerManagementClientImpl {
     public ServerState getStateObject() {
     	return state;
     }
-    
-    public void clearState() {
-    	this.state = null;
-    	this.stateString = null;
-    }
 }

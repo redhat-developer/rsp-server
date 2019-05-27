@@ -41,10 +41,6 @@ import org.junit.Test;
  * @author jrichter
  */
 public class WildFlyLaunchingTest extends RSPCase {
-    
-    private static final String MODE_DEBUG = "debug";
-	private static final String MODE_RUN = "run";
-	private static final String STATUS_MESSAGE_OK = "ok";
 
 	private final DummyClient client = launcher.getClient();
 

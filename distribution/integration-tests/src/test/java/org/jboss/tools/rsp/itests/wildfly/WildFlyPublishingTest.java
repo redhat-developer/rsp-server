@@ -8,9 +8,10 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.itests.wildfly;
 
+import static org.jboss.tools.rsp.itests.util.ServerStateUtil.waitForDeployablePublishState;
 import static org.jboss.tools.rsp.itests.util.ServerStateUtil.waitForNonNullServerState;
-import static org.jboss.tools.rsp.itests.util.ServerStateUtil.waitForServerState;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -20,139 +21,274 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
-import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
-import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerDeployableReference;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerState;
-import org.jboss.tools.rsp.api.dao.StartServerResponse;
-import org.jboss.tools.rsp.api.dao.StopServerAttributes;
+import org.jboss.tools.rsp.api.dao.ServerType;
+import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.itests.RSPCase;
 import org.jboss.tools.rsp.itests.util.DeploymentGeneration;
 import org.jboss.tools.rsp.itests.util.DummyClient;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  *
- * @author jrichter
+ * @author jrichter, odockal
  */
 public class WildFlyPublishingTest extends RSPCase {
 
-	private static final String SERVER_ID = "wildfly6a";
-	private static final String WAR_FILENAME = "test9.war";
-    private final DummyClient client = launcher.getClient();
+	private static final String SERVER_ID = "wildfly";
+	private static final String WAR_FILENAME = "test.war";
+	private final DummyClient client = launcher.getClient();
 
-    @Before
-    public void before() throws Exception {
-        createServer(WILDFLY_ROOT, SERVER_ID);
-    }
+	private ServerHandle handle;
+	private DeployableReference reference;
+	private File warFile = createWar();
 
-    @After
-    public void after() throws Exception {
-    	deleteServer(SERVER_ID);
-    }
+	@Before
+	public void before() throws Exception {
+		createServer(WILDFLY_ROOT, SERVER_ID);
+		startServer(client, SERVER_ID);
+		handle = new ServerHandle(SERVER_ID, wildflyType);
+		reference = new DeployableReference(warFile.getName(), warFile.getAbsolutePath());
+		serverProxy.addDeployable(new ServerDeployableReference(handle, reference));
+	}
 
-    @Test
-    public void testStartServer() throws Exception, ExecutionException {
-        Map<String, Object> attr = new HashMap<>();
-        attr.put("server.home.dir", WILDFLY_ROOT);
-        LaunchParameters params = new LaunchParameters(
-                new ServerAttributes(wildflyType.getId(), SERVER_ID, attr), "run");
-        
-        StartServerResponse response = serverProxy.startServerAsync(params).get();
-        
-        assertTrue("server wasnt successfully started: " + response.getStatus().getMessage(), response.getStatus().isOK());
-        assertEquals("ok", response.getStatus().getMessage());
-        waitForServerState(ServerManagementAPIConstants.STATE_STARTED, 20, client);
-        
-        ServerHandle handle = new ServerHandle(SERVER_ID, wildflyType);
-        File war = createWar();
-        DeployableReference deployable = new DeployableReference(war.getAbsolutePath(), war.getAbsolutePath());
-        ServerDeployableReference req = new ServerDeployableReference(handle, deployable);
-        serverProxy.addDeployable(req);
-        
-        ServerState state = waitForNonNullServerState(20, client);
-        assertNotNull(state);
-        DeployableState ds1 = getDeployableState(deployable, state.getDeployableStates());
-        assertNotNull("state for deployable " + deployable.getPath() + " wasnt found.", ds1);
-        assertNotNull(ds1);
-        assertEquals(ServerManagementAPIConstants.PUBLISH_STATE_ADD, ds1.getPublishState());
-        assertEquals(ServerManagementAPIConstants.STATE_UNKNOWN, ds1.getState());
-        
-        // TODO publish
-        PublishServerRequest pubReq = new PublishServerRequest(handle, ServerManagementAPIConstants.PUBLISH_FULL);
-        serverProxy.publish(pubReq);
-        state = waitForNonNullServerState(20, client);
-        assertNotNull(state);
-        ds1 = getDeployableState(deployable, state.getDeployableStates());
-        assertNotNull("state for deployable " + deployable.getPath() + " wasnt found.", ds1);
-        assertNotNull(ds1);
-        assertEquals(ServerManagementAPIConstants.PUBLISH_STATE_NONE, ds1.getPublishState());
-        assertEquals(ServerManagementAPIConstants.STATE_STARTED, ds1.getState());
-        
-        // TODO touch the file
-        war.setLastModified(System.currentTimeMillis());
-        state = waitForNonNullServerState(20, client);
-        assertNotNull(state);
-        ds1 = getDeployableState(deployable, state.getDeployableStates());
-        assertNotNull("state for deployable " + deployable.getPath() + " wasnt found.", ds1);
-        assertNotNull(ds1);
-        assertEquals(ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL, ds1.getPublishState());
-        assertEquals(ServerManagementAPIConstants.STATE_STARTED, ds1.getState());
+	@After
+	public void after() throws Exception {
+		stopServer(client, SERVER_ID);
+		deleteServer(SERVER_ID);
+	}
 
-        serverProxy.removeDeployable(new ServerDeployableReference(handle,  deployable));
-        state = waitForNonNullServerState(20, client);
-        assertNotNull(state);
-        ds1 = getDeployableState(deployable, state.getDeployableStates());
-        assertNotNull("state for deployable " + deployable.getPath() + " wasnt found.", ds1);
-        assertNotNull(ds1);
-        assertEquals(ServerManagementAPIConstants.PUBLISH_STATE_REMOVE, ds1.getPublishState());
-        assertEquals(ServerManagementAPIConstants.STATE_STARTED, ds1.getState());
+	@Test
+	public void testAddDeployment() throws Exception {
+		ServerState state = waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_ADD, 10, client);
+		assertDeployableState(state, ServerManagementAPIConstants.STATE_UNKNOWN,
+				ServerManagementAPIConstants.PUBLISH_STATE_ADD);
+	}
 
-        // TODO publish
-        pubReq = new PublishServerRequest(handle, ServerManagementAPIConstants.PUBLISH_FULL);
-        serverProxy.publish(pubReq);
-        state = waitForNonNullServerState(20, client);
-        assertNotNull(state);
-        ds1 = getDeployableState(deployable, state.getDeployableStates());
-        assertNull("state for deployable " + deployable.getPath() + " was still found but shouldn't.", ds1);
-                
-        serverProxy.stopServerAsync(new StopServerAttributes(SERVER_ID, true)).get();       
-        waitForServerState(ServerManagementAPIConstants.STATE_STOPPED, 10, client);
-    }
+	@Test
+	public void testPublishDeployment() throws Exception {
+		sendPublishRequest(handle, ServerManagementAPIConstants.PUBLISH_FULL);
+		ServerState state = waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_NONE, 10, client);
+		assertDeployableState(state, ServerManagementAPIConstants.STATE_STARTED,
+				ServerManagementAPIConstants.PUBLISH_STATE_NONE);
+	}
 
-	protected File createWar() {
+	@Test
+	public void testChangedDeployment() throws Exception {
+		sendPublishRequest(handle, ServerManagementAPIConstants.PUBLISH_FULL);
+		ServerState state = waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_NONE, 15, client);
+		assertDeployableState(state, ServerManagementAPIConstants.STATE_STARTED,
+				ServerManagementAPIConstants.PUBLISH_STATE_NONE);
+		warFile.setLastModified(System.currentTimeMillis());
+		state = waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL, 10, client);
+		assertDeployableState(state, ServerManagementAPIConstants.STATE_STARTED,
+				ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL);
+	}
+
+	@Test
+	public void testRemovingDeployment() throws Exception {
+		sendPublishRequest(handle, ServerManagementAPIConstants.PUBLISH_FULL);
+		ServerState state = waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_NONE, 15, client);
+		assertDeployableState(state, ServerManagementAPIConstants.STATE_STARTED,
+				ServerManagementAPIConstants.PUBLISH_STATE_NONE);
+
+		serverProxy.removeDeployable(new ServerDeployableReference(handle, reference));
+		state = waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_REMOVE, 10, client);
+		assertDeployableState(state, ServerManagementAPIConstants.STATE_STARTED,
+				ServerManagementAPIConstants.PUBLISH_STATE_REMOVE);
+
+		sendPublishRequest(handle, ServerManagementAPIConstants.PUBLISH_FULL);
+		state = waitForNonNullServerState(10, client);
+		DeployableState ds = getDeployableState(reference, state.getDeployableStates());
+		assertNull("state for deployable " + reference.getPath() + " was still found but shouldn't.", ds);
+	}
+
+	/*
+	 * Breaks the server, see
+	 * https://github.com/redhat-developer/rsp-server/issues/376
+	 */
+	@Ignore
+	@Test
+	public void testNullPublishRequest() throws InterruptedException, ExecutionException {
+		Status status = serverProxy.publish(null).get();
+		assertEquals(Status.ERROR, status.getSeverity());
+	}
+
+	/*
+	 * This test just fails, see
+	 * https://github.com/redhat-developer/rsp-server/issues/376
+	 */
+	@Ignore
+	@Test
+	public void testInvalidPublishRequest() throws InterruptedException, ExecutionException {
+		Status status = serverProxy.publish(new PublishServerRequest(handle, 5000)).get();
+		assertEquals(Status.ERROR, status.getSeverity());
+	}
+
+	/*
+	 * Breaks the server, see
+	 * https://github.com/redhat-developer/rsp-server/issues/376
+	 */
+	@Ignore
+	@Test
+	public void testRemoveNullDeployment() throws InterruptedException, ExecutionException {
+		Status status = serverProxy.removeDeployable(null).get();
+		assertEquals(Status.ERROR, status.getSeverity());
+	}
+
+	@Test
+	public void testRemoveInvalidDeployment() throws InterruptedException, ExecutionException {
+		Status status = serverProxy
+				.removeDeployable(
+						new ServerDeployableReference(handle, new DeployableReference("labelik", "/I/dont/exist")))
+				.get();
+		assertEquals(Status.ERROR, status.getSeverity());
+	}
+
+	/*
+	 * Breaks the server, see
+	 * https://github.com/redhat-developer/rsp-server/issues/376
+	 */
+	@Ignore
+	@Test
+	public void testAddNullDeployment() throws InterruptedException, ExecutionException {
+		Status status = serverProxy.addDeployable(null).get();
+		assertEquals(Status.ERROR, status.getSeverity());
+	}
+
+	@Test
+	public void testAddInvalidDeployment() throws InterruptedException, ExecutionException {
+		/*
+		 * Breaks the server, see
+		 * https://github.com/redhat-developer/rsp-server/issues/376
+		 */
+		// Status status = serverProxy.addDeployable(new
+		// ServerDeployableReference(handle, new DeployableReference(WAR_FILENAME,
+		// null))).get();
+		// assertEquals(Status.ERROR, status.getSeverity());
+		// System.out.println(status.getMessage());
+		Status status = serverProxy
+				.addDeployable(
+						new ServerDeployableReference(handle, new DeployableReference(WAR_FILENAME, "/I/dont/exist")))
+				.get();
+		assertEquals(Status.ERROR, status.getSeverity());
+		status = serverProxy.addDeployable(
+				new ServerDeployableReference(handle, new DeployableReference(WAR_FILENAME, getProperty("user.dir"))))
+				.get();
+		assertEquals(Status.ERROR, status.getSeverity());
+		status = serverProxy.addDeployable(
+				new ServerDeployableReference(handle, new DeployableReference("labelik", warFile.getAbsolutePath())))
+				.get();
+		assertEquals(Status.ERROR, status.getSeverity());
+
+	}
+
+	@Test
+	public void testListDeploymentOptions() throws InterruptedException, ExecutionException {
+		Attributes attrs = serverProxy.listDeploymentOptions(handle).get();
+		assertNotNull(attrs);
+	}
+
+	/*
+	 * Breaks the server, see
+	 * https://github.com/redhat-developer/rsp-server/issues/376
+	 */
+	@Ignore
+	@Test
+	public void testListDeploymentOptionsInvalidAttributes() throws InterruptedException, ExecutionException {
+		Attributes attrs = serverProxy.listDeploymentOptions(new ServerHandle("foo.server.id",
+				new ServerType("some.id", "my.server", "Random server type definition"))).get();
+		assertNull(attrs);
+	}
+
+	/*
+	 * Breaks the server, see
+	 * https://github.com/redhat-developer/rsp-server/issues/376
+	 */
+	@Ignore
+	@Test
+	public void testListDeploymentOptionsNullAttributes() throws InterruptedException, ExecutionException {
+		Attributes attrs = serverProxy.listDeploymentOptions(null).get();
+		assertNull(attrs);
+	}
+
+	/*
+	 * Breaks the server, see
+	 * https://github.com/redhat-developer/rsp-server/issues/376
+	 */
+	@Ignore
+	@Test
+	public void testGetDeployablesInvalidAttributes() throws InterruptedException, ExecutionException {
+		List<DeployableState> states = serverProxy.getDeployables(new ServerHandle("foo.server.id",
+				new ServerType("some.id", "my.server", "Random server type definition"))).get();
+		assertTrue(states.isEmpty());
+	}
+
+	/*
+	 * Breaks the server, see
+	 * https://github.com/redhat-developer/rsp-server/issues/376
+	 */
+	@Ignore
+	@Test
+	public void testGetDeployablesNullAttributes() throws InterruptedException, ExecutionException {
+		List<DeployableState> states = serverProxy.getDeployables(null).get();
+		assertFalse(states.isEmpty());
+	}
+
+	@Test
+	public void testGetDeployables() throws Exception {
+		DeployableReference ref2 = new DeployableReference("other_id", WAR_FILENAME);
+		serverProxy.addDeployable(new ServerDeployableReference(handle, ref2));
+		waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_ADD, 10, client);
+		List<DeployableState> states = serverProxy.getDeployables(handle).get();
+		assertEquals(2, states.size());
+		DeployableReference actualRef = states.get(0).getReference();
+		DeployableReference actualRef2 = states.get(1).getReference();
+		assertTrue(actualRef.equals(reference) && !actualRef.equals(ref2)
+				|| actualRef.equals(ref2) && !actualRef.equals(reference));
+		assertTrue(actualRef2.equals(ref2) && !actualRef2.equals(reference)
+				|| actualRef2.equals(reference) && !actualRef2.equals(ref2));
+	}
+
+	@Test
+	public void testGetDeployablesEmptyDeployment() throws Exception {
+		waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_ADD, 10, client);
+		serverProxy.removeDeployable(new ServerDeployableReference(handle, reference));
+		List<DeployableState> states = serverProxy.getDeployables(handle).get();
+		assertTrue(states.isEmpty());
+	}
+
+	private void assertDeployableState(ServerState state, int serverState, int publishState) {
+		DeployableState ds = getDeployableState(reference, state.getDeployableStates());
+		assertNotNull("State for deployable " + reference.getPath() + " is null", ds);
+		assertEquals(serverState, ds.getState());
+		assertEquals(publishState, ds.getPublishState());
+	}
+
+	private File createWar() {
 		Path deployments = null;
 		File war = null;
 		try {
 			deployments = Files.createTempDirectory(getClass().getName() + "5");
 			war = deployments.resolve(WAR_FILENAME).toFile();
 			if (!(new DeploymentGeneration().createWar(war))) {
-				fail();
+				fail("Failed to create war file");
 			}
-		} catch (IOException e) {}
+		} catch (IOException e) {
+		}
 		return war != null && war.exists() && war.isFile() ? war : null;
 	}
-
-	public DeployableState getDeployableState(DeployableReference reference, List<DeployableState> states) {
-		if (states == null || states.isEmpty()) {
-			return null;
-		}
-		
-		return states.stream()
-				.filter(state -> reference.equals(state.getReference()))
-				.findFirst()
-				.orElse(null);
-	}    
 }
