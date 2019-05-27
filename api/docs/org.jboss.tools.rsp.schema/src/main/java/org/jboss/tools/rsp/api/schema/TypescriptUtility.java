@@ -401,15 +401,27 @@ public class TypescriptUtility {
 		String retTypeName = convertReturnType(retType.toString());
 
 		if( JavadocUtilities.isNotification(md) ) {
-			sb.append("    on" + capName + "(listener: (arg: " + paramType + ") => " + retTypeName + "): void {\n");
-			sb.append("        this.emitter.on('" + methodName + "', listener);\n");
-			sb.append("    }\n");
+			printOneAddRemoveListener(sb, methodName, capName, paramType, retTypeName);
 		} else {
 			String requestName = methodNameToRequestName(methodName);
 			sb.append("    on" + capName + "(listener: (arg: " + paramType + ") => Promise<" + retTypeName + ">): void {\n");
 			sb.append("        this.connection.onRequest(Messages.Client." + requestName + ".type, listener);\n");
 			sb.append("    }\n");
 		}
+	}
+
+	private void printOneAddRemoveListener(StringBuilder sb, String methodName, String capName, String paramType,
+			String retTypeName) {
+		// add listener
+		sb.append("\n");
+		sb.append("    on" + capName + "(listener: (arg: " + paramType + ") => " + retTypeName + "): void {\n");
+		sb.append("        this.emitter.on('" + methodName + "', listener);\n");
+		sb.append("    }\n");
+		// remove listener
+		sb.append("\n");
+		sb.append("    removeOn" + capName + "(listener: (arg: " + paramType + ") => " + retTypeName + "): void {\n");
+		sb.append("        this.emitter.removeListener('" + methodName + "', listener);\n");
+		sb.append("    }\n");
 	}
 	
 	private String incomingTsClient() {
