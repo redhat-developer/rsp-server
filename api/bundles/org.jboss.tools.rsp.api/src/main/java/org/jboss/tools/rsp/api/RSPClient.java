@@ -32,8 +32,6 @@ public interface RSPClient {
 	@JsonRequest
 	CompletableFuture<String> promptString(StringPrompt prompt);
 
-
-
 	/**
 	 * The `client/discoveryPathAdded` notification is sent by the server to all
 	 * clients in response to the `server/addDiscoveryPath` notification.

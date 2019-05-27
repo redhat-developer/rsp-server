@@ -133,7 +133,7 @@ public class TypescriptUtility {
 		try {
 			Files.write(destination.toPath(), total.getBytes());
 		} catch(IOException ioe) {
-			
+			System.err.println(ioe);
 		}
 	}
 	
@@ -143,7 +143,7 @@ public class TypescriptUtility {
 		try {
 			Files.write(destination.toPath(), fileContents.getBytes());
 		} catch(IOException ioe) {
-			
+			System.err.println(ioe);			
 		}
 	}
 
@@ -153,7 +153,7 @@ public class TypescriptUtility {
 		try {
 			Files.write(destination.toPath(), fileContents.getBytes());
 		} catch(IOException ioe) {
-			
+			System.err.println(ioe);
 		}
 	}
 
@@ -163,7 +163,7 @@ public class TypescriptUtility {
 		try {
 			Files.write(destination.toPath(), fileContents.getBytes());
 		} catch(IOException ioe) {
-			
+			System.err.println(ioe);
 		}
 	}
 	
@@ -174,23 +174,26 @@ public class TypescriptUtility {
 				" * Error messages\n" + 
 				JAVA_END + 
 				"export namespace ErrorMessages {\n");
-		List<String> mNames = null;
 		try {
-			mNames = getMethodNames(getServerInterfaceFile());
+			List<String> mNames = getMethodNames(getServerInterfaceFile());
+			for( String mName : mNames ) {
+				printOneErrorMessageConstant(sb, mName);
+			}
+
+			sb.append(emptyFooter());
+			return sb.toString();
 		} catch(IOException ioe) {
 			throw new RuntimeException(ioe);
-		}
-		
-		for( String n : mNames ) {
-			sb.append("    ");
-			sb.append("export const ");
-			sb.append(methodNameToTimeoutErrorName(n));
-			sb.append(" = 'Failed to ");
-			sb.append(camelCaseToSpaces(n));
-			sb.append(" in time';\n");
-		}
-		sb.append(emptyFooter());
-		return sb.toString();
+		}		
+	}
+
+	private void printOneErrorMessageConstant(StringBuilder sb, String methodName) {
+		sb.append("    ");
+		sb.append("export const ");
+		sb.append(methodNameToTimeoutErrorName(methodName));
+		sb.append(" = 'Failed to ");
+		sb.append(camelCaseToSpaces(methodName));
+		sb.append(" in time';\n");
 	}
 
 	private String camelCaseToSpaces(String n) {
@@ -320,6 +323,9 @@ public class TypescriptUtility {
 	private void outgoingTsServerMethod(StringBuilder sb, Map<String, JavadocComment> map, String[] methods, int i) {
 		JavadocComment jdc = map.get(methods[i]);
 		MethodDeclaration md = getMethodDeclaration(jdc);
+		if (md == null) {
+			return;
+		}
 
 		String methodName = md.getNameAsString();
 		int paramCount = md.getParameters().size();
@@ -363,6 +369,7 @@ public class TypescriptUtility {
 	private String methodNameToTimeoutErrorName(String name) {
 		return name.toUpperCase() + "_TIMEOUT";
 	}
+
 	private String incomingTsRegisterListeners() {
 		StringBuilder sb = new StringBuilder();
 		try {
@@ -370,32 +377,39 @@ public class TypescriptUtility {
 			List<String> names = new ArrayList<>(map.keySet());
 			String[] methods = names.toArray(new String[names.size()]);
 			for( int i = 0; i < methods.length; i++ ) {
-				JavadocComment jdc = map.get(methods[i]);
-				MethodDeclaration md = getMethodDeclaration(jdc);
-
-				String methodName = md.getNameAsString();
-				String capName = capFirstLetter(methodName);
-				int paramCount = md.getParameters().size();
-				String paramType = paramCount > 0 ? convertReturnType(md.getParameter(0).getType().toString()) : null;
-				Type retType = md.getType();
-				String retTypeName = convertReturnType(retType.toString());
-
-				if( JavadocUtilities.isNotification(md) ) {
-					sb.append("    on" + capName + "(listener: (arg: " + paramType + ") => " + retTypeName + "): void {\n");
-					sb.append("        this.emitter.on('" + methodName + "', listener);\n");
-					sb.append("    }\n");
-				} else {
-					String requestName = methodNameToRequestName(methodName);
-					sb.append("    on" + capName + "(listener: (arg: " + paramType + ") => Promise<" + retTypeName + ">): void {\n");
-					sb.append("        this.connection.onRequest(Messages.Client." + requestName + ".type, listener);\n");
-					sb.append("    }\n");
-				}
+				printOneListenerMethod(sb, map, methods[i]);
 			}
 		} catch(IOException ioe) {
 			throw new RuntimeException(ioe);
 		}
 		
 		return sb.toString();
+	}
+
+	private void printOneListenerMethod(StringBuilder sb, Map<String, JavadocComment> map, String method) {
+		JavadocComment jdc = map.get(method);
+		MethodDeclaration md = getMethodDeclaration(jdc);
+		if (md == null) {
+			System.err.println("Method declaration for method '" + method + "' not found. No listener was created.");
+			return;
+		}
+		String methodName = md.getNameAsString();
+		String capName = capFirstLetter(methodName);
+		int paramCount = md.getParameters().size();
+		String paramType = paramCount > 0 ? convertReturnType(md.getParameter(0).getType().toString()) : null;
+		Type retType = md.getType();
+		String retTypeName = convertReturnType(retType.toString());
+
+		if( JavadocUtilities.isNotification(md) ) {
+			sb.append("    on" + capName + "(listener: (arg: " + paramType + ") => " + retTypeName + "): void {\n");
+			sb.append("        this.emitter.on('" + methodName + "', listener);\n");
+			sb.append("    }\n");
+		} else {
+			String requestName = methodNameToRequestName(methodName);
+			sb.append("    on" + capName + "(listener: (arg: " + paramType + ") => Promise<" + retTypeName + ">): void {\n");
+			sb.append("        this.connection.onRequest(Messages.Client." + requestName + ".type, listener);\n");
+			sb.append("    }\n");
+		}
 	}
 	
 	private String incomingTsClient() {
@@ -419,7 +433,7 @@ public class TypescriptUtility {
 				"     */\n" + 
 				"    export namespace Server {\n\n";
 		String footer = "    }\n";
-		
+
 		StringBuilder sb = new StringBuilder();
 		try {
 			Map<String, JavadocComment> map = JavadocUtilities.methodToJavadocMap(getServerInterfaceFile());
@@ -534,6 +548,10 @@ public class TypescriptUtility {
 			
 			// TODO body
 			MethodDeclaration md = getMethodDeclaration(jdc);
+			if (md == null) {
+				System.err.println("No method declaration for '" + jdc.toString() + "' was found. Not creating notification type.");
+				return;
+			}
 			sb.append("            export const type = new NotificationType<");
 			NodeList<Parameter> params = md.getParameters();
 			if( params.size() == 0 ) {
@@ -590,14 +608,16 @@ public class TypescriptUtility {
 	}
 	
 	private File getClientInterfaceFile() throws IOException {
-		File f2 = new File(baseDir);
-		File f = new File(f2, CLIENT_INTERFACE_PATH).getCanonicalFile();
-		return f;
+		return getCanonicalFile(CLIENT_INTERFACE_PATH);
 	}
 
 	private File getServerInterfaceFile() throws IOException {
+		return getCanonicalFile(SERVER_INTERFACE_PATH);
+	}
+	
+	private File getCanonicalFile(String baseRelativePath) throws IOException {
 		File f2 = new File(baseDir);
-		File f = new File(f2, SERVER_INTERFACE_PATH).getCanonicalFile();
+		File f = new File(f2, baseRelativePath).getCanonicalFile();
 		return f;
 	}
 
