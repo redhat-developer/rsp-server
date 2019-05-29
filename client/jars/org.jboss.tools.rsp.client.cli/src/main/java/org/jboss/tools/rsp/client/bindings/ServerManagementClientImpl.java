@@ -172,6 +172,7 @@ public class ServerManagementClientImpl implements RSPClient {
 		PromptStringHandler h2 = new PromptStringHandler(prompt.getPrompt(), prompt.isSecret()) {
 			public void handleInput(String line) throws Exception {
 				ret[0] = CompletableFuture.completedFuture(line);
+				setDone();
 			}
 		};
 		inputProvider.addInputRequest(h2);
@@ -190,9 +191,10 @@ public class ServerManagementClientImpl implements RSPClient {
 		return CompletableFuture.completedFuture(null);
 	}
 	
-	private abstract class PromptStringHandler implements InputHandler {
+	public static abstract class PromptStringHandler implements InputHandler {
 		private String prompt;
 		private boolean isSecret;
+		private boolean done = false;
 		public PromptStringHandler(String prompt) {
 			this(prompt, false);
 		}
@@ -212,6 +214,15 @@ public class ServerManagementClientImpl implements RSPClient {
 		}
 
 		public abstract void handleInput(String line) throws Exception;
+		
+		@Override
+		public boolean isDone() {
+			return done;
+		}
+		
+		protected void setDone() {
+			done = true;
+		}
 	}
 	@Override
 	public void jobAdded(JobHandle job) {

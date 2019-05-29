@@ -30,6 +30,7 @@ import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
 import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
+import org.jboss.tools.rsp.api.dao.GetServerJsonResponse;
 import org.jboss.tools.rsp.api.dao.JobHandle;
 import org.jboss.tools.rsp.api.dao.JobProgress;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
@@ -48,6 +49,8 @@ import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.api.dao.StopServerAttributes;
+import org.jboss.tools.rsp.api.dao.UpdateServerRequest;
+import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
@@ -324,6 +327,43 @@ public class ServerManagementServerImpl implements RSPServer {
 		return ret;
 	}
 
+	
+	@Override
+	public CompletableFuture<GetServerJsonResponse> getServerAsJson(ServerHandle sh) {
+		return createCompletableFuture(() -> getServerAsJsonSync(sh));
+	}
+
+	private GetServerJsonResponse getServerAsJsonSync(ServerHandle sh) {
+		IServer server = managementModel.getServerModel().getServer(sh.getId());
+		GetServerJsonResponse ret = new GetServerJsonResponse();
+		ret.setServerHandle(sh);
+		try {
+			String json = server.asJson(new NullProgressMonitor());
+			ret.setServerJson(json);
+			Status stat = StatusConverter.convert(org.jboss.tools.rsp.eclipse.core.runtime.Status.OK_STATUS);
+			ret.setStatus(stat);
+		} catch(CoreException ce) {
+			ret.setStatus(StatusConverter.convert(ce.getStatus()));
+		}
+		return ret;
+	}
+	
+	@Override
+	public CompletableFuture<UpdateServerResponse> updateServer(UpdateServerRequest req) {
+		return createCompletableFuture(() -> updateServerSync(req));
+	}
+
+	private UpdateServerResponse updateServerSync(UpdateServerRequest req) {
+		// TODO forward to server model, who can 
+		// validate critical framework fields, and pass request
+		// to delegates to validate server-type-specific fields.
+		UpdateServerResponse resp = new UpdateServerResponse();
+		resp.setStatus(StatusConverter.convert(org.jboss.tools.rsp.eclipse.core.runtime.Status.OK_STATUS));
+		return resp;
+	}
+
+	
+	
 	@Override
 	public CompletableFuture<List<ServerType>> getServerTypes() {
 		return createCompletableFuture(() -> getServerTypesSync());

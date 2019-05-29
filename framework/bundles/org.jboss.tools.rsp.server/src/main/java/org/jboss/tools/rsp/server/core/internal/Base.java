@@ -293,12 +293,7 @@ public abstract class Base {
 
 	protected void saveToFile(IProgressMonitor monitor) throws CoreException {
 		try {
-			JSONMemento memento = JSONMemento.createWriteRoot();
-			save(memento);
-			
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			memento.save(out);
-			byte[] bytes = out.toByteArray();
+			byte[] bytes = saveToBytes(monitor);
 			if (file.exists()) {
 				Files.delete(file.toPath());
 			}
@@ -306,6 +301,22 @@ public abstract class Base {
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 0, 
 					NLS.bind("Could not save server to file {0}", file.getAbsolutePath()), e));
+		}
+	}
+	
+	protected byte[] saveToBytes(IProgressMonitor monitor) throws CoreException {
+		try {
+			JSONMemento memento = JSONMemento.createWriteRoot();
+			save(memento);
+			
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			memento.save(out);
+			byte[] bytes = out.toByteArray();
+			return bytes;
+		} catch (Exception e) {
+			throw new CoreException(new Status(IStatus.ERROR, 
+					ServerCoreActivator.BUNDLE_ID, 0, 
+					"Could not save server to stream", e));
 		}
 	}
 

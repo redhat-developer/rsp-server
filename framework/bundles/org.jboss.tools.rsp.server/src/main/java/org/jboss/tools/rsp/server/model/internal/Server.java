@@ -180,6 +180,12 @@ public class Server extends SecuredBase implements IServer {
 	}
 
 	@Override
+	public String asJson(IProgressMonitor monitor) throws CoreException {
+		byte[] ret1 = super.saveToBytes(monitor);
+		return new String(ret1);
+	}
+	
+	@Override
 	public void load(IProgressMonitor monitor) throws CoreException {
 		super.loadFromFile(monitor);
 	}
