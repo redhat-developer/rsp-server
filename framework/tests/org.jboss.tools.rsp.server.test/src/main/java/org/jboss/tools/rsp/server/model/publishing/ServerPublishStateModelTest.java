@@ -45,6 +45,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
 import org.jboss.tools.rsp.server.model.ServerModel;
+import org.jboss.tools.rsp.server.model.internal.publishing.AutoPublishThread;
 import org.jboss.tools.rsp.server.model.internal.publishing.DeployableDelta;
 import org.jboss.tools.rsp.server.model.internal.publishing.ServerPublishStateModel;
 import org.jboss.tools.rsp.server.spi.filewatcher.FileWatcherEvent;
@@ -744,6 +745,197 @@ public class ServerPublishStateModelTest {
 		@Override
 		public String getKey(DeployableReference deployable) {
 			return super.getKey(deployable);
+		}
+		@Override
+		protected boolean isAutoPublisherEnabled() {
+			return false;
+		}
+
+	}
+	
+	
+
+	@Test
+	public void testAddDeployableLaunchesAutoPublish() {
+		AbstractServerDelegate delegate = mock(AbstractServerDelegate.class);
+		this.model = new TestableServerPublishStateModelWithAutoPublisher(delegate, null);
+		TestableServerPublishStateModelWithAutoPublisher model2 = (TestableServerPublishStateModelWithAutoPublisher)model;
+		// Create a new ref
+		String originalLabelAndPath = deployableFile.getLabel();
+		DeployableReference ref = new DeployableReference(originalLabelAndPath,originalLabelAndPath);
+		
+		assertFalse((model2).getPublishThreadCalled());
+		// Add it to the model
+		model2.addDeployable(ref);
+		assertTrue((model2).getPublishThreadCalled());
+
+		// Now try to change the file
+		model2.resetPublishThreadCalled();
+		assertFalse((model2).getPublishThreadCalled());
+		// Add it to the model
+		Path deployablePath = new File(deployableFile.getPath()).toPath();
+		model2.fileChanged(new FileWatcherEvent(deployablePath, StandardWatchEventKinds.ENTRY_MODIFY));
+		assertTrue((model2).getPublishThreadCalled());
+
+		// Now try to delete the file
+		model2.resetPublishThreadCalled();
+		assertFalse((model2).getPublishThreadCalled());
+		// Add it to the model
+		model2.fileChanged(new FileWatcherEvent(deployablePath, StandardWatchEventKinds.ENTRY_DELETE));
+		assertTrue((model2).getPublishThreadCalled());
+
+		// Now try to create the file
+		model2.resetPublishThreadCalled();
+		assertFalse((model2).getPublishThreadCalled());
+		// Add it to the model
+		model2.fileChanged(new FileWatcherEvent(deployablePath, StandardWatchEventKinds.ENTRY_CREATE));
+		assertTrue((model2).getPublishThreadCalled());
+
+		model2.resetPublishThreadCalled();
+		assertFalse((model2).getPublishThreadCalled());
+		// Add it to the model
+		model2.removeDeployable(ref);
+		assertTrue((model2).getPublishThreadCalled());
+	}
+	
+	public class TestableServerPublishStateModelWithAutoPublisher extends TestableServerPublishStateModel {
+		private boolean publishThreadCalled = false;
+		public TestableServerPublishStateModelWithAutoPublisher(AbstractServerDelegate delegate, IFileWatcherService fileWatcher) {
+			super(delegate, fileWatcher);
+		}
+		@Override
+		protected boolean isAutoPublisherEnabled() {
+			return true;
+		}
+		protected void launchOrUpdateAutopublishThreadImpl() {
+			publishThreadCalled = true;
+		}
+		public boolean getPublishThreadCalled() {
+			return publishThreadCalled;
+		}
+
+		public void resetPublishThreadCalled() {
+			publishThreadCalled = false;
+		}
+	}
+
+	
+	
+
+	@Test
+	public void testLaunchOrUpdateAutopublishThreadImpl() {
+		AbstractServerDelegate delegate = mock(AbstractServerDelegate.class);
+		this.model = new TestableServerPublishStateModelWithAutoPublisher2(delegate, null);
+		TestableServerPublishStateModelWithAutoPublisher2 model2 = (TestableServerPublishStateModelWithAutoPublisher2)model;
+		// Create a new ref
+		String originalLabelAndPath = deployableFile.getLabel();
+		DeployableReference ref = new DeployableReference(originalLabelAndPath,originalLabelAndPath);
+		Path deployablePath = new File(deployableFile.getPath()).toPath();
+
+		assertEquals(0, model2.getCreateCalled());
+		assertEquals(0, model2.getPublishCalled());
+
+		// Add it to the model
+		model2.addDeployable(ref);
+		assertEquals(1, model2.getCreateCalled());
+		assertEquals(0, model2.getPublishCalled());
+
+		delay(600);
+		assertEquals(1, model2.getCreateCalled());
+		assertEquals(1, model2.getPublishCalled());
+
+		model2.reset();
+		assertEquals(0, model2.getCreateCalled());
+		assertEquals(0, model2.getPublishCalled());
+		
+
+		model2.fileChanged(new FileWatcherEvent(deployablePath, StandardWatchEventKinds.ENTRY_DELETE));
+		delay(100);
+		assertEquals(1, model2.getCreateCalled());
+		assertEquals(0, model2.getPublishCalled());
+
+		model2.fileChanged(new FileWatcherEvent(deployablePath, StandardWatchEventKinds.ENTRY_DELETE));
+		delay(100);
+		assertEquals(1, model2.getCreateCalled());
+		assertEquals(0, model2.getPublishCalled());
+		model2.fileChanged(new FileWatcherEvent(deployablePath, StandardWatchEventKinds.ENTRY_DELETE));
+		delay(100);
+		assertEquals(1, model2.getCreateCalled());
+		assertEquals(0, model2.getPublishCalled());
+		model2.fileChanged(new FileWatcherEvent(deployablePath, StandardWatchEventKinds.ENTRY_DELETE));
+		delay(100);
+		assertEquals(1, model2.getCreateCalled());
+		assertEquals(0, model2.getPublishCalled());
+		model2.fileChanged(new FileWatcherEvent(deployablePath, StandardWatchEventKinds.ENTRY_DELETE));
+		delay(100);
+		assertEquals(1, model2.getCreateCalled());
+		assertEquals(0, model2.getPublishCalled());
+		model2.fileChanged(new FileWatcherEvent(deployablePath, StandardWatchEventKinds.ENTRY_DELETE));
+		delay(100);
+		assertEquals(1, model2.getCreateCalled());
+		assertEquals(0, model2.getPublishCalled());
+		model2.fileChanged(new FileWatcherEvent(deployablePath, StandardWatchEventKinds.ENTRY_DELETE));
+		delay(400);
+		assertEquals(1, model2.getCreateCalled());
+		assertEquals(1, model2.getPublishCalled());
+	}
+	
+	
+	public class TestableServerPublishStateModelWithAutoPublisher2 extends TestableServerPublishStateModel {
+		private int publishCalled = 0;
+		private int createNewAutoPublishThreadCalled = 0;
+		public TestableServerPublishStateModelWithAutoPublisher2(AbstractServerDelegate delegate, IFileWatcherService fileWatcher) {
+			super(delegate, fileWatcher);
+		}
+		@Override
+		protected boolean isAutoPublisherEnabled() {
+			return true;
+		}
+		protected int getInactivityTimeout() {
+			return 300;
+		}
+		protected AutoPublishThread createNewAutoPublishThread(int timeout) {
+			incrementCreateCalled();
+			return new AutoPublishThread(null, timeout) {
+				@Override
+				protected void publishImpl() {
+					incrementPublishCalled();
+				}
+				@Override
+				protected ServerState getServerState() {
+					ServerState ss = new ServerState();
+					ss.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL);
+					ss.setState(ServerManagementAPIConstants.STATE_STARTED);
+					return ss;
+				}
+
+			};
+		}
+
+		private void incrementPublishCalled() {
+			publishCalled = publishCalled+1;
+		}
+		
+		public synchronized int getPublishCalled() {
+			return publishCalled;
+		}
+		private void incrementCreateCalled() {
+			createNewAutoPublishThreadCalled = createNewAutoPublishThreadCalled+1;
+		}
+		
+		public synchronized int getCreateCalled() {
+			return createNewAutoPublishThreadCalled;
+		}
+		public synchronized void reset() {
+			publishCalled = 0;
+			createNewAutoPublishThreadCalled = 0;
+		}
+	}
+	private void delay(int time) {
+		try {
+			Thread.sleep(time);
+		} catch(InterruptedException ie) {
+			Thread.interrupted();
 		}
 	}
 }

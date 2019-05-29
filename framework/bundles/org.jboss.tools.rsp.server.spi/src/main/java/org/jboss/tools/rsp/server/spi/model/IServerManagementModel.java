@@ -17,6 +17,12 @@ import org.jboss.tools.rsp.server.spi.discovery.IServerBeanTypeManager;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
 import org.jboss.tools.rsp.server.spi.jobs.IJobManager;
 
+/**
+ * This interface should probably be called IRSPModel instead. 
+ * It's not limited to just the server adapters. Lame. 
+ * @author rob
+ *
+ */
 public interface IServerManagementModel {
 	/**
 	 * Get the sub-model relating to server beans 

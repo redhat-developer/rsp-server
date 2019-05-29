@@ -23,6 +23,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.launching.memento.IMemento;
 import org.jboss.tools.rsp.server.core.internal.SecuredBase;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
+import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
@@ -166,6 +167,11 @@ public class Server extends SecuredBase implements IServer {
 	@Override
 	public IServerManagementModel getServerManagementModel() {
 		return managementModel;
+	}
+
+	@Override
+	public IServerModel getServerModel() {
+		return managementModel == null ? null : managementModel.getServerModel();
 	}
 
 	@Override

@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attribute;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
@@ -24,6 +25,7 @@ import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.itests.RSPCase;
+import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
 import org.junit.Test;
 
 /**
@@ -110,9 +112,21 @@ public class WildFlyServerModelTest extends RSPCase {
         Map<String, Attribute> expected = new HashMap<>();
         expected.put("vm.install.path", new Attribute("string",
                 "A string representation pointing to a java home. If not set, java.home will be used instead.", null));
-        assertEquals(new Attributes(expected), attr);
+        
+        expected.put(IJBossServerAttributes.AUTOPUBLISH_ENABLEMENT,
+        		new Attribute(
+					ServerManagementAPIConstants.ATTR_TYPE_BOOL, 
+					"Enable the autopublisher.", 
+					IJBossServerAttributes.AUTOPUBLISH_ENABLEMENT_DEFAULT)
+        		);
+
+        expected.put(IJBossServerAttributes.AUTOPUBLISH_INACTIVITY_LIMIT,
+        		new Attribute(
+					ServerManagementAPIConstants.ATTR_TYPE_INT, 
+					"Set the inactivity limit before the autopublisher runs.", 
+					IJBossServerAttributes.AUTOPUBLISH_INACTIVITY_LIMIT_DEFAULT)
+        		);
     }
-    
     
     @Test
     public void testGetOptionalAttributesInvalid() throws Exception {

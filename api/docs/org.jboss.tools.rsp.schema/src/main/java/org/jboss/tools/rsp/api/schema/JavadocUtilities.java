@@ -6,6 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
+
 package org.jboss.tools.rsp.api.schema;
 
 import java.io.File;

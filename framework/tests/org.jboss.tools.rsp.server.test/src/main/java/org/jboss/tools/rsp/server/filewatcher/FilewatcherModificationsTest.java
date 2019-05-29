@@ -348,7 +348,7 @@ public class FilewatcherModificationsTest {
 		}
 		
 		@Override
-		protected void fireEvents(WatchKey key, WatchEvent<?> event) {
+		protected void fireSingleFileEvent(WatchKey key, WatchEvent<?> event) {
 			debug("fireEvents[1]");
 
 			try {
@@ -359,7 +359,7 @@ public class FilewatcherModificationsTest {
 			
 			events.add(new WatchKeyEvent(key, event));
 			debug("fireEvents[3]");
-			super.fireEvents(key, event);
+			super.fireSingleFileEvent(key, event);
 			endLatch[0].countDown();
 			debug("fireEvents[4]");
 		}

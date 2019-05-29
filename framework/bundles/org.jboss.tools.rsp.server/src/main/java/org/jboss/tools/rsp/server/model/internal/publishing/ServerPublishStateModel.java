@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.jboss.tools.rsp.api.DefaultServerAttributes;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
@@ -30,8 +31,11 @@ import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherEventListener;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
 import org.jboss.tools.rsp.server.spi.servertype.IDeployableResourceDelta;
 import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServerPublishStateModel implements IServerPublishModel, IFileWatcherEventListener {
+	static final Logger LOG = LoggerFactory.getLogger(ServerPublishStateModel.class);
 
 	private final Map<String, DeployableState> states;
 	private final Map<String, Map<String,Object>> deploymentOptions;
@@ -40,6 +44,8 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	private AbstractServerDelegate delegate;
 	private IFileWatcherService fileWatcher;
 	private int publishState = AbstractServerDelegate.PUBLISH_STATE_UNKNOWN;
+	
+	private AutoPublishThread autoPublish;
 	
 	public ServerPublishStateModel(AbstractServerDelegate delegate, IFileWatcherService fileWatcher) {
 		this.delegate = delegate;
@@ -106,6 +112,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		addDeployableImpl(withOptions, ServerManagementAPIConstants.PUBLISH_STATE_ADD);
 		updateServerPublishStateFromDeployments();
 		fireState();
+		launchOrUpdateAutopublishThread();
 		return Status.OK_STATUS;
 	}
 
@@ -133,6 +140,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		}
 		updateServerPublishStateFromDeployments();
 		fireState();
+		launchOrUpdateAutopublishThread();
 		return Status.OK_STATUS;
 	}
 
@@ -194,6 +202,8 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 			clearDelta(key);
 		}
 		updateServerPublishStateFromDeployments();
+		launchOrUpdateAutopublishThread();
+
 	}
 
 	private void clearDelta(String key) {
@@ -259,6 +269,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		updateServerPublishStateFromDeployments();
 		if( changed ) 
 			fireState();
+		launchOrUpdateAutopublishThread();
 	}
 
 	private void registerSingleDelta(FileWatcherEvent event, DeployableReference reference) {
@@ -270,11 +281,8 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	private void fireState() {
 		// Feels strange to allow this class to fire the event
 		// but whatever. This feels so dirty. 
-		if( delegate != null && delegate.getServer() != null 
-				&& delegate.getServer().getServerManagementModel() != null 
-				&& delegate.getServer().getServerManagementModel().getServerModel() != null ) {
-			delegate.getServer().getServerManagementModel().getServerModel()
-				.fireServerStateChanged(delegate.getServer(), delegate.getServerState());
+		if( delegate != null ) {
+			delegate.fireServerStateChanged();
 		}
 	}
 
@@ -345,4 +353,42 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		return ref == null ? null : new DeployableReference(ref.getLabel(), ref.getPath());
 	}
 
+	protected boolean isAutoPublisherEnabled() {
+		return delegate.getServer().getAttribute(
+				DefaultServerAttributes.AUTOPUBLISH_ENABLEMENT, 
+				DefaultServerAttributes.AUTOPUBLISH_ENABLEMENT_DEFAULT);
+	}
+	
+	protected int getInactivityTimeout() {
+		return delegate.getServer().getAttribute(
+				DefaultServerAttributes.AUTOPUBLISH_INACTIVITY_LIMIT, 
+				DefaultServerAttributes.AUTOPUBLISH_INACTIVITY_LIMIT_DEFAULT);
+	}
+
+	protected void launchOrUpdateAutopublishThread() {
+		if (isAutoPublisherEnabled()) {
+			launchOrUpdateAutopublishThreadImpl();
+		}
+	}
+	protected void launchOrUpdateAutopublishThreadImpl() {
+		synchronized (this) {
+			if (this.autoPublish != null) {
+				if (this.autoPublish.isDone() || this.autoPublish.getPublishBegan()) {
+					// we need a new thread
+					this.autoPublish = createNewAutoPublishThread( getInactivityTimeout());
+					this.autoPublish.start();
+				} else {
+					this.autoPublish.updateInactivityCounter();
+				}
+			} else {
+				this.autoPublish = createNewAutoPublishThread( getInactivityTimeout());
+				this.autoPublish.start();
+			}
+		}
+	}
+	
+	protected AutoPublishThread createNewAutoPublishThread(int timeout) {
+		return new AutoPublishThread(delegate.getServer(), timeout);
+	}
+	
 }

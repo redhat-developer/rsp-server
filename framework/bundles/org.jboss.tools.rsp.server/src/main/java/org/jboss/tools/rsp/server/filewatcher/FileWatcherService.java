@@ -368,7 +368,7 @@ public class FileWatcherService implements IFileWatcherService {
 	protected void handleSingleEvent(WatchKey key, WatchEvent<?> event) {
 		Path context = ((Path)key.watchable()).resolve((Path)event.context());
 		subscribeToChanges(event, context);
-		fireEvents(key, event);
+		fireSingleFileEvent(key, event);
 	}
 	
 	/*
@@ -454,7 +454,7 @@ public class FileWatcherService implements IFileWatcherService {
 		}
 	}
 
-	protected void fireEvents(WatchKey key, WatchEvent<?> event) {
+	protected void fireSingleFileEvent(WatchKey key, WatchEvent<?> event) {
 		Path context = ((Path)key.watchable()).resolve((Path)event.context());
 		FileWatcherEvent toFire = new FileWatcherEvent(context, event.kind());
 
