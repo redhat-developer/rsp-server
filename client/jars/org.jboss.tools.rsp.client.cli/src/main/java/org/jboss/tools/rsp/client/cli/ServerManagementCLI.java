@@ -40,7 +40,6 @@ public class ServerManagementCLI implements InputProvider, IClientConnectionClos
 	private Scanner scanner = null;
 	private ServerManagementClientLauncher launcher;
 	private ConcurrentLinkedQueue<InputHandler> queue = new ConcurrentLinkedQueue<>();
-	private StandardCommandHandler defaultHandler;
 	
 	private void connect(String host, String port) throws Exception {
 		if (host == null) {
@@ -53,7 +52,6 @@ public class ServerManagementCLI implements InputProvider, IClientConnectionClos
 		}
 
 		this.launcher = launch(host, port);
-		this.defaultHandler = new StandardCommandHandler(launcher, this);
 	}
 
 	private ServerManagementClientLauncher launch(String host, String port) throws IOException, InterruptedException, ExecutionException {
@@ -146,18 +144,22 @@ public class ServerManagementCLI implements InputProvider, IClientConnectionClos
 	}
 
 	private InputHandler getInputHandler() {
-		InputHandler h = null;
-		if (queue.peek() == null) {
-			h = defaultHandler;
-		} else {
-			h = queue.remove();
+		InputHandler h = queue.peek();
+		if (h != null) {
+			if( h.isDone()) {
+				queue.remove();
+				h = queue.peek();
+			}
+		}
+		if( h == null ) {
+			h = new StandardCommandHandler(launcher, this);
 		}
 		return h;
 	}
 
 	private void printUserPrompt(InputHandler handler) {
 		String prompt = handler.getPrompt();
-		if (prompt != null) {
+		if (prompt != null && !prompt.isEmpty()) {
 			System.out.println(prompt);
 		}
 	}

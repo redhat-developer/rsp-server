@@ -6,11 +6,29 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.rsp.client.cli;
+package org.jboss.tools.rsp.api.dao;
 
-public interface InputHandler {
-	public String getPrompt();
-	public void handleInput(String line) throws Exception;
-	public boolean isSecret();
-	public boolean isDone();
+public class UpdateServerRequest {
+	private ServerHandle handle;
+	private String serverJson;
+	
+	public UpdateServerRequest() {
+		
+	}
+
+	public ServerHandle getHandle() {
+		return handle;
+	}
+
+	public void setHandle(ServerHandle handle) {
+		this.handle = handle;
+	}
+
+	public String getServerJson() {
+		return serverJson;
+	}
+
+	public void setServerJson(String serverJson) {
+		this.serverJson = serverJson;
+	}
 }

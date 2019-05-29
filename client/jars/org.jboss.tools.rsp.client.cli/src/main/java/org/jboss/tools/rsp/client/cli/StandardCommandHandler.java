@@ -26,6 +26,7 @@ import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
 import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
+import org.jboss.tools.rsp.api.dao.GetServerJsonResponse;
 import org.jboss.tools.rsp.api.dao.JobHandle;
 import org.jboss.tools.rsp.api.dao.JobProgress;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
@@ -41,6 +42,8 @@ import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.api.dao.StopServerAttributes;
+import org.jboss.tools.rsp.api.dao.UpdateServerRequest;
+import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
 import org.jboss.tools.rsp.client.bindings.ServerManagementClientLauncher;
@@ -345,6 +348,74 @@ public class StandardCommandHandler implements InputHandler {
 					System.out.println("Server not found: " + suffix.trim());
 			}
 		},
+
+		PRINT_SERVER("print server") {
+			@Override
+			public boolean isMatching(String command) {
+				return command.startsWith(this.command);
+			}
+
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
+				String suffix = command.substring(this.command.length());
+				ServerHandle sh = null;
+				if( suffix.trim().isEmpty()) {
+					sh = assistant.selectServer();
+				} else {
+					sh = findServer(suffix.trim(), launcher);
+				}
+				
+				if (sh != null) {
+					GetServerJsonResponse resp = 
+							launcher.getServerProxy().getServerAsJson(sh).get();
+					if( resp.getStatus().isOK()) {
+						System.out.println(resp.getServerJson());
+					} else {
+						System.out.println(resp.getStatus().toString());
+					}
+				} else
+					System.out.println("Server not found: " + suffix.trim());
+			}
+		},
+		
+		UPDATE_SERVER("update server") {
+			@Override
+			public boolean isMatching(String command) {
+				return command.startsWith(this.command);
+			}
+
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
+				String suffix = command.substring(this.command.length());
+				ServerHandle sh = null;
+				if( suffix.trim().isEmpty()) {
+					sh = assistant.selectServer();
+				} else {
+					sh = findServer(suffix.trim(), launcher);
+				}
+				
+				if (sh != null) {
+					GetServerJsonResponse resp = 
+							launcher.getServerProxy().getServerAsJson(sh).get();
+					if( resp.getStatus().isOK()) {
+						System.out.println("Current value:");
+						System.out.println(resp.getServerJson());
+						
+						System.out.println("Please enter the updated value below.");
+						String multiLine = assistant.promptMultiLineString();
+						UpdateServerRequest req = new UpdateServerRequest();
+						req.setHandle(sh);
+						req.setServerJson(multiLine);
+						UpdateServerResponse updateResp = 
+								launcher.getServerProxy().updateServer(req).get();
+						System.out.println(updateResp.getStatus().toString());
+					} else {
+						System.out.println(resp.getStatus().toString());
+					}
+				} else
+					System.out.println("Server not found: " + suffix.trim());
+			}
+		},
 		LIST_DEPLOYMENTS("list deployments") {
 			@Override
 			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
@@ -637,6 +708,7 @@ public class StandardCommandHandler implements InputHandler {
 	private ServerManagementClientLauncher launcher;
 	private InputProvider provider;
 	private PromptAssistant assistant;
+	private boolean done = false;
 
 	public StandardCommandHandler(ServerManagementClientLauncher launcher, InputProvider provider) {
 		this.launcher = launcher;
@@ -647,6 +719,15 @@ public class StandardCommandHandler implements InputHandler {
 	@Override
 	public void handleInput(String line) throws Exception {
 		processCommand(line);
+		setDone();
+	}
+	
+	public boolean isDone() {
+		return done;
+	}
+	
+	protected void setDone() {
+		done = true;
 	}
 	
 	@Override

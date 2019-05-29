@@ -31,6 +31,7 @@ import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
+import org.jboss.tools.rsp.client.bindings.ServerManagementClientImpl.PromptStringHandler;
 import org.jboss.tools.rsp.client.bindings.ServerManagementClientLauncher;
 
 public class PromptAssistant {
@@ -205,7 +206,7 @@ public class PromptAssistant {
 	}
 
 	public Map<String, String> promptMapValue() {
-		System.out.println("Please enter a map value. Each line should read some.key=some.val.\nSend a blank line to end the map.");
+		System.out.println("Please enter a map value. Each line should read some.key=some.val.\nEnter a blank line to end the map.");
 		Map<String, String> map = new HashMap<>();
 		String tmp = nextLine();
 		while (!tmp.trim().isEmpty()) {
@@ -222,8 +223,14 @@ public class PromptAssistant {
 		return map;
 	}
 
+	public String promptMultiLineString() {
+		System.out.println("Please enter a multi-line String value. \nEnter a blank line to finish.");
+		List<String> tmp = readMultipleLines(null, provider, false);
+		return String.join("\n", tmp);
+	}
+
 	public List<String> promptListValue() {
-		System.out.println("Please enter a list value. Send a blank line to end the list.");
+		System.out.println("Please enter a list value. Enter a blank line to end the list.");
 		List<String> arr = new ArrayList<>();
 		String tmp = nextLine();
 		while (!tmp.trim().isEmpty()) {
@@ -349,32 +356,53 @@ public class PromptAssistant {
 		return sp.ret;
 	}
 
-	public static class StandardPrompt implements InputHandler {
+	public static List<String> readMultipleLines(String prompt, InputProvider provider, boolean secret) {
+		String p = (prompt == null ? "" : prompt);
+		MultiLinePrompt sp = new MultiLinePrompt(p, secret);
+		provider.addInputRequest(sp);
+		sp.await();
+		return sp.ret;
+	}
 
-		public final String prompt;
+	public static class MultiLinePrompt extends StandardPrompt {
+		private List<String> ret = new ArrayList<String>();
+		public MultiLinePrompt(String prompt, boolean isSecret) {
+			super(prompt, isSecret);
+			doneSignal = new CountDownLatch(1);
+		}
+		@Override
+		public void handleInput(String line) throws Exception {
+			ret.add(line);
+			if( line.trim().isEmpty()) {
+				setDone();
+				doneSignal.countDown();
+			}
+		}
+		@Override
+		public void await() {
+			try {
+				doneSignal.await();
+			} catch (InterruptedException ie) {
+				ie.printStackTrace();
+			}
+		}
+
+	}
+	
+	public static class StandardPrompt extends PromptStringHandler {
+
 		public String ret;
-		private boolean secret;
-		public final CountDownLatch doneSignal = new CountDownLatch(1);
+		protected CountDownLatch doneSignal = new CountDownLatch(1);
 
 		public StandardPrompt(String prompt, boolean isSecret) {
-			this.prompt = prompt;
-			this.secret = isSecret;
+			super(prompt, isSecret);
 		}
 		
-		@Override
-		public String getPrompt() {
-			return prompt;
-		}
-		
-		@Override 
-		public boolean isSecret() {
-			return secret;
-		}
-
 		@Override
 		public void handleInput(String line) throws Exception {
 			this.ret = line;
 			doneSignal.countDown();
+			setDone();
 		}
 
 		public void await() {

@@ -21,6 +21,7 @@ import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
+import org.jboss.tools.rsp.api.dao.GetServerJsonResponse;
 import org.jboss.tools.rsp.api.dao.JobHandle;
 import org.jboss.tools.rsp.api.dao.JobProgress;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
@@ -39,6 +40,8 @@ import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.api.dao.StopServerAttributes;
+import org.jboss.tools.rsp.api.dao.UpdateServerRequest;
+import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 
 @JsonSegment("server")
@@ -177,6 +180,27 @@ public interface RSPServer {
 	@JsonRequest
 	CompletableFuture<CreateServerResponse> createServer(ServerAttributes csa);
 
+	/**
+	 * The `server/getServerAsJson` request is sent by the client to 
+	 * fetch a string representation of a server adapter. 
+	 * A server handle and a status object are included along with the 
+	 * json representation of the server.
+	 *
+	 * In the event of failure, the returned `Status` object will
+	 * detail the cause of error.
+	 */
+	@JsonRequest
+	CompletableFuture<GetServerJsonResponse> getServerAsJson(ServerHandle sh);
+
+	/**
+	 * The `server/updateServer` request is sent by the client to 
+	 * update a server with new k/v pairs or changed deployment options. 
+	 *
+	 * In the event of failure, the returned `Status` object will
+	 * detail the cause of error.
+	 */
+	@JsonRequest
+	CompletableFuture<UpdateServerResponse> updateServer(UpdateServerRequest req);
 
 	/*
 	 * Launching
