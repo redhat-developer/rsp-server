@@ -24,7 +24,7 @@ pipeline {
     	            
     	            stages {
     
-                		stage('Build Java 8 & unit tests') {
+                		stage('Build & unit tests') {
                 			steps {
                 				unstash 'source'
                 				sh 'mvn clean install -fae -B'
@@ -57,6 +57,37 @@ pipeline {
                 	}
     	        }
     	        
+    	        stage ('Java 8 runtime win7') {
+    	            
+    	            agent { label 'win7' }
+    	            
+    	            tools {
+                    	jdk 'openjdk-1.8'
+                    }
+                    
+    	            stages {
+    
+                		stage('Build & unit tests') {
+                			steps {
+                				unstash 'source'
+                				bat 'mvn clean install -fae -B'
+                        	}
+                		}
+                		
+                        stage('Integration tests') {
+                			steps {
+                				bat 'mvn verify -B -Pintegration-tests -DskipTests=true -Dmaven.test.failure.ignore=true'
+                        	}
+                        }
+    	            }
+                	post {
+                	    always {
+                	        junit '**/surefire-reports/*.xml'
+                	        archiveArtifacts '**/integration-tests/target/surefire-reports/*,**/tests/**/target/surefire-reports/*'
+                	    }
+                	}
+                }
+    	        
     	        stage ('Java 11 runtime') {
     	            
     	            agent { label 'rhel7' }
@@ -67,7 +98,7 @@ pipeline {
                     
     	            stages {
     
-                		stage('Build Java 11 & unit tests') {
+                		stage('Build & unit tests') {
                 			steps {
                 				unstash 'source'
                 				sh 'mvn clean install -fae -B'
@@ -77,6 +108,37 @@ pipeline {
                         stage('Integration tests') {
                 			steps {
                 				sh 'mvn verify -B -Pintegration-tests -DskipTests=true -Dmaven.test.failure.ignore=true'
+                        	}
+                        }
+    	            }
+                	post {
+                	    always {
+                	        junit '**/surefire-reports/*.xml'
+                	        archiveArtifacts '**/integration-tests/target/surefire-reports/*,**/tests/**/target/surefire-reports/*'
+                	    }
+                	}
+                }
+                
+    	        stage ('Java 11 runtime win10') {
+    	            
+    	            agent { label 'win10' }
+    	            
+    	            tools {
+                    	jdk 'openjdk11'
+                    }
+                    
+    	            stages {
+    
+                		stage('Build & unit tests') {
+                			steps {
+                				unstash 'source'
+                				bat 'mvn clean install -fae -B'
+                        	}
+                		}
+                		
+                        stage('Integration tests') {
+                			steps {
+                				bat 'mvn verify -B -Pintegration-tests -DskipTests=true -Dmaven.test.failure.ignore=true'
                         	}
                         }
     	            }
