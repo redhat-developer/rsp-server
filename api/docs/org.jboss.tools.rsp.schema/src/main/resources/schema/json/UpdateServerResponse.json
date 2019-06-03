@@ -1,0 +1,61 @@
+{
+  "type" : "object",
+  "properties" : {
+    "handle" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "visibleName" : {
+              "type" : "string"
+            },
+            "description" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    },
+    "validation" : {
+      "type" : "object",
+      "properties" : {
+        "status" : {
+          "type" : "object",
+          "properties" : {
+            "severity" : {
+              "type" : "integer"
+            },
+            "plugin" : {
+              "type" : "string"
+            },
+            "code" : {
+              "type" : "integer"
+            },
+            "message" : {
+              "type" : "string"
+            },
+            "trace" : {
+              "type" : "string"
+            },
+            "ok" : {
+              "type" : "boolean"
+            }
+          }
+        },
+        "invalidKeys" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          }
+        }
+      }
+    }
+  }
+}

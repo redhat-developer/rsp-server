@@ -3,7 +3,7 @@
  */
 export namespace Protocol {
     /* tslint:disable */
-    // Generated using typescript-generator version 2.2.413 on 2019-06-03 12:08:28.
+    // Generated using typescript-generator version 2.2.413 on 2019-06-03 14:27:41.
     
     export interface Attribute {
         type: string;
@@ -66,6 +66,12 @@ export namespace Protocol {
         requestId: number;
         downloadRuntimeId: string;
         data: { [index: string]: any };
+    }
+    
+    export interface GetServerJsonResponse {
+        status: Status;
+        serverJson: string;
+        serverHandle: ServerHandle;
     }
     
     export interface JobHandle {
@@ -192,6 +198,16 @@ export namespace Protocol {
         code: number;
         prompt: string;
         secret: boolean;
+    }
+    
+    export interface UpdateServerRequest {
+        handle: ServerHandle;
+        serverJson: string;
+    }
+    
+    export interface UpdateServerResponse {
+        handle: ServerHandle;
+        validation: CreateServerResponse;
     }
     
     export interface VMDescription {
