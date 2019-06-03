@@ -11,6 +11,7 @@ package org.jboss.tools.rsp.server.util;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerState;
+import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
 import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
@@ -29,4 +30,9 @@ public class TestServerDelegate extends AbstractServerDelegate {
 	protected void fireStateChanged(ServerState state) {
 		// Do nothing
 	}
+	@Override
+	public void updateServer(IServer dummyServer, UpdateServerResponse resp) {
+		// TODO Auto-generated method stub
+	}
+
 }

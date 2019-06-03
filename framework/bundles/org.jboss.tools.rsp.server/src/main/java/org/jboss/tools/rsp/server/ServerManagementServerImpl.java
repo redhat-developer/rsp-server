@@ -62,6 +62,8 @@ import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeRunner;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesProvider;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.rsp.server.model.RemoteEventManager;
+import org.jboss.tools.rsp.server.model.internal.DummyServer;
+import org.jboss.tools.rsp.server.model.internal.Server;
 import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
 import org.jboss.tools.rsp.server.spi.jobs.IJob;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
@@ -354,15 +356,66 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	private UpdateServerResponse updateServerSync(UpdateServerRequest req) {
-		// TODO forward to server model, who can 
-		// validate critical framework fields, and pass request
-		// to delegates to validate server-type-specific fields.
 		UpdateServerResponse resp = new UpdateServerResponse();
-		resp.setStatus(StatusConverter.convert(org.jboss.tools.rsp.eclipse.core.runtime.Status.OK_STATUS));
+		ServerHandle sh = req.getHandle();
+		if( sh == null ) {
+			resp.getValidation().setStatus(errorStatus("Server Handle cannot be null"));
+			return resp;
+		}
+		IServer server = managementModel.getServerModel().getServer(sh.getId());
+		if( server == null ) {
+			resp.getValidation().setStatus(errorStatus("Server " + sh.getId() + " not found in model"));
+			return resp;
+		}
+		
+		DummyServer ds = null;
+		try {
+			ds = DummyServer.createDummyServer(req.getServerJson());
+		} catch(Exception ce) {
+			resp.getValidation().setStatus(errorStatus(ce.getMessage(), ce));
+			return resp;
+		}
+		
+		String[] unchangeable = new String[] {
+				// Base.PROP_ID and Base.PROP_ID_SET are protected
+				Server.TYPE_ID, "id", "id-set" 
+		};
+		for( int i = 0; i < unchangeable.length; i++ ) {
+			String dsType = ds.getAttribute(unchangeable[i], (String)null);
+			String type = server.getAttribute(unchangeable[i], (String)null);
+			if( !isEqual(dsType, type)) {
+				resp.getValidation().setStatus(errorStatus("Field " + Server.TYPE_ID + " may not be changed"));
+				return resp;
+			}
+		}
+		
+		// TODO pass request
+		// to delegates to validate server-type-specific fields.
+		server.getDelegate().updateServer(ds, resp);
+		if( resp.getValidation().getStatus() != null && 
+				resp.getValidation().getStatus().getSeverity() == Status.ERROR) {
+			return resp;
+		}
+		
+		// Everything looks good on the framework side... 
+		((Server)server).updateAttributes(ds.getMap());
+		
+		try {
+			server.save(new NullProgressMonitor());
+		} catch(CoreException ce) {
+			resp.getValidation().setStatus(StatusConverter.convert(ce.getStatus()));
+		}
+		
+		if( resp.getValidation().getStatus() == null ) {
+			resp.getValidation().setStatus(StatusConverter.convert(
+					org.jboss.tools.rsp.eclipse.core.runtime.Status.OK_STATUS));
+		}
 		return resp;
 	}
 
-	
+	private boolean isEqual(String one, String two) {
+		return one == null ? two == null : one.equals(two);
+	}
 	
 	@Override
 	public CompletableFuture<List<ServerType>> getServerTypes() {
@@ -382,31 +435,29 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	private StartServerResponse startServerImpl(LaunchParameters attr) {
 		if( attr == null || isEmpty(attr.getMode()) || isEmpty(attr.getParams().getId())) {
-			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
-					"Invalid Parameter");
-			return (new StartServerResponse(StatusConverter.convert(is), null));
+			Status is = errorStatus("Invalid Parameter", null);
+			return (new StartServerResponse(is, null));
 		}
 
 		String id = attr.getParams().getId();
 		IServer server = managementModel.getServerModel().getServer(id);
 		if( server == null ) {
-			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server " + id + " does not exist");
-			return (new StartServerResponse(StatusConverter.convert(is), null));
+			Status is = errorStatus("Server " + id + " does not exist");
+			return (new StartServerResponse(is, null));
 		}
 
 		IServerDelegate del = server.getDelegate();
 		if( del == null ) {
-			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred: Server " + id + " has no delegate.");
-			return (new StartServerResponse(StatusConverter.convert(is), null));
+			Status is = errorStatus("An unexpected error occurred: Server " + id + " has no delegate.");
+			return (new StartServerResponse(is, null));
 		}
 		
 		try {
 			StartServerResponse ret = del.start(attr.getMode());
 			return ret;
 		} catch( Exception e ) {
-			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, 
-					ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred.", e);
-			return (new StartServerResponse(StatusConverter.convert(is), null));
+			Status is = errorStatus("An unexpected error occurred.", e);
+			return (new StartServerResponse(is, null));
 		}
 	}
 	
@@ -422,28 +473,27 @@ public class ServerManagementServerImpl implements RSPServer {
 
 		IServer server = managementModel.getServerModel().getServer(attr.getId());
 		if( server == null ) {
-			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server " + attr.getId() + " does not exist");
-			return (StatusConverter.convert(is));
+			Status is = errorStatus("Server " + attr.getId() + " does not exist");
+			return (is);
 		}
 		IServerDelegate del = server.getDelegate();
 		if( del == null ) {
-			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred: Server " + attr.getId() + " has no delegate.");
-			return (StatusConverter.convert(is));
+			Status is = errorStatus("An unexpected error occurred: Server " + attr.getId() + " has no delegate.");
+			return (is);
 		}
 		
 		if(del.getServerRunState() == IServerDelegate.STATE_STOPPED && !attr.isForce()) {
-			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+			Status is = errorStatus(
 					"The server is already marked as stopped. If you wish to force a stop request, please set the force flag to true.");
-			return (StatusConverter.convert(is));
+			return (is);
 		}
 		
 		try {
 			IStatus ret = del.stop(attr.isForce());
 			return (StatusConverter.convert(ret));
 		} catch( Exception e ) {
-			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, 
-					ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred.", e);
-			return (StatusConverter.convert(is));
+			Status is = errorStatus("An unexpected error occurred.", e);
+			return (is);
 		}
 
 	}
@@ -497,21 +547,20 @@ public class ServerManagementServerImpl implements RSPServer {
 		String id = attr.getRequest().getParams().getId();
 		IServer server = managementModel.getServerModel().getServer(id);
 		if( server == null ) {
-			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server " + id + " does not exist");
-			return StatusConverter.convert(is);
+			Status is = errorStatus("Server " + id + " does not exist");
+			return is;
 		}
 		IServerDelegate del = server.getDelegate();
 		if( del == null ) {
-			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server error: Server " + id + " does not have a delegate.");
-			return StatusConverter.convert(is);
+			Status is = errorStatus("Server error: Server " + id + " does not have a delegate.");
+			return is;
 		}
 		try {
 			IStatus s = del.clientSetServerStarting(attr);
 			return StatusConverter.convert(s);
 		} catch( Exception e ) {
-			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, 
-					ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred.", e);
-			return StatusConverter.convert(is);
+			Status is = errorStatus("An unexpected error occurred.", e);
+			return is;
 		}
 	}
 	
@@ -528,22 +577,21 @@ public class ServerManagementServerImpl implements RSPServer {
 		String id = attr.getParams().getId();
 		IServer server = managementModel.getServerModel().getServer(id);
 		if( server == null ) {
-			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server " + id + " does not exist");
-			return StatusConverter.convert(is);
+			Status is = errorStatus("Server " + id + " does not exist");
+			return is;
 		}
 		IServerDelegate del = server.getDelegate();
 		if( del == null ) {
-			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server error: Server " + id + " does not have a delegate.");
-			return StatusConverter.convert(is);
+			Status is = errorStatus("Server error: Server " + id + " does not have a delegate.");
+			return is;
 		}
 
 		try {
 			IStatus s = del.clientSetServerStarted(attr);
 			return StatusConverter.convert(s);
 		} catch( Exception e ) {
-			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, 
-					ServerCoreActivator.BUNDLE_ID, "An unexpected error occurred.", e);
-			return StatusConverter.convert(is);
+			Status is = errorStatus("An unexpected error occurred.", e);
+			return is;
 		}
 	}
 
@@ -681,7 +729,7 @@ public class ServerManagementServerImpl implements RSPServer {
 			}
 		}
 		WorkflowResponse error = new WorkflowResponse();
-		Status s = new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Unable to find an executor for the given download runtime");
+		Status s = errorStatus("Unable to find an executor for the given download runtime", null);
 		error.setStatus(s);
 		error.setItems(new ArrayList<>());
 		return error;
@@ -713,4 +761,13 @@ public class ServerManagementServerImpl implements RSPServer {
 		return StatusConverter.convert(s);
 	}
 
+	private Status errorStatus(String msg) {
+		return errorStatus(msg, null);
+	}
+	private Status errorStatus(String msg, Throwable t) {
+		IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, 
+				ServerCoreActivator.BUNDLE_ID, 
+				msg, t);
+		return StatusConverter.convert(is);
+	}
 }

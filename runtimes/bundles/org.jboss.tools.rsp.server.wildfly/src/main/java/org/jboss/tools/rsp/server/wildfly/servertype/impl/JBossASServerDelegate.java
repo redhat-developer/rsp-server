@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.server.wildfly.servertype.impl;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
@@ -37,4 +38,12 @@ public class JBossASServerDelegate extends AbstractJBossServerDelegate {
 	protected IJBossPublishController createPublishController() {
 		return new StandardJBossPublishController(getServer(), this);
 	}
+	@Override
+	public void updateServer(IServer dummyServer, UpdateServerResponse resp) {
+		updateServer(dummyServer, resp, 
+				new String[] {ServerManagementAPIConstants.SERVER_HOME_DIR});
+		
+		// TODO check modules? 
+	}
+	
 }

@@ -34,6 +34,7 @@ import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerState;
+import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
@@ -643,5 +644,10 @@ public class ServerDeployableTest {
 		protected void setDeployableState2(DeployableReference reference, int runState) {
 			setDeployableState(reference, runState);
 		}
+		@Override
+		public void updateServer(IServer dummyServer, UpdateServerResponse resp) {
+			// TODO Auto-generated method stub
+		}
+
 	}
 }

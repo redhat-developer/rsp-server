@@ -17,6 +17,7 @@ import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
+import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
@@ -262,6 +263,10 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 	@Override
 	public IStatus canRemoveDeployable(DeployableReference reference) {
 		return Status.CANCEL_STATUS;
+	}
+	@Override
+	public void updateServer(IServer dummyServer, UpdateServerResponse resp) {
+		// TODO Auto-generated method stub
 	}
 
 }
