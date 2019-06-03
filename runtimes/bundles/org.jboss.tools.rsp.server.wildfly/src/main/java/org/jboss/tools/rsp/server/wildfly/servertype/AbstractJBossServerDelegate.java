@@ -18,6 +18,7 @@ import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
+import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
@@ -66,7 +67,11 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 
 	@Override
 	public CreateServerValidation validate() {
-		String home = getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
+		return validate(getServer());
+	}
+	
+	protected CreateServerValidation validate(IServer server) {
+		String home = server.getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
 		
 		if( null == home ) {
 			return validationErrorResponse("Server home must not be null", IJBossServerAttributes.SERVER_HOME, Activator.BUNDLE_ID);
@@ -323,4 +328,38 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		return util.toPojo();
 	}
 
+	protected IStatus verifyUnchanged(IServer ds, IServer server, String[] unchangeable) {
+		for( int i = 0; i < unchangeable.length; i++ ) {
+			String dsType = ds.getAttribute(unchangeable[i], (String)null);
+			String type = server.getAttribute(unchangeable[i], (String)null);
+			if( !isEqual(dsType, type)) {
+				return new Status(IStatus.ERROR, Activator.BUNDLE_ID, "Field " + unchangeable[i] + " may not be changed");
+			}
+		}
+		return Status.OK_STATUS;
+	}
+
+	public void updateServer(IServer dummyServer, UpdateServerResponse resp,
+			String[] unchangeableFields) {
+
+		// First, validate the changes
+		IStatus stat = verifyUnchanged(dummyServer, getServer(), unchangeableFields);
+		
+		// We've already got errors? Return
+		if( !stat.isOK()) {
+			resp.getValidation().setStatus(StatusConverter.convert(stat));
+			return;
+		}
+		
+		// Do next level validation
+		CreateServerValidation validation = validate(dummyServer);
+		if( !validation.getStatus().isOK()) {
+			resp.setValidation(validation.toDao());
+		}
+		
+		// Now, perform any changes that need to be done at the delegate level
+	}
+	private boolean isEqual(String one, String two) {
+		return one == null ? two == null : one.equals(two);
+	}
 }

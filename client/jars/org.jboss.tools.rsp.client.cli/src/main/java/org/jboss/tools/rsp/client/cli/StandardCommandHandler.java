@@ -408,7 +408,7 @@ public class StandardCommandHandler implements InputHandler {
 						req.setServerJson(multiLine);
 						UpdateServerResponse updateResp = 
 								launcher.getServerProxy().updateServer(req).get();
-						System.out.println(updateResp.getStatus().toString());
+						System.out.println(updateResp.getValidation().getStatus().toString());
 					} else {
 						System.out.println(resp.getStatus().toString());
 					}

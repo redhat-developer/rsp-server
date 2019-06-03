@@ -8,47 +8,23 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.api.dao;
 
-import java.util.Map;
-
 public class UpdateServerResponse {
 	private ServerHandle handle;
-	private String serverJson;
-	private Status status;
-	private Map<String, String> propertiesInError;
-	
+	private CreateServerResponse validation;
 	public UpdateServerResponse() {
-		
+		validation = new CreateServerResponse();
 	}
-
 	public ServerHandle getHandle() {
 		return handle;
 	}
-
 	public void setHandle(ServerHandle handle) {
 		this.handle = handle;
 	}
-
-	public String getServerJson() {
-		return serverJson;
+	public CreateServerResponse getValidation() {
+		return validation;
+	}
+	public void setValidation(CreateServerResponse validation) {
+		this.validation = validation;
 	}
 
-	public void setServerJson(String serverJson) {
-		this.serverJson = serverJson;
-	}
-
-	public Status getStatus() {
-		return status;
-	}
-
-	public void setStatus(Status status) {
-		this.status = status;
-	}
-
-	public Map<String, String> getPropertiesInError() {
-		return propertiesInError;
-	}
-
-	public void setPropertiesInError(Map<String, String> propertiesInError) {
-		this.propertiesInError = propertiesInError;
-	}
 }

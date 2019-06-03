@@ -18,6 +18,7 @@ import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
+import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
@@ -299,6 +300,22 @@ public interface IServerDelegate {
 	 * @return
 	 */
 	public Attributes listDeploymentOptions();
+
+	/**
+	 * Take all actions required to update this server to look exactly 
+	 * like the dummy server from the client's edits. 
+	 * 
+	 * Validation should occur first, to ensure that all fields are 100%
+	 * able to be saved. If any fields are invalid or cannot be saved, 
+	 * the update should not occur. 
+	 * 
+	 * In the event of an error, subclasses must make sure to roll-back any changes
+	 * so as to avoid an inconsistent state. 
+	 * 
+	 * @param dummyServer
+	 * @param resp
+	 */
+	public void updateServer(IServer dummyServer, UpdateServerResponse resp);
 	
 
 }

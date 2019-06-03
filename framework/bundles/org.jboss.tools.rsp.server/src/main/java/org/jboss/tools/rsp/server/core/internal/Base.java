@@ -451,7 +451,7 @@ public abstract class Base {
 		}
 	}
 
-	private IMemento loadMemento(InputStream in) throws IOException {
+	protected IMemento loadMemento(InputStream in) throws IOException {
 		IMemento memento;
 		try {
 			memento = JSONMemento.loadMemento(in);

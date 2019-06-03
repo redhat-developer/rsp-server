@@ -21,6 +21,8 @@ import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.launching.memento.IMemento;
+import org.jboss.tools.rsp.secure.model.ISecureStorage;
+import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
 import org.jboss.tools.rsp.server.core.internal.SecuredBase;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
@@ -52,7 +54,12 @@ public class Server extends SecuredBase implements IServer {
 		super(file, managementModel.getSecureStorageProvider());
 		this.managementModel = managementModel;
 	}
-	
+
+	public Server(File file, ISecureStorageProvider storage, IServerManagementModel managementModel) {
+		super(file, storage);
+		this.managementModel = managementModel;
+	}
+
 	public Server(File file, IServerType type, String id, Map<String, Object> attributes, IServerManagementModel managementModel) {
 		super(file, id, managementModel.getSecureStorageProvider());
 		this.serverType = type;
@@ -211,4 +218,8 @@ public class Server extends SecuredBase implements IServer {
 		}
 	}
 
+	public void updateAttributes(Map<String, Object> newValues) {
+		// TODO smart to just clone the map? Idk
+		this.map = newValues;
+	}
 }

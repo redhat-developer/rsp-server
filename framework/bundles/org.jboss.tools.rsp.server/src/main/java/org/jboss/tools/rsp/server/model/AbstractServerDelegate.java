@@ -25,6 +25,7 @@ import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
+import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
@@ -519,6 +520,14 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		if(getServer() != null && getServer().getServerModel() != null ) {
 			getServer().getServerModel().fireServerStateChanged(getServer(), getServerState());
 		}
+	}
+
+	/**
+	 * Subclasses may override
+	 */
+	@Override
+	public void updateServer(IServer dummyServer, UpdateServerResponse resp) {
+		// TODO Auto-generated method stub
 	}
 
 }
