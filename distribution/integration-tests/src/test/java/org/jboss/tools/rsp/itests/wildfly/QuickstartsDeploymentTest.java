@@ -134,7 +134,8 @@ public class QuickstartsDeploymentTest extends RSPCase {
 		assertTrue("File " + projectPath + " does not exist", Files.exists(projectPath, LinkOption.NOFOLLOW_LINKS));
 		// No deployable avaiable at the moment
 		assertTrue(serverProxy.getDeployables(handle).get().isEmpty());
-		serverProxy.addDeployable(new ServerDeployableReference(handle, reference));
+		Status status = serverProxy.addDeployable(new ServerDeployableReference(handle, reference)).get();
+		assertEquals("Expected request status is 'ok' but was " + status, Status.OK, status.getSeverity());
 		waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_ADD, 10, client);
 		verifyURL(url.toString(), 404);
 

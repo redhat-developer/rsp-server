@@ -62,7 +62,8 @@ public class WildFlyPublishingTest extends RSPCase {
 		startServer(client, SERVER_ID);
 		handle = new ServerHandle(SERVER_ID, wildflyType);
 		reference = new DeployableReference(warFile.getName(), warFile.getAbsolutePath());
-		serverProxy.addDeployable(new ServerDeployableReference(handle, reference));
+		Status status = serverProxy.addDeployable(new ServerDeployableReference(handle, reference)).get();
+		assertEquals("Expected request status is 'ok' but was " + status, Status.OK, status.getSeverity());
 	}
 
 	@After
@@ -89,7 +90,7 @@ public class WildFlyPublishingTest extends RSPCase {
 	@Test
 	public void testChangedDeployment() throws Exception {
 		sendPublishRequest(handle, ServerManagementAPIConstants.PUBLISH_FULL);
-		ServerState state = waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_NONE, 15, client);
+		ServerState state = waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_NONE, 10, client);
 		assertDeployableState(state, ServerManagementAPIConstants.STATE_STARTED,
 				ServerManagementAPIConstants.PUBLISH_STATE_NONE);
 		warFile.setLastModified(System.currentTimeMillis());
@@ -105,7 +106,8 @@ public class WildFlyPublishingTest extends RSPCase {
 		assertDeployableState(state, ServerManagementAPIConstants.STATE_STARTED,
 				ServerManagementAPIConstants.PUBLISH_STATE_NONE);
 
-		serverProxy.removeDeployable(new ServerDeployableReference(handle, reference));
+		Status status = serverProxy.removeDeployable(new ServerDeployableReference(handle, reference)).get();
+		assertEquals("Expected request status is 'ok' but was " + status, Status.OK, status.getSeverity());
 		state = waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_REMOVE, 10, client);
 		assertDeployableState(state, ServerManagementAPIConstants.STATE_STARTED,
 				ServerManagementAPIConstants.PUBLISH_STATE_REMOVE);
@@ -251,7 +253,8 @@ public class WildFlyPublishingTest extends RSPCase {
 	@Test
 	public void testGetDeployables() throws Exception {
 		DeployableReference ref2 = new DeployableReference("other_id", WAR_FILENAME);
-		serverProxy.addDeployable(new ServerDeployableReference(handle, ref2));
+		Status status = serverProxy.addDeployable(new ServerDeployableReference(handle, ref2)).get();
+		assertEquals("Expected request status is 'ok' but was " + status, Status.OK, status.getSeverity());
 		waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_ADD, 10, client);
 		List<DeployableState> states = serverProxy.getDeployables(handle).get();
 		assertEquals(2, states.size());
@@ -266,7 +269,8 @@ public class WildFlyPublishingTest extends RSPCase {
 	@Test
 	public void testGetDeployablesEmptyDeployment() throws Exception {
 		waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_ADD, 10, client);
-		serverProxy.removeDeployable(new ServerDeployableReference(handle, reference));
+		Status status = serverProxy.removeDeployable(new ServerDeployableReference(handle, reference)).get();
+		assertEquals("Expected request status is 'ok' but was " + status, Status.OK, status.getSeverity());
 		List<DeployableState> states = serverProxy.getDeployables(handle).get();
 		assertTrue(states.isEmpty());
 	}
