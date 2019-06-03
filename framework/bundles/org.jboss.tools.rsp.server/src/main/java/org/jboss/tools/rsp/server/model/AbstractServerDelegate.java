@@ -148,6 +148,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		state.setPublishState(getServerPublishState());
 		state.setState(getServerRunState());
 		state.setDeployableStates(getServerPublishModel().getDeployableStates());
+		state.setRunMode(getMode());
 		return state;
 	}
 

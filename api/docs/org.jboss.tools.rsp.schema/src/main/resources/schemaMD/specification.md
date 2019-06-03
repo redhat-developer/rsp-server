@@ -1286,6 +1286,9 @@ This endpoint returns the following schema as a return value:
     "publishState" : {
       "type" : "integer"
     },
+    "runMode" : {
+      "type" : "string"
+    },
     "deployableStates" : {
       "type" : "array",
       "items" : {
@@ -1344,6 +1347,7 @@ This endpoint returns the following schema as a return value:
     server: ServerHandle;
     state: number;
     publishState: number;
+    runMode: string;
     deployableStates: DeployableState[];
 }
 
@@ -2559,6 +2563,9 @@ This endpoint takes the following json schemas as parameters:
     "publishState" : {
       "type" : "integer"
     },
+    "runMode" : {
+      "type" : "string"
+    },
     "deployableStates" : {
       "type" : "array",
       "items" : {
@@ -2617,6 +2624,7 @@ This endpoint takes the following json schemas as parameters:
     server: ServerHandle;
     state: number;
     publishState: number;
+    runMode: string;
     deployableStates: DeployableState[];
 }
 
