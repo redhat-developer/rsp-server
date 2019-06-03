@@ -64,6 +64,14 @@ export class Outgoing {
         return Common.sendSimpleRequest(this.connection, Messages.Server.CreateServerRequest.type,
             param, timeout, ErrorMessages.CREATESERVER_TIMEOUT);
     }
+    getServerAsJson(param: Protocol.ServerHandle, timeout: number = Common.DEFAULT_TIMEOUT): Promise<Protocol.GetServerJsonResponse> {
+        return Common.sendSimpleRequest(this.connection, Messages.Server.GetServerAsJsonRequest.type,
+            param, timeout, ErrorMessages.GETSERVERASJSON_TIMEOUT);
+    }
+    updateServer(param: Protocol.UpdateServerRequest, timeout: number = Common.DEFAULT_TIMEOUT): Promise<Protocol.UpdateServerResponse> {
+        return Common.sendSimpleRequest(this.connection, Messages.Server.UpdateServerRequest.type,
+            param, timeout, ErrorMessages.UPDATESERVER_TIMEOUT);
+    }
     getLaunchModes(param: Protocol.ServerType, timeout: number = Common.DEFAULT_TIMEOUT): Promise<Array<Protocol.ServerLaunchMode>> {
         return Common.sendSimpleRequest(this.connection, Messages.Server.GetLaunchModesRequest.type,
             param, timeout, ErrorMessages.GETLAUNCHMODES_TIMEOUT);
@@ -153,6 +161,8 @@ export namespace ErrorMessages {
     export const GETREQUIREDATTRIBUTES_TIMEOUT = 'Failed to get required attributes in time';
     export const GETOPTIONALATTRIBUTES_TIMEOUT = 'Failed to get optional attributes in time';
     export const CREATESERVER_TIMEOUT = 'Failed to create server in time';
+    export const GETSERVERASJSON_TIMEOUT = 'Failed to get server as json in time';
+    export const UPDATESERVER_TIMEOUT = 'Failed to update server in time';
     export const GETLAUNCHMODES_TIMEOUT = 'Failed to get launch modes in time';
     export const GETREQUIREDLAUNCHATTRIBUTES_TIMEOUT = 'Failed to get required launch attributes in time';
     export const GETOPTIONALLAUNCHATTRIBUTES_TIMEOUT = 'Failed to get optional launch attributes in time';

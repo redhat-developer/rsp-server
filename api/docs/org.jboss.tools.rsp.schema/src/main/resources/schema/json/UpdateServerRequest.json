@@ -1,0 +1,30 @@
+{
+  "type" : "object",
+  "properties" : {
+    "handle" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "visibleName" : {
+              "type" : "string"
+            },
+            "description" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    },
+    "serverJson" : {
+      "type" : "string"
+    }
+  }
+}

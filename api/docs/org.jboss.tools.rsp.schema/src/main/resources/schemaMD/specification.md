@@ -807,6 +807,271 @@ export interface Status {
     ok: boolean;
 }</pre></td></tr></table>
 
+#### server/getServerAsJson
+
+ The `server/getServerAsJson` request is sent by the client to fetch a string representation of a server adapter. A server handle and a status object are included along with the json representation of the server. In the event of failure, the returned `Status` object will detail the cause of error. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "type" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "visibleName" : {
+          "type" : "string"
+        },
+        "description" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface ServerHandle {
+    id: string;
+    type: ServerType;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
+    description: string;
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "status" : {
+      "type" : "object",
+      "properties" : {
+        "severity" : {
+          "type" : "integer"
+        },
+        "plugin" : {
+          "type" : "string"
+        },
+        "code" : {
+          "type" : "integer"
+        },
+        "message" : {
+          "type" : "string"
+        },
+        "trace" : {
+          "type" : "string"
+        },
+        "ok" : {
+          "type" : "boolean"
+        }
+      }
+    },
+    "serverJson" : {
+      "type" : "string"
+    },
+    "serverHandle" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "visibleName" : {
+              "type" : "string"
+            },
+            "description" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface GetServerJsonResponse {
+    status: Status;
+    serverJson: string;
+    serverHandle: ServerHandle;
+}
+
+export interface Status {
+    severity: number;
+    plugin: string;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+}
+
+export interface ServerHandle {
+    id: string;
+    type: ServerType;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
+    description: string;
+}</pre></td></tr></table>
+
+#### server/updateServer
+
+ The `server/updateServer` request is sent by the client to update a server with new k/v pairs or changed deployment options. In the event of failure, the returned `Status` object will detail the cause of error. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "handle" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "visibleName" : {
+              "type" : "string"
+            },
+            "description" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    },
+    "serverJson" : {
+      "type" : "string"
+    }
+  }
+}</pre></td><td><pre>export interface UpdateServerRequest {
+    handle: ServerHandle;
+    serverJson: string;
+}
+
+export interface ServerHandle {
+    id: string;
+    type: ServerType;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
+    description: string;
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "handle" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "visibleName" : {
+              "type" : "string"
+            },
+            "description" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    },
+    "validation" : {
+      "type" : "object",
+      "properties" : {
+        "status" : {
+          "type" : "object",
+          "properties" : {
+            "severity" : {
+              "type" : "integer"
+            },
+            "plugin" : {
+              "type" : "string"
+            },
+            "code" : {
+              "type" : "integer"
+            },
+            "message" : {
+              "type" : "string"
+            },
+            "trace" : {
+              "type" : "string"
+            },
+            "ok" : {
+              "type" : "boolean"
+            }
+          }
+        },
+        "invalidKeys" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          }
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface UpdateServerResponse {
+    handle: ServerHandle;
+    validation: CreateServerResponse;
+}
+
+export interface ServerHandle {
+    id: string;
+    type: ServerType;
+}
+
+export interface CreateServerResponse {
+    status: Status;
+    invalidKeys: string[];
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
+    description: string;
+}
+
+export interface Status {
+    severity: number;
+    plugin: string;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+}</pre></td></tr></table>
+
 #### server/getLaunchModes
 
  The `server/getLaunchModes` request is sent by the client to get a list of launch modes that are applicable to this server type. Some servers can only be started. Others can be started, debugged, profiled, etc. Server types may come up with their own launch modes if desired. This method may return null if an error occurs on the server or the parameter is invalid. 

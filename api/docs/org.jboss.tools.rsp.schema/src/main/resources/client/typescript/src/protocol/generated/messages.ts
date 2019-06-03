@@ -132,6 +132,28 @@ export namespace Messages {
             export const type = new RequestType<Protocol.ServerAttributes, Protocol.CreateServerResponse, void, void>('server/createServer');
         }
         /**
+         * The `server/getServerAsJson` request is sent by the client to 
+         * fetch a string representation of a server adapter. 
+         * A server handle and a status object are included along with the 
+         * json representation of the server.
+         *
+         * In the event of failure, the returned `Status` object will
+         * detail the cause of error.
+         */
+        export namespace GetServerAsJsonRequest {
+            export const type = new RequestType<Protocol.ServerHandle, Protocol.GetServerJsonResponse, void, void>('server/getServerAsJson');
+        }
+        /**
+         * The `server/updateServer` request is sent by the client to 
+         * update a server with new k/v pairs or changed deployment options. 
+         *
+         * In the event of failure, the returned `Status` object will
+         * detail the cause of error.
+         */
+        export namespace UpdateServerRequest {
+            export const type = new RequestType<Protocol.UpdateServerRequest, Protocol.UpdateServerResponse, void, void>('server/updateServer');
+        }
+        /**
          * The `server/getLaunchModes` request is sent by the client to get
          * a list of launch modes that are applicable to this server type.
          * Some servers can only be started.
