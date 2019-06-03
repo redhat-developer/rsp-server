@@ -77,6 +77,8 @@ public class ServerManagementClientImpl implements RSPClient {
 		sb.append(state.getServer().getType() + ":" + state.getServer().getId()); 
 		sb.append("\n  State: ");
 		sb.append(getRunStateString(state.getState()));
+		sb.append(",  Mode: ");
+		sb.append(state.getRunMode());
 		sb.append("\n  Publish State: ");
 		sb.append(getPublishStateString(state.getPublishState()));
 		sb.append("\n  Deployments: ");

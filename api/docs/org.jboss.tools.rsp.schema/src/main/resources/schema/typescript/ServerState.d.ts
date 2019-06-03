@@ -2,6 +2,7 @@ export interface ServerState {
     server: ServerHandle;
     state: number;
     publishState: number;
+    runMode: string;
     deployableStates: DeployableState[];
 }
 

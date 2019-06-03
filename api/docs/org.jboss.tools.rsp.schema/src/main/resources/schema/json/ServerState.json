@@ -29,6 +29,9 @@
     "publishState" : {
       "type" : "integer"
     },
+    "runMode" : {
+      "type" : "string"
+    },
     "deployableStates" : {
       "type" : "array",
       "items" : {

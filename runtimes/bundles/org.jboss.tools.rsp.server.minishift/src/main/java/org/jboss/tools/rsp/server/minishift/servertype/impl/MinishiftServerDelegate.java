@@ -118,7 +118,9 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 			return new StartServerResponse(s, null);
 		}
 		
+		setMode(mode);
 		setServerState(IServerDelegate.STATE_STARTING);
+		
 		CommandLineDetails launchedDetails = null;
 		try {
 			IServerStartLauncher launcher = getStartLauncher();
@@ -212,6 +214,7 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 		if( state == SERVER_STATE.UP) {
 			setServerState(IServerDelegate.STATE_STARTED);
 		} else {
+			setMode(null);
 			setServerState(IServerDelegate.STATE_STOPPED);
 		}
 		

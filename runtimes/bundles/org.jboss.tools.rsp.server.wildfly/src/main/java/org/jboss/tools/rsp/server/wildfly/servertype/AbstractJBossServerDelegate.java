@@ -136,7 +136,9 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 			return new StartServerResponse(s, null);
 		}
 		
+		setMode(mode);
 		setServerState(IServerDelegate.STATE_STARTING);
+		
 		CommandLineDetails launchedDetails = null;
 		try {
 			launchPoller(IServerStatePoller.SERVER_STATE.UP);
@@ -225,6 +227,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 				allTerminated &= all[i].isTerminated();
 			}
 			if( allTerminated ) {
+				setMode(null);
 				setServerState(IServerDelegate.STATE_STOPPED);
 				setStartLaunch(null);
 			}

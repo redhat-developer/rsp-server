@@ -3,7 +3,7 @@
  */
 export namespace Protocol {
     /* tslint:disable */
-    // Generated using typescript-generator version 2.2.413 on 2019-05-27 17:37:06.
+    // Generated using typescript-generator version 2.2.413 on 2019-06-03 12:08:28.
     
     export interface Attribute {
         type: string;
@@ -159,6 +159,7 @@ export namespace Protocol {
         server: ServerHandle;
         state: number;
         publishState: number;
+        runMode: string;
         deployableStates: DeployableState[];
     }
     
