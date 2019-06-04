@@ -19,6 +19,8 @@ import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.ServerType;
+import org.jboss.tools.rsp.api.dao.UpdateServerRequest;
+import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
@@ -109,5 +111,12 @@ public interface IServerModel {
 	 * @throws CoreException
 	 */
 	IStatus publish(IServer server, int kind) throws CoreException;
+
+	/**
+	 * Update the server from the given remote request
+	 * @param req
+	 * @return
+	 */
+	UpdateServerResponse updateServer(UpdateServerRequest req);
 
 }
