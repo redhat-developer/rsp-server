@@ -29,6 +29,8 @@ import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.ServerType;
+import org.jboss.tools.rsp.api.dao.UpdateServerRequest;
+import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
@@ -40,6 +42,7 @@ import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
 import org.jboss.tools.rsp.server.model.internal.DaoUtilities;
+import org.jboss.tools.rsp.server.model.internal.DummyServer;
 import org.jboss.tools.rsp.server.model.internal.Server;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
@@ -601,6 +604,83 @@ public class ServerModel implements IServerModel {
 
 	private org.jboss.tools.rsp.api.dao.Status createDaoErrorStatus(String message) {
 		return new org.jboss.tools.rsp.api.dao.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, message, null);
+	}
+	private org.jboss.tools.rsp.api.dao.Status errorStatus(String msg) {
+		return errorStatus(msg, null);
+	}
+	private org.jboss.tools.rsp.api.dao.Status errorStatus(String msg, Throwable t) {
+		IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, 
+				ServerCoreActivator.BUNDLE_ID, 
+				msg, t);
+		return StatusConverter.convert(is);
+	}
+	private boolean isEqual(String one, String two) {
+		return one == null ? two == null : one.equals(two);
+	}
+	
+	@Override
+	public UpdateServerResponse updateServer(UpdateServerRequest req) {
+
+		UpdateServerResponse resp = new UpdateServerResponse();
+		ServerHandle sh = req.getHandle();
+		if( sh == null ) {
+			resp.getValidation().setStatus(errorStatus("Server Handle cannot be null"));
+			return resp;
+		}
+		IServer server = managementModel.getServerModel().getServer(sh.getId());
+		if( server == null ) {
+			resp.getValidation().setStatus(errorStatus("Server " + sh.getId() + " not found in model"));
+			return resp;
+		}
+		
+		DummyServer ds = null;
+		try {
+			ds = DummyServer.createDummyServer(req.getServerJson());
+		} catch(Exception ce) {
+			resp.getValidation().setStatus(errorStatus(ce.getMessage(), ce));
+			return resp;
+		}
+		
+		String[] unchangeable = new String[] {
+				// Base.PROP_ID and Base.PROP_ID_SET are protected
+				Server.TYPE_ID, "id", "id-set" 
+		};
+		for( int i = 0; i < unchangeable.length; i++ ) {
+			String dsType = ds.getAttribute(unchangeable[i], (String)null);
+			String type = server.getAttribute(unchangeable[i], (String)null);
+			if( !isEqual(dsType, type)) {
+				resp.getValidation().setStatus(errorStatus("Field " + Server.TYPE_ID + " may not be changed"));
+				return resp;
+			}
+		}
+		
+		IServerType type = serverTypes.get(req.getHandle().getType().getId());
+		IStatus validAttributes = validateAttributes(type, ds.getMap());
+		if( !validAttributes.isOK()) {
+			resp.getValidation().setStatus(StatusConverter.convert(validAttributes));
+			return resp;
+		}
+		
+		server.getDelegate().updateServer(ds, resp);
+		if( resp.getValidation().getStatus() != null && 
+				resp.getValidation().getStatus().getSeverity() == Status.ERROR) {
+			return resp;
+		}
+		
+		// Everything looks good on the framework side... 
+		((Server)server).updateAttributes(ds.getMap());
+		
+		try {
+			server.save(new NullProgressMonitor());
+		} catch(CoreException ce) {
+			resp.getValidation().setStatus(StatusConverter.convert(ce.getStatus()));
+		}
+		
+		if( resp.getValidation().getStatus() == null ) {
+			resp.getValidation().setStatus(StatusConverter.convert(
+					org.jboss.tools.rsp.eclipse.core.runtime.Status.OK_STATUS));
+		}
+		return resp;
 	}
 	
 }

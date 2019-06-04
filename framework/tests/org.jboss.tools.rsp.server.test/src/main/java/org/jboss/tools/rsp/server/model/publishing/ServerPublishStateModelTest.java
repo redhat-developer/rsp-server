@@ -726,7 +726,7 @@ public class ServerPublishStateModelTest {
 		return tmpFile;
 	}
 
-	public class TestableServerPublishStateModel extends ServerPublishStateModel {
+	public static class TestableServerPublishStateModel extends ServerPublishStateModel {
 
 		public TestableServerPublishStateModel(AbstractServerDelegate delegate, IFileWatcherService fileWatcher) {
 			super(delegate, fileWatcher);

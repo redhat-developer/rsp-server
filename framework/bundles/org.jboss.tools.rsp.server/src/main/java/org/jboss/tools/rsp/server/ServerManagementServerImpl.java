@@ -84,7 +84,8 @@ public class ServerManagementServerImpl implements RSPServer {
 	private final RemoteEventManager remoteEventManager;
 	private ServerManagementServerLauncher launcher;
 	
-	public ServerManagementServerImpl(ServerManagementServerLauncher launcher, IServerManagementModel managementModel) {
+	public ServerManagementServerImpl(ServerManagementServerLauncher launcher, 
+			IServerManagementModel managementModel) {
 		this.launcher = launcher;
 		this.managementModel = managementModel;
 		this.remoteEventManager = new RemoteEventManager(this);
@@ -327,8 +328,7 @@ public class ServerManagementServerImpl implements RSPServer {
 		String id = attr.getId();
 		Map<String, Object> attributes = attr.getAttributes();
 		
-		CreateServerResponse ret = managementModel.getServerModel().createServer(serverType, id, attributes);
-		return ret;
+		return managementModel.getServerModel().createServer(serverType, id, attributes);
 	}
 
 	
@@ -358,65 +358,9 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	private UpdateServerResponse updateServerSync(UpdateServerRequest req) {
-		UpdateServerResponse resp = new UpdateServerResponse();
-		ServerHandle sh = req.getHandle();
-		if( sh == null ) {
-			resp.getValidation().setStatus(errorStatus("Server Handle cannot be null"));
-			return resp;
-		}
-		IServer server = managementModel.getServerModel().getServer(sh.getId());
-		if( server == null ) {
-			resp.getValidation().setStatus(errorStatus("Server " + sh.getId() + " not found in model"));
-			return resp;
-		}
-		
-		DummyServer ds = null;
-		try {
-			ds = DummyServer.createDummyServer(req.getServerJson());
-		} catch(Exception ce) {
-			resp.getValidation().setStatus(errorStatus(ce.getMessage(), ce));
-			return resp;
-		}
-		
-		String[] unchangeable = new String[] {
-				// Base.PROP_ID and Base.PROP_ID_SET are protected
-				Server.TYPE_ID, "id", "id-set" 
-		};
-		for( int i = 0; i < unchangeable.length; i++ ) {
-			String dsType = ds.getAttribute(unchangeable[i], (String)null);
-			String type = server.getAttribute(unchangeable[i], (String)null);
-			if( !isEqual(dsType, type)) {
-				resp.getValidation().setStatus(errorStatus("Field " + Server.TYPE_ID + " may not be changed"));
-				return resp;
-			}
-		}
-		
-		server.getDelegate().updateServer(ds, resp);
-		if( resp.getValidation().getStatus() != null && 
-				resp.getValidation().getStatus().getSeverity() == Status.ERROR) {
-			return resp;
-		}
-		
-		// Everything looks good on the framework side... 
-		((Server)server).updateAttributes(ds.getMap());
-		
-		try {
-			server.save(new NullProgressMonitor());
-		} catch(CoreException ce) {
-			resp.getValidation().setStatus(StatusConverter.convert(ce.getStatus()));
-		}
-		
-		if( resp.getValidation().getStatus() == null ) {
-			resp.getValidation().setStatus(StatusConverter.convert(
-					org.jboss.tools.rsp.eclipse.core.runtime.Status.OK_STATUS));
-		}
-		return resp;
+		return managementModel.getServerModel().updateServer(req);
 	}
 
-	private boolean isEqual(String one, String two) {
-		return one == null ? two == null : one.equals(two);
-	}
-	
 	@Override
 	public CompletableFuture<List<ServerType>> getServerTypes() {
 		return createCompletableFuture(() -> getServerTypesSync());
