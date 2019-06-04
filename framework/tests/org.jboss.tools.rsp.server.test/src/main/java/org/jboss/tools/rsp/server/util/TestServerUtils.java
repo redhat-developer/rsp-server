@@ -19,7 +19,6 @@ import java.nio.file.Paths;
 import java.util.function.Function;
 
 import org.jboss.tools.rsp.api.dao.Attributes;
-import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.server.model.ServerModel;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
@@ -77,6 +76,7 @@ public class TestServerUtils {
 			Function<IServer, IServerDelegate> delegateProvider,
 			Attributes required) {
 		return new TestServerType(typeId, typeId + ".name", typeId + ".desc", delegateProvider) {
+			@Override
 			public Attributes getRequiredAttributes() {
 				return required;
 			}

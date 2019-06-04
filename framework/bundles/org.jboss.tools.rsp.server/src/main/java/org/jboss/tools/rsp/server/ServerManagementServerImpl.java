@@ -64,8 +64,6 @@ import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesProvider;
 import org.jboss.tools.rsp.server.core.internal.ServerStringConstants;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.rsp.server.model.RemoteEventManager;
-import org.jboss.tools.rsp.server.model.internal.DummyServer;
-import org.jboss.tools.rsp.server.model.internal.Server;
 import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
 import org.jboss.tools.rsp.server.spi.jobs.IJob;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
