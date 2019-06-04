@@ -10,13 +10,9 @@ package org.jboss.tools.rsp.server.wildfly.servertype.impl;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
-import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
-import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
-import org.jboss.tools.rsp.server.spi.util.StatusConverter;
-import org.jboss.tools.rsp.server.wildfly.impl.Activator;
 import org.jboss.tools.rsp.server.wildfly.servertype.AbstractJBossServerDelegate;
 import org.jboss.tools.rsp.server.wildfly.servertype.publishing.IJBossPublishController;
 import org.jboss.tools.rsp.server.wildfly.servertype.publishing.WildFlyPublishController;

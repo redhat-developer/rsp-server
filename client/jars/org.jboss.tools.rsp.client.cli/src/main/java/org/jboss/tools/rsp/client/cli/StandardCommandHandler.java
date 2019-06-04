@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.client.cli;
 
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,7 +50,8 @@ import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
 import org.jboss.tools.rsp.client.bindings.ServerManagementClientLauncher;
 
 public class StandardCommandHandler implements InputHandler {
-
+	private static final MessageFormat SERVER_NOT_FOUND = new MessageFormat("Server not found: {0}");
+	
 	private enum Commands {
 		SHUTDOWN("shutdown") {
 			@Override
@@ -342,10 +344,11 @@ public class StandardCommandHandler implements InputHandler {
 					sh = findServer(suffix.trim(), launcher);
 				}
 				
-				if (sh != null)
+				if (sh != null) {
 					launcher.getServerProxy().deleteServer(sh);
-				else
-					System.out.println("Server not found: " + suffix.trim());
+				} else {
+					System.out.println(SERVER_NOT_FOUND.format(suffix.trim()));
+				}
 			}
 		},
 
@@ -373,8 +376,9 @@ public class StandardCommandHandler implements InputHandler {
 					} else {
 						System.out.println(resp.getStatus().toString());
 					}
-				} else
-					System.out.println("Server not found: " + suffix.trim());
+				} else {
+					System.out.println(SERVER_NOT_FOUND.format(suffix.trim()));
+				}
 			}
 		},
 		
@@ -412,8 +416,9 @@ public class StandardCommandHandler implements InputHandler {
 					} else {
 						System.out.println(resp.getStatus().toString());
 					}
-				} else
-					System.out.println("Server not found: " + suffix.trim());
+				} else {
+					System.out.println(SERVER_NOT_FOUND.format(suffix.trim()));
+				}
 			}
 		},
 		LIST_DEPLOYMENTS("list deployments") {

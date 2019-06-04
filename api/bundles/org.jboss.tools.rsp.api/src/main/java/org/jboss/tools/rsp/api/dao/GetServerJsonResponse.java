@@ -14,7 +14,7 @@ public class GetServerJsonResponse {
 	private ServerHandle serverHandle;
 	
 	public GetServerJsonResponse() {
-		
+		// 0-arg constructor required
 	}
 	public Status getStatus() {
 		return status;

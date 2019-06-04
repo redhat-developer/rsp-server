@@ -123,33 +123,29 @@ public class ServerManagementCLI implements InputProvider, IClientConnectionClos
 			}
 			String content = getUserInput();
 			InputHandler handler = getInputHandler();
-			if (handler != null ) {
-				final String content2 = content;
-				if (!launcher.isConnectionActive()) {
-					close();
-				}
-				
-				new Thread("Handle input") {
-					@Override
-					public void run() {
-						try {
-							handler.handleInput(content2);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				}.start();
+			final String content2 = content;
+			if (!launcher.isConnectionActive()) {
+				close();
 			}
+			
+			new Thread("Handle input") {
+				@Override
+				public void run() {
+					try {
+						handler.handleInput(content2);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}.start();
 		}
 	}
 
 	private InputHandler getInputHandler() {
 		InputHandler h = queue.peek();
-		if (h != null) {
-			if( h.isDone()) {
-				queue.remove();
-				h = queue.peek();
-			}
+		if (h != null && h.isDone()) {
+			queue.remove();
+			h = queue.peek();
 		}
 		if( h == null ) {
 			h = new StandardCommandHandler(launcher, this);

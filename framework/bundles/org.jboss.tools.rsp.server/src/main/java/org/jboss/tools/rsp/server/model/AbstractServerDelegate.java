@@ -527,7 +527,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	 */
 	@Override
 	public void updateServer(IServer dummyServer, UpdateServerResponse resp) {
-		// TODO Auto-generated method stub
+		// Subclasses may override with custom logic
 	}
 
 }

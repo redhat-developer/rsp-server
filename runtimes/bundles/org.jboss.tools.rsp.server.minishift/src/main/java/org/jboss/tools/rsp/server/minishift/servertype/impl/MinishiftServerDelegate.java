@@ -266,7 +266,7 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 	}
 	@Override
 	public void updateServer(IServer dummyServer, UpdateServerResponse resp) {
-		// TODO Auto-generated method stub
+		// Do nothing
 	}
 
 }
