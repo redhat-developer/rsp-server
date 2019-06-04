@@ -13,7 +13,7 @@ public class UpdateServerRequest {
 	private String serverJson;
 	
 	public UpdateServerRequest() {
-		
+		// 0-arg constructor required
 	}
 
 	public ServerHandle getHandle() {

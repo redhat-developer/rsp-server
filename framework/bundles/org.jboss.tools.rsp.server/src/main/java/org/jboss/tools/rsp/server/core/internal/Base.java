@@ -311,8 +311,7 @@ public abstract class Base {
 			
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			memento.save(out);
-			byte[] bytes = out.toByteArray();
-			return bytes;
+			return out.toByteArray();
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR, 
 					ServerCoreActivator.BUNDLE_ID, 0, 

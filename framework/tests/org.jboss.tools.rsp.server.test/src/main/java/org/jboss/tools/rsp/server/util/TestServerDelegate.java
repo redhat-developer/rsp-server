@@ -32,7 +32,7 @@ public class TestServerDelegate extends AbstractServerDelegate {
 	}
 	@Override
 	public void updateServer(IServer dummyServer, UpdateServerResponse resp) {
-		// TODO Auto-generated method stub
+		// do nothing
 	}
 
 }

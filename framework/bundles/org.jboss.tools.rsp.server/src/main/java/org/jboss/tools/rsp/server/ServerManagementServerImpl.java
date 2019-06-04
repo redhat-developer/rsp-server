@@ -57,9 +57,11 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
+import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeRunner;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesProvider;
+import org.jboss.tools.rsp.server.core.internal.ServerStringConstants;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.rsp.server.model.RemoteEventManager;
 import org.jboss.tools.rsp.server.model.internal.DummyServer;
@@ -389,8 +391,6 @@ public class ServerManagementServerImpl implements RSPServer {
 			}
 		}
 		
-		// TODO pass request
-		// to delegates to validate server-type-specific fields.
 		server.getDelegate().updateServer(ds, resp);
 		if( resp.getValidation().getStatus() != null && 
 				resp.getValidation().getStatus().getSeverity() == Status.ERROR) {
@@ -442,22 +442,22 @@ public class ServerManagementServerImpl implements RSPServer {
 		String id = attr.getParams().getId();
 		IServer server = managementModel.getServerModel().getServer(id);
 		if( server == null ) {
-			Status is = errorStatus("Server " + id + " does not exist");
+			String msg = NLS.bind(ServerStringConstants.SERVER_DNE, id);
+			Status is = errorStatus(msg);
 			return (new StartServerResponse(is, null));
 		}
 
 		IServerDelegate del = server.getDelegate();
 		if( del == null ) {
-			Status is = errorStatus("An unexpected error occurred: Server " + id + " has no delegate.");
+			Status is = errorStatus(NLS.bind(ServerStringConstants.UNEXPECTED_ERROR_DELEGATE, id));
 			return (new StartServerResponse(is, null));
 		}
 		
 		try {
-			StartServerResponse ret = del.start(attr.getMode());
-			return ret;
+			return del.start(attr.getMode());
 		} catch( Exception e ) {
-			Status is = errorStatus("An unexpected error occurred.", e);
-			return (new StartServerResponse(is, null));
+			Status is = errorStatus(ServerStringConstants.UNEXPECTED_ERROR, e);
+			return new StartServerResponse(is, null);
 		}
 	}
 	
@@ -473,27 +473,23 @@ public class ServerManagementServerImpl implements RSPServer {
 
 		IServer server = managementModel.getServerModel().getServer(attr.getId());
 		if( server == null ) {
-			Status is = errorStatus("Server " + attr.getId() + " does not exist");
-			return (is);
+			String msg = NLS.bind(ServerStringConstants.SERVER_DNE, attr.getId());
+			return errorStatus(msg);
 		}
 		IServerDelegate del = server.getDelegate();
 		if( del == null ) {
-			Status is = errorStatus("An unexpected error occurred: Server " + attr.getId() + " has no delegate.");
-			return (is);
+			return errorStatus("An unexpected error occurred: Server " + attr.getId() + " has no delegate.");
 		}
 		
 		if(del.getServerRunState() == IServerDelegate.STATE_STOPPED && !attr.isForce()) {
-			Status is = errorStatus(
+			return errorStatus(
 					"The server is already marked as stopped. If you wish to force a stop request, please set the force flag to true.");
-			return (is);
 		}
 		
 		try {
-			IStatus ret = del.stop(attr.isForce());
-			return (StatusConverter.convert(ret));
+			return StatusConverter.convert(del.stop(attr.isForce()));
 		} catch( Exception e ) {
-			Status is = errorStatus("An unexpected error occurred.", e);
-			return (is);
+			return errorStatus(ServerStringConstants.UNEXPECTED_ERROR, e);
 		}
 
 	}
@@ -504,24 +500,22 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	private CommandLineDetails getLaunchCommandSync(LaunchParameters req) {
-		if( req == null || isEmpty(req.getMode()) || isEmpty(req.getParams().getId())) {
-			return null;
+		boolean empty = req == null || isEmpty(req.getMode()) || isEmpty(req.getParams().getId()); 
+		if( !empty ) {
+			String id = req.getParams().getId();
+			IServer server = managementModel.getServerModel().getServer(id);
+			if( server != null ) {
+				IServerDelegate del = server.getDelegate();
+				if( del != null ) {
+					try {
+						return del.getStartLaunchCommand(req.getMode(), req.getParams());
+					} catch( Exception e ) {
+						// Ignore
+					}
+				}
+			}
 		}
-		String id = req.getParams().getId();
-		IServer server = managementModel.getServerModel().getServer(id);
-		if( server == null ) {
-			return null;
-		}
-		IServerDelegate del = server.getDelegate();
-		if( del == null ) {
-			return null;
-		}
-		try {
-			CommandLineDetails det = del.getStartLaunchCommand(req.getMode(), req.getParams());
-			return det;
-		} catch( Exception e ) {
-			return null;
-		}
+		return null;
 	}
 	
 	@Override
@@ -547,20 +541,17 @@ public class ServerManagementServerImpl implements RSPServer {
 		String id = attr.getRequest().getParams().getId();
 		IServer server = managementModel.getServerModel().getServer(id);
 		if( server == null ) {
-			Status is = errorStatus("Server " + id + " does not exist");
-			return is;
+			String msg = NLS.bind(ServerStringConstants.SERVER_DNE, id);
+			return errorStatus(msg);
 		}
 		IServerDelegate del = server.getDelegate();
 		if( del == null ) {
-			Status is = errorStatus("Server error: Server " + id + " does not have a delegate.");
-			return is;
+			return errorStatus(NLS.bind(ServerStringConstants.UNEXPECTED_ERROR_DELEGATE, id));
 		}
 		try {
-			IStatus s = del.clientSetServerStarting(attr);
-			return StatusConverter.convert(s);
+			return StatusConverter.convert(del.clientSetServerStarting(attr));
 		} catch( Exception e ) {
-			Status is = errorStatus("An unexpected error occurred.", e);
-			return is;
+			return errorStatus(ServerStringConstants.UNEXPECTED_ERROR, e);
 		}
 	}
 	
@@ -577,21 +568,18 @@ public class ServerManagementServerImpl implements RSPServer {
 		String id = attr.getParams().getId();
 		IServer server = managementModel.getServerModel().getServer(id);
 		if( server == null ) {
-			Status is = errorStatus("Server " + id + " does not exist");
-			return is;
+			String msg = NLS.bind(ServerStringConstants.SERVER_DNE, id);
+			return errorStatus(msg);
 		}
 		IServerDelegate del = server.getDelegate();
 		if( del == null ) {
-			Status is = errorStatus("Server error: Server " + id + " does not have a delegate.");
-			return is;
+			return errorStatus("Server error: Server " + id + " does not have a delegate.");
 		}
 
 		try {
-			IStatus s = del.clientSetServerStarted(attr);
-			return StatusConverter.convert(s);
+			return StatusConverter.convert(del.clientSetServerStarted(attr));
 		} catch( Exception e ) {
-			Status is = errorStatus("An unexpected error occurred.", e);
-			return is;
+			return errorStatus(ServerStringConstants.UNEXPECTED_ERROR, e);
 		}
 	}
 

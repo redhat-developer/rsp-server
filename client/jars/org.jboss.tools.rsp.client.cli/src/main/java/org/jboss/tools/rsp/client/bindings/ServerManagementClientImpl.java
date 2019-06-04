@@ -191,7 +191,7 @@ public class ServerManagementClientImpl implements RSPClient {
 		return CompletableFuture.completedFuture(null);
 	}
 	
-	public static abstract class PromptStringHandler implements InputHandler {
+	public abstract static class PromptStringHandler implements InputHandler {
 		private String prompt;
 		private boolean isSecret;
 		private boolean done = false;
