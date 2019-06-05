@@ -181,9 +181,9 @@ public interface RSPServer {
 	CompletableFuture<CreateServerResponse> createServer(ServerAttributes csa);
 
 	/**
-	 * The `server/getServerAsJson` request is sent by the client to 
-	 * fetch a string representation of a server adapter. 
-	 * A server handle and a status object are included along with the 
+	 * The `server/getServerAsJson` request is sent by the client to
+	 * fetch a string representation of a server adapter.
+	 * A server handle and a status object are included along with the
 	 * json representation of the server.
 	 *
 	 * In the event of failure, the returned `Status` object will
@@ -193,8 +193,8 @@ public interface RSPServer {
 	CompletableFuture<GetServerJsonResponse> getServerAsJson(ServerHandle sh);
 
 	/**
-	 * The `server/updateServer` request is sent by the client to 
-	 * update a server with new k/v pairs or changed deployment options. 
+	 * The `server/updateServer` request is sent by the client to
+	 * update a server with new k/v pairs or changed deployment options.
 	 *
 	 * In the event of failure, the returned `Status` object will
 	 * detail the cause of error.
@@ -327,7 +327,7 @@ public interface RSPServer {
 	 * This can be any set of custom server-defined settings, or standard options,
 	 * for example, an output name for an archive, whether to zip folders, etc.
 	 * This request may return null in case of error.
-	 * 
+	 *
 	 * @param serverHandle
 	 */
 	@JsonRequest
