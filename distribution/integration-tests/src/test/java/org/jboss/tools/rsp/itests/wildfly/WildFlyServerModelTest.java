@@ -138,14 +138,50 @@ public class WildFlyServerModelTest extends RSPCase {
 					"Enable the autopublisher.", 
 					IJBossServerAttributes.AUTOPUBLISH_ENABLEMENT_DEFAULT)
         		);
-
         expected.put(IJBossServerAttributes.AUTOPUBLISH_INACTIVITY_LIMIT,
         		new Attribute(
 					ServerManagementAPIConstants.ATTR_TYPE_INT, 
 					"Set the inactivity limit before the autopublisher runs.", 
 					IJBossServerAttributes.AUTOPUBLISH_INACTIVITY_LIMIT_DEFAULT)
         		);
+        expected.put(IJBossServerAttributes.JBOSS_SERVER_HOST, 
+        		new Attribute(
+					ServerManagementAPIConstants.ATTR_TYPE_STRING, 
+					"Set the host you want your JBoss / WildFly instance to bind to. Use 0.0.0.0 for all.", 
+					IJBossServerAttributes.JBOSS_SERVER_HOST_DEFAULT)
+        		);
+        expected.put(IJBossServerAttributes.JBOSS_SERVER_PORT,
+        		new Attribute(
+					ServerManagementAPIConstants.ATTR_TYPE_INT, 
+					"Set the port you want your JBoss / WildFly instance to bind to", 
+					IJBossServerAttributes.JBOSS_SERVER_PORT_DEFAULT)
+        		);
+        expected.put(IJBossServerAttributes.WILDFLY_CONFIG_FILE, 
+        		new Attribute(
+					ServerManagementAPIConstants.ATTR_TYPE_STRING, 
+					"Set the configuration file you want your WildFly instance to use.", 
+					IJBossServerAttributes.WILDFLY_CONFIG_FILE_DEFAULT)
+        		);
+		for( String k : expected.keySet()) {
+			Attribute expectedAttr = expected.get(k);
+			Attribute actualAttr = attr.getAttributes().get(k);
+			assertEquals(expectedAttr.getDescription(), actualAttr.getDescription());
+			assertEquals(expectedAttr.getType(), actualAttr.getType());
+			assertEquals(expectedAttr.isSecret(), actualAttr.isSecret());
+			assertEqualsExceptDoubleShouldBeInt(
+					expectedAttr.getDefaultVal(), actualAttr.getDefaultVal());
+		}
     }
+
+	private void assertEqualsExceptDoubleShouldBeInt(
+			Object expected, Object actual) {
+		if( expected instanceof Integer && actual instanceof Double) {
+			assertTrue(((Double)actual).intValue() == ((Integer)expected).intValue());
+		} else {
+			assertEquals(expected, actual);
+		}
+		
+	}
     
     @Test
     public void testGetOptionalAttributesInvalid() throws Exception {
