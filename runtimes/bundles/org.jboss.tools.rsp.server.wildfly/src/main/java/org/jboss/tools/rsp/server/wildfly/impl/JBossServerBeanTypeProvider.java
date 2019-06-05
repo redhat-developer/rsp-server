@@ -46,6 +46,8 @@ import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly15;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly150Web;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly16;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly160Web;
+import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly17;
+import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly170Web;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly80;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly90;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly90Web;
@@ -77,6 +79,8 @@ public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider {
 	public static final ServerBeanType WILDFLY150_WEB = new ServerBeanTypeWildfly150Web();
 	public static final ServerBeanType WILDFLY160 = new ServerBeanTypeWildfly16();
 	public static final ServerBeanType WILDFLY160_WEB = new ServerBeanTypeWildfly160Web();
+	public static final ServerBeanType WILDFLY170 = new ServerBeanTypeWildfly17();
+	public static final ServerBeanType WILDFLY170_WEB = new ServerBeanTypeWildfly170Web();
 	public static final ServerBeanType EAP70 = new ServerBeanTypeEAP70();
 	public static final ServerBeanType EAP71 = new ServerBeanTypeEAP71();
 	public static final ServerBeanType EAP72 = new ServerBeanTypeEAP72();
@@ -116,6 +120,7 @@ public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider {
 		WILDFLY140, WILDFLY140_WEB,
 		WILDFLY150, WILDFLY150_WEB,
 		WILDFLY160, WILDFLY160_WEB,
+		WILDFLY170, WILDFLY170_WEB,
 		WILDFLY80, 
 		FSW6, EAP61, SOA6, JPP61,  DV6, 
 		UNKNOWN_AS72_PRODUCT,

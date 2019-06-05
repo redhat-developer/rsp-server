@@ -12,6 +12,16 @@ package org.jboss.tools.rsp.server.wildfly.servertype.capabilities;
 
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
+import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.WildFlyExtendedProperties.Wildfly100ExtendedProperties;
+import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.WildFlyExtendedProperties.Wildfly110ExtendedProperties;
+import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.WildFlyExtendedProperties.Wildfly120ExtendedProperties;
+import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.WildFlyExtendedProperties.Wildfly130ExtendedProperties;
+import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.WildFlyExtendedProperties.Wildfly140ExtendedProperties;
+import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.WildFlyExtendedProperties.Wildfly150ExtendedProperties;
+import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.WildFlyExtendedProperties.Wildfly160ExtendedProperties;
+import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.WildFlyExtendedProperties.Wildfly170ExtendedProperties;
+import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.WildFlyExtendedProperties.Wildfly80ExtendedProperties;
+import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.WildFlyExtendedProperties.Wildfly90ExtendedProperties;
 
 public class ExtendedServerPropertiesAdapterFactory implements IServerConstants {
 
@@ -63,6 +73,8 @@ public class ExtendedServerPropertiesAdapterFactory implements IServerConstants 
 			return new Wildfly150ExtendedProperties(s);
 		case SERVER_WILDFLY_160:
 			return new Wildfly160ExtendedProperties(s);
+		case SERVER_WILDFLY_170:
+			return new Wildfly170ExtendedProperties(s);
 		default:
 			return null;
 		}
