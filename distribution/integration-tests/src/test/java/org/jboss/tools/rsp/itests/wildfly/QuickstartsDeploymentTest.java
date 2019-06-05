@@ -157,7 +157,6 @@ public class QuickstartsDeploymentTest extends RSPCase {
 		// even though publishing is done, app is not yet deployed, thus waiting takes
 		// place
 		HttpUtility.waitForUrlEndpoint(url, 200, 30);
-		verifyURL(url.toString(), 200);
 
 		// Remove deployment
 		Status statusRemove = serverProxy.removeDeployable(new ServerDeployableReference(handle, reference)).get();
@@ -177,7 +176,6 @@ public class QuickstartsDeploymentTest extends RSPCase {
 		state = getDeployableStateByReference(handle, reference);
 		assertNull("Deployable reference was still found", state);
 		HttpUtility.waitForUrlEndpoint(url, 404, 30);
-		verifyURL(url.toString(), 404);
 	}
 
 	private DeployableState getDeployableStateByReference(ServerHandle handle, DeployableReference reference) {
