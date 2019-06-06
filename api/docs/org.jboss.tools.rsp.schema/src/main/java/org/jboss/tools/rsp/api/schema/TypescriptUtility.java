@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
@@ -498,14 +499,17 @@ public class TypescriptUtility {
 	}
 
 
-	
+	private static final Pattern LINE_END_SPACES = Pattern.compile(" +$", Pattern.MULTILINE);
+
 	private void printOneRequest(String methodName, JavadocComment jdc, 
 			StringBuilder sb, String serverOrClient) {
 		if( jdc != null ) {
 			String comment = jdc.getContent().substring(1);
+			String commentTabs = comment.replaceAll("\t", "        ");
+			String removedTrailingWS = LINE_END_SPACES.matcher(commentTabs).replaceAll("");
 			sb.append("        /**\n");
-			sb.append(comment.replaceAll("\t", "        "));
-			sb.append("*/");
+			sb.append(removedTrailingWS);
+			sb.append("         */");
 			sb.append("\n        export namespace ");
 			sb.append(methodNameToRequestName(methodName));
 			sb.append(" {\n");
@@ -551,9 +555,11 @@ public class TypescriptUtility {
 			StringBuilder sb, String serverOrClient) {
 		if( jdc != null ) {
 			String comment = jdc.getContent().substring(1);
+			String commentTabs = comment.replaceAll("\t", "        ");
+			String removedTrailingWS = LINE_END_SPACES.matcher(commentTabs).replaceAll("");
 			sb.append("        /**\n");
-			sb.append(comment.replaceAll("\t", "        "));
-			sb.append("*/");
+			sb.append(removedTrailingWS);
+			sb.append("         */");
 			sb.append("\n        export namespace ");
 			sb.append(methodNameToNotificationName(methodName));
 			sb.append(" {\n");
