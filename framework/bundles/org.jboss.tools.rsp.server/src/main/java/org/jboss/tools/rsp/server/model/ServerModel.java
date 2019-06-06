@@ -649,7 +649,8 @@ public class ServerModel implements IServerModel {
 			String dsType = ds.getAttribute(unchangeable[i], (String)null);
 			String type = server.getAttribute(unchangeable[i], (String)null);
 			if( !isEqual(dsType, type)) {
-				resp.getValidation().setStatus(errorStatus("Field " + Server.TYPE_ID + " may not be changed"));
+				resp.getValidation().setStatus(errorStatus(
+						NLS.bind("Field {0} may not be changed", unchangeable[i])));
 				return resp;
 			}
 		}
