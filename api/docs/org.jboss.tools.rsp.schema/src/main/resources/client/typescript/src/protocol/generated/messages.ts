@@ -132,9 +132,9 @@ export namespace Messages {
             export const type = new RequestType<Protocol.ServerAttributes, Protocol.CreateServerResponse, void, void>('server/createServer');
         }
         /**
-         * The `server/getServerAsJson` request is sent by the client to 
-         * fetch a string representation of a server adapter. 
-         * A server handle and a status object are included along with the 
+         * The `server/getServerAsJson` request is sent by the client to
+         * fetch a string representation of a server adapter.
+         * A server handle and a status object are included along with the
          * json representation of the server.
          *
          * In the event of failure, the returned `Status` object will
@@ -144,8 +144,8 @@ export namespace Messages {
             export const type = new RequestType<Protocol.ServerHandle, Protocol.GetServerJsonResponse, void, void>('server/getServerAsJson');
         }
         /**
-         * The `server/updateServer` request is sent by the client to 
-         * update a server with new k/v pairs or changed deployment options. 
+         * The `server/updateServer` request is sent by the client to
+         * update a server with new k/v pairs or changed deployment options.
          *
          * In the event of failure, the returned `Status` object will
          * detail the cause of error.
@@ -267,7 +267,7 @@ export namespace Messages {
          * This can be any set of custom server-defined settings, or standard options,
          * for example, an output name for an archive, whether to zip folders, etc.
          * This request may return null in case of error.
-         * 
+         *
          * @param serverHandle
          */
         export namespace ListDeploymentOptionsRequest {
