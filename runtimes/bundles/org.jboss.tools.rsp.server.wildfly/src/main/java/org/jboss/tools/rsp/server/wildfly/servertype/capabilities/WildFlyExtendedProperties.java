@@ -49,12 +49,12 @@ public class WildFlyExtendedProperties {
 	}
 	public static class Wildfly130ExtendedProperties extends AbstractWildflyExtendedProperties {
 		public Wildfly130ExtendedProperties(IServer server) {
-			super("13.0", "1.8", "11.", HTTP_REMOTING_JMX_NEW, new Wildfly110DefaultLaunchArguments(server), server);
+			super("13.0", "1.8", "10.", HTTP_REMOTING_JMX_NEW, new Wildfly110DefaultLaunchArguments(server), server);
 		}
 	}
 	public static class Wildfly140ExtendedProperties extends AbstractWildflyExtendedProperties {
 		public Wildfly140ExtendedProperties(IServer server) {
-			super("14", "1.8", "11.", HTTP_REMOTING_JMX_NEW, new Wildfly110DefaultLaunchArguments(server), server);
+			super("14", "1.8", "10.", HTTP_REMOTING_JMX_NEW, new Wildfly110DefaultLaunchArguments(server), server);
 		}
 	}
 	public static class Wildfly150ExtendedProperties extends AbstractWildflyExtendedProperties {
