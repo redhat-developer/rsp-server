@@ -30,11 +30,6 @@ public class JBossASServerDelegate extends AbstractJBossServerDelegate {
 		return LauncherDiscovery.getDefault().getShutdownLauncher(getServer());
 	}
 	@Override
-	protected String getPollURL(IServer server) {
-		// TODO?
-		return "http://localhost:8080";
-	}
-	@Override
 	protected IJBossPublishController createPublishController() {
 		return new StandardJBossPublishController(getServer(), this);
 	}
