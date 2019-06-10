@@ -21,12 +21,16 @@ import org.jboss.tools.rsp.eclipse.debug.core.ArgumentUtils;
  */
 public class ArgsUtil {
 
-	public static final Integer NO_VALUE = new Integer(-1); 
+	public static final Integer NO_VALUE = Integer.valueOf(-1); 
 	public static final String EQ = "="; //$NON-NLS-1$
 	public static final String SPACE=" "; //$NON-NLS-1$
 	public static final String VMO = "-D"; //$NON-NLS-1$
 	public static final String EMPTY=""; //$NON-NLS-1$
 	public static final String QUOTE="\""; //$NON-NLS-1$
+	
+	private ArgsUtil() {
+		// Do nothing
+	}
 	
 	public static String[] parse(String s) {
 		if( s != null && s.isEmpty()) {
@@ -37,7 +41,7 @@ public class ArgsUtil {
 
 	public static Map<String, Object> getSystemProperties(String argString) {
 		String[] args = parse(argString);
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, Object> map = new HashMap<>();
 		
 		for( int i = 0; i < args.length; i++ ) {
 			if( args[i].startsWith(VMO)) {
@@ -109,9 +113,8 @@ public class ArgsUtil {
 	}
 	
 	public static String setArg(String allArgs, String shortOpt, String longOpt, String value ) {
-		if( value != null && value.contains(SPACE)) {
-			// avoid double quotes
-			if( !(value.startsWith(QUOTE) && value.endsWith(QUOTE)))
+		if( value != null && value.contains(SPACE) && 
+				!(value.startsWith(QUOTE) && value.endsWith(QUOTE))) {
 				value = QUOTE + value + QUOTE;
 		}
 		return setArg(allArgs, shortOpt, longOpt, value, false);
@@ -145,51 +148,38 @@ public class ArgsUtil {
 	 * @return
 	 */
 	public static String setArg(String allArgs, String[] shortOpt, String[] longOpt, String value, boolean addQuotes ) {
-		String rawValue = value;
-		if( value != null && addQuotes )
-			value = QUOTE + value + QUOTE;
-		else 
-			rawValue = getRawValue(value);
+		String rawValue = (value != null && addQuotes) ? value : getRawValue(value);
+		value = (value != null && addQuotes) ? (QUOTE + value + QUOTE) : value;
 
 		boolean found = false;
 		String[] args = parse(allArgs);
-		String retVal = EMPTY;
-		for( int i = 0; i < args.length; i++ ) {
+		
+		for( int i = 0; i < args.length && !found; i++ ) {
 			if( matchesShortArg(args[i], shortOpt)) {
-				if( value != null ) {
-					args[i+1] = value;
-					retVal += args[i] + SPACE + args[++i] + SPACE;
-				}
+				args[i+1] = value;
 				found = true;
-			} else if(  matchesLongArg(args[i], longOpt)) {
-				if( value != null ) {
-					String newVal = null;
-					if( args[i].startsWith(QUOTE)) {
-						newVal = QUOTE + longOpt[0] + EQ + rawValue + QUOTE;
-					} else {
-						newVal = longOpt[0] + EQ + value;
-					}
-					args[i] = newVal;
-					retVal += args[i] + SPACE;
-				}
+			} else if( matchesLongArg(args[i], longOpt)) {
+				String newVal = args[i].startsWith(QUOTE) ? 
+						(QUOTE + longOpt[0] + EQ + rawValue + QUOTE) 
+						: longOpt[0] + EQ + value;
+				args[i] = newVal;
 				found = true;
-			} else {
-				retVal += args[i] + SPACE;
 			}
 		}
-		
-		// turn this to a retval;
-		if( !found ) {
-			if( longOpt != null && longOpt.length > 0 ) 
-				retVal = retVal + longOpt[0] + EQ + value;
-			else
-				retVal = retVal + shortOpt[0] + SPACE + value;
-		} 
-		return retVal;
+		String suffix = getSetArgAddition(shortOpt, longOpt, value);
+		return argsToString(args).trim() + (suffix == null ? "" : (SPACE + suffix)); 
+	}
+	
+	private static String getSetArgAddition(String[] shortOpt, String[] longOpt, String value) {
+		if( longOpt != null && longOpt.length > 0 ) 
+			return longOpt[0] + EQ + value;
+		else if( shortOpt != null && shortOpt.length > 0 ) 
+			return shortOpt[0] + SPACE + value;
+		return "";
 	}
 	
 	private static String argsToString(String[] args) {
-		StringBuffer retVal = new StringBuffer();
+		StringBuilder retVal = new StringBuilder();
 		for( int i = 0; i < args.length; i++ ) {
 			retVal.append(args[i]);
 			retVal.append(SPACE);

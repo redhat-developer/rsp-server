@@ -510,9 +510,14 @@ public class ServerModelTest {
 		IServerType type = mock(IServerType.class);
 		doReturn(typeId).when(type).getId();
 		doReturn(delegate).when(type).createServerDelegate(any(IServer.class));
-		Attributes attrs = mock(Attributes.class);
-		doReturn(attributes).when(attrs).getAttributes();
-		doReturn(attrs).when(type).getRequiredAttributes();
+
+		Attributes requiredAttrs = mock(Attributes.class);
+		doReturn(attributes).when(requiredAttrs).getAttributes();
+		doReturn(requiredAttrs).when(type).getRequiredAttributes();
+		
+		Attributes optionalAttrs = mock(Attributes.class);
+		doReturn(new HashMap<String, Object>()).when(optionalAttrs).getAttributes();
+		doReturn(optionalAttrs).when(type).getOptionalAttributes();
 		return type;
 	}
 

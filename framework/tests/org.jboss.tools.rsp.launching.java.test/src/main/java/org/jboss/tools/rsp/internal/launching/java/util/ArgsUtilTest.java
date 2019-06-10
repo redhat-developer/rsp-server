@@ -15,8 +15,8 @@ import org.jboss.tools.rsp.launching.java.ArgsUtil;
 import junit.framework.TestCase;
 
 public class ArgsUtilTest extends TestCase {
-	private static String QUOTE = "\"";
-	private static String EQ = "=";
+	private static final String QUOTE = "\"";
+	private static final String EQ = "=";
 
 	public void testParse() {
 		assertEquals(1, ArgsUtil.parse("").length);
