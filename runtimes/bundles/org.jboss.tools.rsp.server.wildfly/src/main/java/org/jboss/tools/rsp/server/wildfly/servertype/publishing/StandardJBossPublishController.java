@@ -69,6 +69,11 @@ public class StandardJBossPublishController implements IJBossPublishController {
 			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
 					NLS.bind("Server {0} does not support deployment with null path.", server));
 		
+		if( outputName == null ) {
+			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
+					NLS.bind("RSP unable to discover preferred output name for deployment.", server));
+		}
+		
 		File f = new File(path);
 		// When removing a module, there's no reason it must exist
 		if( mustExist && !f.exists())
@@ -95,10 +100,13 @@ public class StandardJBossPublishController implements IJBossPublishController {
 	
 	protected String getOutputName(DeployableReference ref) {
 		Map<String, Object> options = ref.getOptions();
-		String def = new File(ref.getPath()).getName();
-		if( options != null && 
-				options.get(ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME) != null ) {
-			return (String)options.get(ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME);
+		String def = null;
+		if( ref.getPath() != null ) {
+			def = new File(ref.getPath()).getName();
+		}
+		String k = ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME; 
+		if( options != null && options.get(k) != null ) {
+			return (String)options.get(k);
 		}
 		return def;
 	}
