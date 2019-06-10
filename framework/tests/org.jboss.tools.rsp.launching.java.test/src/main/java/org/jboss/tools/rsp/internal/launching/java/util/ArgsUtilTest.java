@@ -124,9 +124,9 @@ public class ArgsUtilTest extends TestCase {
 		String folder = "my folder";
 		String args = argId + EQ + QUOTE + folder + QUOTE;
 		String args2 = ArgsUtil.setArg(args, null, argId, folder + "2");
-		assertTrue(args2.trim().equals(argId + EQ + QUOTE + folder + "2" + QUOTE));
+		assertEquals(args2.trim(), (argId + EQ + QUOTE + folder + "2" + QUOTE));
 		args2 = ArgsUtil.setArg(args2, null, argId, folder + "3");
-		assertTrue(args2.trim().equals(argId + EQ + QUOTE + folder + "3" + QUOTE));
+		assertEquals(args2.trim(), (argId + EQ + QUOTE + folder + "3" + QUOTE));
 	}
 	
 	public void testSetToNulLWithQuotes() {

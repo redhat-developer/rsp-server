@@ -113,8 +113,11 @@ public class ArgsUtil {
 	}
 	
 	public static String setArg(String allArgs, String shortOpt, String longOpt, String value ) {
-		if( value != null && value.contains(SPACE) && 
-				!(value.startsWith(QUOTE) && value.endsWith(QUOTE))) {
+		if( value != null && value.contains(SPACE)) {
+			boolean startsWith = value.startsWith(QUOTE);
+			boolean endsWith = value.endsWith(QUOTE);
+			boolean and = startsWith && endsWith;
+			if( !and )
 				value = QUOTE + value + QUOTE;
 		}
 		return setArg(allArgs, shortOpt, longOpt, value, false);
@@ -156,18 +159,31 @@ public class ArgsUtil {
 		
 		for( int i = 0; i < args.length && !found; i++ ) {
 			if( matchesShortArg(args[i], shortOpt)) {
+				if( value == null ) {
+					args[i] = null;
+				}
 				args[i+1] = value;
 				found = true;
 			} else if( matchesLongArg(args[i], longOpt)) {
-				String newVal = args[i].startsWith(QUOTE) ? 
-						(QUOTE + longOpt[0] + EQ + rawValue + QUOTE) 
-						: longOpt[0] + EQ + value;
-				args[i] = newVal;
+				if( rawValue == null ) {
+					args[i] = null;
+				} else {
+					String newVal = args[i].startsWith(QUOTE) ? 
+							(QUOTE + longOpt[0] + EQ + rawValue + QUOTE) 
+							: longOpt[0] + EQ + value;
+					args[i] = newVal;
+				}
 				found = true;
 			}
 		}
+		
+		if( found ) {
+			return argsToString(args).trim();
+		}
 		String suffix = getSetArgAddition(shortOpt, longOpt, value);
-		return argsToString(args).trim() + (suffix == null ? "" : (SPACE + suffix)); 
+		String safeSuffix = SPACE + (suffix == null ? "" : suffix);
+		String ret = (argsToString(args).trim() + safeSuffix).trim();
+		return ret;
 	}
 	
 	private static String getSetArgAddition(String[] shortOpt, String[] longOpt, String value) {
@@ -181,8 +197,10 @@ public class ArgsUtil {
 	private static String argsToString(String[] args) {
 		StringBuilder retVal = new StringBuilder();
 		for( int i = 0; i < args.length; i++ ) {
-			retVal.append(args[i]);
-			retVal.append(SPACE);
+			if( args[i] != null ) {
+				retVal.append(args[i]);
+				retVal.append(SPACE);
+			}
 		}
 		return retVal.toString();
 	}
