@@ -52,6 +52,7 @@ import org.jboss.tools.rsp.api.dao.StopServerAttributes;
 import org.jboss.tools.rsp.api.dao.UpdateServerRequest;
 import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
+import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
@@ -564,17 +565,31 @@ public class ServerManagementServerImpl implements RSPServer {
 		return createCompletableFuture(() -> getDeployablesSync(handle));
 	}
 
+	// This API has no way to return an error. Should be changed
 	public List<DeployableState> getDeployablesSync(ServerHandle handle) {
+		if( handle == null || handle.getId() == null ) {
+			return new ArrayList<DeployableState>();
+		}
 		IServer server = managementModel.getServerModel().getServer(handle.getId());
-		 return managementModel.getServerModel().getDeployables(server);
+		if( server == null ) {
+			return new ArrayList<DeployableState>();
+		}
+		return managementModel.getServerModel().getDeployables(server);
 	}
 	
 	public CompletableFuture<Attributes> listDeploymentOptions(ServerHandle handle) {
 		return createCompletableFuture(() -> listDeploymentOptionsSync(handle));
 	}
 	
+	// This API has no way to return an error. Should be changed
 	public Attributes listDeploymentOptionsSync(ServerHandle handle) {
+		if( handle == null ) {
+			return new CreateServerAttributesUtility().toPojo();
+		}
 		IServer server = managementModel.getServerModel().getServer(handle.getId());
+		if( server == null || server.getDelegate() == null) {
+			return new CreateServerAttributesUtility().toPojo();
+		}
 		return server.getDelegate().listDeploymentOptions();
 	}
 	
@@ -583,17 +598,32 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	public Status addDeployableSync(ServerHandle handle, ServerDeployableReference req) {
-		IServer server = managementModel.getServerModel().getServer(handle.getId());
+		if( req == null || req.getServer() == null || req.getDeployableReference() == null) {
+			return errorStatus("Invalid request; Expected fields not present.", null);
+		}
+		String serverId = req.getServer().getId();
+		IServer server = managementModel.getServerModel().getServer(serverId);
+		if( server == null ) {
+			return errorStatus( "Server " + serverId + " not found.");
+		}
 		IStatus stat = managementModel.getServerModel().addDeployable(server, req.getDeployableReference());
 		return StatusConverter.convert(stat);
 	}
 	
 	public CompletableFuture<Status> removeDeployable(ServerDeployableReference request) {
-		return createCompletableFuture(() -> removeDeployableSync(request.getServer(), request));
+		return createCompletableFuture(() -> removeDeployableSync(request));
 	}
 
-	public Status removeDeployableSync(ServerHandle handle, ServerDeployableReference reference) {
-		IServer server = managementModel.getServerModel().getServer(handle.getId());
+	public Status removeDeployableSync(ServerDeployableReference reference) {
+		if( reference == null || reference.getServer() == null || reference.getDeployableReference() == null) {
+			return errorStatus("Invalid request; Expected fields not present.", null);
+		}
+		String serverId = reference.getServer().getId();
+		IServer server = managementModel.getServerModel().getServer(serverId);
+		if( server == null ) {
+			return errorStatus( "Server " + serverId + " not found.");
+		}
+
 		IStatus stat = managementModel.getServerModel().removeDeployable(server, reference.getDeployableReference());
 		return StatusConverter.convert(stat);
 	}
@@ -604,6 +634,10 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	private Status publishSync(PublishServerRequest request) {
+		if( request == null || request.getServer() == null ) {
+			return errorStatus("Invalid request; Expected fields not present.", null);
+		}
+		
 		try {
 			IServer server = managementModel.getServerModel().getServer(request.getServer().getId());
 			IStatus stat = managementModel.getServerModel().publish(server, request.getKind());
