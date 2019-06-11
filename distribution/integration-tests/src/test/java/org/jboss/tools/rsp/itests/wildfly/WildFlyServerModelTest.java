@@ -44,10 +44,26 @@ public class WildFlyServerModelTest extends RSPCase {
                 "WildFly 11.x", "A server adapter capable of discovering and controlling a WildFly 11.x runtime instance.");
         ServerType wfly12 = new ServerType("org.jboss.ide.eclipse.as.wildfly.120",
                 "WildFly 12.x", "A server adapter capable of discovering and controlling a WildFly 12.x runtime instance.");
+        ServerType wfly13 = new ServerType("org.jboss.ide.eclipse.as.wildfly.130",
+                "WildFly 13.x", "A server adapter capable of discovering and controlling a WildFly 13.x runtime instance.");
+        ServerType wfly14 = new ServerType("org.jboss.ide.eclipse.as.wildfly.140",
+                "WildFly 14.x", "A server adapter capable of discovering and controlling a WildFly 14.x runtime instance.");
+        ServerType wfly15 = new ServerType("org.jboss.ide.eclipse.as.wildfly.150",
+                "WildFly 15.x", "A server adapter capable of discovering and controlling a WildFly 15.x runtime instance.");
+        ServerType wfly16 = new ServerType("org.jboss.ide.eclipse.as.wildfly.160",
+                "WildFly 16.x", "A server adapter capable of discovering and controlling a WildFly 16.x runtime instance.");
+        ServerType wfly17 = new ServerType("org.jboss.ide.eclipse.as.wildfly.170",
+                "WildFly 17.x", "A server adapter capable of discovering and controlling a WildFly 17.x runtime instance.");
+
         
         assertTrue(types.contains(wfly10));
         assertTrue(types.contains(wfly11));
         assertTrue(types.contains(wfly12));
+        assertTrue(types.contains(wfly13));
+        assertTrue(types.contains(wfly14));
+        assertTrue(types.contains(wfly15));
+        assertTrue(types.contains(wfly16));
+        assertTrue(types.contains(wfly17));
         assertTrue(types.contains(wildflyType));
     }
     
@@ -63,11 +79,14 @@ public class WildFlyServerModelTest extends RSPCase {
                 "JBoss EAP 7.0", "A server adapter capable of discovering and controlling a JBoss EAP 7.0 runtime instance.");
         ServerType eap71 = new ServerType("org.jboss.ide.eclipse.as.eap.71",
                 "JBoss EAP 7.1", "A server adapter capable of discovering and controlling a JBoss EAP 7.1 runtime instance.");
+        ServerType eap72 = new ServerType("org.jboss.ide.eclipse.as.eap.72",
+                "JBoss EAP 7.2", "A server adapter capable of discovering and controlling a JBoss EAP 7.2 runtime instance.");
         
         assertTrue(types.contains(eap60));
         assertTrue(types.contains(eap61));
         assertTrue(types.contains(eap70));
         assertTrue(types.contains(eap71));
+        assertTrue(types.contains(eap72));
     }
     
     @Test
