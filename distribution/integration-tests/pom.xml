@@ -233,6 +233,22 @@
 			</properties>
 		</profile>
 		<profile>
+			<id>wildfly-17</id>
+			<activation>
+				<property>
+					<name>wildfly</name>
+					<value>17</value>
+				</property>
+			</activation>
+			<properties>
+				<server.id>install-wildfly-17.0.0.Final</server.id>
+				<server.url>http://download.jboss.org/wildfly/17.0.0.Final/wildfly-17.0.0.Final.zip</server.url>
+				<server.sha1>f3d9f92856c7a35d27b7c5ad6423a1dfa7f1f9e7</server.sha1>
+				<server.type.id>org.jboss.ide.eclipse.as.wildfly.170</server.type.id>
+				<server.version>17.0.0.Final</server.version>
+			</properties>
+		</profile>
+		<profile>
 			<id>wildfly-quickstarts</id>
 			<activation>
 				<property>
