@@ -42,9 +42,10 @@ public class ServerJavaVersionTest {
 	private static final String JAVA_10 = "10.6.1";
 	private static final String JAVA_11 = "11.6.0";
 	private static final String JAVA_12 = "12.6.0";
+	private static final String JAVA_13 = "13.0.1";
 
 	private static final String[] ALL_JAVA = {
-			JAVA_2, JAVA_3, JAVA_4, JAVA_5, JAVA_6, JAVA_7, JAVA_8, JAVA_9, JAVA_10, JAVA_11, JAVA_12
+			JAVA_2, JAVA_3, JAVA_4, JAVA_5, JAVA_6, JAVA_7, JAVA_8, JAVA_9, JAVA_10, JAVA_11, JAVA_12, JAVA_13
 	};
 
 	@Test
@@ -209,6 +210,17 @@ public class ServerJavaVersionTest {
 		 */
 		serverTypeTest(IServerConstants.SERVER_WILDFLY_160, 
 				JAVA_8, JAVA_9, JAVA_10, JAVA_11, JAVA_12);
+	}
+
+	@Test
+	public void testWildFly170() {
+		/**
+		 * java 8 - 13
+		 * 
+		 * @see https://wildfly.org/news/2019/06/10/WildFly17-Final-Released/
+		 */
+		serverTypeTest(IServerConstants.SERVER_WILDFLY_170, 
+				JAVA_8, JAVA_9, JAVA_10, JAVA_11, JAVA_12, JAVA_13);
 	}
 
 	@Test
