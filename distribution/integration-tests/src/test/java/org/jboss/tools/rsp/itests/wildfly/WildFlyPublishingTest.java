@@ -11,7 +11,6 @@ package org.jboss.tools.rsp.itests.wildfly;
 import static org.jboss.tools.rsp.itests.util.ServerStateUtil.waitForDeployablePublishState;
 import static org.jboss.tools.rsp.itests.util.ServerStateUtil.waitForNonNullServerState;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -28,6 +27,8 @@ import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
+import org.jboss.tools.rsp.api.dao.ListDeployablesResponse;
+import org.jboss.tools.rsp.api.dao.ListDeploymentOptionsResponse;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
 import org.jboss.tools.rsp.api.dao.ServerDeployableReference;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
@@ -39,7 +40,6 @@ import org.jboss.tools.rsp.itests.util.DeploymentGeneration;
 import org.jboss.tools.rsp.itests.util.DummyClient;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -118,33 +118,18 @@ public class WildFlyPublishingTest extends RSPCase {
 		assertNull("state for deployable " + reference.getPath() + " was still found but shouldn't.", ds);
 	}
 
-	/*
-	 * Breaks the server, see
-	 * https://github.com/redhat-developer/rsp-server/issues/376
-	 */
-	@Ignore
 	@Test
 	public void testNullPublishRequest() throws InterruptedException, ExecutionException {
 		Status status = serverProxy.publish(null).get();
 		assertEquals(Status.ERROR, status.getSeverity());
 	}
 
-	/*
-	 * This test just fails, see
-	 * https://github.com/redhat-developer/rsp-server/issues/376
-	 */
-	@Ignore
 	@Test
 	public void testInvalidPublishRequest() throws InterruptedException, ExecutionException {
 		Status status = serverProxy.publish(new PublishServerRequest(handle, 5000)).get();
 		assertEquals(Status.ERROR, status.getSeverity());
 	}
 
-	/*
-	 * Breaks the server, see
-	 * https://github.com/redhat-developer/rsp-server/issues/376
-	 */
-	@Ignore
 	@Test
 	public void testRemoveNullDeployment() throws InterruptedException, ExecutionException {
 		Status status = serverProxy.removeDeployable(null).get();
@@ -160,11 +145,6 @@ public class WildFlyPublishingTest extends RSPCase {
 		assertEquals(Status.ERROR, status.getSeverity());
 	}
 
-	/*
-	 * Breaks the server, see
-	 * https://github.com/redhat-developer/rsp-server/issues/376
-	 */
-	@Ignore
 	@Test
 	public void testAddNullDeployment() throws InterruptedException, ExecutionException {
 		Status status = serverProxy.addDeployable(null).get();
@@ -173,16 +153,11 @@ public class WildFlyPublishingTest extends RSPCase {
 
 	@Test
 	public void testAddInvalidDeployment() throws InterruptedException, ExecutionException {
-		/*
-		 * Breaks the server, see
-		 * https://github.com/redhat-developer/rsp-server/issues/376
-		 */
-		// Status status = serverProxy.addDeployable(new
-		// ServerDeployableReference(handle, new DeployableReference(WAR_FILENAME,
-		// null))).get();
-		// assertEquals(Status.ERROR, status.getSeverity());
-		// System.out.println(status.getMessage());
 		Status status = serverProxy
+				.addDeployable(new ServerDeployableReference(handle, new DeployableReference(WAR_FILENAME, null)))
+				.get();
+		assertEquals(Status.ERROR, status.getSeverity());
+		status = serverProxy
 				.addDeployable(
 						new ServerDeployableReference(handle, new DeployableReference(WAR_FILENAME, "/I/dont/exist")))
 				.get();
@@ -204,50 +179,35 @@ public class WildFlyPublishingTest extends RSPCase {
 		assertNotNull(attrs);
 	}
 
-	/*
-	 * Breaks the server, see
-	 * https://github.com/redhat-developer/rsp-server/issues/376
-	 */
-	@Ignore
 	@Test
 	public void testListDeploymentOptionsInvalidAttributes() throws InterruptedException, ExecutionException {
-		Attributes attrs = serverProxy.listDeploymentOptions(new ServerHandle("foo.server.id",
-				new ServerType("some.id", "my.server", "Random server type definition"))).get().getAttributes();
-		assertNull(attrs);
+
+		ListDeploymentOptionsResponse response = serverProxy.listDeploymentOptions(new ServerHandle("foo.server.id",
+				new ServerType("some.id", "my.server", "Random server type definition"))).get();
+		assertEquals(Status.ERROR, response.getStatus().getSeverity());
+		assertTrue(response.getAttributes().getAttributes().isEmpty());
 	}
 
-	/*
-	 * Breaks the server, see
-	 * https://github.com/redhat-developer/rsp-server/issues/376
-	 */
-	@Ignore
 	@Test
 	public void testListDeploymentOptionsNullAttributes() throws InterruptedException, ExecutionException {
-		Attributes attrs = serverProxy.listDeploymentOptions(null).get().getAttributes();
-		assertNull(attrs);
+		ListDeploymentOptionsResponse response = serverProxy.listDeploymentOptions(null).get();
+		assertEquals(Status.ERROR, response.getStatus().getSeverity());
+		assertTrue(response.getAttributes().getAttributes().isEmpty());
 	}
 
-	/*
-	 * Breaks the server, see
-	 * https://github.com/redhat-developer/rsp-server/issues/376
-	 */
-	@Ignore
 	@Test
 	public void testGetDeployablesInvalidAttributes() throws InterruptedException, ExecutionException {
-		List<DeployableState> states = serverProxy.getDeployables(new ServerHandle("foo.server.id",
-				new ServerType("some.id", "my.server", "Random server type definition"))).get().getStates();
-		assertTrue(states.isEmpty());
+		ListDeployablesResponse response = serverProxy.getDeployables(new ServerHandle("foo.server.id",
+				new ServerType("some.id", "my.server", "Random server type definition"))).get();
+		assertEquals(Status.ERROR, response.getStatus().getSeverity());
+		assertNull(response.getStates());
 	}
 
-	/*
-	 * Breaks the server, see
-	 * https://github.com/redhat-developer/rsp-server/issues/376
-	 */
-	@Ignore
 	@Test
 	public void testGetDeployablesNullAttributes() throws InterruptedException, ExecutionException {
-		List<DeployableState> states = serverProxy.getDeployables(null).get().getStates();
-		assertFalse(states.isEmpty());
+		ListDeployablesResponse response = serverProxy.getDeployables(null).get();
+		assertEquals(Status.ERROR, response.getStatus().getSeverity());
+		assertNull(response.getStates());
 	}
 
 	@Test
