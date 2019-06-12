@@ -63,8 +63,16 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	
 	protected abstract IServerShutdownLauncher getStopLauncher();
 
-	protected abstract String getPollURL(IServer server);
 
+	protected String getPollURL(IServer server) {
+		String host = server.getAttribute(IJBossServerAttributes.JBOSS_SERVER_HOST, 
+				IJBossServerAttributes.JBOSS_SERVER_HOST_DEFAULT);
+		int port = server.getAttribute(IJBossServerAttributes.JBOSS_SERVER_PORT, 
+				IJBossServerAttributes.JBOSS_SERVER_PORT_DEFAULT);
+		String url = NLS.bind("http://{0}:{1}", host, port);
+		return url;
+	}
+	
 	@Override
 	public CreateServerValidation validate() {
 		return validate(getServer());

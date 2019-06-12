@@ -272,17 +272,27 @@ public class ServerModel implements IServerModel {
 		Set<String> required = util.listAttributes();
 		for (String attrKey : required) {
 			String attributeType = util.getAttributeType(attrKey);
-			validateAttribute(attrKey, map, attributeType , multiStatus);
+			validateAttribute(attrKey, map, attributeType , multiStatus, true);
 		}
+		
+		Attributes optAttr = type.getOptionalAttributes();
+		util = new CreateServerAttributesUtility(optAttr);
+		Set<String> optional = util.listAttributes();
+		for (String attrKey : optional) {
+			String attributeType = util.getAttributeType(attrKey);
+			validateAttribute(attrKey, map, attributeType , multiStatus, false);
+		}
+
 		return multiStatus;
 	}
 
-	private void validateAttribute(String attrKey, Map<String, Object> attributeValues, String attributeType, MultiStatus multiStatus) {
+	private void validateAttribute(String attrKey, Map<String, Object> attributeValues, String attributeType, 
+			MultiStatus multiStatus, boolean required) {
 		Object value = attributeValues.get(attrKey);
-		if (value == null) {
+		if (required && value == null) {
 			multiStatus.add(
 					new Status(IStatus.ERROR, attrKey, NLS.bind("Attribute {0} must not be null", attrKey)));
-		} else {
+		} else if( value != null ){
 			Class<?> actualType = value.getClass();
 			Class<?> expectedType = DaoUtilities.getAttributeTypeClass(attributeType);
 			if (!actualType.equals(expectedType)) {

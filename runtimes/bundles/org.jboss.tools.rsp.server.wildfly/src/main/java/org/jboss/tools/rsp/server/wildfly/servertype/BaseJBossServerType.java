@@ -82,6 +82,16 @@ public abstract class BaseJBossServerType implements IServerType{
 					"Set the inactivity limit before the autopublisher runs.", 
 					IJBossServerAttributes.AUTOPUBLISH_INACTIVITY_LIMIT_DEFAULT);
 
+			attrs.addAttribute(IJBossServerAttributes.JBOSS_SERVER_HOST, 
+					ServerManagementAPIConstants.ATTR_TYPE_STRING, 
+					"Set the host you want your JBoss / WildFly instance to bind to. Use 0.0.0.0 for all.", 
+					IJBossServerAttributes.JBOSS_SERVER_HOST_DEFAULT);
+
+			attrs.addAttribute(IJBossServerAttributes.JBOSS_SERVER_PORT, 
+					ServerManagementAPIConstants.ATTR_TYPE_INT, 
+					"Set the port you want your JBoss / WildFly instance to bind to", 
+					IJBossServerAttributes.JBOSS_SERVER_PORT_DEFAULT);
+			
 			optional = attrs.toPojo();
 		}
 		return optional;

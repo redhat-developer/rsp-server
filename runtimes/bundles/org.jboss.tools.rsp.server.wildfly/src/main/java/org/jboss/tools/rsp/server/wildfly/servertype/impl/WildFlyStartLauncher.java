@@ -11,6 +11,7 @@ package org.jboss.tools.rsp.server.wildfly.servertype.impl;
 import java.util.Arrays;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
+import org.jboss.tools.rsp.launching.java.ArgsUtil;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.wildfly.servertype.AbstractLauncher;
@@ -44,11 +45,17 @@ public class WildFlyStartLauncher extends AbstractLauncher {
 	@Override
 	protected String getVMArguments() {
 		IDefaultLaunchArguments largs = getLaunchArgs();
+		String ret = null;
 		if( largs != null ) {
 			String serverHome = getDelegate().getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String) null);
-			return largs.getStartDefaultVMArgs(new Path(serverHome));
+			ret = largs.getStartDefaultVMArgs(new Path(serverHome));
+			int port = getDelegate().getServer().getAttribute(
+					IJBossServerAttributes.JBOSS_SERVER_PORT, (int)-1);
+			if( port != -1 ) {
+				ret = ArgsUtil.setSystemProperty(ret, "jboss.http.port", ""+port);
+			}
 		}
-		return null;
+		return ret;
 	}
 
 	@Override
@@ -58,6 +65,12 @@ public class WildFlyStartLauncher extends AbstractLauncher {
 		if( largs != null ) {
 			String serverHome = getDelegate().getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String) null);
 			r1 = largs.getStartDefaultProgramArgs(new Path(serverHome));
+			
+			String host = getDelegate().getServer().getAttribute(
+					IJBossServerAttributes.JBOSS_SERVER_HOST, (String)null);
+			if( host != null ) {
+				r1 = ArgsUtil.setArg(r1, "-b", null, host);
+			}
 		}
 		return r1;
 	}
