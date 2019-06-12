@@ -67,22 +67,22 @@ public class StandardJBossPublishController implements IJBossPublishController {
 	private IStatus validateSupportedDeployable(String path, String outputName, boolean mustExist) {
 		if( path == null )
 			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
-					NLS.bind("Server {0} does not support deployment with null path.", server));
+					NLS.bind("Server {0} does not support deployment with null path.", server.getId()));
 		
 		if( outputName == null ) {
 			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
-					NLS.bind("RSP unable to discover preferred output name for deployment.", server));
+					NLS.bind("Unable to discover preferred output name for deployment to server {0}", server.getId()));
 		}
 		
 		File f = new File(path);
 		// When removing a module, there's no reason it must exist
 		if( mustExist && !f.exists())
 			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
-					NLS.bind("Server {0} does not support deployments that do not exist in the filesystem.", server));
+					NLS.bind("Server {0} does not support deployments that do not exist in the filesystem.", server.getId()));
 
 		if( mustExist && !supportsExplodedDeployment() && !f.isFile())
 			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, 
-					NLS.bind("Server {0} does not support exploded deployment, and deployment path is a directory.", server));
+					NLS.bind("Server {0} does not support exploded deployment, and deployment path is a directory.", server.getId()));
 		
 		for( int i = 0; i < supportedSuffix.length; i++ ) {
 			if( hasSuffix(outputName, supportedSuffix[i]))
