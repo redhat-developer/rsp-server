@@ -661,7 +661,7 @@ public class ServerModel implements IServerModel {
 		try {
 			ds = DummyServer.createDummyServer(req.getServerJson(), this);
 		} catch(Exception ce) {
-			resp.getValidation().setStatus(errorStatus(ce.getMessage(), ce));
+			resp.getValidation().setStatus(errorStatus("Update Failed: " + ce.getMessage(), ce));
 			return resp;
 		}
 		
