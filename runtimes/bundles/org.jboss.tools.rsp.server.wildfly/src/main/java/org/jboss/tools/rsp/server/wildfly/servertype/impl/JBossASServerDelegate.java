@@ -35,10 +35,10 @@ public class JBossASServerDelegate extends AbstractJBossServerDelegate {
 	}
 	@Override
 	public void updateServer(IServer dummyServer, UpdateServerResponse resp) {
+		// TODO check modules? 
+		
 		updateServer(dummyServer, resp, 
 				new String[] {ServerManagementAPIConstants.SERVER_HOME_DIR});
-		
-		// TODO check modules? 
 	}
 	
 }

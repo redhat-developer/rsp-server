@@ -41,6 +41,7 @@ import org.jboss.tools.rsp.launching.RuntimeProcessEventManager;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
 import org.jboss.tools.rsp.server.model.internal.ServerStreamListener;
 import org.jboss.tools.rsp.server.model.internal.publishing.ServerPublishStateModel;
+import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.model.polling.IPollResultListener;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller;
@@ -130,7 +131,11 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 
 	@Override
 	public int getServerPublishState() {
-		return getServerPublishModel().getServerPublishState();
+		IServerPublishModel pubMod = getServerPublishModel();
+		if( pubMod != null ) {
+			return pubMod.getServerPublishState();
+		}
+		return AbstractServerDelegate.PUBLISH_STATE_UNKNOWN;
 	}
 
 	public ServerHandle getServerHandle() {
@@ -148,7 +153,9 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		state.setServer(handle);
 		state.setPublishState(getServerPublishState());
 		state.setState(getServerRunState());
-		state.setDeployableStates(getServerPublishModel().getDeployableStates());
+		IServerPublishModel pubMod = getServerPublishModel();
+		if( pubMod != null ) 
+			state.setDeployableStates(pubMod.getDeployableStates());
 		state.setRunMode(getMode());
 		return state;
 	}
@@ -174,18 +181,26 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	}
 	
 	protected void fireStateChanged(ServerState state) {
-		getServerModel().fireServerStateChanged(server, state);
+		IServerModel sm = getServerModel();
+		if( sm != null ) 
+			sm.fireServerStateChanged(server, state);
 	}
 
 	protected void fireServerProcessTerminated(String processId) {
-		getServerModel().fireServerProcessTerminated(server, processId);
+		IServerModel sm = getServerModel();
+		if( sm != null ) 
+			sm.fireServerProcessTerminated(server, processId);
 	}
 	
 	protected void fireServerProcessCreated(String processId) {
-		getServerModel().fireServerProcessCreated(server, processId);
+		IServerModel sm = getServerModel();
+		if( sm != null ) 
+			sm.fireServerProcessCreated(server, processId);
 	}
 
 	protected IServerModel getServerModel() {
+		if( server == null || server.getServerManagementModel() == null )
+			return null;
 		return server.getServerManagementModel().getServerModel();
 	}
 
@@ -401,10 +416,19 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	@Override
 	public IServerPublishModel getServerPublishModel() {
 		if( this.publishModel == null ) {
-			this.publishModel = new ServerPublishStateModel(this, getServer().getServerManagementModel().getFileWatcherService());
+			this.publishModel = new ServerPublishStateModel(this, getFileWatcherService());
 		}
 		return this.publishModel;
 	}
+	
+	protected IFileWatcherService getFileWatcherService() {
+		if( getServer() != null 
+				&& getServer().getServerManagementModel() != null ) {
+			return getServer().getServerManagementModel().getFileWatcherService();
+		}
+		return null;
+	}
+	
 	
 	@Override
 	public IStatus publish(int publishType) {
@@ -465,7 +489,8 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	}
 	
 	protected void updatePublishStateFromModules() throws CoreException {
-		publishModel.updateServerPublishStateFromDeployments(true);
+		if( publishModel != null )
+			publishModel.updateServerPublishStateFromDeployments(true);
 	}
 
 	protected void publishDeployable(DeployableReference reference, 

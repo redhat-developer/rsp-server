@@ -235,7 +235,7 @@ public class ServerModel implements IServerModel {
 			return new CreateServerResponse(createDaoErrorStatus("Server Type " + serverType + " not found"), 
 					Collections.emptyList());
 		}
-		IStatus validAttributes = validateAttributes(type, attributes);
+		IStatus validAttributes = validateAttributes(type, attributes, true);
 		if( !validAttributes.isOK()) {
 			return new CreateServerResponse(StatusConverter.convert(validAttributes), 
 					getInvalidAttributeKeys(validAttributes));
@@ -264,37 +264,35 @@ public class ServerModel implements IServerModel {
 		return valid.toDao();
 	}
 	
-	private IStatus validateAttributes(IServerType type, Map<String, Object> map) {
-		MultiStatus multiStatus = new MultiStatus(ServerCoreActivator.BUNDLE_ID, 0, 
+	private IStatus validateAttributes(IServerType type, 
+			Map<String, Object> map, boolean updateMapWithConversions) {
+		MultiStatus ms = new MultiStatus(ServerCoreActivator.BUNDLE_ID, 0, 
 				NLS.bind("There are missing/invalid required attributes for server type {0}", type), null);
-		Attributes attr = type.getRequiredAttributes();
+		runValidateAttributes(type, map, type.getRequiredAttributes(), true, ms, updateMapWithConversions);
+		runValidateAttributes(type, map, type.getOptionalAttributes(), false, ms, updateMapWithConversions);
+		return ms;
+	}
+	
+	private void runValidateAttributes(IServerType type, Map<String, Object> map, 
+			 Attributes attr, boolean areRequired, 
+			MultiStatus ms, boolean updateMapWithConversions) {
 		CreateServerAttributesUtility util = new CreateServerAttributesUtility(attr);
 		Set<String> required = util.listAttributes();
 		for (String attrKey : required) {
 			String attributeType = util.getAttributeType(attrKey);
-			validateAttribute(attrKey, map, attributeType , multiStatus, true);
+			validateAttribute(attrKey, map, attributeType , ms, areRequired, updateMapWithConversions);
 		}
-		
-		Attributes optAttr = type.getOptionalAttributes();
-		util = new CreateServerAttributesUtility(optAttr);
-		Set<String> optional = util.listAttributes();
-		for (String attrKey : optional) {
-			String attributeType = util.getAttributeType(attrKey);
-			validateAttribute(attrKey, map, attributeType , multiStatus, false);
-		}
-
-		return multiStatus;
 	}
 
 	private void validateAttribute(String attrKey, Map<String, Object> attributeValues, String attributeType, 
-			MultiStatus multiStatus, boolean required) {
+			MultiStatus multiStatus, boolean required, boolean updateMapWithConversions) {
 		Object value = attributeValues.get(attrKey);
 		if (required && value == null) {
 			multiStatus.add(
 					new Status(IStatus.ERROR, attrKey, NLS.bind("Attribute {0} must not be null", attrKey)));
 		} else if( value != null ){
-			Class<?> actualType = value.getClass();
 			Class<?> expectedType = DaoUtilities.getAttributeTypeClass(attributeType);
+			Class<?> actualType = value.getClass();
 			if (!actualType.equals(expectedType)) {
 				// Something's different than expectations based on json transfer
 				// Try to convert it
@@ -304,7 +302,9 @@ public class ServerModel implements IServerModel {
 							NLS.bind("Attribute {0} must be of type {1} but is of type {2}",
 									new String[] { attrKey, expectedType.getName(), actualType.getName() })));
 				} else {
-					attributeValues.put(attrKey, converted);
+					if( updateMapWithConversions) {
+						attributeValues.put(attrKey, converted);
+					}
 				}
 			} 
 			if (String.class.equals(expectedType) 
@@ -320,6 +320,20 @@ public class ServerModel implements IServerModel {
 		if( Integer.class.equals(expected) && Double.class.equals(value.getClass())) {
 			return Integer.valueOf(((Double)value).intValue());
 		}
+		
+		if( Integer.class.equals(expected) && String.class.equals(value.getClass()) ) {
+			try {
+				return Integer.parseInt((String)value);
+			} catch(NumberFormatException nfe) {
+				return null;
+			}
+		}
+		if( Boolean.class.equals(expected) && String.class.equals(value.getClass()) ) {
+			boolean isBool = "true".equalsIgnoreCase((String)value) || 
+					"false".equalsIgnoreCase((String)value);
+			return isBool ? Boolean.parseBoolean((String)value) : null;
+		}
+
 		return null;
 	}
 
@@ -455,7 +469,7 @@ public class ServerModel implements IServerModel {
 	
 	@Override
 	public IServerType getIServerType(String typeId) {
-		return serverTypes.get(typeId);
+		return typeId == null ? null : serverTypes.get(typeId);
 	}
 	
 	@Override
@@ -645,7 +659,7 @@ public class ServerModel implements IServerModel {
 		
 		DummyServer ds = null;
 		try {
-			ds = DummyServer.createDummyServer(req.getServerJson());
+			ds = DummyServer.createDummyServer(req.getServerJson(), this);
 		} catch(Exception ce) {
 			resp.getValidation().setStatus(errorStatus(ce.getMessage(), ce));
 			return resp;
@@ -666,7 +680,7 @@ public class ServerModel implements IServerModel {
 		}
 		
 		IServerType type = serverTypes.get(req.getHandle().getType().getId());
-		IStatus validAttributes = validateAttributes(type, ds.getMap());
+		IStatus validAttributes = validateAttributes(type, ds.getMap(), false);
 		if( !validAttributes.isOK()) {
 			resp.getValidation().setStatus(StatusConverter.convert(validAttributes));
 			return resp;

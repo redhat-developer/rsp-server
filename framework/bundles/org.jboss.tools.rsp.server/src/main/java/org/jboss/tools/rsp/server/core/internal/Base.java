@@ -455,9 +455,13 @@ public abstract class Base {
 		try {
 			memento = JSONMemento.loadMemento(in);
 		} catch (JsonSyntaxException se) {
-			// most probably that it is still in the previous xml format
+			// [out of date] most probably that it is still in the previous xml format
+			// Odds are nobody is using xml format anymore. 
 			in.reset();
 			memento = XMLMemento.loadMemento(in);
+			if( memento == null ) {
+				throw se;
+			}
 		}
 		return memento;
 	}
