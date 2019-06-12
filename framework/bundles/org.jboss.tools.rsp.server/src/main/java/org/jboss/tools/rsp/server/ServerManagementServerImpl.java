@@ -26,7 +26,6 @@ import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
-import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
 import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
@@ -35,6 +34,8 @@ import org.jboss.tools.rsp.api.dao.JobHandle;
 import org.jboss.tools.rsp.api.dao.JobProgress;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
+import org.jboss.tools.rsp.api.dao.ListDeployablesResponse;
+import org.jboss.tools.rsp.api.dao.ListDeploymentOptionsResponse;
 import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
@@ -561,36 +562,52 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	@Override
-	public CompletableFuture<List<DeployableState>> getDeployables(ServerHandle handle) {
+	public CompletableFuture<ListDeployablesResponse> getDeployables(ServerHandle handle) {
 		return createCompletableFuture(() -> getDeployablesSync(handle));
 	}
 
 	// This API has no way to return an error. Should be changed
-	public List<DeployableState> getDeployablesSync(ServerHandle handle) {
+	public ListDeployablesResponse getDeployablesSync(ServerHandle handle) {
 		if( handle == null || handle.getId() == null ) {
-			return new ArrayList<DeployableState>();
+			ListDeployablesResponse resp = new ListDeployablesResponse(
+					null, errorStatus("Unable to locate server with null id."));
+			return resp;
 		}
 		IServer server = managementModel.getServerModel().getServer(handle.getId());
 		if( server == null ) {
-			return new ArrayList<DeployableState>();
+			ListDeployablesResponse resp = new ListDeployablesResponse(
+					null, errorStatus(NLS.bind("Unable to locate server {0}", 
+							handle == null ? "null" : handle.getId())));
+			return resp;
 		}
-		return managementModel.getServerModel().getDeployables(server);
+		ListDeployablesResponse resp = new ListDeployablesResponse();
+		resp.setStatus(StatusConverter.convert(org.jboss.tools.rsp.eclipse.core.runtime.Status.OK_STATUS));
+		resp.setStates(managementModel.getServerModel().getDeployables(server));
+		return resp;
 	}
 	
-	public CompletableFuture<Attributes> listDeploymentOptions(ServerHandle handle) {
+	public CompletableFuture<ListDeploymentOptionsResponse> listDeploymentOptions(ServerHandle handle) {
 		return createCompletableFuture(() -> listDeploymentOptionsSync(handle));
 	}
 	
 	// This API has no way to return an error. Should be changed
-	public Attributes listDeploymentOptionsSync(ServerHandle handle) {
+	public ListDeploymentOptionsResponse listDeploymentOptionsSync(ServerHandle handle) {
+		ListDeploymentOptionsResponse resp = new ListDeploymentOptionsResponse();
 		if( handle == null ) {
-			return new CreateServerAttributesUtility().toPojo();
+			resp.setStatus(errorStatus("Unable to locate server with null id"));
+			resp.setAttributes(new CreateServerAttributesUtility().toPojo());
+			return resp;
 		}
 		IServer server = managementModel.getServerModel().getServer(handle.getId());
 		if( server == null || server.getDelegate() == null) {
-			return new CreateServerAttributesUtility().toPojo();
+			resp.setStatus(errorStatus(NLS.bind("Server {0} not found.", handle.getId())));
+			resp.setAttributes(new CreateServerAttributesUtility().toPojo());
+			return resp;
 		}
-		return server.getDelegate().listDeploymentOptions();
+		
+		resp.setStatus(StatusConverter.convert(org.jboss.tools.rsp.eclipse.core.runtime.Status.OK_STATUS));
+		resp.setAttributes(server.getDelegate().listDeploymentOptions());
+		return resp;
 	}
 	
 	public CompletableFuture<Status> addDeployable(ServerDeployableReference request) {
