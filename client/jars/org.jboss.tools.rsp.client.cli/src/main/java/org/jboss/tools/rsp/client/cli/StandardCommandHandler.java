@@ -32,6 +32,7 @@ import org.jboss.tools.rsp.api.dao.JobHandle;
 import org.jboss.tools.rsp.api.dao.JobProgress;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
+import org.jboss.tools.rsp.api.dao.ListDeployablesResponse;
 import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
@@ -428,10 +429,10 @@ public class StandardCommandHandler implements InputHandler {
 				try {
 					ServerHandle server = assistant.selectServer();
 					if( server != null ) {
-						List<DeployableState> deployables = launcher.getServerProxy().getDeployables(server).get();
-						System.out.println(deployables.size() + " deployments found:");
+						ListDeployablesResponse deployables = launcher.getServerProxy().getDeployables(server).get();
+						System.out.println(deployables.getStates().size() + " deployments found:");
 						int c = 1;
-						for( DeployableState ds : deployables ) {
+						for( DeployableState ds : deployables.getStates() ) {
 							int pubState = ds.getPublishState();
 							String pubStateString = getPublishState(pubState);
 							int runState = ds.getState();

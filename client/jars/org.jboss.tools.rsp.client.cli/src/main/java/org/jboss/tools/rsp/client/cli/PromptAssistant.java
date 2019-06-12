@@ -26,6 +26,7 @@ import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
 import org.jboss.tools.rsp.api.dao.JobHandle;
 import org.jboss.tools.rsp.api.dao.JobProgress;
+import org.jboss.tools.rsp.api.dao.ListDeployablesResponse;
 import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
@@ -82,15 +83,15 @@ public class PromptAssistant {
 	}
 
 	public DeployableReference chooseDeployment(ServerHandle handle) throws InterruptedException, ExecutionException {
-		List<DeployableState> deployables = launcher.getServerProxy().getDeployables(handle).get();
-		List<String> collectorCollection = deployables.stream()
+		ListDeployablesResponse deployables = launcher.getServerProxy().getDeployables(handle).get();
+		List<String> collectorCollection = deployables.getStates().stream()
 				.map(DeployableState::getReference)
 				.map(DeployableReference::getLabel)
 				.collect(Collectors.toList());
 		String ret = promptUser(collectorCollection, "Please select a deployment:");
 		if( ret != null && collectorCollection.contains(ret)) {
 			int ind = collectorCollection.indexOf(ret);
-			return deployables.get(ind).getReference();
+			return deployables.getStates().get(ind).getReference();
 		}
 		return null;
 	}

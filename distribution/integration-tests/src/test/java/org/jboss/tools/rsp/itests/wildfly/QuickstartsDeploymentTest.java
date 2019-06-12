@@ -133,7 +133,7 @@ public class QuickstartsDeploymentTest extends RSPCase {
 		// Verify project path
 		assertTrue("File " + projectPath + " does not exist", Files.exists(projectPath, LinkOption.NOFOLLOW_LINKS));
 		// No deployable avaiable at the moment
-		assertTrue(serverProxy.getDeployables(handle).get().isEmpty());
+		assertTrue(serverProxy.getDeployables(handle).get().getStates().isEmpty());
 		Status status = serverProxy.addDeployable(new ServerDeployableReference(handle, reference)).get();
 		assertEquals("Expected request status is 'ok' but was " + status, Status.OK, status.getSeverity());
 		waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_ADD, 10, client);
@@ -173,7 +173,7 @@ public class QuickstartsDeploymentTest extends RSPCase {
 		sendPublishRequest(handle, ServerManagementAPIConstants.PUBLISH_FULL);
 
 		// Deployment is no more
-		assertTrue(serverProxy.getDeployables(handle).get().isEmpty());
+		assertTrue(serverProxy.getDeployables(handle).get().getStates().isEmpty());
 		state = getDeployableStateByReference(handle, reference);
 		assertNull("Deployable reference was still found", state);
 		HttpUtility.waitForUrlEndpoint(url, 404, 30);
@@ -183,7 +183,7 @@ public class QuickstartsDeploymentTest extends RSPCase {
 	private DeployableState getDeployableStateByReference(ServerHandle handle, DeployableReference reference) {
 		List<DeployableState> deployables = new ArrayList<>();
 		try {
-			deployables = serverProxy.getDeployables(handle).get();
+			deployables = serverProxy.getDeployables(handle).get().getStates();
 		} catch (InterruptedException | ExecutionException e) {
 			log.log(Level.SEVERE, "Failed to get deployables", e);
 			e.printStackTrace();
