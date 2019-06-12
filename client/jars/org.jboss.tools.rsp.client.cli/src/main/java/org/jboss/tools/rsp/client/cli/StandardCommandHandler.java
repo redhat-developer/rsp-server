@@ -407,6 +407,7 @@ public class StandardCommandHandler implements InputHandler {
 						
 						System.out.println("Please enter the updated value below.");
 						String multiLine = assistant.promptMultiLineString();
+						System.out.println("**** Multiline is:\n" + multiLine);
 						UpdateServerRequest req = new UpdateServerRequest();
 						req.setHandle(sh);
 						req.setServerJson(multiLine);

@@ -88,11 +88,10 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 	
 	private void registerFileWatcher(DeployableReference reference) {
-		File f = new File(reference.getPath());
-		boolean recursive = f.exists() && f.isDirectory();
-		
-		String path = reference.getPath();
 		if( fileWatcher != null ) {
+			File f = new File(reference.getPath());
+			boolean recursive = f.exists() && f.isDirectory();
+			String path = reference.getPath();
 			fileWatcher.addFileWatcherListener(new File(path).toPath(), this, recursive);
 		}
 	}
@@ -104,11 +103,13 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	 */
 	@Override
 	public synchronized IStatus addDeployable(DeployableReference withOptions) {
-		if (contains(withOptions)) {
+		DeployableState ds = getStates().get(getKey(withOptions));
+		if (ds != null && ds.getPublishState() != ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) {
 			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, IStatus.ERROR, 
 					NLS.bind("Could not add deploybale with path {0}: it already exists.", 
 							getKey(withOptions)), null);
 		}
+
 		addDeployableImpl(withOptions, ServerManagementAPIConstants.PUBLISH_STATE_ADD);
 		updateServerPublishStateFromDeployments();
 		fireState();

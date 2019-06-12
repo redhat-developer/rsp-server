@@ -9,11 +9,15 @@
 package org.jboss.tools.rsp.server.wildfly.servertype;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
@@ -22,12 +26,14 @@ import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
+import org.jboss.tools.rsp.eclipse.core.runtime.MultiStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.debug.core.DebugException;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
+import org.jboss.tools.rsp.server.ServerCoreActivator;
 import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
@@ -349,24 +355,103 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 
 	public void updateServer(IServer dummyServer, UpdateServerResponse resp,
 			String[] unchangeableFields) {
+		if( preUpdateServerValidationErrors(dummyServer, resp, unchangeableFields)) {
+			return;
+		}
 
+		// Now, perform any changes that need to be done at the delegate level
+		List<DeployableState> existing = getServerPublishModel().getDeployableStates();
+		List<DeployableState> updated = dummyServer.getDelegate().getServerPublishModel().getDeployableStates();
+		
+		for( DeployableState ds : existing ) {
+			getServerPublishModel().fillOptionsFromCache(ds.getReference());
+		}
+
+		for( DeployableState ds : updated ) {
+			dummyServer.getDelegate().getServerPublishModel().fillOptionsFromCache(ds.getReference());
+		}
+
+		// Calculate the delta on modules?
+		List<DeployableReference> unchanged = new ArrayList<>();
+		List<DeployableReference> removed = new ArrayList<>();
+		for( DeployableState ds : existing ) {
+			DeployableState matching = findExactMatch(ds.getReference(), updated);
+			if( matching == null ) {
+				removed.add(ds.getReference());
+			} else {
+				unchanged.add(ds.getReference());
+				updated.remove(ds);
+			}
+		}
+		MultiStatus ret = new MultiStatus(ServerCoreActivator.BUNDLE_ID, 0, 
+				NLS.bind("Updating Server {0}...", getServer().getName()), null);
+
+		// Handle removals
+		for( DeployableReference removed1 : removed ) {
+			ret.add(getServerPublishModel().removeDeployable(removed1));
+		}
+		// Whatever is left is 'added'
+		for( DeployableState ds : updated ) {
+			ret.add(getServerPublishModel().addDeployable(ds.getReference()));
+		}
+		
+		if( !ret.isOK()) {
+			resp.getValidation().setStatus(StatusConverter.convert(ret));
+		}
+	}
+	
+	private boolean preUpdateServerValidationErrors(
+			IServer dummyServer, UpdateServerResponse resp,
+			String[] unchangeableFields) {
+		
 		// First, validate the changes
 		IStatus stat = verifyUnchanged(dummyServer, getServer(), unchangeableFields);
 		
 		// We've already got errors? Return
 		if( !stat.isOK()) {
 			resp.getValidation().setStatus(StatusConverter.convert(stat));
-			return;
+			return true;
 		}
 		
 		// Do next level validation
 		CreateServerValidation validation = validate(dummyServer);
 		if( !validation.getStatus().isOK()) {
 			resp.setValidation(validation.toDao());
+			return true;
 		}
 		
-		// Now, perform any changes that need to be done at the delegate level
+		stat = verifyDeploymentChanges(dummyServer, getServer());
+		if( !stat.isOK()) {
+			resp.getValidation().setStatus(StatusConverter.convert(stat));
+			return true;
+		}
+		return false;
 	}
+	private DeployableState findExactMatch(DeployableReference reference, List<DeployableState> updated) {
+		String label = reference.getLabel();
+		String path = reference.getPath();
+		for( DeployableState ds : updated) {
+			if( !ds.getReference().getLabel().equals(label))
+				continue;
+			if( !ds.getReference().getPath().equals(path))
+				continue;
+			
+			Map<String, Object> origOptions = reference.getOptions();
+			Map<String, Object> updatedOptions = ds.getReference().getOptions();
+			if( origOptions == null && updatedOptions == null )
+				return ds;
+			if( origOptions == null )
+				continue;
+			if( origOptions.equals(updatedOptions)) 
+				return ds;
+		}
+		return null;
+	}
+
+	private IStatus verifyDeploymentChanges(IServer dummyServer, IServer server) {
+		return Status.OK_STATUS;
+	}
+
 	private boolean isEqual(String one, String two) {
 		return one == null ? two == null : one.equals(two);
 	}
