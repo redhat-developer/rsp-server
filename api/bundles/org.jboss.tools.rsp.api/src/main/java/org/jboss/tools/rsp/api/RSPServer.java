@@ -26,6 +26,8 @@ import org.jboss.tools.rsp.api.dao.JobHandle;
 import org.jboss.tools.rsp.api.dao.JobProgress;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
+import org.jboss.tools.rsp.api.dao.ListDeployablesResponse;
+import org.jboss.tools.rsp.api.dao.ListDeploymentOptionsResponse;
 import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
@@ -318,7 +320,7 @@ public interface RSPServer {
 	 * get a list of all deployables
 	 */
 	@JsonRequest
-	CompletableFuture<List<DeployableState>> getDeployables(ServerHandle handle);
+	CompletableFuture<ListDeployablesResponse> getDeployables(ServerHandle handle);
 
 	
 	/**
@@ -331,7 +333,7 @@ public interface RSPServer {
 	 * @param serverHandle
 	 */
 	@JsonRequest
-	CompletableFuture<Attributes> listDeploymentOptions(ServerHandle server);
+	CompletableFuture<ListDeploymentOptionsResponse> listDeploymentOptions(ServerHandle server);
 
 	
 	/**

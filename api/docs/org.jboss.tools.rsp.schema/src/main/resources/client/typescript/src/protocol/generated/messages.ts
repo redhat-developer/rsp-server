@@ -259,7 +259,7 @@ export namespace Messages {
          * get a list of all deployables
          */
         export namespace GetDeployablesRequest {
-            export const type = new RequestType<Protocol.ServerHandle, Array<Protocol.DeployableState>, void, void>('server/getDeployables');
+            export const type = new RequestType<Protocol.ServerHandle, Protocol.ListDeployablesResponse, void, void>('server/getDeployables');
         }
         /**
          * The `server/listDeploymentOptions` request is sent by the client to list the
@@ -271,7 +271,7 @@ export namespace Messages {
          * @param serverHandle
          */
         export namespace ListDeploymentOptionsRequest {
-            export const type = new RequestType<Protocol.ServerHandle, Protocol.Attributes, void, void>('server/listDeploymentOptions');
+            export const type = new RequestType<Protocol.ServerHandle, Protocol.ListDeploymentOptionsResponse, void, void>('server/listDeploymentOptions');
         }
         /**
          * The `server/addDeployable` request is sent by the client to the server

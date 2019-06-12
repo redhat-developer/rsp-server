@@ -1854,81 +1854,10 @@ export interface ServerType {
     description: string;
 }</pre></td></tr></table>
 
-This endpoint returns a list of the following schema as a return value: 
+This endpoint returns the following schema as a return value: 
 
 <table><tr><th>json</th><th>typescript</th></tr>
-<tr><td><pre>{
-  "type" : "object",
-  "properties" : {
-    "server" : {
-      "type" : "object",
-      "properties" : {
-        "id" : {
-          "type" : "string"
-        },
-        "type" : {
-          "type" : "object",
-          "properties" : {
-            "id" : {
-              "type" : "string"
-            },
-            "visibleName" : {
-              "type" : "string"
-            },
-            "description" : {
-              "type" : "string"
-            }
-          }
-        }
-      }
-    },
-    "reference" : {
-      "type" : "object",
-      "properties" : {
-        "label" : {
-          "type" : "string"
-        },
-        "path" : {
-          "type" : "string"
-        },
-        "options" : {
-          "type" : "object",
-          "additionalProperties" : {
-            "type" : "any"
-          }
-        }
-      }
-    },
-    "state" : {
-      "type" : "integer"
-    },
-    "publishState" : {
-      "type" : "integer"
-    }
-  }
-}</pre></td><td><pre>export interface DeployableState {
-    server: ServerHandle;
-    reference: DeployableReference;
-    state: number;
-    publishState: number;
-}
-
-export interface ServerHandle {
-    id: string;
-    type: ServerType;
-}
-
-export interface DeployableReference {
-    label: string;
-    path: string;
-    options?: { [index: string]: any };
-}
-
-export interface ServerType {
-    id: string;
-    visibleName: string;
-    description: string;
-}</pre></td></tr></table>
+<tr><td><pre></pre></td><td><pre></pre></td></tr></table>
 
 #### server/listDeploymentOptions
 
@@ -1972,40 +1901,7 @@ export interface ServerType {
 This endpoint returns the following schema as a return value: 
 
 <table><tr><th>json</th><th>typescript</th></tr>
-<tr><td><pre>{
-  "type" : "object",
-  "properties" : {
-    "attributes" : {
-      "type" : "object",
-      "additionalProperties" : {
-        "type" : "object",
-        "properties" : {
-          "type" : {
-            "type" : "string"
-          },
-          "description" : {
-            "type" : "string"
-          },
-          "defaultVal" : {
-            "type" : "any"
-          },
-          "secret" : {
-            "type" : "boolean"
-          }
-        }
-      }
-    }
-  }
-}</pre></td><td><pre>export interface Attributes {
-    attributes: { [index: string]: Attribute };
-}
-
-export interface Attribute {
-    type: string;
-    description: string;
-    defaultVal: any;
-    secret: boolean;
-}</pre></td></tr></table>
+<tr><td><pre></pre></td><td><pre></pre></td></tr></table>
 
 #### server/addDeployable
 
