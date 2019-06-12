@@ -200,7 +200,7 @@ public class WildFlyPublishingTest extends RSPCase {
 
 	@Test
 	public void testListDeploymentOptions() throws InterruptedException, ExecutionException {
-		Attributes attrs = serverProxy.listDeploymentOptions(handle).get();
+		Attributes attrs = serverProxy.listDeploymentOptions(handle).get().getAttributes();
 		assertNotNull(attrs);
 	}
 
@@ -212,7 +212,7 @@ public class WildFlyPublishingTest extends RSPCase {
 	@Test
 	public void testListDeploymentOptionsInvalidAttributes() throws InterruptedException, ExecutionException {
 		Attributes attrs = serverProxy.listDeploymentOptions(new ServerHandle("foo.server.id",
-				new ServerType("some.id", "my.server", "Random server type definition"))).get();
+				new ServerType("some.id", "my.server", "Random server type definition"))).get().getAttributes();
 		assertNull(attrs);
 	}
 
@@ -223,7 +223,7 @@ public class WildFlyPublishingTest extends RSPCase {
 	@Ignore
 	@Test
 	public void testListDeploymentOptionsNullAttributes() throws InterruptedException, ExecutionException {
-		Attributes attrs = serverProxy.listDeploymentOptions(null).get();
+		Attributes attrs = serverProxy.listDeploymentOptions(null).get().getAttributes();
 		assertNull(attrs);
 	}
 
@@ -235,7 +235,7 @@ public class WildFlyPublishingTest extends RSPCase {
 	@Test
 	public void testGetDeployablesInvalidAttributes() throws InterruptedException, ExecutionException {
 		List<DeployableState> states = serverProxy.getDeployables(new ServerHandle("foo.server.id",
-				new ServerType("some.id", "my.server", "Random server type definition"))).get();
+				new ServerType("some.id", "my.server", "Random server type definition"))).get().getStates();
 		assertTrue(states.isEmpty());
 	}
 
@@ -246,7 +246,7 @@ public class WildFlyPublishingTest extends RSPCase {
 	@Ignore
 	@Test
 	public void testGetDeployablesNullAttributes() throws InterruptedException, ExecutionException {
-		List<DeployableState> states = serverProxy.getDeployables(null).get();
+		List<DeployableState> states = serverProxy.getDeployables(null).get().getStates();
 		assertFalse(states.isEmpty());
 	}
 
@@ -256,7 +256,7 @@ public class WildFlyPublishingTest extends RSPCase {
 		Status status = serverProxy.addDeployable(new ServerDeployableReference(handle, ref2)).get();
 		assertEquals("Expected request status is 'ok' but was " + status, Status.OK, status.getSeverity());
 		waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_ADD, 10, client);
-		List<DeployableState> states = serverProxy.getDeployables(handle).get();
+		List<DeployableState> states = serverProxy.getDeployables(handle).get().getStates();
 		assertEquals(2, states.size());
 		DeployableReference actualRef = states.get(0).getReference();
 		DeployableReference actualRef2 = states.get(1).getReference();
@@ -271,7 +271,7 @@ public class WildFlyPublishingTest extends RSPCase {
 		waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_ADD, 10, client);
 		Status status = serverProxy.removeDeployable(new ServerDeployableReference(handle, reference)).get();
 		assertEquals("Expected request status is 'ok' but was " + status, Status.OK, status.getSeverity());
-		List<DeployableState> states = serverProxy.getDeployables(handle).get();
+		List<DeployableState> states = serverProxy.getDeployables(handle).get().getStates();
 		assertTrue(states.isEmpty());
 	}
 
