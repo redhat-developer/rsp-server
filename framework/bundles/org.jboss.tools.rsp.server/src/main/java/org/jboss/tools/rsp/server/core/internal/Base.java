@@ -451,19 +451,7 @@ public abstract class Base {
 	}
 
 	protected IMemento loadMemento(InputStream in) throws IOException {
-		IMemento memento;
-		try {
-			memento = JSONMemento.loadMemento(in);
-		} catch (JsonSyntaxException se) {
-			// [out of date] most probably that it is still in the previous xml format
-			// Odds are nobody is using xml format anymore. 
-			in.reset();
-			memento = XMLMemento.loadMemento(in);
-			if( memento == null ) {
-				throw se;
-			}
-		}
-		return memento;
+		return JSONMemento.loadMemento(in);
 	}
 
 	/**

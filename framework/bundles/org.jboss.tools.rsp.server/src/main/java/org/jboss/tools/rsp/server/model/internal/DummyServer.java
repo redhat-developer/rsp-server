@@ -48,13 +48,13 @@ public class DummyServer extends Server {
 				memento = loadMemento(in); 
 			} catch(JsonSyntaxException jse) {
 				throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 0, 
-						NLS.bind("Update failed: Parse error while reading updated server: {0}", 
+						NLS.bind("Parse error while reading server string: {0}", 
 								jse.getMessage()), null));
 			}
 			load(memento);
 		} catch (IOException | RuntimeException e) {
 			throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 0, 
-					NLS.bind("Could not update server from provided string: {0}", json), e));
+					NLS.bind("Error while reading server string: {0}", e.getMessage()), e));
 		}
 	}
 	
