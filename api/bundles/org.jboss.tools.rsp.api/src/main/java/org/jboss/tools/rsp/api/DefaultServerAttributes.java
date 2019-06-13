@@ -26,14 +26,6 @@ public interface DefaultServerAttributes {
 	public static final boolean AUTOPUBLISH_ENABLEMENT_DEFAULT = true;
 	public static final int AUTOPUBLISH_INACTIVITY_LIMIT_DEFAULT = 5000;
 	
-	/*
-	 * Server host/port
-	 */
-	public static final String JBOSS_SERVER_HOST = "jboss.server.host";
-	public static final String JBOSS_SERVER_HOST_DEFAULT = "localhost";
-	public static final String JBOSS_SERVER_PORT = "jboss.server.port";
-	public static final int JBOSS_SERVER_PORT_DEFAULT = 8080;
-
 	
 	/*
 	 * Deployment options 
