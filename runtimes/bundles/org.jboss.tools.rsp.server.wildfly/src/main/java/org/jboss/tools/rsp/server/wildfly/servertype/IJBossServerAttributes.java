@@ -19,9 +19,16 @@ public interface IJBossServerAttributes extends DefaultServerAttributes {
 	
 	
 	/*
-	 * Optional Attributes
+	 * JBoss Optional Attributes
 	 */
 	public static final String VM_INSTALL_PATH = "vm.install.path";
+	public static final String JBOSS_SERVER_HOST = "jboss.server.host";
+	public static final String JBOSS_SERVER_HOST_DEFAULT = "localhost";
+	public static final String JBOSS_SERVER_PORT = "jboss.server.port";
+	public static final int JBOSS_SERVER_PORT_DEFAULT = 8080;
+	public static final String WILDFLY_CONFIG_FILE = "wildfly.server.config.file";
+	public static final String WILDFLY_CONFIG_FILE_DEFAULT = "standalone.xml";
+	
 
 	/*
 	 * Launch attributes

@@ -68,35 +68,37 @@ public abstract class BaseJBossServerType implements IServerType{
 	public Attributes getOptionalAttributes() {
 		if( optional == null ) {
 			CreateServerAttributesUtility attrs = new CreateServerAttributesUtility();
-			attrs.addAttribute(IJBossServerAttributes.VM_INSTALL_PATH, 
-					ServerManagementAPIConstants.ATTR_TYPE_STRING, 
-					"A string representation pointing to a java home. If not set, java.home will be used instead.", null);
-
-			attrs.addAttribute(IJBossServerAttributes.AUTOPUBLISH_ENABLEMENT, 
-					ServerManagementAPIConstants.ATTR_TYPE_BOOL, 
-					"Enable the autopublisher.", 
-					IJBossServerAttributes.AUTOPUBLISH_ENABLEMENT_DEFAULT);
-
-			attrs.addAttribute(IJBossServerAttributes.AUTOPUBLISH_INACTIVITY_LIMIT, 
-					ServerManagementAPIConstants.ATTR_TYPE_INT, 
-					"Set the inactivity limit before the autopublisher runs.", 
-					IJBossServerAttributes.AUTOPUBLISH_INACTIVITY_LIMIT_DEFAULT);
-
-			attrs.addAttribute(IJBossServerAttributes.JBOSS_SERVER_HOST, 
-					ServerManagementAPIConstants.ATTR_TYPE_STRING, 
-					"Set the host you want your JBoss / WildFly instance to bind to. Use 0.0.0.0 for all.", 
-					IJBossServerAttributes.JBOSS_SERVER_HOST_DEFAULT);
-
-			attrs.addAttribute(IJBossServerAttributes.JBOSS_SERVER_PORT, 
-					ServerManagementAPIConstants.ATTR_TYPE_INT, 
-					"Set the port you want your JBoss / WildFly instance to bind to", 
-					IJBossServerAttributes.JBOSS_SERVER_PORT_DEFAULT);
-			
+			fillOptionalAttributes(attrs);
 			optional = attrs.toPojo();
 		}
 		return optional;
 	}
 
+	protected void fillOptionalAttributes(CreateServerAttributesUtility attrs) {
+		attrs.addAttribute(IJBossServerAttributes.VM_INSTALL_PATH, 
+				ServerManagementAPIConstants.ATTR_TYPE_STRING, 
+				"A string representation pointing to a java home. If not set, java.home will be used instead.", null);
+
+		attrs.addAttribute(IJBossServerAttributes.AUTOPUBLISH_ENABLEMENT, 
+				ServerManagementAPIConstants.ATTR_TYPE_BOOL, 
+				"Enable the autopublisher.", 
+				IJBossServerAttributes.AUTOPUBLISH_ENABLEMENT_DEFAULT);
+
+		attrs.addAttribute(IJBossServerAttributes.AUTOPUBLISH_INACTIVITY_LIMIT, 
+				ServerManagementAPIConstants.ATTR_TYPE_INT, 
+				"Set the inactivity limit before the autopublisher runs.", 
+				IJBossServerAttributes.AUTOPUBLISH_INACTIVITY_LIMIT_DEFAULT);
+
+		attrs.addAttribute(IJBossServerAttributes.JBOSS_SERVER_HOST, 
+				ServerManagementAPIConstants.ATTR_TYPE_STRING, 
+				"Set the host you want your JBoss / WildFly instance to bind to. Use 0.0.0.0 for all.", 
+				IJBossServerAttributes.JBOSS_SERVER_HOST_DEFAULT);
+
+		attrs.addAttribute(IJBossServerAttributes.JBOSS_SERVER_PORT, 
+				ServerManagementAPIConstants.ATTR_TYPE_INT, 
+				"Set the port you want your JBoss / WildFly instance to bind to", 
+				IJBossServerAttributes.JBOSS_SERVER_PORT_DEFAULT);
+	}
 	@Override
 	public Attributes getRequiredLaunchAttributes() {
 		CreateServerAttributesUtility attrs = new CreateServerAttributesUtility();

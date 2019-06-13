@@ -71,6 +71,11 @@ public class WildFlyStartLauncher extends AbstractLauncher {
 			if( host != null ) {
 				r1 = ArgsUtil.setArg(r1, "-b", null, host);
 			}
+			
+			String configFile = getDelegate().getServer().getAttribute(
+					IJBossServerAttributes.WILDFLY_CONFIG_FILE, 
+					IJBossServerAttributes.WILDFLY_CONFIG_FILE_DEFAULT);
+			r1 = ArgsUtil.setArg(r1, null, "--server-config", configFile);
 		}
 		return r1;
 	}

@@ -8,9 +8,12 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.wildfly.servertype.impl;
 
+import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.wildfly.servertype.BaseJBossServerType;
+import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
 
 public class WildFlyServerType extends BaseJBossServerType {
 	public WildFlyServerType(String id, String name, String desc) {
@@ -20,5 +23,14 @@ public class WildFlyServerType extends BaseJBossServerType {
 	@Override
 	public IServerDelegate createServerDelegateImpl(IServer server) {
 		return new WildFlyServerDelegate(server);
+	}
+	
+	protected void fillOptionalAttributes(CreateServerAttributesUtility attrs) {
+		super.fillOptionalAttributes(attrs);
+		attrs.addAttribute(IJBossServerAttributes.WILDFLY_CONFIG_FILE, 
+				ServerManagementAPIConstants.ATTR_TYPE_STRING, 
+				"Set the configuration file you want your WildFly instance to use.", 
+				IJBossServerAttributes.WILDFLY_CONFIG_FILE_DEFAULT);
+
 	}
 }
