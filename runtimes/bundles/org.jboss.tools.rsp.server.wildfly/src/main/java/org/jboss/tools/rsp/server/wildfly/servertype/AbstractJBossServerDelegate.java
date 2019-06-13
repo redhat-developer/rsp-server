@@ -247,13 +247,26 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 			}
 			if( allTerminated ) {
 				setMode(null);
-				setServerState(IServerDelegate.STATE_STOPPED);
 				setStartLaunch(null);
+				setServerState(IServerDelegate.STATE_STOPPED);
 			}
 		}
 		fireServerProcessTerminated(getProcessId(p));
 	}
+	
+	@Override
+	protected void setServerState(int state) {
+		if( state == IServerDelegate.STATE_STOPPED ) {
+			markAllDeploymentsStopped();
+		}
+		super.setServerState(state);
+	}
 
+	protected void markAllDeploymentsStopped() {
+		for( DeployableState ds : getServerPublishModel().getDeployableStates()) {
+			getServerPublishModel().setDeployableState(ds.getReference(), IServerDelegate.STATE_STOPPED);
+		}
+	}
 	protected ILaunch getStartLaunch() {
 		return (ILaunch)getSharedData(START_LAUNCH_SHARED_DATA);
 	}

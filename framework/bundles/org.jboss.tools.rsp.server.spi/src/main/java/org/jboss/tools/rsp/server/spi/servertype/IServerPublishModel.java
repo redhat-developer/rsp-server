@@ -124,4 +124,9 @@ public interface IServerPublishModel {
 	 * @return
 	 */
 	public int getServerPublishState();
+
+	/**
+	 * Update the server publish state based on the state of its deployments 
+	 */
+	public void updateServerPublishStateFromDeployments(boolean fireEvent);
 }
