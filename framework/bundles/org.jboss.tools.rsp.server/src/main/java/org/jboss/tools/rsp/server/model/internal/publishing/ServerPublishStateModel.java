@@ -280,8 +280,6 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 
 	private void fireState() {
-		// Feels strange to allow this class to fire the event
-		// but whatever. This feels so dirty. 
 		if( delegate != null ) {
 			delegate.fireServerStateChanged();
 		}
