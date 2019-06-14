@@ -255,11 +255,11 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	}
 	
 	@Override
-	protected void setServerState(int state) {
+	protected void setServerState(int state, boolean fire) {
 		if( state == IServerDelegate.STATE_STOPPED ) {
 			markAllDeploymentsStopped();
 		}
-		super.setServerState(state);
+		super.setServerState(state, fire);
 	}
 
 	protected void markAllDeploymentsStopped() {
