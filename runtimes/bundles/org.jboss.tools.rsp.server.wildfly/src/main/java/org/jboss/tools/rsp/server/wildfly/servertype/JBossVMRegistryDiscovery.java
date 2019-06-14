@@ -22,7 +22,7 @@ public class JBossVMRegistryDiscovery {
 
 	public IVMInstall findVMInstall(IServerDelegate delegate) {
 		String vmPath = getVMPath(delegate);
-		return findVMInstall(vmPath);
+		return findVMInstall(vmPath, delegate);
 	}
 
 	private String getVMPath(IServerDelegate delegate) {
@@ -32,20 +32,30 @@ public class JBossVMRegistryDiscovery {
 		}
 		return delegate.getServer().getAttribute(IJBossServerAttributes.VM_INSTALL_PATH, (String) null);
 	}
-
 	public IVMInstall findVMInstall(String vmPath) {
-		IVMInstallRegistry reg = getDefaultRegistry();
+		return findVMInstall(vmPath, null);
+	}
 	
+	public IVMInstall findVMInstall(String vmPath, IServerDelegate delegate) {
+		IVMInstallRegistry reg = findDefaultRegistry(delegate);
 		if( reg == null )
 			return null;
 		
 		IVMInstall vmi = null;
 		if( vmPath == null ) {
-			vmi = getDefaultRegistry().getDefaultVMInstall();
+			vmi = reg.getDefaultVMInstall();
 		} else {
-			vmi = getDefaultRegistry().findVMInstall(new File(vmPath));
+			vmi = reg.findVMInstall(new File(vmPath));
 		}
 		return vmi;
+	}
+
+	private IVMInstallRegistry findDefaultRegistry(IServerDelegate delegate) {
+		if( delegate != null && delegate.getServer() != null 
+				&& delegate.getServer().getServerManagementModel() != null) {
+			return delegate.getServer().getServerManagementModel().getVMInstallModel();
+		}
+		return getDefaultRegistry();
 	}
 
 	public IVMRunner getVMRunner(IServerDelegate delegate, String mode) {

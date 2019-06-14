@@ -51,7 +51,7 @@ public class WildFlyStartLauncher extends AbstractLauncher {
 			ret = largs.getStartDefaultVMArgs(new Path(serverHome));
 			int port = getDelegate().getServer().getAttribute(
 					IJBossServerAttributes.JBOSS_SERVER_PORT, (int)-1);
-			if( port != -1 ) {
+			if( port > 0) {
 				ret = ArgsUtil.setSystemProperty(ret, "jboss.http.port", ""+port);
 			}
 		}
