@@ -23,7 +23,6 @@ public class StopServerStopsDeploymentsTest {
 	public void testStopServerStopsDeployments() throws IOException {
 		IServer server = mockServer();
 		TestWildFlyServerDelegate del = (TestWildFlyServerDelegate) server.getDelegate();
-		del.setServerState(ServerManagementAPIConstants.STATE_STARTED);
 		String f = Files.createTempFile(System.currentTimeMillis() + "", ".war").toString();
 		String f1 = Files.createTempFile(System.currentTimeMillis() + "", ".war").toString();
 		String f2 = Files.createTempFile(System.currentTimeMillis() + "", ".war").toString();
@@ -34,6 +33,8 @@ public class StopServerStopsDeploymentsTest {
 		del.getServerPublishModel().addDeployable(r1);
 		del.getServerPublishModel().addDeployable(r2);
 		del.getServerPublishModel().addDeployable(r3);
+		
+		del.setServerState(ServerManagementAPIConstants.STATE_STARTED);
 		del.getServerPublishModel().setDeployableState(r1, ServerManagementAPIConstants.STATE_STARTED);
 		del.getServerPublishModel().setDeployableState(r2, ServerManagementAPIConstants.STATE_STARTED);
 		del.getServerPublishModel().setDeployableState(r3, ServerManagementAPIConstants.STATE_STARTED);
@@ -54,6 +55,30 @@ public class StopServerStopsDeploymentsTest {
 		assertEquals(del.getServerPublishModel().getDeployableState(r2).getState(), ServerManagementAPIConstants.STATE_STOPPED);
 		assertEquals(del.getServerPublishModel().getDeployableState(r3).getState(), ServerManagementAPIConstants.STATE_STOPPED);
 		
+		
+		
+		// Now test the method with fire events in it
+		del.setServerState(ServerManagementAPIConstants.STATE_STARTED);
+		del.getServerPublishModel().setDeployableState(r1, ServerManagementAPIConstants.STATE_STARTED);
+		del.getServerPublishModel().setDeployableState(r2, ServerManagementAPIConstants.STATE_STARTED);
+		del.getServerPublishModel().setDeployableState(r3, ServerManagementAPIConstants.STATE_STARTED);
+
+		
+		assertEquals(del.getServerRunState(), ServerManagementAPIConstants.STATE_STARTED);
+		assertEquals(del.getServerState().getState(), ServerManagementAPIConstants.STATE_STARTED);
+
+		assertEquals(del.getServerPublishModel().getDeployableState(r1).getState(), ServerManagementAPIConstants.STATE_STARTED);
+		assertEquals(del.getServerPublishModel().getDeployableState(r2).getState(), ServerManagementAPIConstants.STATE_STARTED);
+		assertEquals(del.getServerPublishModel().getDeployableState(r3).getState(), ServerManagementAPIConstants.STATE_STARTED);
+		
+		
+		del.setServerState(ServerManagementAPIConstants.STATE_STOPPED, true);
+		assertEquals(del.getServerRunState(), ServerManagementAPIConstants.STATE_STOPPED);
+		assertEquals(del.getServerState().getState(), ServerManagementAPIConstants.STATE_STOPPED);
+
+		assertEquals(del.getServerPublishModel().getDeployableState(r1).getState(), ServerManagementAPIConstants.STATE_STOPPED);
+		assertEquals(del.getServerPublishModel().getDeployableState(r2).getState(), ServerManagementAPIConstants.STATE_STOPPED);
+		assertEquals(del.getServerPublishModel().getDeployableState(r3).getState(), ServerManagementAPIConstants.STATE_STOPPED);
 	}
 	
 	private static class TestWildFlyServerDelegate extends WildFlyServerDelegate {
@@ -65,6 +90,12 @@ public class StopServerStopsDeploymentsTest {
 		public void setServerState(int state) {
 			super.setServerState(state);
 		}
+
+		@Override
+		public void setServerState(int state, boolean fire) {
+			super.setServerState(state, fire);
+		}
+
 		@Override
 		protected IServerPublishModel createServerPublishModel() {
 			return new ServerPublishStateModel(this, null);
