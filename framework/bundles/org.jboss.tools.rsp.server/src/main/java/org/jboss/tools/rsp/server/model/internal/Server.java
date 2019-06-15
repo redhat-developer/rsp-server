@@ -122,9 +122,9 @@ public class Server extends SecuredBase implements IServer {
 					Map<String, Object> optionMap = new HashMap<>();
 					if( options != null ) {
 						for( IMemento one : options ) {
-							String k = one.getString(MEMENTO_DEPLOYABLE_KEY);
-							String v = one.getString(MEMENTO_DEPLOYABLE_VAL);
-							optionMap.put(k,v);
+							for (String name: one.getNames()) {
+								optionMap.put(name, one.getString(name));
+							}
 						}
 					}
 					DeployableReference ref = new DeployableReference(label, path); 
