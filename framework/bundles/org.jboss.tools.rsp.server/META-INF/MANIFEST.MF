@@ -48,5 +48,6 @@ Export-Package: org.jboss.tools.rsp.server,
  org.jboss.tools.rsp.server.filewatcher,
  org.jboss.tools.rsp.server.jobs,
  org.jboss.tools.rsp.server.model,
+ org.jboss.tools.rsp.server.model.internal;x-friends:="org.jboss.tools.rsp.server.test",
  org.jboss.tools.rsp.server.model.internal.publishing;x-friends:="org.jboss.tools.rsp.server.test"
 Require-Bundle: org.jboss.tools.rsp.api

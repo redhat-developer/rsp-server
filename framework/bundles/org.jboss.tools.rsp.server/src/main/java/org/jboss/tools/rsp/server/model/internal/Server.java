@@ -40,8 +40,6 @@ public class Server extends SecuredBase implements IServer {
 	private static final String MEMENTO_DEPLOYABLE_PATH = "path";
 	private static final String MEMENTO_DEPLOYABLE_OPTIONS = "options";
 	private static final String MEMENTO_DEPLOYABLE_OPTION = "option";
-	private static final String MEMENTO_DEPLOYABLE_KEY = "key";
-	private static final String MEMENTO_DEPLOYABLE_VAL = "val";
 
 	private IServerDelegate delegate;
 	private IServerType serverType;
