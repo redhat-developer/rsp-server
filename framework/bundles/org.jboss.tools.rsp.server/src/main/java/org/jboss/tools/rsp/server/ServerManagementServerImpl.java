@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.RSPServer;
+import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.SocketLauncher;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
@@ -651,12 +652,15 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	private Status publishSync(PublishServerRequest request) {
-		if( request == null || request.getServer() == null ) {
+		if( request == null || request.getServer() == null 
+				|| request.getServer().getId() == null) {
 			return errorStatus("Invalid request; Expected fields not present.", null);
 		}
-		
 		try {
 			IServer server = managementModel.getServerModel().getServer(request.getServer().getId());
+			if( server == null ) {
+				return errorStatus("Server not found: " + request.getServer().getId(), null);
+			}
 			IStatus stat = managementModel.getServerModel().publish(server, request.getKind());
 			return StatusConverter.convert(stat);
 		} catch(CoreException ce) {

@@ -613,6 +613,16 @@ public class ServerModel implements IServerModel {
 
 	@Override
 	public IStatus publish(IServer server, int kind) throws CoreException {
+		if(kind != ServerManagementAPIConstants.PUBLISH_INCREMENTAL &&
+				kind != ServerManagementAPIConstants.PUBLISH_FULL &&
+						kind != ServerManagementAPIConstants.PUBLISH_CLEAN &&
+								kind != ServerManagementAPIConstants.PUBLISH_AUTO) {
+			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+					NLS.bind("Publish request for server {0} failed: Publish kind constant {1} is invalid.",
+							server.getId(), kind));
+		}
+		
+
 		IServerDelegate s = serverDelegates.get(server.getId());
 		if( s != null ) {
 			IStatus canPublish = s.canPublish();
