@@ -1,0 +1,53 @@
+{
+  "type" : "object",
+  "properties" : {
+    "attributes" : {
+      "type" : "object",
+      "properties" : {
+        "attributes" : {
+          "type" : "object",
+          "additionalProperties" : {
+            "type" : "object",
+            "properties" : {
+              "type" : {
+                "type" : "string"
+              },
+              "description" : {
+                "type" : "string"
+              },
+              "defaultVal" : {
+                "type" : "any"
+              },
+              "secret" : {
+                "type" : "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "status" : {
+      "type" : "object",
+      "properties" : {
+        "severity" : {
+          "type" : "integer"
+        },
+        "plugin" : {
+          "type" : "string"
+        },
+        "code" : {
+          "type" : "integer"
+        },
+        "message" : {
+          "type" : "string"
+        },
+        "trace" : {
+          "type" : "string"
+        },
+        "ok" : {
+          "type" : "boolean"
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2019-06-12 16:10:23.
+// Generated using typescript-generator version 2.2.413 on 2019-06-17 14:57:43.
 
 export interface Attribute {
     type: string;
@@ -93,6 +93,16 @@ export interface LaunchAttributesRequest {
 export interface LaunchParameters {
     mode: string;
     params: ServerAttributes;
+}
+
+export interface ListDeployablesResponse {
+    states: DeployableState[];
+    status: Status;
+}
+
+export interface ListDeploymentOptionsResponse {
+    attributes: Attributes;
+    status: Status;
 }
 
 export interface ListDownloadRuntimeResponse {
