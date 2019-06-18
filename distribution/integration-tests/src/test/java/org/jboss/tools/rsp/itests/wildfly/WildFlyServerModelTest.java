@@ -26,6 +26,7 @@ import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.itests.RSPCase;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
+import org.jboss.tools.rsp.server.wildfly.servertype.impl.WildFlyServerType;
 import org.junit.Test;
 
 /**
@@ -127,26 +128,31 @@ public class WildFlyServerModelTest extends RSPCase {
     @Test
     public void testGetOptionalAttributes() throws Exception {
         Attributes attr = serverProxy.getOptionalAttributes(wildflyType).get();
-        
-        Map<String, Attribute> expected = new HashMap<>();
-        expected.put("vm.install.path", new Attribute("string",
-                "A string representation pointing to a java home. If not set, java.home will be used instead.", null));
-        
-        expected.put(IJBossServerAttributes.AUTOPUBLISH_ENABLEMENT,
-        		new Attribute(
-					ServerManagementAPIConstants.ATTR_TYPE_BOOL, 
-					"Enable the autopublisher.", 
-					IJBossServerAttributes.AUTOPUBLISH_ENABLEMENT_DEFAULT)
-        		);
-
-        expected.put(IJBossServerAttributes.AUTOPUBLISH_INACTIVITY_LIMIT,
-        		new Attribute(
-					ServerManagementAPIConstants.ATTR_TYPE_INT, 
-					"Set the inactivity limit before the autopublisher runs.", 
-					IJBossServerAttributes.AUTOPUBLISH_INACTIVITY_LIMIT_DEFAULT)
-        		);
+        Attributes expected1 = new WildFlyServerType("blah", "blah", "blah").getOptionalAttributes();
+        Map<String, Attribute> expected = expected1.getAttributes();
+		
+		assertEquals(expected.size(), attr.getAttributes().size());
+		assertEquals(expected.keySet(), attr.getAttributes().keySet());
+		for( String k : expected.keySet()) {
+			Attribute expectedAttr = expected.get(k);
+			Attribute actualAttr = attr.getAttributes().get(k);
+			assertEquals(expectedAttr.getDescription(), actualAttr.getDescription());
+			assertEquals(expectedAttr.getType(), actualAttr.getType());
+			assertEquals(expectedAttr.isSecret(), actualAttr.isSecret());
+			assertEqualsExceptDoubleShouldBeInt(
+					expectedAttr.getDefaultVal(), actualAttr.getDefaultVal());
+		}
     }
-    
+
+	private void assertEqualsExceptDoubleShouldBeInt(
+			Object expected, Object actual) {
+		if( expected instanceof Integer && actual instanceof Double) {
+			assertTrue(((Double)actual).intValue() == ((Integer)expected).intValue());
+		} else {
+			assertEquals(expected, actual);
+		}
+		
+	}
     @Test
     public void testGetOptionalAttributesInvalid() throws Exception {
         ServerType type = new ServerType("foo", "bar", "baz");
