@@ -28,15 +28,24 @@ public class RSPServerHandler {
     private static final int WAIT_SERVER_STARTED = 3000;
     private static final String DISTRIBUTION_FILENAME = System.getProperty("rsp-distribution.filename") + ".zip";
     private static final String DISTRIBUTION_PATH = "../distribution/target/";
-    private static final String SERVER_ROOT = DISTRIBUTION_PATH + "/rsp-distribution";
+    
+    
+    private static final String SERVER_ROOT_SYSPROP = "rsp.distro.root";
+    private static final String SERVER_ROOT_SYSPROP_RESOLVED = System.getProperty(SERVER_ROOT_SYSPROP);
+    private static final String SERVER_ROOT = 
+    		SERVER_ROOT_SYSPROP_RESOLVED != null ? SERVER_ROOT_SYSPROP_RESOLVED : 
+    		(DISTRIBUTION_PATH + "/rsp-distribution");
+    
     private static final File SERVER_DATA = LaunchingCore.getDataLocation();
     private static final String DATA_BACKUP = SERVER_DATA + ".backup";
 
     private static Process serverProcess;
 
     public static void prepareServer() throws ZipException {
-    	ZipFile zipFile = new ZipFile(new File(DISTRIBUTION_PATH, DISTRIBUTION_FILENAME));
-        zipFile.extractAll(DISTRIBUTION_PATH);
+    	if( SERVER_ROOT_SYSPROP_RESOLVED == null || !(new File(SERVER_ROOT_SYSPROP_RESOLVED).exists())) {
+	    	ZipFile zipFile = new ZipFile(new File(DISTRIBUTION_PATH, DISTRIBUTION_FILENAME));
+	        zipFile.extractAll(DISTRIBUTION_PATH);
+    	}
     }
 
     public static void startServer() throws Exception {
