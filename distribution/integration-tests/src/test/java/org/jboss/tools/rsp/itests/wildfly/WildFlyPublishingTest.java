@@ -22,6 +22,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
@@ -55,6 +59,8 @@ public class WildFlyPublishingTest extends RSPCase {
 	private ServerHandle handle;
 	private DeployableReference reference;
 	private File warFile = createWar();
+	
+	private static Logger log = Logger.getLogger(WildFlyPublishingTest.class.getName());
 
 	@Before
 	public void before() throws Exception {
@@ -145,10 +151,19 @@ public class WildFlyPublishingTest extends RSPCase {
 		assertEquals(Status.ERROR, status.getSeverity());
 	}
 
+	/*
+	 * Test is still failing and without timeout in blocking get call, it would get stuck
+	 * Passing null value into addDeployable breaks the server.
+	 */
 	@Test
 	public void testAddNullDeployment() throws InterruptedException, ExecutionException {
-		Status status = serverProxy.addDeployable(null).get();
-		assertEquals(Status.ERROR, status.getSeverity());
+		try {
+			Status status = serverProxy.addDeployable(null).get(2, TimeUnit.SECONDS);
+			assertEquals(Status.ERROR, status.getSeverity());
+		} catch (TimeoutException e) {
+			log.log(Level.SEVERE, "Timeout exception occured during addDeployable call", e);
+			fail("AddDeployable call with null parameter has timed out.");
+		}
 	}
 
 	@Test
