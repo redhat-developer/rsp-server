@@ -3,6 +3,10 @@
 pipeline {
 	agent { label 'rhel7-micro' }
 	
+	options {
+        timeout(time: 1, unit: 'HOURS')
+    }
+
 	tools {
 		maven 'maven3-latest'
 		jdk 'openjdk-1.8'
