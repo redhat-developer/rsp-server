@@ -58,7 +58,7 @@ public class DeploymentGeneration {
 			ZipEntry e2 = new ZipEntry("META-INF/MANIFEST.MF");
 			out.putNextEntry(e2);
 			byte[] data2 = manifest.getBytes();
-			out.write(data, 0, data2.length);
+			out.write(data2, 0, data2.length);
 			out.closeEntry();
 
 			ZipEntry e3 = new ZipEntry("WEB-INF/web.xml");
