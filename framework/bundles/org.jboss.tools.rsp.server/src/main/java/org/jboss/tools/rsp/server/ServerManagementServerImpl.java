@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.RSPServer;
-import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.SocketLauncher;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
@@ -612,10 +611,10 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 	
 	public CompletableFuture<Status> addDeployable(ServerDeployableReference request) {
-		return createCompletableFuture(() -> addDeployableSync(request.getServer(), request));
+		return createCompletableFuture(() -> addDeployableSync(request));
 	}
 
-	public Status addDeployableSync(ServerHandle handle, ServerDeployableReference req) {
+	public Status addDeployableSync(ServerDeployableReference req) {
 		if( req == null || req.getServer() == null || req.getDeployableReference() == null) {
 			return errorStatus("Invalid request; Expected fields not present.", null);
 		}
