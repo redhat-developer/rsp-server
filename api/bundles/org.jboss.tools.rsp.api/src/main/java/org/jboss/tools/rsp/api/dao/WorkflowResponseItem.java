@@ -8,7 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.api.dao;
 
-import java.util.List;
+import java.util.HashMap;
 
 public class WorkflowResponseItem {
 	// An id for this item, such as 'workflow.license', "workflow.username", "workflow.password", etc
@@ -16,6 +16,13 @@ public class WorkflowResponseItem {
 	// Or can try to re-use common types listed in ServerManagementAPIConstants
 	private String id;
 	
+	/*
+	 * One of
+	 *    null (defaults to  WORKFLOW_TYPE_PROMPT)
+	 *    ServerManagementAPIConstants.WORKFLOW_TYPE_PROMPT
+	 *    ServerManagementAPIConstants.WORKFLOW_TYPE_OPEN_EDITOR
+	 *    ServerManagementAPIConstants.WORKFLOW_TYPE_OPEN_BROWSER
+	 */
 	private String itemType;
 
 	// What to show: 
@@ -27,27 +34,14 @@ public class WorkflowResponseItem {
 	// or the value for a link url, 
 	private String content;
 	
+	private WorkflowPromptDetails prompt;
 	
-	/*
-	 * One of 
-	 *    null  (no response required)
-	 *    ServerManagementAPIConstants.ATTR_TYPE_BOOL
-	 *    ServerManagementAPIConstants.ATTR_TYPE_INT
-	 *    ServerManagementAPIConstants.ATTR_TYPE_STRING
-	 *    ServerManagementAPIConstants.ATTR_TYPE_LIST
-	 *    ServerManagementAPIConstants.ATTR_TYPE_MAP
-	 */
-	private String responseType;
+	private HashMap<String,String> properties;
 	
-	/*
-	 * Is the response a secret / should it be hidden in the UI when typing it?
-	 */
-	private boolean responseSecret = false;
 	
-	// A list of valid responses or null if any conforming type is acceptable
-	private List<String> validResponses;
-
-	
+	public WorkflowResponseItem() {
+		// 0-arg constructor 
+	}
 	
 	/*
 	 * Getters and setters below
@@ -85,29 +79,20 @@ public class WorkflowResponseItem {
 		this.content = content;
 	}
 
-	public String getResponseType() {
-		return responseType;
+	public WorkflowPromptDetails getPrompt() {
+		return prompt;
 	}
 
-	public void setResponseType(String responseType) {
-		this.responseType = responseType;
+	public void setPrompt(WorkflowPromptDetails prompt) {
+		this.prompt = prompt;
 	}
 
-	public List<String> getValidResponses() {
-		return validResponses;
+	public HashMap<String,String> getProperties() {
+		return properties;
 	}
 
-	public void setValidResponses(List<String> validResponses) {
-		this.validResponses = validResponses;
+	public void setProperties(HashMap<String,String> properties) {
+		this.properties = properties;
 	}
 
-	public boolean isResponseSecret() {
-		return responseSecret;
-	}
-
-	public void setResponseSecret(boolean responseSecret) {
-		this.responseSecret = responseSecret;
-	}
-	
-	
 }

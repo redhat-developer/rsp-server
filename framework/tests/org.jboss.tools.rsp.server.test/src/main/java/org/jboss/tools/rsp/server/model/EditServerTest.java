@@ -179,11 +179,6 @@ public class EditServerTest {
 			super(server);
 		}
 
-		@Override
-		public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params) {
-			// TODO Auto-generated method stub
-			return null;
-		}
 	}
 }
 

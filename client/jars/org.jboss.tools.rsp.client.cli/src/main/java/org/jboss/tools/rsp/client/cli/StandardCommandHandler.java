@@ -594,11 +594,11 @@ public class StandardCommandHandler implements InputHandler {
 					if( item.getContent() != null )
 						System.out.println("Content:\n" + item.getContent());
 					
-					String type = item.getResponseType();
+					String type = item.getPrompt().getResponseType();
 					if( type != null && !ServerManagementAPIConstants.ATTR_TYPE_NONE.equals(type)) {
 						// Prompt for input
 						asst.promptForAttributeSingleKey(type, null, null, 
-								item.getId(), item.isResponseSecret(), true, toSend);
+								item.getId(), item.getPrompt().isResponseSecret(), true, toSend);
 					}
 				}
 				return toSend;

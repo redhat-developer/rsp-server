@@ -608,10 +608,6 @@ public class ServerDeployableTest {
 			super(server);
 		}
 		@Override
-		public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params) {
-			return null;
-		}
-		@Override
 		protected void publishDeployable(
 				DeployableReference reference, 
 				int publishRequestType, int modulePublishState) throws CoreException {
@@ -644,10 +640,5 @@ public class ServerDeployableTest {
 		protected void setDeployableState2(DeployableReference reference, int runState) {
 			setDeployableState(reference, runState);
 		}
-		@Override
-		public void updateServer(IServer dummyServer, UpdateServerResponse resp) {
-			// Do nothing
-		}
-
 	}
 }
