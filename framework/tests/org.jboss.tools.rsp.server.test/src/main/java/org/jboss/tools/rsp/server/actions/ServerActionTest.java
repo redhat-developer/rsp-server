@@ -29,6 +29,7 @@ import org.jboss.tools.rsp.api.RSPServer;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
 import org.jboss.tools.rsp.api.dao.ServerActionRequest;
+import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.WorkflowPromptDetails;
@@ -203,10 +204,14 @@ public class ServerActionTest {
 		assertTrue(resp.getStatus().isOK());
 		assertNotNull(resp.getWorkflows());
 		assertTrue(resp.getWorkflows().size() == 1);
-		Map<String, WorkflowResponse> map = resp.getWorkflows();
-		assertNotNull(map);
-		assertTrue(map.containsKey(ServerActionTestDelegateOneAction.ACTION_ID));
-		WorkflowResponse action1 = map.get(ServerActionTestDelegateOneAction.ACTION_ID);
+		List<ServerActionWorkflow> list = resp.getWorkflows();
+		assertNotNull(list);
+		assertTrue(list.size() == 1);
+
+		ServerActionWorkflow actionWrapper = list.get(0);
+		assertTrue(actionWrapper.getActionId().equals(ServerActionTestDelegateOneAction.ACTION_ID));
+		
+		WorkflowResponse action1 = actionWrapper.getActionWorkflow();
 		assertNotNull(action1.getItems());
 		assertTrue(action1.getItems().size() == 1);
 		WorkflowResponseItem i1 = action1.getItems().get(0);
@@ -229,11 +234,14 @@ public class ServerActionTest {
 		assertNotNull(resp.getStatus());
 		assertTrue(resp.getStatus().isOK());
 		assertNotNull(resp.getWorkflows());
+		
+		List<ServerActionWorkflow> list = resp.getWorkflows();
+		assertNotNull(list);
+		assertTrue(list.size() == 1);
+		ServerActionWorkflow actionWrapper = list.get(0);
+		assertTrue(actionWrapper.getActionId().equals(ServerActionTestDelegateOneAction.ACTION_ID));
+		WorkflowResponse action1 = actionWrapper.getActionWorkflow();
 		assertTrue(resp.getWorkflows().size() == 1);
-		Map<String, WorkflowResponse> map = resp.getWorkflows();
-		assertNotNull(map);
-		assertTrue(map.containsKey(ServerActionTestDelegateOneAction.ACTION_ID));
-		WorkflowResponse action1 = map.get(ServerActionTestDelegateOneAction.ACTION_ID);
 		assertNotNull(action1.getItems());
 		assertTrue(action1.getItems().size() == 1);
 		WorkflowResponseItem i1 = action1.getItems().get(0);
@@ -262,29 +270,36 @@ public class ServerActionTest {
 	}
 
 	private class ServerActionTestDelegateOneAction extends AbstractServerDelegate {
-		public static final String WORKFLOW_ITEM_ONE_ID  = "action1.action.id";
+		public static final String SINGLE_PROMPT_ID  = "action1.action.id";
 		public static final String ACTION_ID = "test.action1";
-		public static final String LABEL = "Prompt Label";
+		public static final String ACTION_LABEL = "action label";
+		public static final String SINGLE_PROMPT_LABEL = "Prompt Label";
 		public ServerActionTestDelegateOneAction(IServer server) {
 			super(server);
 		}
 		public ListServerActionResponse listServerActions() {
 			ListServerActionResponse ret = new ListServerActionResponse();
 			ret.setStatus(StatusConverter.convert(Status.OK_STATUS));
-			Map<String, WorkflowResponse> actions = new LinkedHashMap<>();
+			List<ServerActionWorkflow> workflows = new ArrayList<>();
+			ret.setWorkflows(workflows);
+			
+			// Create one action
 			WorkflowResponse oneWorkflow = new WorkflowResponse();
 			List<WorkflowResponseItem> itemList = new ArrayList<>();
 			WorkflowResponseItem item1 = new WorkflowResponseItem();
-			item1.setId(WORKFLOW_ITEM_ONE_ID);
-			item1.setLabel(LABEL);
+			item1.setId(SINGLE_PROMPT_ID);
+			item1.setLabel(SINGLE_PROMPT_LABEL);
 			WorkflowPromptDetails pDetails = new WorkflowPromptDetails();
 			pDetails.setResponseSecret(false);
 			pDetails.setResponseType(ServerManagementAPIConstants.ATTR_TYPE_STRING);
 			item1.setPrompt(pDetails);
 			itemList.add(item1);
 			oneWorkflow.setItems(itemList);
-			actions.put(ACTION_ID, oneWorkflow);
-			ret.setWorkflows(actions);
+			
+			ServerActionWorkflow actionWorkflow = new ServerActionWorkflow(
+					ACTION_ID, ACTION_LABEL, oneWorkflow);
+			workflows.add(actionWorkflow);
+			ret.setWorkflows(workflows);
 			return ret;
 		}
 	}
@@ -296,7 +311,7 @@ public class ServerActionTest {
 		public ListServerActionResponse listServerActions() {
 			ListServerActionResponse ret = new ListServerActionResponse();
 			ret.setStatus(StatusConverter.convert(Status.OK_STATUS));
-			ret.setWorkflows(new HashMap<>());
+			ret.setWorkflows(new ArrayList<>());
 			return ret;
 		}
 	}

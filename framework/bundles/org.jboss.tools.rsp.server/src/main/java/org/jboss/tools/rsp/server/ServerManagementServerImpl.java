@@ -814,8 +814,6 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( id == null ) { 
 			return errorStatus("Invalid Request: Request must include server id.");
 		}
-		System.out.println(managementModel);
-		System.out.println(managementModel.getServerModel());
 		IServer server = managementModel.getServerModel().getServer(id);
 		if( server == null ) {
 			return errorStatus(NLS.bind(ServerStringConstants.SERVER_DNE, id), null);

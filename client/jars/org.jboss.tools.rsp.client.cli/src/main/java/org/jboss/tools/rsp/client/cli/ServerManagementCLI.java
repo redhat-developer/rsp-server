@@ -72,7 +72,7 @@ public class ServerManagementCLI implements InputProvider, IClientConnectionClos
 
 	@Override
 	public void addInputRequest(InputHandler handler) {
-		if (queue.peek() == null) {
+		if (queue.peek() == null || (queue.peek().isDone() && queue.size() == 1)) {
 			printUserPrompt(handler);
 		}
 		queue.add(handler);

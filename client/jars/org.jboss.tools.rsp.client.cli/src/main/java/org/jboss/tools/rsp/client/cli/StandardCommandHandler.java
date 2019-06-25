@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
@@ -34,7 +35,10 @@ import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ListDeployablesResponse;
 import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
+import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
+import org.jboss.tools.rsp.api.dao.ServerActionRequest;
+import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerBean;
 import org.jboss.tools.rsp.api.dao.ServerDeployableReference;
@@ -546,6 +550,59 @@ public class StandardCommandHandler implements InputHandler {
 			}
 		},
 
+		RUN_SERVER_ACTION("server action") {
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
+				try {
+					ServerHandle server = assistant.selectServer();
+					if( server != null ) {
+						CompletableFuture<ListServerActionResponse> resp = launcher.getServerProxy().listServerActions(server);
+						ListServerActionResponse resp2 = resp.get();
+						if( resp2.getStatus() == null || !resp2.getStatus().isOK()) {
+							System.out.println(resp2.getStatus());
+							return;
+						}
+						
+						// Select an action
+						ServerActionWorkflow actionToRun = assistant.selectServerAction(resp2);
+						if( actionToRun == null ) {
+							System.out.println("Aborted.");
+							return;
+						}
+						
+						boolean continueWorklow = validateWorkflowResponse(actionToRun.getActionWorkflow(), 
+								"The action '" + actionToRun.getActionLabel() + "' is running.");
+						if( !continueWorklow )
+							return;
+						Map<String, Object> toSend = displayPromptsSeekWorkflowInput(actionToRun.getActionWorkflow(), assistant);
+						
+						ServerActionRequest serverActionReq = new ServerActionRequest();
+						serverActionReq.setActionId(actionToRun.getActionId());
+						serverActionReq.setData(toSend);
+						serverActionReq.setServerId(server.getId());
+						WorkflowResponse workflowResp = launcher.getServerProxy().executeServerAction(serverActionReq).get();
+						
+						boolean done = false;
+						while( !done ) {
+							continueWorklow = validateWorkflowResponse(workflowResp, 
+									"The action '" + actionToRun.getActionLabel() + "' is running.");
+							if( !continueWorklow )
+								return;
+							toSend = displayPromptsSeekWorkflowInput(actionToRun.getActionWorkflow(), assistant);
+							
+							serverActionReq = new ServerActionRequest();
+							serverActionReq.setActionId(actionToRun.getActionId());
+							serverActionReq.setData(toSend);
+							serverActionReq.setServerId(server.getId());
+							serverActionReq.setRequestId(workflowResp.getRequestId());
+							workflowResp = launcher.getServerProxy().executeServerAction(serverActionReq).get();
+						}
+					}
+				} catch(InterruptedException | ExecutionException ioe) {
+					ioe.printStackTrace();
+				}
+			}
+		},
 		LIST_RUNTIMES("list runtimes") {
 			@Override
 			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
@@ -562,47 +619,6 @@ public class StandardCommandHandler implements InputHandler {
 		},
 
 		DOWNLOAD_RUNTIME("download runtime") {
-			private boolean validateResponse(WorkflowResponse resp) {
-				if( resp == null || resp.getStatus() == null) {
-					System.out.println("The server has returned an empty response.");
-					return false;
-				}
-				int statusSev = resp.getStatus().getSeverity();
-				if( statusSev == Status.OK) {
-					// All done
-					System.out.println("The runtime is downloading.");
-					return false;
-				} 
-				
-				if( statusSev == Status.CANCEL || statusSev == Status.ERROR ) {
-					System.out.println("The download runtime workflow has failed.");
-					System.out.println(resp.getStatus().getMessage());
-					return false;
-				}
-				return true;
-			}
-			
-			private Map<String, Object> displayPromptsSeekInput(WorkflowResponse resp, PromptAssistant asst) {
-
-				HashMap<String, Object> toSend = new HashMap<>();
-				
-				List<WorkflowResponseItem> respItems = resp.getItems();
-				for( WorkflowResponseItem item : respItems ) {
-					System.out.println("Item: " + item.getId());
-					if( item.getLabel() != null)
-						System.out.println("Label: " + item.getLabel());
-					if( item.getContent() != null )
-						System.out.println("Content:\n" + item.getContent());
-					
-					String type = item.getPrompt().getResponseType();
-					if( type != null && !ServerManagementAPIConstants.ATTR_TYPE_NONE.equals(type)) {
-						// Prompt for input
-						asst.promptForAttributeSingleKey(type, null, null, 
-								item.getId(), item.getPrompt().isResponseSecret(), true, toSend);
-					}
-				}
-				return toSend;
-			}
 			
 			@Override
 			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
@@ -617,10 +633,10 @@ public class StandardCommandHandler implements InputHandler {
 					WorkflowResponse resp = launcher.getServerProxy().downloadRuntime(req).get();
 					boolean done = false;
 					while( !done ) {
-						boolean continueWorklow = validateResponse(resp);
+						boolean continueWorklow = validateWorkflowResponse(resp, "The runtime is downloading.");
 						if( !continueWorklow )
 							return;
-						Map<String, Object> toSend = displayPromptsSeekInput(resp, assistant);
+						Map<String, Object> toSend = displayPromptsSeekWorkflowInput(resp, assistant);
 						DownloadSingleRuntimeRequest req2 = new DownloadSingleRuntimeRequest();
 						req2.setRequestId(resp.getRequestId());
 						req2.setDownloadRuntimeId(dlrt.getId());
@@ -710,6 +726,52 @@ public class StandardCommandHandler implements InputHandler {
 			System.out.println("command: " + String.join(" ", cmdline));
 		}
 
+		
+		private static boolean validateWorkflowResponse(WorkflowResponse resp, String okMessage) {
+			if( resp == null || resp.getStatus() == null) {
+				System.out.println("The server has returned an empty response.");
+				return false;
+			}
+			int statusSev = resp.getStatus().getSeverity();
+			if( statusSev == Status.OK) {
+				// All done
+				System.out.println("The workflow has completed: " + okMessage);
+				return false;
+			} 
+			
+			if( statusSev == Status.CANCEL || statusSev == Status.ERROR ) {
+				System.out.println("The workflow has failed.");
+				System.out.println(resp.getStatus().getMessage());
+				return false;
+			}
+			return true;
+		}
+		
+
+		private static Map<String, Object> displayPromptsSeekWorkflowInput(WorkflowResponse resp, PromptAssistant asst) {
+
+			HashMap<String, Object> toSend = new HashMap<>();
+			
+			List<WorkflowResponseItem> respItems = resp.getItems();
+			if( respItems == null )
+				return toSend;
+			
+			for( WorkflowResponseItem item : respItems ) {
+				System.out.println("Item: " + item.getId());
+				if( item.getLabel() != null)
+					System.out.println("Label: " + item.getLabel());
+				if( item.getContent() != null )
+					System.out.println("Content:\n" + item.getContent());
+				
+				String type = item.getPrompt().getResponseType();
+				if( type != null && !ServerManagementAPIConstants.ATTR_TYPE_NONE.equals(type)) {
+					// Prompt for input
+					asst.promptForAttributeSingleKey(type, null, null, 
+							item.getId(), item.getPrompt().isResponseSecret(), true, toSend);
+				}
+			}
+			return toSend;
+		}
 	}
 	
 	private ServerManagementClientLauncher launcher;

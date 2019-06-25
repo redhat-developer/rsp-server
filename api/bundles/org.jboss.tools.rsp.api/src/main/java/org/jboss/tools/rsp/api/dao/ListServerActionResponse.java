@@ -1,9 +1,9 @@
 package org.jboss.tools.rsp.api.dao;
 
-import java.util.Map;
+import java.util.List;
 
 public class ListServerActionResponse {
-	private Map<String, WorkflowResponse> workflows;
+	private List<ServerActionWorkflow> workflows;
 	private Status status;
 	
 	public ListServerActionResponse() {
@@ -18,11 +18,11 @@ public class ListServerActionResponse {
 		this.status = status;
 	}
 
-	public Map<String, WorkflowResponse> getWorkflows() {
+	public List<ServerActionWorkflow> getWorkflows() {
 		return workflows;
 	}
 
-	public void setWorkflows(Map<String, WorkflowResponse> workflows) {
+	public void setWorkflows(List<ServerActionWorkflow> workflows) {
 		this.workflows = workflows;
 	}
 }

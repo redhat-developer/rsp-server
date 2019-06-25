@@ -575,7 +575,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	public ListServerActionResponse listServerActions() {
 		ListServerActionResponse ret = new ListServerActionResponse();
 		ret.setStatus(StatusConverter.convert(Status.OK_STATUS));
-		ret.setWorkflows(new HashMap<>());
+		ret.setWorkflows(new ArrayList<>());
 		return ret;
 	}
 	@Override
