@@ -759,7 +759,13 @@ public class ServerManagementServerImpl implements RSPServer {
 			return resp;
 		}
 		IServer server = managementModel.getServerModel().getServer(handle.getId());
-		return server.getDelegate().listServerActions();
+		try {
+			return server.getDelegate().listServerActions();
+		} catch(RuntimeException re) {
+			Status err = errorStatus("Error loading actions: " + re.getMessage(), re);
+			resp.setStatus(err);
+			return resp;
+		}
 	}
 
 	@Override
@@ -776,7 +782,15 @@ public class ServerManagementServerImpl implements RSPServer {
 		}
 		IServer server = managementModel.getServerModel().getServer(serverId);
 		IServerDelegate del = server.getDelegate();
-		return del.executeServerAction(req);
+		try {
+			return del.executeServerAction(req);
+		} catch(RuntimeException re) {
+			Status err = errorStatus("Error loading actions: " + re.getMessage(), re);
+			WorkflowResponse resp3 = new WorkflowResponse();
+			resp3.setRequestId(req.getRequestId());
+			resp3.setStatus(err);
+			return resp3;
+		}
 	}
 
 	private Status verifyServerAndDelegate(ServerHandle handle) {
