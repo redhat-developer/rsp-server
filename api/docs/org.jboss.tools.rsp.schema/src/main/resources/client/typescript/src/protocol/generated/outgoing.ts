@@ -136,6 +136,14 @@ export class Outgoing {
         return Common.sendSimpleRequest(this.connection, Messages.Server.DownloadRuntimeRequest.type,
             param, timeout, ErrorMessages.DOWNLOADRUNTIME_TIMEOUT);
     }
+    listServerActions(param: Protocol.ServerHandle, timeout: number = Common.DEFAULT_TIMEOUT): Promise<Protocol.ListServerActionResponse> {
+        return Common.sendSimpleRequest(this.connection, Messages.Server.ListServerActionsRequest.type,
+            param, timeout, ErrorMessages.LISTSERVERACTIONS_TIMEOUT);
+    }
+    executeServerAction(param: Protocol.ServerActionRequest, timeout: number = Common.DEFAULT_TIMEOUT): Promise<Protocol.WorkflowResponse> {
+        return Common.sendSimpleRequest(this.connection, Messages.Server.ExecuteServerActionRequest.type,
+            param, timeout, ErrorMessages.EXECUTESERVERACTION_TIMEOUT);
+    }
     getJobs(timeout: number = Common.DEFAULT_TIMEOUT): Promise<Array<Protocol.JobProgress>> {
         return Common.sendSimpleRequest(this.connection, Messages.Server.GetJobsRequest.type,
             null, timeout, ErrorMessages.GETJOBS_TIMEOUT);
@@ -179,6 +187,8 @@ export namespace ErrorMessages {
     export const PUBLISH_TIMEOUT = 'Failed to publish in time';
     export const LISTDOWNLOADABLERUNTIMES_TIMEOUT = 'Failed to list downloadable runtimes in time';
     export const DOWNLOADRUNTIME_TIMEOUT = 'Failed to download runtime in time';
+    export const LISTSERVERACTIONS_TIMEOUT = 'Failed to list server actions in time';
+    export const EXECUTESERVERACTION_TIMEOUT = 'Failed to execute server action in time';
     export const GETJOBS_TIMEOUT = 'Failed to get jobs in time';
     export const CANCELJOB_TIMEOUT = 'Failed to cancel job in time';
 }

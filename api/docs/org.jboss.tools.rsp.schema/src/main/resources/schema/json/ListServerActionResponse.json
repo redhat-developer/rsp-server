@@ -1,0 +1,119 @@
+{
+  "type" : "object",
+  "properties" : {
+    "workflows" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "actionId" : {
+            "type" : "string"
+          },
+          "actionLabel" : {
+            "type" : "string"
+          },
+          "actionWorkflow" : {
+            "type" : "object",
+            "properties" : {
+              "status" : {
+                "type" : "object",
+                "properties" : {
+                  "severity" : {
+                    "type" : "integer"
+                  },
+                  "plugin" : {
+                    "type" : "string"
+                  },
+                  "code" : {
+                    "type" : "integer"
+                  },
+                  "message" : {
+                    "type" : "string"
+                  },
+                  "trace" : {
+                    "type" : "string"
+                  },
+                  "ok" : {
+                    "type" : "boolean"
+                  }
+                }
+              },
+              "requestId" : {
+                "type" : "integer"
+              },
+              "jobId" : {
+                "type" : "string"
+              },
+              "items" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "object",
+                  "properties" : {
+                    "id" : {
+                      "type" : "string"
+                    },
+                    "itemType" : {
+                      "type" : "string"
+                    },
+                    "label" : {
+                      "type" : "string"
+                    },
+                    "content" : {
+                      "type" : "string"
+                    },
+                    "prompt" : {
+                      "type" : "object",
+                      "properties" : {
+                        "responseType" : {
+                          "type" : "string"
+                        },
+                        "responseSecret" : {
+                          "type" : "boolean"
+                        },
+                        "validResponses" : {
+                          "type" : "array",
+                          "items" : {
+                            "type" : "string"
+                          }
+                        }
+                      }
+                    },
+                    "properties" : {
+                      "type" : "object",
+                      "additionalProperties" : {
+                        "type" : "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "status" : {
+      "type" : "object",
+      "properties" : {
+        "severity" : {
+          "type" : "integer"
+        },
+        "plugin" : {
+          "type" : "string"
+        },
+        "code" : {
+          "type" : "integer"
+        },
+        "message" : {
+          "type" : "string"
+        },
+        "trace" : {
+          "type" : "string"
+        },
+        "ok" : {
+          "type" : "boolean"
+        }
+      }
+    }
+  }
+}

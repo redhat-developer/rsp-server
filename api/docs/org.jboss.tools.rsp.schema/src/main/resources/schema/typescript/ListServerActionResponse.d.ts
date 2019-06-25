@@ -1,8 +1,12 @@
-export interface WorkflowResponse {
+export interface ListServerActionResponse {
+    workflows: ServerActionWorkflow[];
     status: Status;
-    requestId: number;
-    jobId: string;
-    items: WorkflowResponseItem[];
+}
+
+export interface ServerActionWorkflow {
+    actionId: string;
+    actionLabel: string;
+    actionWorkflow: WorkflowResponse;
 }
 
 export interface Status {
@@ -12,6 +16,13 @@ export interface Status {
     message: string;
     trace: string;
     ok: boolean;
+}
+
+export interface WorkflowResponse {
+    status: Status;
+    requestId: number;
+    jobId: string;
+    items: WorkflowResponseItem[];
 }
 
 export interface WorkflowResponseItem {

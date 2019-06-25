@@ -2544,15 +2544,26 @@ This endpoint returns the following schema as a return value:
           "content" : {
             "type" : "string"
           },
-          "responseType" : {
-            "type" : "string"
+          "prompt" : {
+            "type" : "object",
+            "properties" : {
+              "responseType" : {
+                "type" : "string"
+              },
+              "responseSecret" : {
+                "type" : "boolean"
+              },
+              "validResponses" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "string"
+                }
+              }
+            }
           },
-          "responseSecret" : {
-            "type" : "boolean"
-          },
-          "validResponses" : {
-            "type" : "array",
-            "items" : {
+          "properties" : {
+            "type" : "object",
+            "additionalProperties" : {
               "type" : "string"
             }
           }
@@ -2581,6 +2592,356 @@ export interface WorkflowResponseItem {
     itemType: string;
     label: string;
     content: string;
+    prompt: WorkflowPromptDetails;
+    properties: { [index: string]: string };
+}
+
+export interface WorkflowPromptDetails {
+    responseType: string;
+    responseSecret: boolean;
+    validResponses: string[];
+}</pre></td></tr></table>
+
+#### server/listServerActions
+
+ Get a list of server action items @return 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string"
+    },
+    "type" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "visibleName" : {
+          "type" : "string"
+        },
+        "description" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface ServerHandle {
+    id: string;
+    type: ServerType;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
+    description: string;
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "workflows" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "actionId" : {
+            "type" : "string"
+          },
+          "actionLabel" : {
+            "type" : "string"
+          },
+          "actionWorkflow" : {
+            "type" : "object",
+            "properties" : {
+              "status" : {
+                "type" : "object",
+                "properties" : {
+                  "severity" : {
+                    "type" : "integer"
+                  },
+                  "plugin" : {
+                    "type" : "string"
+                  },
+                  "code" : {
+                    "type" : "integer"
+                  },
+                  "message" : {
+                    "type" : "string"
+                  },
+                  "trace" : {
+                    "type" : "string"
+                  },
+                  "ok" : {
+                    "type" : "boolean"
+                  }
+                }
+              },
+              "requestId" : {
+                "type" : "integer"
+              },
+              "jobId" : {
+                "type" : "string"
+              },
+              "items" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "object",
+                  "properties" : {
+                    "id" : {
+                      "type" : "string"
+                    },
+                    "itemType" : {
+                      "type" : "string"
+                    },
+                    "label" : {
+                      "type" : "string"
+                    },
+                    "content" : {
+                      "type" : "string"
+                    },
+                    "prompt" : {
+                      "type" : "object",
+                      "properties" : {
+                        "responseType" : {
+                          "type" : "string"
+                        },
+                        "responseSecret" : {
+                          "type" : "boolean"
+                        },
+                        "validResponses" : {
+                          "type" : "array",
+                          "items" : {
+                            "type" : "string"
+                          }
+                        }
+                      }
+                    },
+                    "properties" : {
+                      "type" : "object",
+                      "additionalProperties" : {
+                        "type" : "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "status" : {
+      "type" : "object",
+      "properties" : {
+        "severity" : {
+          "type" : "integer"
+        },
+        "plugin" : {
+          "type" : "string"
+        },
+        "code" : {
+          "type" : "integer"
+        },
+        "message" : {
+          "type" : "string"
+        },
+        "trace" : {
+          "type" : "string"
+        },
+        "ok" : {
+          "type" : "boolean"
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface ListServerActionResponse {
+    workflows: ServerActionWorkflow[];
+    status: Status;
+}
+
+export interface ServerActionWorkflow {
+    actionId: string;
+    actionLabel: string;
+    actionWorkflow: WorkflowResponse;
+}
+
+export interface Status {
+    severity: number;
+    plugin: string;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+}
+
+export interface WorkflowResponse {
+    status: Status;
+    requestId: number;
+    jobId: string;
+    items: WorkflowResponseItem[];
+}
+
+export interface WorkflowResponseItem {
+    id: string;
+    itemType: string;
+    label: string;
+    content: string;
+    prompt: WorkflowPromptDetails;
+    properties: { [index: string]: string };
+}
+
+export interface WorkflowPromptDetails {
+    responseType: string;
+    responseSecret: boolean;
+    validResponses: string[];
+}</pre></td></tr></table>
+
+#### server/executeServerAction
+
+ Initiate a request to download a runtime @return 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "requestId" : {
+      "type" : "integer"
+    },
+    "actionId" : {
+      "type" : "string"
+    },
+    "serverId" : {
+      "type" : "string"
+    },
+    "data" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "any"
+      }
+    }
+  }
+}</pre></td><td><pre>export interface ServerActionRequest {
+    requestId: number;
+    actionId: string;
+    serverId: string;
+    data: { [index: string]: any };
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "status" : {
+      "type" : "object",
+      "properties" : {
+        "severity" : {
+          "type" : "integer"
+        },
+        "plugin" : {
+          "type" : "string"
+        },
+        "code" : {
+          "type" : "integer"
+        },
+        "message" : {
+          "type" : "string"
+        },
+        "trace" : {
+          "type" : "string"
+        },
+        "ok" : {
+          "type" : "boolean"
+        }
+      }
+    },
+    "requestId" : {
+      "type" : "integer"
+    },
+    "jobId" : {
+      "type" : "string"
+    },
+    "items" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "itemType" : {
+            "type" : "string"
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "content" : {
+            "type" : "string"
+          },
+          "prompt" : {
+            "type" : "object",
+            "properties" : {
+              "responseType" : {
+                "type" : "string"
+              },
+              "responseSecret" : {
+                "type" : "boolean"
+              },
+              "validResponses" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "properties" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}</pre></td><td><pre>export interface WorkflowResponse {
+    status: Status;
+    requestId: number;
+    jobId: string;
+    items: WorkflowResponseItem[];
+}
+
+export interface Status {
+    severity: number;
+    plugin: string;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+}
+
+export interface WorkflowResponseItem {
+    id: string;
+    itemType: string;
+    label: string;
+    content: string;
+    prompt: WorkflowPromptDetails;
+    properties: { [index: string]: string };
+}
+
+export interface WorkflowPromptDetails {
     responseType: string;
     responseSecret: boolean;
     validResponses: string[];

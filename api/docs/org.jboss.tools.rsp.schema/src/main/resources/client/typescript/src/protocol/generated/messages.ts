@@ -322,6 +322,20 @@ export namespace Messages {
             export const type = new RequestType<Protocol.DownloadSingleRuntimeRequest, Protocol.WorkflowResponse, void, void>('server/downloadRuntime');
         }
         /**
+         * Get a list of server action items
+         * @return
+         */
+        export namespace ListServerActionsRequest {
+            export const type = new RequestType<Protocol.ServerHandle, Protocol.ListServerActionResponse, void, void>('server/listServerActions');
+        }
+        /**
+         * Initiate a request to download a runtime
+         * @return
+         */
+        export namespace ExecuteServerActionRequest {
+            export const type = new RequestType<Protocol.ServerActionRequest, Protocol.WorkflowResponse, void, void>('server/executeServerAction');
+        }
+        /**
          * Initiate a request to get a view of the current job model
          * @return
          */

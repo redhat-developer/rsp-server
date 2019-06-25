@@ -1,3 +1,9 @@
+export interface ServerActionWorkflow {
+    actionId: string;
+    actionLabel: string;
+    actionWorkflow: WorkflowResponse;
+}
+
 export interface WorkflowResponse {
     status: Status;
     requestId: number;
