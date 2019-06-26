@@ -259,7 +259,7 @@ public class WildFlyServerModelTest extends RSPCase {
         Status status = serverProxy.deleteServer(handle).get();
         
         assertEquals(IStatus.ERROR, status.getSeverity());
-        assertEquals("Server not removed: wfly3", status.getMessage());
+        assertEquals("Server wfly3 does not exist", status.getMessage());
     }
     
     @Test
@@ -268,7 +268,7 @@ public class WildFlyServerModelTest extends RSPCase {
         Status status = serverProxy.deleteServer(handle).get();
         
         assertEquals(IStatus.ERROR, status.getSeverity());
-        assertEquals("Server not removed: wfly4", status.getMessage());
+        assertEquals("Invalid Request: Server type not found.", status.getMessage());
     }
     
     @Test
@@ -276,7 +276,7 @@ public class WildFlyServerModelTest extends RSPCase {
         Status status = serverProxy.deleteServer(null).get();
         
         assertEquals(IStatus.ERROR, status.getSeverity());
-        assertEquals(INVALID_PARAM, status.getMessage());
+        assertEquals(MISSING_SERVER_HANDLE, status.getMessage());
     }
     
     @Test
