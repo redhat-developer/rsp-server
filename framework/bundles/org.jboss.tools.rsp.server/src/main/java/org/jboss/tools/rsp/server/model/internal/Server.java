@@ -29,8 +29,9 @@ import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
+import org.jboss.tools.rsp.server.spi.servertype.IServerWorkingCopy;
 
-public class Server extends SecuredBase implements IServer {
+public class Server extends SecuredBase implements IServer, IServerWorkingCopy {
 
 	public static final String TYPE_ID = "org.jboss.tools.rsp.server.typeId";
 
@@ -61,10 +62,13 @@ public class Server extends SecuredBase implements IServer {
 		super(file, id, managementModel.getSecureStorageProvider());
 		this.serverType = type;
 		this.managementModel = managementModel;
-		setAttributes(attributes);
 		if( this.serverType != null ) {
 			setAttribute(TYPE_ID, type.getId());
 			this.delegate = this.serverType.createServerDelegate(this);
+		}
+		setAttributes(attributes);
+		if( this.delegate != null ) {
+			this.delegate.setDefaults(this);
 		}
 	}
 
@@ -218,5 +222,10 @@ public class Server extends SecuredBase implements IServer {
 	public void updateAttributes(Map<String, Object> newValues) {
 		// TODO smart to just clone the map? Idk
 		this.map = newValues;
+	}
+
+	@Override
+	public IServerWorkingCopy createWorkingCopy() {
+		return this;
 	}
 }

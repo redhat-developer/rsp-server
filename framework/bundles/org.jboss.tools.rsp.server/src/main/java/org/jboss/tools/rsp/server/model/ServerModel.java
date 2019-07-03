@@ -51,6 +51,7 @@ import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
+import org.jboss.tools.rsp.server.spi.servertype.IServerWorkingCopy;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,7 +155,7 @@ public class ServerModel implements IServerModel {
 	@Override
 	public void saveServers() throws CoreException {
 		for (IServer server : getServers().values()) {
-			server.save(new NullProgressMonitor());
+			((IServerWorkingCopy)server).save(new NullProgressMonitor());
 		}
 	}
 	
@@ -706,7 +707,7 @@ public class ServerModel implements IServerModel {
 		((Server)server).updateAttributes(ds.getMap());
 		
 		try {
-			server.save(new NullProgressMonitor());
+			((IServerWorkingCopy)server).save(new NullProgressMonitor());
 		} catch(CoreException ce) {
 			resp.getValidation().setStatus(StatusConverter.convert(ce.getStatus()));
 		}
