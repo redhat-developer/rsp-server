@@ -44,6 +44,7 @@ import org.jboss.tools.rsp.server.spi.model.polling.WebPortPoller;
 import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
+import org.jboss.tools.rsp.server.spi.servertype.IServerWorkingCopy;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 import org.jboss.tools.rsp.server.spi.util.VersionComparisonUtility;
 import org.jboss.tools.rsp.server.wildfly.impl.Activator;
@@ -468,4 +469,10 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	private boolean isEqual(String one, String two) {
 		return one == null ? two == null : one.equals(two);
 	}
+	
+	@Override
+	public void setDefaults(IServerWorkingCopy server) {
+		server.setAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_BOOLEAN, false);
+	}
+
 }

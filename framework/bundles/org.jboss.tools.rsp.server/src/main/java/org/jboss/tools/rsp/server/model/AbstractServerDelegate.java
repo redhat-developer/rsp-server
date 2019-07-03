@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
@@ -55,6 +56,7 @@ import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
+import org.jboss.tools.rsp.server.spi.servertype.IServerWorkingCopy;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 
 public abstract class AbstractServerDelegate implements IServerDelegate, IDebugEventSetListener {
@@ -588,4 +590,8 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	
 
 
+	@Override
+	public void setDefaults(IServerWorkingCopy server) {
+		// DO nothing
+	}
 }

@@ -30,18 +30,37 @@ public class JSONMemento implements IMemento {
 
 	private JsonObject jsonObject;
 	private String name;
+	private boolean htmlEncode;
 
 	public JSONMemento(JsonObject jsonObject, String name) {
-		this.jsonObject = jsonObject;
-		this.name = name;
+		this(jsonObject, name, false);
 	}
 
+	public JSONMemento(JsonObject jsonObject, String name, boolean htmlEncode) {
+		this.jsonObject = jsonObject;
+		this.name = name;
+		this.htmlEncode = htmlEncode;
+	}
+
+	private static Gson createGson(boolean htmlEncode) {
+		GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
+		if( !htmlEncode ) {
+			builder = builder.disableHtmlEscaping();
+		}
+		Gson gson = builder.create();
+		return gson;
+	}
+	
 	public static JSONMemento loadMemento(InputStream in) {
 		return createReadRoot(in);
 	}
 	
 	public static JSONMemento createReadRoot(InputStream in) {
-		Gson gson = new Gson();
+		return createReadRoot(in, false);
+	}
+	
+	public static JSONMemento createReadRoot(InputStream in, boolean encode) {
+		Gson gson = createGson(encode);
 		try (Reader reader = new InputStreamReader(in)) {
 			JsonElement rootElement = gson.fromJson(reader, JsonElement.class);
 			return new JSONMemento(rootElement.getAsJsonObject(), "");
@@ -161,7 +180,7 @@ public class JSONMemento implements IMemento {
 	
 	@Override
 	public void save(OutputStream os) throws IOException {
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		Gson gson = createGson(htmlEncode);
 		JsonElement jsonElement = gson.fromJson(this.jsonObject, JsonElement.class);
 		
 		try(BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os))) {

@@ -23,8 +23,8 @@ public interface IServer extends IServerAttributes {
 	
 	IServerDelegate getDelegate();
 	
-	void save(IProgressMonitor monitor) throws CoreException;
-
+	IServerWorkingCopy createWorkingCopy();
+	
 	String asJson(IProgressMonitor monitor) throws CoreException;
 	
 	void load(IProgressMonitor monitor) throws CoreException;
