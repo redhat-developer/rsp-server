@@ -50,7 +50,6 @@ public class CDKServerType extends BaseMinishiftServerType {
 	
 	@Override
 	public IServerDelegate createServerDelegate(IServer server) {
-		MinishiftServerDelegate ret = new MinishiftServerDelegate(server);
-		return ret;
+		return new CDKServerDelegate(server);
 	}
 }

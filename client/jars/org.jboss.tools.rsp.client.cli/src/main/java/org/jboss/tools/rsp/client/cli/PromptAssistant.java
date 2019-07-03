@@ -28,6 +28,8 @@ import org.jboss.tools.rsp.api.dao.JobHandle;
 import org.jboss.tools.rsp.api.dao.JobProgress;
 import org.jboss.tools.rsp.api.dao.ListDeployablesResponse;
 import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
+import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
+import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerType;
@@ -413,5 +415,17 @@ public class PromptAssistant {
 				ie.printStackTrace();
 			}
 		}
+	}
+
+	public ServerActionWorkflow selectServerAction(ListServerActionResponse resp2) {
+		List<String> collectorCollection = resp2.getWorkflows().stream()
+				.map(ServerActionWorkflow::getActionLabel)
+				.collect(Collectors.toList());
+		String ret = promptUser(collectorCollection, "Please select a server action:");
+		if( ret != null && collectorCollection.contains(ret)) {
+			int ind = collectorCollection.indexOf(ret);
+			return resp2.getWorkflows().get(ind);
+		}
+		return null;
 	}
 }

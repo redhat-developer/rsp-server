@@ -16,9 +16,13 @@ import java.util.List;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
+import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
+import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
+import org.jboss.tools.rsp.api.dao.ServerActionRequest;
+import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
@@ -26,6 +30,7 @@ import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
+import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
@@ -552,11 +557,35 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	}
 
 	/**
-	 * Subclasses may override
+	 * Subclasses may / should override
 	 */
 	@Override
 	public void updateServer(IServer dummyServer, UpdateServerResponse resp) {
 		// Subclasses may override with custom logic
 	}
+	
+
+	@Override
+	public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params) {
+		// Subclasses may override with custom logic
+		return null;
+	}
+	
+	@Override
+	public ListServerActionResponse listServerActions() {
+		ListServerActionResponse ret = new ListServerActionResponse();
+		ret.setStatus(StatusConverter.convert(Status.OK_STATUS));
+		ret.setWorkflows(new ArrayList<>());
+		return ret;
+	}
+	@Override
+	public WorkflowResponse executeServerAction(ServerActionRequest req) {
+		WorkflowResponse resp = new WorkflowResponse();
+		resp.setStatus(StatusConverter.convert(Status.CANCEL_STATUS));
+		resp.setItems(new ArrayList<>());
+		return resp;
+	}
+	
+
 
 }

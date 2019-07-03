@@ -378,10 +378,6 @@ public class ServerIncrementalDeployableTest {
 			super(server);
 		}
 		@Override
-		public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params) {
-			return null;
-		}
-		@Override
 		protected void publishDeployable(
 				DeployableReference reference, 
 				int publishRequestType, int modulePublishState) throws CoreException {

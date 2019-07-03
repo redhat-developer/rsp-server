@@ -28,7 +28,9 @@ import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ListDeployablesResponse;
 import org.jboss.tools.rsp.api.dao.ListDeploymentOptionsResponse;
 import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
+import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
+import org.jboss.tools.rsp.api.dao.ServerActionRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerBean;
 import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
@@ -386,6 +388,24 @@ public interface RSPServer {
 	@JsonRequest
 	public CompletableFuture<WorkflowResponse> downloadRuntime(DownloadSingleRuntimeRequest req);
 
+	
+	/*
+	 * Server actions
+	 */
+	/**
+	 * Get a list of server action items
+	 * @return
+	 */
+	@JsonRequest
+	CompletableFuture<ListServerActionResponse> listServerActions(ServerHandle handle);
+
+	/**
+	 * Initiate a request to download a runtime
+	 * @return
+	 */
+	@JsonRequest
+	public CompletableFuture<WorkflowResponse> executeServerAction(ServerActionRequest req);
+	
 
 	/*
 	 * Jobs
@@ -405,5 +425,6 @@ public interface RSPServer {
 	 */
 	@JsonRequest
 	public CompletableFuture<Status> cancelJob(JobHandle job);
+
 
 }

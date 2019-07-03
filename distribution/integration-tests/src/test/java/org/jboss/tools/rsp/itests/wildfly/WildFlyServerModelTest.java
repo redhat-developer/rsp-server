@@ -26,6 +26,7 @@ import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.itests.RSPCase;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
+import org.jboss.tools.rsp.server.wildfly.servertype.impl.WildFlyServerType;
 import org.junit.Test;
 
 /**
@@ -182,7 +183,7 @@ public class WildFlyServerModelTest extends RSPCase {
 		}
 		
 	}
-    
+
     @Test
     public void testGetOptionalAttributesInvalid() throws Exception {
         ServerType type = new ServerType("foo", "bar", "baz");
@@ -258,7 +259,7 @@ public class WildFlyServerModelTest extends RSPCase {
         Status status = serverProxy.deleteServer(handle).get();
         
         assertEquals(IStatus.ERROR, status.getSeverity());
-        assertEquals("Server not removed: wfly3", status.getMessage());
+        assertEquals("Server wfly3 does not exist", status.getMessage());
     }
     
     @Test
@@ -267,7 +268,7 @@ public class WildFlyServerModelTest extends RSPCase {
         Status status = serverProxy.deleteServer(handle).get();
         
         assertEquals(IStatus.ERROR, status.getSeverity());
-        assertEquals("Server not removed: wfly4", status.getMessage());
+        assertEquals("Invalid Request: Server type not found.", status.getMessage());
     }
     
     @Test
@@ -275,7 +276,7 @@ public class WildFlyServerModelTest extends RSPCase {
         Status status = serverProxy.deleteServer(null).get();
         
         assertEquals(IStatus.ERROR, status.getSeverity());
-        assertEquals(INVALID_PARAM, status.getMessage());
+        assertEquals(MISSING_SERVER_HANDLE, status.getMessage());
     }
     
     @Test

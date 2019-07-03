@@ -23,6 +23,7 @@ import org.jboss.tools.rsp.api.dao.Attribute;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
 import org.jboss.tools.rsp.api.dao.Status;
+import org.jboss.tools.rsp.api.dao.WorkflowPromptDetails;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
@@ -206,25 +207,31 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 		WorkflowResponseItem item1 = new WorkflowResponseItem();
 		item1.setId(ServerManagementAPIConstants.WORKFLOW_LICENSE_TEXT_ID);
 		item1.setLabel("Please approve the following license:");
-
-		item1.setResponseType(ServerManagementAPIConstants.ATTR_TYPE_NONE);
+		item1.setItemType(ServerManagementAPIConstants.WORKFLOW_TYPE_PROMPT_LARGE);
 		try {
 			item1.setContent(dlrt.getLicense(new NullProgressMonitor()));
 		} catch(CoreException ce) {
 			item1.setContent("Error loading license text.");
 		}
+		WorkflowPromptDetails det = new WorkflowPromptDetails();
+		item1.setPrompt(det);
+		det.setResponseType(ServerManagementAPIConstants.ATTR_TYPE_NONE);
+		
 
 		WorkflowResponseItem item1a = new WorkflowResponseItem();
 		item1a.setId(ServerManagementAPIConstants.WORKFLOW_LICENSE_URL_ID);
 		item1a.setLabel("License URL: ");
-
-		item1a.setResponseType(ServerManagementAPIConstants.ATTR_TYPE_NONE);
 		item1a.setContent(dlrt.getLicenseURL());
+		det = new WorkflowPromptDetails();
+		item1a.setPrompt(det);
+		det.setResponseType(ServerManagementAPIConstants.ATTR_TYPE_NONE);
 
 		WorkflowResponseItem item2 = new WorkflowResponseItem();
 		item2.setId(ServerManagementAPIConstants.WORKFLOW_LICENSE_SIGN_ID);
 		item2.setLabel("Do you agree to the license?");
-		item2.setResponseType(ServerManagementAPIConstants.ATTR_TYPE_BOOL);
+		det = new WorkflowPromptDetails();
+		item2.setPrompt(det);
+		det.setResponseType(ServerManagementAPIConstants.ATTR_TYPE_BOOL);
 
 		items.add(item1);
 		items.add(item1a);
@@ -266,12 +273,16 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 		return createWorkflowItem(id, label, responseType, false);
 	}
 
-	protected WorkflowResponseItem createWorkflowItem(String id, String label, String responseType, boolean secret) {
+	protected WorkflowResponseItem createWorkflowItem(String id, String label, 
+			String responseType, boolean secret) {
 		WorkflowResponseItem item1 = new WorkflowResponseItem();
 		item1.setId(id);
 		item1.setLabel(label);
-		item1.setResponseType(responseType);
-		item1.setResponseSecret(secret);
+		item1.setItemType(ServerManagementAPIConstants.WORKFLOW_TYPE_PROMPT_SMALL);
+		WorkflowPromptDetails prompt = new WorkflowPromptDetails();
+		item1.setPrompt(prompt);
+		prompt.setResponseType(responseType);
+		prompt.setResponseSecret(secret);
 		return item1;
 	}
 

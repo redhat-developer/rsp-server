@@ -14,11 +14,14 @@ import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
+import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
+import org.jboss.tools.rsp.api.dao.ServerActionRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
+import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
@@ -300,6 +303,21 @@ public interface IServerDelegate {
 	 * @return
 	 */
 	public Attributes listDeploymentOptions();
+	
+	/**
+	 * List all currently accessible / enabled server actions
+	 * for the given server. 
+	 * 
+	 * @return
+	 */
+	public ListServerActionResponse listServerActions();
+
+	/**
+	 * Execute a given server action request
+	 * 
+	 * @return
+	 */
+	public WorkflowResponse executeServerAction(ServerActionRequest req);
 
 	/**
 	 * Take all actions required to update this server to look exactly 

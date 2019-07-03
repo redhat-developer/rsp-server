@@ -37,7 +37,9 @@ import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ListDeployablesResponse;
 import org.jboss.tools.rsp.api.dao.ListDeploymentOptionsResponse;
 import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
+import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
+import org.jboss.tools.rsp.api.dao.ServerActionRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerBean;
 import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
@@ -88,7 +90,11 @@ public class ServerManagementServerImpl implements RSPServer {
 			IServerManagementModel managementModel) {
 		this.launcher = launcher;
 		this.managementModel = managementModel;
-		this.remoteEventManager = new RemoteEventManager(this);
+		this.remoteEventManager = createRemoteEventManager();
+	}
+	
+	protected RemoteEventManager createRemoteEventManager() {
+		return new RemoteEventManager(this);
 	}
 	
 	public List<RSPClient> getClients() {
@@ -236,9 +242,10 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 	
 	private Status deleteServerSync(ServerHandle handle) {
-		if( handle == null || isEmpty(handle.getId())) {
-			return invalidParameterStatus();
-		}
+		Status validate = verifyServerAndDelegate(handle);
+		if( validate != null && !validate.isOK()) 
+			return validate;
+		
 		IServer server = managementModel.getServerModel().getServer(handle.getId());
 		boolean b = managementModel.getServerModel().removeServer(server);
 		return booleanToStatus(b, "Server not removed: " + handle.getId());
@@ -338,6 +345,12 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	private GetServerJsonResponse getServerAsJsonSync(ServerHandle sh) {
+		Status valid = verifyServerAndDelegate(sh);
+		if( valid != null && !valid.isOK()) {
+			GetServerJsonResponse ret = new GetServerJsonResponse();
+			ret.setStatus(valid);
+			return ret;
+		}
 		IServer server = managementModel.getServerModel().getServer(sh.getId());
 		GetServerJsonResponse ret = new GetServerJsonResponse();
 		ret.setServerHandle(sh);
@@ -383,20 +396,13 @@ public class ServerManagementServerImpl implements RSPServer {
 			return (new StartServerResponse(is, null));
 		}
 
+		Status valid = verifyServerAndDelegate(attr.getParams().getId());
+		if( valid != null && !valid.isOK()) {
+			return (new StartServerResponse(valid, null));
+		}
 		String id = attr.getParams().getId();
 		IServer server = managementModel.getServerModel().getServer(id);
-		if( server == null ) {
-			String msg = NLS.bind(ServerStringConstants.SERVER_DNE, id);
-			Status is = errorStatus(msg);
-			return (new StartServerResponse(is, null));
-		}
-
 		IServerDelegate del = server.getDelegate();
-		if( del == null ) {
-			Status is = errorStatus(NLS.bind(ServerStringConstants.UNEXPECTED_ERROR_DELEGATE, id));
-			return (new StartServerResponse(is, null));
-		}
-		
 		try {
 			return del.start(attr.getMode());
 		} catch( Exception e ) {
@@ -667,17 +673,6 @@ public class ServerManagementServerImpl implements RSPServer {
 		}
 	}
 
-	private static <T> CompletableFuture<T> createCompletableFuture(Supplier<T> supplier) {
-		final RSPClient rspc = ClientThreadLocal.getActiveClient();
-		CompletableFuture<T> completableFuture = new CompletableFuture<>();
-		CompletableFuture.runAsync(() -> {
-			ClientThreadLocal.setActiveClient(rspc);
-			completableFuture.complete(supplier.get());
-			ClientThreadLocal.setActiveClient(null);
-		});
-		return completableFuture;
-	}
-
 	@Override
 	public CompletableFuture<ListDownloadRuntimeResponse> listDownloadableRuntimes() {
 		return createCompletableFuture(() -> listDownloadableRuntimesInternal());
@@ -745,6 +740,89 @@ public class ServerManagementServerImpl implements RSPServer {
 		return StatusConverter.convert(s);
 	}
 
+	
+	/*
+	 * Server actions
+	 * 
+	 * (non-Javadoc)
+	 * @see org.jboss.tools.rsp.api.RSPServer#listServerActions()
+	 */
+	@Override
+	public CompletableFuture<ListServerActionResponse> listServerActions(ServerHandle handle) {
+		return createCompletableFuture(() -> listServerActionsSync(handle));
+	}
+	private ListServerActionResponse listServerActionsSync(ServerHandle handle) {
+		ListServerActionResponse resp = new ListServerActionResponse();
+		Status s = verifyServerAndDelegate(handle);
+		if( s != null && !s.isOK()) {
+			resp.setStatus(s);
+			return resp;
+		}
+		IServer server = managementModel.getServerModel().getServer(handle.getId());
+		try {
+			return server.getDelegate().listServerActions();
+		} catch(RuntimeException re) {
+			Status err = errorStatus("Error loading actions: " + re.getMessage(), re);
+			resp.setStatus(err);
+			return resp;
+		}
+	}
+
+	@Override
+	public CompletableFuture<WorkflowResponse> executeServerAction(ServerActionRequest req) {
+		return createCompletableFuture(() -> executeServerActionSync(req));
+	}
+	private WorkflowResponse executeServerActionSync(ServerActionRequest req) {
+		String serverId = req.getServerId();
+		Status s = verifyServerAndDelegate(serverId);
+		if( s != null && !s.isOK()) {
+			WorkflowResponse err = new WorkflowResponse();
+			err.setStatus(s);
+			return err;
+		}
+		IServer server = managementModel.getServerModel().getServer(serverId);
+		IServerDelegate del = server.getDelegate();
+		try {
+			return del.executeServerAction(req);
+		} catch(RuntimeException re) {
+			Status err = errorStatus("Error loading actions: " + re.getMessage(), re);
+			WorkflowResponse resp3 = new WorkflowResponse();
+			resp3.setRequestId(req.getRequestId());
+			resp3.setStatus(err);
+			return resp3;
+		}
+	}
+
+	private Status verifyServerAndDelegate(ServerHandle handle) {
+		if( handle == null ) { 
+			return errorStatus("Invalid Request: Request must include server handle.");
+		}
+		if( handle.getType() == null ) { 
+			return errorStatus("Invalid Request: Request must include server type.");
+		}
+		if( handle.getType().getId() == null ) { 
+			return errorStatus("Invalid Request: Request must include server type id.");
+		}
+		if( managementModel.getServerModel().getIServerType(
+				handle.getType().getId()) == null ) {
+			return errorStatus("Invalid Request: Server type not found.");
+		}
+		return verifyServerAndDelegate(handle.getId());
+	}
+	
+	private Status verifyServerAndDelegate(String id) {
+		if( id == null ) { 
+			return errorStatus("Invalid Request: Request must include server id.");
+		}
+		IServer server = managementModel.getServerModel().getServer(id);
+		if( server == null ) {
+			return errorStatus(NLS.bind(ServerStringConstants.SERVER_DNE, id), null);
+		}
+		if( server.getDelegate() == null ) {
+			return errorStatus(NLS.bind(ServerStringConstants.UNEXPECTED_ERROR_DELEGATE, id), null);
+		}
+		return null;
+	}
 	private Status errorStatus(String msg) {
 		return errorStatus(msg, null);
 	}
@@ -754,4 +832,16 @@ public class ServerManagementServerImpl implements RSPServer {
 				msg, t);
 		return StatusConverter.convert(is);
 	}
+
+	private static <T> CompletableFuture<T> createCompletableFuture(Supplier<T> supplier) {
+		final RSPClient rspc = ClientThreadLocal.getActiveClient();
+		CompletableFuture<T> completableFuture = new CompletableFuture<>();
+		CompletableFuture.runAsync(() -> {
+			ClientThreadLocal.setActiveClient(rspc);
+			completableFuture.complete(supplier.get());
+			ClientThreadLocal.setActiveClient(null);
+		});
+		return completableFuture;
+	}
+
 }

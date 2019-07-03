@@ -3,7 +3,7 @@
  */
 export namespace Protocol {
     /* tslint:disable */
-    // Generated using typescript-generator version 2.2.413 on 2019-06-17 14:57:43.
+    // Generated using typescript-generator version 2.2.413 on 2019-06-25 15:20:46.
     
     export interface Attribute {
         type: string;
@@ -113,9 +113,27 @@ export namespace Protocol {
         runtimes: DownloadRuntimeDescription[];
     }
     
+    export interface ListServerActionResponse {
+        workflows: ServerActionWorkflow[];
+        status: Status;
+    }
+    
     export interface PublishServerRequest {
         server: ServerHandle;
         kind: number;
+    }
+    
+    export interface ServerActionRequest {
+        requestId: number;
+        actionId: string;
+        serverId: string;
+        data: { [index: string]: any };
+    }
+    
+    export interface ServerActionWorkflow {
+        actionId: string;
+        actionLabel: string;
+        actionWorkflow: WorkflowResponse;
     }
     
     export interface ServerAttributes {
@@ -230,6 +248,12 @@ export namespace Protocol {
         id: string;
     }
     
+    export interface WorkflowPromptDetails {
+        responseType: string;
+        responseSecret: boolean;
+        validResponses: string[];
+    }
+    
     export interface WorkflowResponse {
         status: Status;
         requestId: number;
@@ -242,9 +266,8 @@ export namespace Protocol {
         itemType: string;
         label: string;
         content: string;
-        responseType: string;
-        responseSecret: boolean;
-        validResponses: string[];
+        prompt: WorkflowPromptDetails;
+        properties: { [index: string]: string };
     }
     
 }

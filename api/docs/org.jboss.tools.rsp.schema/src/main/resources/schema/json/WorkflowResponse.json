@@ -47,15 +47,26 @@
           "content" : {
             "type" : "string"
           },
-          "responseType" : {
-            "type" : "string"
+          "prompt" : {
+            "type" : "object",
+            "properties" : {
+              "responseType" : {
+                "type" : "string"
+              },
+              "responseSecret" : {
+                "type" : "boolean"
+              },
+              "validResponses" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "string"
+                }
+              }
+            }
           },
-          "responseSecret" : {
-            "type" : "boolean"
-          },
-          "validResponses" : {
-            "type" : "array",
-            "items" : {
+          "properties" : {
+            "type" : "object",
+            "additionalProperties" : {
               "type" : "string"
             }
           }

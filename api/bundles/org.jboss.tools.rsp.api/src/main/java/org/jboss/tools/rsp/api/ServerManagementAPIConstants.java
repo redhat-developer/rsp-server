@@ -24,6 +24,11 @@ public interface ServerManagementAPIConstants extends DefaultServerAttributes {
 	public static final String ATTR_TYPE_STRING= "string";
 	public static final String ATTR_TYPE_LIST = "list";
 	public static final String ATTR_TYPE_MAP = "map";
+	
+	public static final String WORKFLOW_TYPE_PROMPT_SMALL = "workflow.prompt.small";
+	public static final String WORKFLOW_TYPE_PROMPT_LARGE = "workflow.prompt.large";
+	public static final String WORKFLOW_TYPE_OPEN_EDITOR = "workflow.editor.open";	
+	public static final String WORKFLOW_TYPE_OPEN_BROWSER = "workflow.browser.open";	
 
 
 	/**
