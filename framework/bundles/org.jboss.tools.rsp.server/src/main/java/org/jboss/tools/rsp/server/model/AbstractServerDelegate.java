@@ -588,8 +588,6 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		return resp;
 	}
 	
-
-
 	@Override
 	public void setDefaults(IServerWorkingCopy server) {
 		// DO nothing

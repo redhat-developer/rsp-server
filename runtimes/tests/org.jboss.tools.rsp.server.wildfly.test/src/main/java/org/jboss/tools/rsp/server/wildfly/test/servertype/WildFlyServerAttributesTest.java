@@ -1,8 +1,8 @@
 package org.jboss.tools.rsp.server.wildfly.test.servertype;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -23,6 +23,7 @@ import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
+import org.jboss.tools.rsp.server.spi.servertype.IServerWorkingCopy;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
 import org.jboss.tools.rsp.server.wildfly.servertype.impl.ServerTypeStringConstants;
 import org.jboss.tools.rsp.server.wildfly.servertype.impl.WildFlyServerDelegate;
@@ -139,6 +140,9 @@ public class WildFlyServerAttributesTest {
 	private static final String RUNNING_VM_ID = "running";
 	private IServer mockServer() {
 		IServer server = mock(IServer.class);
+		IServerWorkingCopy wc = mock(IServerWorkingCopy.class);
+		doReturn(wc).when(server).createWorkingCopy();
+		
 		TestWildFlyServerDelegate del = new TestWildFlyServerDelegate(server);
 		doReturn(del).when(server).getDelegate();
 		IServerType st = mock(IServerType.class);

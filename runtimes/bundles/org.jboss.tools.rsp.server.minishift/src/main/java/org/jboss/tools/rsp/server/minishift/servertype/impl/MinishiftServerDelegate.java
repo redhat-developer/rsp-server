@@ -40,6 +40,7 @@ import org.jboss.tools.rsp.server.spi.model.polling.PollThreadUtils;
 import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
+import org.jboss.tools.rsp.server.spi.servertype.IServerWorkingCopy;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -271,8 +272,7 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 		// Do nothing
 	}
 	@Override
-	public Map<String, Object> getDefaultAttributes(IServer server) {
-		return Collections.emptyMap();
+	public void setDefaults(IServerWorkingCopy server) {
+		// DO nothing
 	}
-
 }
