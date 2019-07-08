@@ -26,7 +26,6 @@ import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.itests.RSPCase;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
-import org.jboss.tools.rsp.server.wildfly.servertype.impl.WildFlyServerType;
 import org.junit.Test;
 
 /**
