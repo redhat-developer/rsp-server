@@ -53,11 +53,11 @@ public class RSPSecureStorage implements ISecureStorage {
 			try {
 				byte[] encrypted = util.getBytesFromFile(backingFile);
 				byte[] decrypted = util.decrypt(key, encrypted);
-
 				byte[] magicBytes = HASH_COMMENT.getBytes();
 				if (!startsWith(decrypted, magicBytes)) {
 					throw new CryptoException("Invalid key", null);
 				}
+				String test = new String(decrypted);
 				tmp.load(new ByteArrayInputStream(decrypted));
 				Arrays.fill(decrypted, (byte) 0);
 				this.secretData = tmp;
