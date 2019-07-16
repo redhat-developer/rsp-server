@@ -18,7 +18,7 @@ public class ServerBeanTypeEAP72 extends ServerBeanTypeEnterprise {
 	}
 	@Override
 	public String getServerAdapterTypeId(String version) {
-		return IServerConstants.SERVER_EAP_71;
+		return IServerConstants.SERVER_EAP_72;
 	}
 	public boolean isServerRoot(File location) {
 		return getEAP6xVersion(location, EAP_LAYERED_PRODUCT_META_INF, "7.2", "eap", RELEASE_NAME_JBOSS_EAP) != null; //$NON-NLS-1$
