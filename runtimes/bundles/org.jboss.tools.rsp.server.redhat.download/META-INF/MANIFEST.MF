@@ -31,6 +31,8 @@ Import-Package: org.eclipse.lsp4j.jsonrpc,
  org.jboss.tools.rsp.runtime.core.model,
  org.jboss.tools.rsp.runtime.core.model.installer,
  org.jboss.tools.rsp.runtime.core.util,
+ org.jboss.tools.rsp.secure.crypto,
+ org.jboss.tools.rsp.secure.model,
  org.jboss.tools.rsp.server,
  org.jboss.tools.rsp.server.discovery,
  org.jboss.tools.rsp.server.discovery.serverbeans,
@@ -46,4 +48,5 @@ Import-Package: org.eclipse.lsp4j.jsonrpc,
  org.jboss.tools.rsp.stacks.core.model,
  org.osgi.framework,
  org.slf4j
-Export-Package: org.jboss.tools.rsp.server.redhat.download
+Export-Package: org.jboss.tools.rsp.server.redhat.credentials,
+ org.jboss.tools.rsp.server.redhat.download

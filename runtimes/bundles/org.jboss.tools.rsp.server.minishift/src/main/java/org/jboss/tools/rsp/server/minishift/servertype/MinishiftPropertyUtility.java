@@ -33,12 +33,34 @@ public class MinishiftPropertyUtility {
 		return server.getAttribute(IMinishiftServerAttributes.MINISHIFT_HOME, (String)null);
 	}
 
+	/**
+	 * Get either the hard-coded username for use on this server, or, 
+	 * if that is not set, get the username stored in the global settings
+	 * for redhat access credentials 
+	 * @param server
+	 * @return
+	 */
 	public static String getMinishiftUsername(IServer server) {
-		return server.getAttribute(IMinishiftServerAttributes.MINISHIFT_REG_USERNAME, (String) null);
+		String name = server.getAttribute(IMinishiftServerAttributes.MINISHIFT_REG_USERNAME, (String) null);
+		if( name == null ) {
+			
+		}
+		return name;
 	}
 
+	/**
+	 * Get either the hard-coded password for use on this server, or, 
+	 * if that is not set, get the password stored in the global settings
+	 * for redhat access credentials 
+	 * @param server
+	 * @return
+	 */
 	public static String getMinishiftPassword(IServer server) {
-		return server.getAttribute(IMinishiftServerAttributes.MINISHIFT_REG_PASSWORD, (String) null);
+		String pass = server.getAttribute(IMinishiftServerAttributes.MINISHIFT_REG_PASSWORD, (String) null);
+		if( pass == null ) {
+			
+		}
+		return pass;
 	}
 
 }

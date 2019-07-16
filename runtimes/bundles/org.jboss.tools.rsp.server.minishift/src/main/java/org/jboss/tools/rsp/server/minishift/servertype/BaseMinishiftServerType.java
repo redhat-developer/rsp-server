@@ -43,44 +43,49 @@ public abstract class BaseMinishiftServerType implements IServerType {
 	public String getDescription() {
 		return desc;
 	}
-
+	
+	protected boolean isCDK() {
+		return false;
+	}
+	
 	@Override
 	public Attributes getRequiredAttributes() {
 		if (required == null) {
 			CreateServerAttributesUtility attrs = new CreateServerAttributesUtility();
-			
-			attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_BINARY, 
-					ServerManagementAPIConstants.ATTR_TYPE_STRING,
-					"A filesystem path pointing to a minishift binary file.", null);
+			fillRequiredAttributes(attrs);
 			this.required = attrs.toPojo();
 		}
 		return required;
 	}
 	
-	protected boolean isCDK() {
-		return false;
+	protected void fillRequiredAttributes(CreateServerAttributesUtility attrs) {
+		attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_BINARY, 
+				ServerManagementAPIConstants.ATTR_TYPE_STRING,
+				"A filesystem path pointing to a minishift binary file.", null);
 	}
 
 	@Override
 	public Attributes getOptionalAttributes() {
 		if (optional == null) {
 			CreateServerAttributesUtility attrs = new CreateServerAttributesUtility();
-
-			attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_VM_DRIVER, 
-					ServerManagementAPIConstants.ATTR_TYPE_STRING,
-					"The driver to use for the Minishift VM. Possible values: [virtualbox vmwarefusion kvm xhyve hyperv] (default \"kvm\")", null);
-			
-			attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_PROFILE, 
-					ServerManagementAPIConstants.ATTR_TYPE_STRING,
-					"A minishift profile. Default value is 'minishift'", "minishift");
-
-			attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_HOME, 
-					ServerManagementAPIConstants.ATTR_TYPE_STRING,
-					"A attribute to set the MINISHIFT_HOME environment variable when interacting with the server. The MINISHIFT_HOME environment variable allows you to choose a different home directory for Minishift", null);
-
+			fillOptionalAttributes(attrs);
 			this.optional = attrs.toPojo();
 		}
 		return optional;
+	}
+
+	protected void fillOptionalAttributes(CreateServerAttributesUtility attrs) {
+		attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_VM_DRIVER, 
+				ServerManagementAPIConstants.ATTR_TYPE_STRING,
+				"The driver to use for the Minishift VM. Possible values: [virtualbox vmwarefusion kvm xhyve hyperv] (default \"kvm\")", null);
+		
+		attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_PROFILE, 
+				ServerManagementAPIConstants.ATTR_TYPE_STRING,
+				"A minishift profile. Default value is 'minishift'", "minishift");
+
+		attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_HOME, 
+				ServerManagementAPIConstants.ATTR_TYPE_STRING,
+				"A attribute to set the MINISHIFT_HOME environment variable when interacting with the server. The MINISHIFT_HOME environment variable allows you to choose a different home directory for Minishift", null);
 	}
 
 	@Override
