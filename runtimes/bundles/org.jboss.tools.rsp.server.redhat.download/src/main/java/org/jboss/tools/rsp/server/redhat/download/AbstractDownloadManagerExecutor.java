@@ -34,6 +34,8 @@ import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeConnectionFactory;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
 import org.jboss.tools.rsp.runtime.core.util.DownloadRuntimeSessionCache;
 import org.jboss.tools.rsp.runtime.core.util.DownloadRuntimeSessionCache.DownloadManagerSessionState;
+import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
+import org.jboss.tools.rsp.server.redhat.credentials.RedHatAccessCredentials;
 import org.jboss.tools.rsp.server.spi.SPIActivator;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.runtimes.AbstractLicenseOnlyDownloadExecutor;
@@ -59,6 +61,15 @@ public abstract class AbstractDownloadManagerExecutor
 
 	@Override
 	public WorkflowResponse execute(DownloadSingleRuntimeRequest req) {
+		try {
+			return executeInternal(req);
+		} catch(Throwable t ) {
+			t.printStackTrace();
+			return null;
+		}
+	}
+	
+	private WorkflowResponse executeInternal(DownloadSingleRuntimeRequest req) {
 		if( req == null || getRuntime() == null) {
 			return quickResponse(IStatus.ERROR, "No runtime found for id=null", req);
 		}
@@ -68,10 +79,26 @@ public abstract class AbstractDownloadManagerExecutor
 		}
 
 		if (req.getRequestId() == 0 || state == null) {
-			WorkflowResponse ret = requestCredentials();
+			// First step, see whether we need credentials
+			if( requiresCredentials()) {
+				// We do. So ask the user for them.
+				WorkflowResponse ret = requestCredentials();
+				SESSION_STATE.updateRequestState(
+						ret.getRequestId(), STEP_CREDENTIALS, new HashMap<String, Object>());
+				return ret;
+			}
+		}
+		
+		if( state == null && !requiresCredentials()) {
+			// The user hasn't been prompted for credentials, but 
+			// they exist in the global model. Therefore, we create an 
+			// on-the-fly request id for this request and update the 
+			// state to indicate it has passed the request-credentials step
+			long requestId = ensureRequestId(-1);
 			SESSION_STATE.updateRequestState(
-					ret.getRequestId(), STEP_CREDENTIALS, new HashMap<String, Object>());
-			return ret;
+					requestId, STEP_CREDENTIALS, new HashMap<String, Object>());
+			req.setRequestId(requestId);
+			state = SESSION_STATE.getState(req.getRequestId());
 		}
 		
 		if (state.getWorkflowStep() == STEP_CREDENTIALS) {
@@ -96,6 +123,49 @@ public abstract class AbstractDownloadManagerExecutor
 		return executeAdditionalSteps(req);
 	}
 	
+
+	protected boolean requiresCredentials() {
+		return !isRedHatPasswordSet() || !isRedHatUsernameSet();
+	}
+	
+	protected boolean isRedHatUsernameSet() {
+		return getRedHatUsername()  == null ? false : true;
+	}
+	
+	protected String getRedHatUsername() {
+		ISecureStorageProvider storage = getServerModel().getSecureStorageProvider();
+		if( storage != null ) {
+			return RedHatAccessCredentials.getGlobalRedhatUser(storage);
+		}
+		return null;
+	}
+	
+	protected boolean isRedHatPasswordSet() {
+		return getRedHatPassword() == null ? false : true;
+	}
+	
+	protected String getRedHatPassword() {
+		ISecureStorageProvider storage = getServerModel().getSecureStorageProvider();
+		if( storage != null ) {
+			return RedHatAccessCredentials.getGlobalRedhatPassword(storage);
+		}
+		return null;
+	}
+	
+	protected void setRedHatPassword(String password) {
+		ISecureStorageProvider storage = getServerModel().getSecureStorageProvider();
+		if( storage != null ) {
+			RedHatAccessCredentials.setGlobalRedhatPassword(storage, password);
+		}
+	}
+
+	protected void setRedHatUser(String username) {
+		ISecureStorageProvider storage = getServerModel().getSecureStorageProvider();
+		if( storage != null ) {
+			RedHatAccessCredentials.setGlobalRedhatUser(storage, username);
+		}
+	}
+
 	/*
 	 * Subclasses to override if necessary
 	 */
@@ -137,15 +207,20 @@ public abstract class AbstractDownloadManagerExecutor
 	}
 	
 	protected WorkflowResponse handleCredentials(DownloadSingleRuntimeRequest req) {
+		setCredentialsInWorkflowOrStorage(req);
+		
 		int existingStep = 	SESSION_STATE.getState(req.getRequestId()).getWorkflowStep();
 		
 		// Update model with new values from user
 		SESSION_STATE.updateRequestState(
 				req.getRequestId(), existingStep, req.getData());
 		
+		String submittedUser = (String)req.getData().get(ServerManagementAPIConstants.WORKFLOW_USERNAME_ID);
+		String submittedPassword = (String)req.getData().get(ServerManagementAPIConstants.WORKFLOW_PASSWORD_ID);
+		
+		
 		// We're in the handle-credential step. They should actually be sending me credentials
-		if (req.getData().get(ServerManagementAPIConstants.WORKFLOW_USERNAME_ID) == null
-				&& req.getData().get(ServerManagementAPIConstants.WORKFLOW_PASSWORD_ID) == null) {
+		if (submittedUser == null && submittedPassword == null) {
 			return quickResponse(IStatus.ERROR, "Canceled by user", req);
 		}
 		
@@ -182,6 +257,52 @@ public abstract class AbstractDownloadManagerExecutor
 				req.getRequestId(), STEP_TC, credentialStateData);
 		return null;
 	}
+	
+	
+	/*
+	 * This odd method is used to handle the situation where either a user has no 
+	 * global credentials saved and has set credentials on this request, or, the situation
+	 * where the user has not included credentials in this request but they already exist
+	 * in the global model. 
+	 * 
+	 * In the first case, the credentials used for this download are persisted
+	 * in the global model for future use. 
+	 * 
+	 * In the second case, the credentials currently in secure storage will be 
+	 * placed into this workflow to be used rather than prompt the user.
+	 */
+	private void setCredentialsInWorkflowOrStorage(DownloadSingleRuntimeRequest req) {
+		Map<String, Object> map = req.getData();
+		if( map == null ) {
+			map = new HashMap<String,Object>();
+			req.setData(map);
+		}
+		String submittedUser = (String)map.get(ServerManagementAPIConstants.WORKFLOW_USERNAME_ID);
+		String submittedPassword = (String)map.get(ServerManagementAPIConstants.WORKFLOW_PASSWORD_ID);
+
+		if( !requiresCredentials() && 
+				(submittedUser == null || submittedPassword == null) ) {
+			// Credentials were not required bc secure storage has them.
+			// User put in no values for user/pass, so load the ones from secure storage
+			if( submittedUser == null || submittedUser.isEmpty()) {
+				req.getData().put(ServerManagementAPIConstants.WORKFLOW_USERNAME_ID,
+						getRedHatUsername());
+			}
+
+			if( submittedPassword == null || submittedPassword.isEmpty()) {
+				req.getData().put(ServerManagementAPIConstants.WORKFLOW_PASSWORD_ID,
+						getRedHatPassword());
+			}
+		} else if( requiresCredentials() && 
+				(submittedUser != null && submittedPassword != null
+				&& !submittedUser.isEmpty() && !submittedPassword.isEmpty())) { 
+			// Credentials were required, did not exist in secure storage
+			// User inputted non-null values, so lets persist them to secure storage
+			setRedHatUser(submittedUser);
+			setRedHatPassword(submittedPassword);
+		}
+	}
+	
 	
 	private boolean isValidCredentials(int credentialState) {
 		return credentialState == DownloadManagerWorkflowUtility.AUTHORIZED 
