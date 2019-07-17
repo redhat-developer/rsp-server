@@ -11,6 +11,7 @@ package org.jboss.tools.rsp.server;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -380,9 +381,14 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	private List<ServerType> getServerTypesSync() {
-		ServerType[] types = managementModel.getServerModel().getAccessibleServerTypes();
-		Comparator<ServerType> c = (h1,h2) -> new AlphanumComparator().compare(h1.getVisibleName(), h2.getVisibleName()); 
-		return Arrays.asList(types).stream().sorted(c).collect(Collectors.toList());
+		try {
+			ServerType[] types = managementModel.getServerModel().getAccessibleServerTypes();
+			Comparator<ServerType> c = (h1,h2) -> new AlphanumComparator().compare(h1.getVisibleName(), h2.getVisibleName()); 
+			return Arrays.asList(types).stream().sorted(c).collect(Collectors.toList());
+		} catch(Throwable t) {
+			t.printStackTrace();
+			return Collections.EMPTY_LIST;
+		}
 	}
 
 	@Override
