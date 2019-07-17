@@ -63,8 +63,8 @@ public abstract class AbstractDownloadManagerExecutor
 	public WorkflowResponse execute(DownloadSingleRuntimeRequest req) {
 		try {
 			return executeInternal(req);
-		} catch(Throwable t ) {
-			t.printStackTrace();
+		} catch(Exception t ) {
+			LOG.error("Error handling download request", t);
 			return null;
 		}
 	}
@@ -78,27 +78,26 @@ public abstract class AbstractDownloadManagerExecutor
 			state = SESSION_STATE.getState(req.getRequestId());
 		}
 
-		if (req.getRequestId() == 0 || state == null) {
-			// First step, see whether we need credentials
-			if( requiresCredentials()) {
+		boolean nullState = (req.getRequestId() == 0 || state == null);
+		// First step, see whether we need credentials
+		if( nullState ) {
+			if( requiresCredentials() ) {
 				// We do. So ask the user for them.
 				WorkflowResponse ret = requestCredentials();
 				SESSION_STATE.updateRequestState(
 						ret.getRequestId(), STEP_CREDENTIALS, new HashMap<String, Object>());
 				return ret;
+			} else {
+				// The user hasn't been prompted for credentials, but 
+				// they exist in the global model. Therefore, we create an 
+				// on-the-fly request id for this request and update the 
+				// state to indicate it has passed the request-credentials step
+				long requestId = ensureRequestId(-1);
+				SESSION_STATE.updateRequestState(
+						requestId, STEP_CREDENTIALS, new HashMap<String, Object>());
+				req.setRequestId(requestId);
+				state = SESSION_STATE.getState(req.getRequestId());
 			}
-		}
-		
-		if( state == null && !requiresCredentials()) {
-			// The user hasn't been prompted for credentials, but 
-			// they exist in the global model. Therefore, we create an 
-			// on-the-fly request id for this request and update the 
-			// state to indicate it has passed the request-credentials step
-			long requestId = ensureRequestId(-1);
-			SESSION_STATE.updateRequestState(
-					requestId, STEP_CREDENTIALS, new HashMap<String, Object>());
-			req.setRequestId(requestId);
-			state = SESSION_STATE.getState(req.getRequestId());
 		}
 		
 		if (state.getWorkflowStep() == STEP_CREDENTIALS) {
