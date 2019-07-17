@@ -18,8 +18,9 @@ public class WorkflowResponseItem {
 	
 	/*
 	 * One of
-	 *    null (defaults to  WORKFLOW_TYPE_PROMPT)
-	 *    ServerManagementAPIConstants.WORKFLOW_TYPE_PROMPT
+	 *    null (defaults to  WORKFLOW_TYPE_PROMPT_SMALL)
+	 *    ServerManagementAPIConstants.WORKFLOW_TYPE_PROMPT_SMALL
+	 *    ServerManagementAPIConstants.WORKFLOW_TYPE_PROMPT_LARGE
 	 *    ServerManagementAPIConstants.WORKFLOW_TYPE_OPEN_EDITOR
 	 *    ServerManagementAPIConstants.WORKFLOW_TYPE_OPEN_BROWSER
 	 */

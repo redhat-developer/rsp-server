@@ -8,18 +8,28 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.wildfly.servertype.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
+import org.jboss.tools.rsp.api.dao.ServerActionRequest;
+import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
 import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
+import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
+import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
 import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
+import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 import org.jboss.tools.rsp.server.wildfly.impl.Activator;
 import org.jboss.tools.rsp.server.wildfly.servertype.AbstractJBossServerDelegate;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
+import org.jboss.tools.rsp.server.wildfly.servertype.actions.ShowInBrowserActionHandler;
 import org.jboss.tools.rsp.server.wildfly.servertype.publishing.IJBossPublishController;
 import org.jboss.tools.rsp.server.wildfly.servertype.publishing.WildFlyPublishController;
 
@@ -60,4 +70,23 @@ public class WildFlyServerDelegate extends AbstractJBossServerDelegate {
 		}
 		return new CreateServerValidation(Status.OK_STATUS, null);
 	}
+	
+	@Override
+	public ListServerActionResponse listServerActions() {
+		ListServerActionResponse ret = new ListServerActionResponse();
+		ret.setStatus(StatusConverter.convert(Status.OK_STATUS));
+		List<ServerActionWorkflow> allActions = new ArrayList<>();
+		allActions.add(ShowInBrowserActionHandler.getInitialWorkflow(this));
+		ret.setWorkflows(allActions);
+		return ret;
+	}
+	
+	@Override
+	public WorkflowResponse executeServerAction(ServerActionRequest req) {
+		if( ShowInBrowserActionHandler.ACTION_SHOW_IN_BROWSER_ID.equals(req.getActionId() )) {
+			return new ShowInBrowserActionHandler(this).handle(req);
+		}
+		return cancelWorkflowResponse();
+	}
+	
 }

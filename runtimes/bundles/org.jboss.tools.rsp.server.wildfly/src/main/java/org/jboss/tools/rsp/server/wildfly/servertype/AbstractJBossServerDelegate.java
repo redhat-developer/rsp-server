@@ -71,7 +71,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	protected abstract IServerShutdownLauncher getStopLauncher();
 
 
-	protected String getPollURL(IServer server) {
+	public String getPollURL(IServer server) {
 		String host = server.getAttribute(IJBossServerAttributes.JBOSS_SERVER_HOST, 
 				IJBossServerAttributes.JBOSS_SERVER_HOST_DEFAULT);
 		int port = server.getAttribute(IJBossServerAttributes.JBOSS_SERVER_PORT, 
