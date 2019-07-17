@@ -4,13 +4,23 @@ import org.jboss.tools.rsp.secure.crypto.NotInitializedCryptoException;
 import org.jboss.tools.rsp.secure.model.ISecureStorage;
 import org.jboss.tools.rsp.secure.model.ISecureStorage.ISecureNode;
 import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
+import org.jboss.tools.rsp.server.model.ServerModel;
 import org.jboss.tools.rsp.server.redhat.download.impl.Activator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RedHatAccessCredentials {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(RedHatAccessCredentials.class);
+
 	private static final String NODE_PREFIX = Activator.BUNDLE_ID + "/redhat/global/";
 	private static final String USERNAME_GLOBAL_PREFERENCE = NODE_PREFIX + "redhat.access.global.username";
 	private static final String PASSWORD_GLOBAL_PREFERENCE = NODE_PREFIX + "redhat.access.global.password";
 
+	private RedHatAccessCredentials() {
+		// private constructor
+	}
+	
 	public static final String getGlobalRedhatUser(ISecureStorageProvider storage) {
 		try {
 			ISecureStorage storage2 = storage.getSecureStorage(true);
@@ -19,6 +29,7 @@ public class RedHatAccessCredentials {
 				return node.getStringProperty(USERNAME_GLOBAL_PREFERENCE, (String) null);
 			}
 		} catch (NotInitializedCryptoException e) {
+			LOG.error(e.getMessage(), e);
 		}
 		return null;
 	}
@@ -31,6 +42,7 @@ public class RedHatAccessCredentials {
 				return node.getStringProperty(PASSWORD_GLOBAL_PREFERENCE, (String) null);
 			}
 		} catch (NotInitializedCryptoException e) {
+			LOG.error(e.getMessage(), e);
 		}
 		return null;
 	}
@@ -45,6 +57,7 @@ public class RedHatAccessCredentials {
 				return true;
 			}
 		} catch (NotInitializedCryptoException e) {
+			LOG.error(e.getMessage(), e);
 		}
 		return false;
 	}
@@ -58,6 +71,7 @@ public class RedHatAccessCredentials {
 				return true;
 			}
 		} catch (NotInitializedCryptoException e) {
+			LOG.error(e.getMessage(), e);
 		}
 		return false;
 	}

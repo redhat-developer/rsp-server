@@ -42,14 +42,14 @@ public class CDKServerType extends BaseMinishiftServerType {
 	private boolean isRedHatUsernameSet() {
 		ISecureStorageProvider storage= getSecureStorage();
 		if( storage != null ) {
-			return RedHatAccessCredentials.getGlobalRedhatUser(storage) == null ? false : true;
+			return RedHatAccessCredentials.getGlobalRedhatUser(storage) != null;
 		}
 		return false;
 	}
 	private boolean isRedHatPasswordSet() {
 		ISecureStorageProvider storage = getSecureStorage();
 		if( storage != null ) {
-			return RedHatAccessCredentials.getGlobalRedhatPassword(storage) == null ? false : true;
+			return RedHatAccessCredentials.getGlobalRedhatPassword(storage) != null;
 		}
 		return false;
 	}

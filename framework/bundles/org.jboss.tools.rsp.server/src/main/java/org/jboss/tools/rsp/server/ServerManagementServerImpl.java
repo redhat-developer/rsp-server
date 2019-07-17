@@ -381,14 +381,9 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	private List<ServerType> getServerTypesSync() {
-		try {
-			ServerType[] types = managementModel.getServerModel().getAccessibleServerTypes();
-			Comparator<ServerType> c = (h1,h2) -> new AlphanumComparator().compare(h1.getVisibleName(), h2.getVisibleName()); 
-			return Arrays.asList(types).stream().sorted(c).collect(Collectors.toList());
-		} catch(Throwable t) {
-			t.printStackTrace();
-			return Collections.EMPTY_LIST;
-		}
+		ServerType[] types = managementModel.getServerModel().getAccessibleServerTypes();
+		Comparator<ServerType> c = (h1,h2) -> new AlphanumComparator().compare(h1.getVisibleName(), h2.getVisibleName()); 
+		return Arrays.asList(types).stream().sorted(c).collect(Collectors.toList());
 	}
 
 	@Override
