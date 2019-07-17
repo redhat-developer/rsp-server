@@ -55,18 +55,6 @@ public class CDKServerDelegate extends MinishiftServerDelegate {
 		}
 		return cancelWorkflowResponse();
 	}
-	private WorkflowResponse cancelWorkflowResponse() {
-		WorkflowResponse resp = new WorkflowResponse();
-		resp.setStatus(StatusConverter.convert(Status.CANCEL_STATUS));
-		resp.setItems(new ArrayList<>());
-		return resp;
-	}
-	private WorkflowResponse okWorkflowResponse() {
-		WorkflowResponse resp = new WorkflowResponse();
-		resp.setStatus(StatusConverter.convert(Status.OK_STATUS));
-		resp.setItems(new ArrayList<>());
-		return resp;
-	}
 	protected WorkflowResponse runSetupCdk(ServerActionRequest req) {
 		try {
 			ILaunch launch = new SetupCDKLauncher(this).launch("run");

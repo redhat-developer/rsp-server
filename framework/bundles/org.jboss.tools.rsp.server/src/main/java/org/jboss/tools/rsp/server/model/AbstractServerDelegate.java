@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
@@ -587,7 +586,19 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		resp.setItems(new ArrayList<>());
 		return resp;
 	}
-	
+
+	public static WorkflowResponse cancelWorkflowResponse() {
+		WorkflowResponse resp = new WorkflowResponse();
+		resp.setStatus(StatusConverter.convert(Status.CANCEL_STATUS));
+		resp.setItems(new ArrayList<>());
+		return resp;
+	}
+	public static WorkflowResponse okWorkflowResponse() {
+		WorkflowResponse resp = new WorkflowResponse();
+		resp.setStatus(StatusConverter.convert(Status.OK_STATUS));
+		resp.setItems(new ArrayList<>());
+		return resp;
+	}
 	@Override
 	public void setDefaults(IServerWorkingCopy server) {
 		// DO nothing

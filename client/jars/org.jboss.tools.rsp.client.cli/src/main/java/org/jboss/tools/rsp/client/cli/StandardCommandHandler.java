@@ -762,7 +762,14 @@ public class StandardCommandHandler implements InputHandler {
 					System.out.println("Label: " + item.getLabel());
 				if( item.getContent() != null )
 					System.out.println("Content:\n" + item.getContent());
-				
+				if( item.getPrompt() != null && item.getPrompt().getValidResponses() != null && 
+						item.getPrompt().getValidResponses().size() > 0 ) {
+					System.out.println("Possible responses: ");
+					List<String> list = item.getPrompt().getValidResponses();
+					for( String str : list ) {
+						System.out.println("   " + str);
+					}
+				}
 				String type = item.getPrompt().getResponseType();
 				if( type != null && !ServerManagementAPIConstants.ATTR_TYPE_NONE.equals(type)) {
 					// Prompt for input
