@@ -8,6 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.minishift.servertype;
 
+import org.jboss.tools.rsp.server.redhat.credentials.RedHatAccessCredentials;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
 public class MinishiftPropertyUtility {
@@ -43,7 +44,7 @@ public class MinishiftPropertyUtility {
 	public static String getMinishiftUsername(IServer server) {
 		String name = server.getAttribute(IMinishiftServerAttributes.MINISHIFT_REG_USERNAME, (String) null);
 		if( name == null ) {
-			
+			return RedHatAccessCredentials.getGlobalRedhatUser(server.getServerManagementModel().getSecureStorageProvider());
 		}
 		return name;
 	}
@@ -58,7 +59,7 @@ public class MinishiftPropertyUtility {
 	public static String getMinishiftPassword(IServer server) {
 		String pass = server.getAttribute(IMinishiftServerAttributes.MINISHIFT_REG_PASSWORD, (String) null);
 		if( pass == null ) {
-			
+			return RedHatAccessCredentials.getGlobalRedhatPassword(server.getServerManagementModel().getSecureStorageProvider());
 		}
 		return pass;
 	}
