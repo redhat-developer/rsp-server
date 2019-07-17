@@ -91,6 +91,7 @@ public class WildFlyServerModelTest extends RSPCase {
     
     @Test
     public void testMinishiftSupport() throws Exception {
+    	launcher.getClient().addPromptStringReply("dummySecurePass");
         List<ServerType> types = serverProxy.getServerTypes().get();
         
         ServerType minishift = new ServerType("org.jboss.tools.openshift.cdk.server.type.minishift.v1_12",

@@ -1,10 +1,10 @@
 package org.jboss.tools.rsp.server.redhat.credentials;
 
 import org.jboss.tools.rsp.secure.crypto.NotInitializedCryptoException;
+import org.jboss.tools.rsp.secure.model.ISecureStorage;
 import org.jboss.tools.rsp.secure.model.ISecureStorage.ISecureNode;
 import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
 import org.jboss.tools.rsp.server.redhat.download.impl.Activator;
-import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 
 public class RedHatAccessCredentials {
 	private static final String NODE_PREFIX = Activator.BUNDLE_ID + "/redhat/global/";
@@ -13,40 +13,52 @@ public class RedHatAccessCredentials {
 
 	public static final String getGlobalRedhatUser(ISecureStorageProvider storage) {
 		try {
-			ISecureNode node = storage.getSecureStorage(true).getNode(NODE_PREFIX);
-			return node.getStringProperty(USERNAME_GLOBAL_PREFERENCE, (String) null);
+			ISecureStorage storage2 = storage.getSecureStorage(true);
+			if( storage2 != null ) {
+				ISecureNode node = storage2.getNode(NODE_PREFIX);
+				return node.getStringProperty(USERNAME_GLOBAL_PREFERENCE, (String) null);
+			}
 		} catch (NotInitializedCryptoException e) {
-			return null;
 		}
+		return null;
 	}
 
 	public static final String getGlobalRedhatPassword(ISecureStorageProvider storage) {
 		try {
-			ISecureNode node = storage.getSecureStorage(true).getNode(NODE_PREFIX);
-			return node.getStringProperty(PASSWORD_GLOBAL_PREFERENCE, (String) null);
+			ISecureStorage storage2 = storage.getSecureStorage(true);
+			if( storage2 != null ) {
+				ISecureNode node = storage2.getNode(NODE_PREFIX);
+				return node.getStringProperty(PASSWORD_GLOBAL_PREFERENCE, (String) null);
+			}
 		} catch (NotInitializedCryptoException e) {
-			return null;
 		}
+		return null;
 	}
 	
 
 	public static final boolean setGlobalRedhatUser(ISecureStorageProvider storage, String val) {
 		try {
-			ISecureNode node = storage.getSecureStorage(true).getNode(NODE_PREFIX);
-			node.setStringProperty(USERNAME_GLOBAL_PREFERENCE, val);
-			return true;
+			ISecureStorage storage2 = storage.getSecureStorage(true);
+			if( storage2 != null ) {
+				ISecureNode node = storage2.getNode(NODE_PREFIX);
+				node.setStringProperty(USERNAME_GLOBAL_PREFERENCE, val);
+				return true;
+			}
 		} catch (NotInitializedCryptoException e) {
-			return false;
 		}
+		return false;
 	}
 
 	public static final boolean setGlobalRedhatPassword(ISecureStorageProvider storage, String val) {
 		try {
-			ISecureNode node = storage.getSecureStorage(true).getNode(NODE_PREFIX);
-			node.setStringProperty(PASSWORD_GLOBAL_PREFERENCE, val);
-			return true;
+			ISecureStorage storage2 = storage.getSecureStorage(true);
+			if( storage2 != null ) {
+				ISecureNode node = storage2.getNode(NODE_PREFIX);
+				node.setStringProperty(PASSWORD_GLOBAL_PREFERENCE, val);
+				return true;
+			}
 		} catch (NotInitializedCryptoException e) {
-			return false;
 		}
+		return false;
 	}
 }

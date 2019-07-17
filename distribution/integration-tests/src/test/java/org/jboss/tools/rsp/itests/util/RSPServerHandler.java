@@ -49,7 +49,19 @@ public class RSPServerHandler {
     }
 
     public static void startServer() throws Exception {
-        ProcessBuilder builder = new ProcessBuilder("java", "-jar", "bin/felix.jar");
+    	// Debug on port 8001
+        ProcessBuilder builder = new ProcessBuilder(
+        		"java", 
+        			// debug flags
+//	        		"-Xdebug", 
+//	        		"-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8001",
+//	        		"-Xnoagent",
+        		"-jar", "bin/felix.jar"
+        		);
+        
+        // No debugging
+        //ProcessBuilder builder = new ProcessBuilder("java", "-jar", "bin/felix.jar");
+
         builder.directory(new File(SERVER_ROOT));
         serverProcess = builder.start();
         Thread.sleep(WAIT_SERVER_STARTED);
