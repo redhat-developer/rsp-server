@@ -1,8 +1,10 @@
 package org.jboss.tools.rsp.server.wildfly.servertype.actions;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
@@ -26,9 +28,19 @@ public class ShowInBrowserActionHandler {
 	public static final String ACTION_SHOW_IN_BROWSER_SELECTED_PROMPT_ID = "ShowInBrowserActionHandler.selection.id";
 	public static final String ACTION_SHOW_IN_BROWSER_SELECTED_PROMPT_LABEL = 
 			"Which deployment do you want to show in the web browser?";
-	public static final String ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT = "Show server's root page.";
+	public static final String ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT = "Welcome Page (Index)";
 
 	public static final ServerActionWorkflow getInitialWorkflow(WildFlyServerDelegate wildFlyServerDelegate2) {
+		return new ShowInBrowserActionHandler(wildFlyServerDelegate2).getInitialWorkflowInternal();
+	}
+
+
+	private WildFlyServerDelegate wildFlyServerDelegate;
+	public ShowInBrowserActionHandler(WildFlyServerDelegate wildFlyServerDelegate) {
+		this.wildFlyServerDelegate = wildFlyServerDelegate;
+	}
+	
+	private ServerActionWorkflow getInitialWorkflowInternal() {
 		WorkflowResponse workflow = new WorkflowResponse();
 		workflow.setStatus(StatusConverter.convert(
 				new Status(IStatus.INFO, Activator.BUNDLE_ID, ACTION_SHOW_IN_BROWSER_LABEL)));
@@ -46,9 +58,9 @@ public class ShowInBrowserActionHandler {
 		prompt.setResponseSecret(false);
 		prompt.setResponseType(ServerManagementAPIConstants.ATTR_TYPE_STRING);
 		
-		List<String> deployments = wildFlyServerDelegate2.getServerPublishModel().getDeployableStates()
-		.stream().map(DeployableState::getReference).map(DeployableReference::getPath)
-		.collect(Collectors.toList());
+		List<String> deployments = getDeployableStatesHavingContextRoots()
+			.stream().map(DeployableState::getReference).map(DeployableReference::getPath)
+			.collect(Collectors.toList());
 		
 		List<String> deployments2 = new ArrayList<>();
 		deployments2.add(ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT);
@@ -61,30 +73,15 @@ public class ShowInBrowserActionHandler {
 		workflow.setItems(items);
 		return action;
 	}
-	
-	
-	private WildFlyServerDelegate wildFlyServerDelegate;
-	public ShowInBrowserActionHandler(WildFlyServerDelegate wildFlyServerDelegate) {
-		this.wildFlyServerDelegate = wildFlyServerDelegate;
-	}
+
 
 	public WorkflowResponse handle(ServerActionRequest req) {
 		String choice = (String)req.getData().get(ACTION_SHOW_IN_BROWSER_SELECTED_PROMPT_ID);
 		if( choice == null ) {
 			return AbstractServerDelegate.cancelWorkflowResponse();
 		}
-		String url = null;
-		if( choice.equals(ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT)) {
-			url = wildFlyServerDelegate.getPollURL(wildFlyServerDelegate.getServer());
-		} else {
-			List<DeployableState> states = wildFlyServerDelegate.getServerPublishModel().getDeployableStates();
-			for( DeployableState ds : states ) {
-				if( ds.getReference().getPath().equals(choice)) {
-					// TODO figure out the context root for this deployment?!
-				}
-			}
-		}
 		
+		String url = findUrlFromChoice(choice);
 		if( url != null ) {
 			WorkflowResponseItem item = new WorkflowResponseItem();
 			item.setItemType(ServerManagementAPIConstants.WORKFLOW_TYPE_OPEN_BROWSER);
@@ -98,4 +95,60 @@ public class ShowInBrowserActionHandler {
 		return AbstractServerDelegate.cancelWorkflowResponse();
 	}
 
+	
+	private String findUrlFromChoice(String choice) {
+		String baseUrl = wildFlyServerDelegate.getPollURL(wildFlyServerDelegate.getServer());
+		if( choice.equals(ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT)) {
+			return baseUrl;
+		} else {
+			List<DeployableState> states = wildFlyServerDelegate
+					.getServerPublishModel().getDeployableStatesWithOptions();
+			for( DeployableState ds : states ) {
+				if( ds.getReference().getPath().equals(choice)) {
+					String contextRoot = getContextRoot(ds);
+					if( contextRoot != null ) {
+						return baseUrl + "/" + contextRoot;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	private String getContextRoot(DeployableState ds) {
+		// TODO figure out the context root for this deployment?!
+		DeployableReference ref = ds.getReference();
+		String outputName = getOutputName(ref);
+		
+		if( outputName.endsWith(".war") || outputName.endsWith(".ear")) {
+			return outputName.substring(0, outputName.length() - 4);
+		}
+		return null;
+	}
+	// copied from StandardJBossPublishController
+	protected String getOutputName(DeployableReference ref) {
+		Map<String, Object> options = ref.getOptions();
+		String def = null;
+		if( ref.getPath() != null ) {
+			def = new File(ref.getPath()).getName();
+		}
+		String k = ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME; 
+		if( options != null && options.get(k) != null ) {
+			return (String)options.get(k);
+		}
+		return def;
+	}
+	
+	private List<DeployableState> getDeployableStatesHavingContextRoots() {
+		List<DeployableState> dss = wildFlyServerDelegate.getServerPublishModel().getDeployableStatesWithOptions();
+		ArrayList<DeployableState> collector = new ArrayList<DeployableState>();
+		for( DeployableState ds : dss ) {
+			if( getContextRoot(ds) != null ) 
+				collector.add(ds);
+		}
+		return collector;
+	}
+	
+
+	
 }

@@ -571,7 +571,7 @@ public class StandardCommandHandler implements InputHandler {
 						}
 						
 						boolean continueWorklow = validateWorkflowResponse(actionToRun.getActionWorkflow(), 
-								"The action '" + actionToRun.getActionLabel() + "' is running.");
+								assistant, "The action '" + actionToRun.getActionLabel() + "' is running.");
 						if( !continueWorklow )
 							return;
 						Map<String, Object> toSend = displayPromptsSeekWorkflowInput(actionToRun.getActionWorkflow(), assistant);
@@ -584,7 +584,8 @@ public class StandardCommandHandler implements InputHandler {
 						
 						boolean done = false;
 						while( !done ) {
-							continueWorklow = validateWorkflowResponse(workflowResp, 
+							continueWorklow = validateWorkflowResponse(workflowResp,
+									assistant,
 									"The action '" + actionToRun.getActionLabel() + "' is running.");
 							if( !continueWorklow )
 								return;
@@ -633,7 +634,7 @@ public class StandardCommandHandler implements InputHandler {
 					WorkflowResponse resp = launcher.getServerProxy().downloadRuntime(req).get();
 					boolean done = false;
 					while( !done ) {
-						boolean continueWorklow = validateWorkflowResponse(resp, "The runtime is downloading.");
+						boolean continueWorklow = validateWorkflowResponse(resp, assistant, "The runtime is downloading.");
 						if( !continueWorklow )
 							return;
 						Map<String, Object> toSend = displayPromptsSeekWorkflowInput(resp, assistant);
@@ -727,7 +728,8 @@ public class StandardCommandHandler implements InputHandler {
 		}
 
 		
-		private static boolean validateWorkflowResponse(WorkflowResponse resp, String okMessage) {
+		private static boolean validateWorkflowResponse(WorkflowResponse resp, 
+				PromptAssistant asst, String okMessage) {
 			if( resp == null || resp.getStatus() == null) {
 				System.out.println("The server has returned an empty response.");
 				return false;
@@ -735,6 +737,7 @@ public class StandardCommandHandler implements InputHandler {
 			int statusSev = resp.getStatus().getSeverity();
 			if( statusSev == Status.OK) {
 				// All done
+				displayPromptsSeekWorkflowInput(resp, asst);
 				System.out.println("The workflow has completed: " + okMessage);
 				return false;
 			} 
@@ -762,19 +765,31 @@ public class StandardCommandHandler implements InputHandler {
 					System.out.println("Label: " + item.getLabel());
 				if( item.getContent() != null )
 					System.out.println("Content:\n" + item.getContent());
-				if( item.getPrompt() != null && item.getPrompt().getValidResponses() != null && 
-						item.getPrompt().getValidResponses().size() > 0 ) {
-					System.out.println("Possible responses: ");
-					List<String> list = item.getPrompt().getValidResponses();
-					for( String str : list ) {
-						System.out.println("   " + str);
+				
+				if( item.getPrompt() != null ) {
+					if( item.getPrompt().getValidResponses() != null && 
+							item.getPrompt().getValidResponses().size() > 0 ) {
+						System.out.println("Possible responses: ");
+						List<String> list = item.getPrompt().getValidResponses();
+						for( String str : list ) {
+							System.out.println("   " + str);
+						}
 					}
-				}
-				String type = item.getPrompt().getResponseType();
-				if( type != null && !ServerManagementAPIConstants.ATTR_TYPE_NONE.equals(type)) {
-					// Prompt for input
-					asst.promptForAttributeSingleKey(type, null, null, 
-							item.getId(), item.getPrompt().isResponseSecret(), true, toSend);
+					String type = item.getPrompt().getResponseType();
+					if( type != null && !ServerManagementAPIConstants.ATTR_TYPE_NONE.equals(type)) {
+						// Prompt for input
+						asst.promptForAttributeSingleKey(type, null, null, 
+								item.getId(), item.getPrompt().isResponseSecret(), true, toSend);
+					}
+				} else {
+					// Handling no prompts, just info
+					System.out.println("Item type: " + item.getItemType());
+					if( item.getProperties() != null ) {
+						System.out.println("Properties: ");
+						for( String prop : item.getProperties().keySet() ) {
+							System.out.println(prop + " = " + item.getProperties().get(prop));
+						}
+					}
 				}
 			}
 			return toSend;
