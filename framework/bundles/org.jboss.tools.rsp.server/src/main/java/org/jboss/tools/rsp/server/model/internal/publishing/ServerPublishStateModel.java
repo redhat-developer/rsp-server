@@ -168,6 +168,17 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 
 	@Override
+	public synchronized List<DeployableState> getDeployableStatesWithOptions() {
+		List<DeployableState> ret = getStates().values().stream().
+				map(element -> cloneDeployableState(element.getReference(), element))
+				.collect(Collectors.toList());
+		for( DeployableState ds : ret ) {
+			fillOptionsFromCache(ds.getReference());
+		}
+		return new ArrayList<>(ret);
+	}
+
+	@Override
 	public synchronized DeployableState getDeployableState(DeployableReference reference) {
 		DeployableState ds = getStates().get(getKey(reference));
 		if (ds == null) {

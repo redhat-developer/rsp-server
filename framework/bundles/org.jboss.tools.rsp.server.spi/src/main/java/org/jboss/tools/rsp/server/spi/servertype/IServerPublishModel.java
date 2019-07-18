@@ -59,7 +59,13 @@ public interface IServerPublishModel {
 	 * @return
 	 */
 	public List<DeployableState> getDeployableStates();
-	
+
+	/**
+	 * Returns a list of the deployables for this server and their current states
+	 * @return
+	 */
+	public List<DeployableState> getDeployableStatesWithOptions();
+
 	/**
 	 * Allows the framework to initialize the model from a data store
 	 * @param references
