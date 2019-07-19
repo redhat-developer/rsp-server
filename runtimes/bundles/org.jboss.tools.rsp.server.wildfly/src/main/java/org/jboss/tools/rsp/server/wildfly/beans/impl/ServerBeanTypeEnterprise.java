@@ -68,12 +68,12 @@ public abstract class ServerBeanTypeEnterprise extends JBossServerBeanType {
 	
 	public String getServerAdapterTypeEAPLegacy(String version) {
 		// TODO this needs to be split up, does not belong here
-		if( "4.2".equals(version)) return IServerConstants.SERVER_EAP_43;
-		if( "4.3".equals(version)) return IServerConstants.SERVER_EAP_43;
-		if( "5.0".equals(version)) return IServerConstants.SERVER_EAP_50;
-		if( "5.1".equals(version)) return IServerConstants.SERVER_EAP_50;
-		if( "5.2".equals(version)) return IServerConstants.SERVER_EAP_50;
-		if( "5.3".equals(version)) return IServerConstants.SERVER_EAP_50;
+		if( version.startsWith("4.2")) return IServerConstants.SERVER_EAP_43;
+		if( version.startsWith("4.3")) return IServerConstants.SERVER_EAP_43;
+		if( version.startsWith("5.0")) return IServerConstants.SERVER_EAP_50;
+		if( version.startsWith("5.1")) return IServerConstants.SERVER_EAP_50;
+		if( version.startsWith("5.2")) return IServerConstants.SERVER_EAP_50;
+		if( version.startsWith("5.3")) return IServerConstants.SERVER_EAP_50;
 		// All others should be declared in their proper subclass to ensure that
 		// non-exact matches still get a non-null result.
 		return null;

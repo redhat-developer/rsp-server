@@ -10,16 +10,12 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.wildfly.test.beans;
 
-import static org.mockito.Mockito.*;
-
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanLoader;
-import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanTypeManager;
 import org.jboss.tools.rsp.server.spi.discovery.ServerBeanType;
-import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
 import org.jboss.tools.rsp.server.wildfly.impl.JBossServerBeanTypeProvider;
 import org.jboss.tools.rsp.server.wildfly.test.util.MatrixUtils;
@@ -123,16 +119,7 @@ public class JBossServerBeanLoaderTest extends TestCase {
 		if( expected.get(serverType) == null )
 			fail("Test Case needs to be updated for new adapter or mock test");
 		
-		IServerManagementModel managementModel = mock(IServerManagementModel.class);
-		ServerBeanLoader loader = new ServerBeanLoader(serverDir, managementModel) {
-			protected ServerBeanTypeManager getServerBeanTypeManager() {
-				return new ServerBeanTypeManager() {
-					public ServerBeanType[] getAllRegisteredTypes() {
-						return JBossServerBeanTypeProvider.KNOWN_TYPES;
-					}
-				};
-			}
-		};
+		ServerBeanLoader loader = MockServerCreationUtilities.createMockServerBeanLoader(serverType, serverDir);
 		ServerBeanType type = loader.getServerBeanType();
 		assertEquals("Expected and actual server beans do not match for server type " + serverType, expectedType, type);
 		String fullVersion = loader.getFullServerVersion();
