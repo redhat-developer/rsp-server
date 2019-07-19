@@ -4,7 +4,7 @@ Bundle-Name: org.jboss.tools.rsp.server.spi
 Bundle-SymbolicName: org.jboss.tools.rsp.server.spi
 Automatic-Module-Name: org.jboss.tools.rsp.server.spi
 Bundle-Activator: org.jboss.tools.rsp.server.spi.SPIActivator
-Bundle-Version: 0.20.1.qualifier
+Bundle-Version: 0.20.1.Final
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: org.jboss.jdf.stacks.model;resolution:=optional,
  org.jboss.tools.rsp.api,
