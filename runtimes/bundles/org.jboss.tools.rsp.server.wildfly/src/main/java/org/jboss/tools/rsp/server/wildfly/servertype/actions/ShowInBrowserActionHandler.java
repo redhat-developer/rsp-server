@@ -40,7 +40,7 @@ public class ShowInBrowserActionHandler {
 		this.wildFlyServerDelegate = wildFlyServerDelegate;
 	}
 	
-	private ServerActionWorkflow getInitialWorkflowInternal() {
+	protected ServerActionWorkflow getInitialWorkflowInternal() {
 		WorkflowResponse workflow = new WorkflowResponse();
 		workflow.setStatus(StatusConverter.convert(
 				new Status(IStatus.INFO, Activator.BUNDLE_ID, ACTION_SHOW_IN_BROWSER_LABEL)));
@@ -97,12 +97,11 @@ public class ShowInBrowserActionHandler {
 
 	
 	private String findUrlFromChoice(String choice) {
-		String baseUrl = wildFlyServerDelegate.getPollURL(wildFlyServerDelegate.getServer());
+		String baseUrl = getBaseUrl();
 		if( choice.equals(ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT)) {
 			return baseUrl;
 		} else {
-			List<DeployableState> states = wildFlyServerDelegate
-					.getServerPublishModel().getDeployableStatesWithOptions();
+			List<DeployableState> states = getDeployableStates();
 			for( DeployableState ds : states ) {
 				if( ds.getReference().getPath().equals(choice)) {
 					String contextRoot = getContextRoot(ds);
@@ -114,9 +113,16 @@ public class ShowInBrowserActionHandler {
 		}
 		return null;
 	}
+	
+	protected String getBaseUrl() {
+		return wildFlyServerDelegate.getPollURL(wildFlyServerDelegate.getServer());
+	}
+	
+	protected List<DeployableState> getDeployableStates() {
+		return wildFlyServerDelegate.getServerPublishModel().getDeployableStatesWithOptions();
+	}
 
 	private String getContextRoot(DeployableState ds) {
-		// TODO figure out the context root for this deployment?!
 		DeployableReference ref = ds.getReference();
 		String outputName = getOutputName(ref);
 		
@@ -140,8 +146,8 @@ public class ShowInBrowserActionHandler {
 	}
 	
 	private List<DeployableState> getDeployableStatesHavingContextRoots() {
-		List<DeployableState> dss = wildFlyServerDelegate.getServerPublishModel().getDeployableStatesWithOptions();
-		ArrayList<DeployableState> collector = new ArrayList<DeployableState>();
+		List<DeployableState> dss = getDeployableStates();
+		ArrayList<DeployableState> collector = new ArrayList<>();
 		for( DeployableState ds : dss ) {
 			if( getContextRoot(ds) != null ) 
 				collector.add(ds);

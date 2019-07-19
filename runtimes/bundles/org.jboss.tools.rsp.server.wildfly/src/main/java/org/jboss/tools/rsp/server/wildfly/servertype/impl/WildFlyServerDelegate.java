@@ -18,7 +18,6 @@ import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
 import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
-import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
