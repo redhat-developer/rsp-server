@@ -10,16 +10,26 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.wildfly.test.beans;
 
+import static org.mockito.Mockito.mock;
+
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanLoader;
+import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanTypeManager;
+import org.jboss.tools.rsp.server.spi.discovery.ServerBeanType;
+import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
+import org.jboss.tools.rsp.server.wildfly.impl.JBossServerBeanTypeProvider;
 import org.jboss.tools.rsp.server.wildfly.test.util.IOUtil;
 import org.junit.Assert;
 
@@ -135,6 +145,29 @@ public class MockServerCreationUtilities extends Assert {
 		ArrayList<Object> l = new ArrayList<Object>(Arrays.asList(getJBossServerTypeParameters()));
 		l.addAll(Arrays.asList(TEST_SERVER_TYPES_TO_MOCK));
 		return (String[]) l.toArray(new String[l.size()]);
+	}
+	
+	/**
+	 * 
+	 * @param serverType
+	 * @return
+	 */
+	public static ServerBeanLoader createMockServerBeanLoader(String serverType, File serverDir) {
+		if( serverDir == null || !serverDir.exists())
+			fail("Creation of mock server type " + serverType + " has failed.");
+		
+		IServerManagementModel managementModel = mock(IServerManagementModel.class);
+		return new ServerBeanLoader(serverDir, managementModel) {
+			@Override
+			protected ServerBeanTypeManager getServerBeanTypeManager() {
+				return new ServerBeanTypeManager() {
+					@Override
+					public ServerBeanType[] getAllRegisteredTypes() {
+						return JBossServerBeanTypeProvider.KNOWN_TYPES;
+					}
+				};
+			}
+		};
 	}
 	
 	/*
@@ -550,8 +583,13 @@ public class MockServerCreationUtilities extends Assert {
 	protected static File extractToTmpDir(String path) {
 		File pathFile = new File(MOCK_TMP_DIR, path);
 		if( !pathFile.exists()) {
-			ClassLoader classLoader = MockServerCreationUtilities.class.getClassLoader();
-			InputStream is = classLoader.getResourceAsStream("serverMock/" + path);
+			Path here = Paths.get(System.getProperty("user.dir"));
+			InputStream is = null;
+			try {
+				is = new FileInputStream(here.toString() + "/serverMock/" + path);
+			} catch (FileNotFoundException e) {
+				// do nothing as some servers do not have its twiddle jar
+			}
 			if( is == null )
 				return null;
 			
