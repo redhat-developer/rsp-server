@@ -751,7 +751,8 @@ public class StandardCommandHandler implements InputHandler {
 		}
 		
 
-		private static Map<String, Object> displayPromptsSeekWorkflowInput(WorkflowResponse resp, PromptAssistant asst) {
+		private static Map<String, Object> displayPromptsSeekWorkflowInput(
+				WorkflowResponse resp, PromptAssistant asst) {
 
 			HashMap<String, Object> toSend = new HashMap<>();
 			
@@ -760,39 +761,49 @@ public class StandardCommandHandler implements InputHandler {
 				return toSend;
 			
 			for( WorkflowResponseItem item : respItems ) {
-				System.out.println("Item: " + item.getId());
-				if( item.getLabel() != null)
-					System.out.println("Label: " + item.getLabel());
-				if( item.getContent() != null )
-					System.out.println("Content:\n" + item.getContent());
-				
-				if( item.getPrompt() != null ) {
-					if( item.getPrompt().getValidResponses() != null && 
-							item.getPrompt().getValidResponses().size() > 0 ) {
-						System.out.println("Possible responses: ");
-						List<String> list = item.getPrompt().getValidResponses();
-						for( String str : list ) {
-							System.out.println("   " + str);
-						}
-					}
-					String type = item.getPrompt().getResponseType();
-					if( type != null && !ServerManagementAPIConstants.ATTR_TYPE_NONE.equals(type)) {
-						// Prompt for input
-						asst.promptForAttributeSingleKey(type, null, null, 
-								item.getId(), item.getPrompt().isResponseSecret(), true, toSend);
-					}
-				} else {
-					// Handling no prompts, just info
-					System.out.println("Item type: " + item.getItemType());
-					if( item.getProperties() != null ) {
-						System.out.println("Properties: ");
-						for( String prop : item.getProperties().keySet() ) {
-							System.out.println(prop + " = " + item.getProperties().get(prop));
-						}
+				handleSingleWorkflowItem(item, toSend, asst);
+			}
+			return toSend;
+		}
+
+		private static void handleSingleWorkflowItem(
+				WorkflowResponseItem item, HashMap<String, Object> toSend, PromptAssistant asst) {
+			
+			System.out.println("Item: " + item.getId());
+			if( item.getLabel() != null)
+				System.out.println("Label: " + item.getLabel());
+			if( item.getContent() != null )
+				System.out.println("Content:\n" + item.getContent());
+			
+			if( item.getPrompt() != null ) {
+				handleSinglePrompt(item, toSend, asst);
+			} else {
+				// Handling no prompts, just info
+				System.out.println("Item type: " + item.getItemType());
+				if( item.getProperties() != null ) {
+					System.out.println("Properties: ");
+					for( String prop : item.getProperties().keySet() ) {
+						System.out.println(prop + " = " + item.getProperties().get(prop));
 					}
 				}
 			}
-			return toSend;
+		}
+
+		private static void handleSinglePrompt(WorkflowResponseItem item, HashMap<String, Object> toSend, PromptAssistant asst) {
+			if( item.getPrompt().getValidResponses() != null && 
+					!item.getPrompt().getValidResponses().isEmpty() ) {
+				System.out.println("Possible responses: ");
+				List<String> list = item.getPrompt().getValidResponses();
+				for( String str : list ) {
+					System.out.println("   " + str);
+				}
+			}
+			String type = item.getPrompt().getResponseType();
+			if( type != null && !ServerManagementAPIConstants.ATTR_TYPE_NONE.equals(type)) {
+				// Prompt for input
+				asst.promptForAttributeSingleKey(type, null, null, 
+						item.getId(), item.getPrompt().isResponseSecret(), true, toSend);
+			}
 		}
 	}
 	
