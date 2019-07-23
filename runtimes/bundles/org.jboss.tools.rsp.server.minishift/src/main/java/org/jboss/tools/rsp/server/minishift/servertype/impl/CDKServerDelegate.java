@@ -50,7 +50,7 @@ public class CDKServerDelegate extends MinishiftServerDelegate {
 	
 	@Override
 	public WorkflowResponse executeServerAction(ServerActionRequest req) {
-		if( ACTION_SETUP_CDK_ID.equals(req.getActionId() )) {
+		if( req != null && ACTION_SETUP_CDK_ID.equals(req.getActionId() )) {
 			return runSetupCdk(req);
 		}
 		return cancelWorkflowResponse();
