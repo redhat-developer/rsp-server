@@ -76,10 +76,12 @@ public class ShowInBrowserActionHandler {
 
 
 	public WorkflowResponse handle(ServerActionRequest req) {
-		String choice = (String)req.getData().get(ACTION_SHOW_IN_BROWSER_SELECTED_PROMPT_ID);
-		if( choice == null ) {
+		if( req == null || req.getData() == null ) 
 			return AbstractServerDelegate.cancelWorkflowResponse();
-		}
+			
+		String choice = (String)req.getData().get(ACTION_SHOW_IN_BROWSER_SELECTED_PROMPT_ID);
+		if( choice == null )
+			return AbstractServerDelegate.cancelWorkflowResponse();
 		
 		String url = findUrlFromChoice(choice);
 		if( url != null ) {
