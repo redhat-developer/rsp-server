@@ -219,7 +219,7 @@ public abstract class AbstractDownloadManagerExecutor
 		
 		
 		// We're in the handle-credential step. They should actually be sending me credentials
-		if (submittedUser == null || submittedPassword == null) {
+		if (submittedUser == null || submittedPassword == null || submittedUser.isEmpty() || submittedPassword.isEmpty()) {
 			return quickResponse(IStatus.ERROR, "Canceled by user", req);
 		}
 		
