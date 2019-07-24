@@ -15,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attribute;
@@ -36,7 +37,7 @@ public class WildFlyServerModelTest extends RSPCase {
     
     @Test
     public void testWildflySupport() throws Exception {
-        List<ServerType> types = serverProxy.getServerTypes().get();
+        List<ServerType> types = serverProxy.getServerTypes().get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
         
         ServerType wfly10 = new ServerType("org.jboss.ide.eclipse.as.wildfly.100",
                 "WildFly 10.x", "A server adapter capable of discovering and controlling a WildFly 10.x runtime instance.");
@@ -69,7 +70,7 @@ public class WildFlyServerModelTest extends RSPCase {
     
     @Test
     public void testEAPSupport() throws Exception {
-        List<ServerType> types = serverProxy.getServerTypes().get();
+        List<ServerType> types = serverProxy.getServerTypes().get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
         
         ServerType eap60 = new ServerType("org.jboss.ide.eclipse.as.eap.60",
                 "JBoss EAP 6.0", "A server adapter capable of discovering and controlling a JBoss EAP 6.0 runtime instance.");
@@ -92,7 +93,7 @@ public class WildFlyServerModelTest extends RSPCase {
     @Test
     public void testMinishiftSupport() throws Exception {
     	launcher.getClient().addPromptStringReply("dummySecurePass");
-        List<ServerType> types = serverProxy.getServerTypes().get();
+        List<ServerType> types = serverProxy.getServerTypes().get(REQUEST_TIMEOUT + 100, TimeUnit.MILLISECONDS);
         
         ServerType minishift = new ServerType("org.jboss.tools.openshift.cdk.server.type.minishift.v1_12",
                 "Minishift 1.12+", "A server adapter capable of controlling a Minishift 1.12+ runtime instance.");
@@ -102,7 +103,7 @@ public class WildFlyServerModelTest extends RSPCase {
     
     @Test
     public void testGetRequiredAttributes() throws Exception {
-        Attributes attr = serverProxy.getRequiredAttributes(wildflyType).get();
+        Attributes attr = serverProxy.getRequiredAttributes(wildflyType).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
         
         Map<String, Attribute> expected = new HashMap<>();
         expected.put("server.home.dir", new Attribute("string", "A filesystem path pointing to a server installation's root directory", null));
@@ -113,21 +114,21 @@ public class WildFlyServerModelTest extends RSPCase {
     public void testGetRequiredAttributesInvalid() throws Exception {
         ServerType type = new ServerType("foo", "bar", "baz");
         
-        Attributes attr = serverProxy.getRequiredAttributes(type).get();
+        Attributes attr = serverProxy.getRequiredAttributes(type).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
         
         assertNull(attr);
     }
     
     @Test
     public void testGetRequiredAttributesNull() throws Exception {
-        Attributes attr = serverProxy.getRequiredAttributes(null).get();
+        Attributes attr = serverProxy.getRequiredAttributes(null).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
         
         assertNull(attr);
     }
     
     @Test
     public void testGetOptionalAttributes() throws Exception {
-        Attributes attr = serverProxy.getOptionalAttributes(wildflyType).get();
+        Attributes attr = serverProxy.getOptionalAttributes(wildflyType).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
         
         Map<String, Attribute> expected = new HashMap<>();
         expected.put("vm.install.path", new Attribute("string",
@@ -188,14 +189,14 @@ public class WildFlyServerModelTest extends RSPCase {
     public void testGetOptionalAttributesInvalid() throws Exception {
         ServerType type = new ServerType("foo", "bar", "baz");
         
-        Attributes attr = serverProxy.getOptionalAttributes(type).get();
+        Attributes attr = serverProxy.getOptionalAttributes(type).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
         
         assertNull(attr);
     }
     
     @Test
     public void testGetOptionalAttributesNull() throws Exception {
-        Attributes attr = serverProxy.getOptionalAttributes(null).get();
+        Attributes attr = serverProxy.getOptionalAttributes(null).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
         
         assertNull(attr);
     }
@@ -208,7 +209,7 @@ public class WildFlyServerModelTest extends RSPCase {
         assertEquals(IStatus.OK, status.getSeverity());
         assertEquals("ok", status.getMessage());
         
-        List<ServerHandle> handles = serverProxy.getServerHandles().get();
+        List<ServerHandle> handles = serverProxy.getServerHandles().get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
         ServerHandle expected = new ServerHandle(serverName, wildflyType);
         assertTrue(handles.contains(expected));
     }
@@ -216,7 +217,7 @@ public class WildFlyServerModelTest extends RSPCase {
     @Test
     public void testCreateServerInvalid() throws Exception {
         ServerAttributes attr = new ServerAttributes("UNKNOWN", "fly", null);
-        Status status = serverProxy.createServer(attr).get().getStatus();
+        Status status = serverProxy.createServer(attr).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS).getStatus();
         
         assertEquals(IStatus.ERROR, status.getSeverity());
         assertEquals("Server Type UNKNOWN not found", status.getMessage());
@@ -224,7 +225,7 @@ public class WildFlyServerModelTest extends RSPCase {
     
     @Test
     public void testCreateServerNull() throws Exception {
-        Status status = serverProxy.createServer(null).get().getStatus();
+        Status status = serverProxy.createServer(null).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS).getStatus();
         
         assertEquals(IStatus.ERROR, status.getSeverity());
         assertEquals(INVALID_PARAM, status.getMessage());
@@ -247,7 +248,7 @@ public class WildFlyServerModelTest extends RSPCase {
         createServer(WILDFLY_ROOT, "wfly2");
         
         ServerHandle handle = new ServerHandle("wfly2", wildflyType);
-        Status status = serverProxy.deleteServer(handle).get();
+        Status status = serverProxy.deleteServer(handle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
         
         assertEquals(IStatus.OK, status.getSeverity());
         assertEquals("ok", status.getMessage());
@@ -256,7 +257,7 @@ public class WildFlyServerModelTest extends RSPCase {
     @Test
     public void testDeleteNonexistentServer() throws Exception {
         ServerHandle handle = new ServerHandle("wfly3", wildflyType);
-        Status status = serverProxy.deleteServer(handle).get();
+        Status status = serverProxy.deleteServer(handle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
         
         assertEquals(IStatus.ERROR, status.getSeverity());
         assertEquals("Server wfly3 does not exist", status.getMessage());
@@ -265,7 +266,7 @@ public class WildFlyServerModelTest extends RSPCase {
     @Test
     public void testDeleteServerInvalid() throws Exception {
         ServerHandle handle = new ServerHandle("wfly4", new ServerType("foo", "foo", "foo"));
-        Status status = serverProxy.deleteServer(handle).get();
+        Status status = serverProxy.deleteServer(handle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
         
         assertEquals(IStatus.ERROR, status.getSeverity());
         assertEquals("Invalid Request: Server type not found.", status.getMessage());
@@ -273,7 +274,7 @@ public class WildFlyServerModelTest extends RSPCase {
     
     @Test
     public void testDeleteServerNull() throws Exception {
-        Status status = serverProxy.deleteServer(null).get();
+        Status status = serverProxy.deleteServer(null).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
         
         assertEquals(IStatus.ERROR, status.getSeverity());
         assertEquals(MISSING_SERVER_HANDLE, status.getMessage());
@@ -284,7 +285,7 @@ public class WildFlyServerModelTest extends RSPCase {
         createServer(WILDFLY_ROOT, "wfly5");
         createServer(WILDFLY_ROOT, "wfly6");
         
-        List<ServerHandle> handles = serverProxy.getServerHandles().get();
+        List<ServerHandle> handles = serverProxy.getServerHandles().get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
         
         assertTrue(handles.contains(new ServerHandle("wfly5", wildflyType)));
         assertTrue(handles.contains(new ServerHandle("wfly6", wildflyType)));
