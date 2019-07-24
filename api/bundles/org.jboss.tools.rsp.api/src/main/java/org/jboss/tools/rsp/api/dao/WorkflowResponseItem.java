@@ -8,7 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.api.dao;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class WorkflowResponseItem {
 	// An id for this item, such as 'workflow.license', "workflow.username", "workflow.password", etc
@@ -37,7 +37,7 @@ public class WorkflowResponseItem {
 	
 	private WorkflowPromptDetails prompt;
 	
-	private HashMap<String,String> properties;
+	private Map<String,String> properties;
 	
 	
 	public WorkflowResponseItem() {
@@ -88,11 +88,11 @@ public class WorkflowResponseItem {
 		this.prompt = prompt;
 	}
 
-	public HashMap<String,String> getProperties() {
+	public Map<String,String> getProperties() {
 		return properties;
 	}
 
-	public void setProperties(HashMap<String,String> properties) {
+	public void setProperties(Map<String,String> properties) {
 		this.properties = properties;
 	}
 
