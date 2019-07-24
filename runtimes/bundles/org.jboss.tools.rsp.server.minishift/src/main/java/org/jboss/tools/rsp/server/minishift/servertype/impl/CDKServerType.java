@@ -8,6 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.minishift.servertype.impl;
 
+import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
@@ -15,6 +16,7 @@ import org.jboss.tools.rsp.server.LauncherSingleton;
 import org.jboss.tools.rsp.server.minishift.servertype.BaseMinishiftServerType;
 import org.jboss.tools.rsp.server.minishift.servertype.IMinishiftServerAttributes;
 import org.jboss.tools.rsp.server.redhat.credentials.RedHatAccessCredentials;
+import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
@@ -117,6 +119,13 @@ public class CDKServerType extends BaseMinishiftServerType {
 	}
 	
 	protected void setGlobalCredentialsIfUnset(IServer server) {
+		// This step should only be done if this createServerDelegate is called
+		// as part of a user workflow in the context of a call from a client.
+		RSPClient rspc = ClientThreadLocal.getActiveClient();
+		if( rspc == null )
+			return;
+		
+
 		if( !isRedHatUsernameSet() ) {
 			String user = server.getAttribute(IMinishiftServerAttributes.MINISHIFT_REG_USERNAME, (String)null);
 			if( user != null && user.isEmpty()) {

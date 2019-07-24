@@ -65,7 +65,7 @@ public abstract class AbstractDownloadManagerExecutor
 			return executeInternal(req);
 		} catch(Exception t ) {
 			LOG.error("Error handling download request", t);
-			return null;
+			return quickResponse(IStatus.ERROR, t.getMessage(), req, t);
 		}
 	}
 	
