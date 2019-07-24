@@ -22,7 +22,6 @@ import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attribute;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
-import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.api.dao.WorkflowPromptDetails;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
@@ -30,6 +29,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
+import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.core.runtime.SubMonitor;
 import org.jboss.tools.rsp.foundation.core.tasks.TaskModel;
 import org.jboss.tools.rsp.launching.LaunchingCore;
@@ -45,6 +45,7 @@ import org.jboss.tools.rsp.server.spi.client.MessageContextStore.MessageContext;
 import org.jboss.tools.rsp.server.spi.jobs.IJob;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
+import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 
 /*
  * A class for simple download-runtimes that require only a license agreement
@@ -63,8 +64,13 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 	}
 	
 	protected WorkflowResponse quickResponse(int sev, String msg, DownloadSingleRuntimeRequest req) {
+		return quickResponse(sev, msg, req, null);
+	}
+	protected WorkflowResponse quickResponse(int sev, String msg, 
+			DownloadSingleRuntimeRequest req, Throwable t) {
 		WorkflowResponse resp = new WorkflowResponse();
-		resp.setStatus(new Status(sev,  SPIActivator.BUNDLE_ID, msg));
+		IStatus istat = new Status(sev, SPIActivator.BUNDLE_ID, msg, t);
+		resp.setStatus(StatusConverter.convert(istat));
 		if( req != null )
 			resp.setRequestId(req.getRequestId());
 		return resp;
@@ -238,10 +244,13 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 		items.add(item2);
 		resp.setItems(items);
 		resp.setRequestId(id);
-		resp.setStatus(new Status(IStatus.INFO, SPIActivator.BUNDLE_ID, "Please fill the requried information"));
+		resp.setStatus(statusDao(IStatus.INFO, SPIActivator.BUNDLE_ID, "Please fill the requried information"));
 		return resp;
 	}
 
+	protected org.jboss.tools.rsp.api.dao.Status statusDao(int sev, String bundle, String msg) {
+		return new org.jboss.tools.rsp.api.dao.Status(sev, bundle, msg);
+	}
 
 	protected WorkflowResponse convertAttributes(String serverTypeId, DownloadSingleRuntimeRequest req, List<String> ignored) {
 		List<WorkflowResponseItem> items = new ArrayList<>();
@@ -265,7 +274,7 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 		WorkflowResponse resp = new WorkflowResponse();
 		resp.setItems(items);
 		resp.setRequestId(req.getRequestId());
-		resp.setStatus(	new Status(IStatus.INFO, SPIActivator.BUNDLE_ID, "Please fill the requried information"));
+		resp.setStatus(statusDao(IStatus.INFO, SPIActivator.BUNDLE_ID, "Please fill the requried information"));
 		return resp;
 	}
 	

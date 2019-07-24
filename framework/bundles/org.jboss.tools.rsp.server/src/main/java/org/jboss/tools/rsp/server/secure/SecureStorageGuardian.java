@@ -131,7 +131,7 @@ public class SecureStorageGuardian implements ISecureStorageProvider {
 	public ISecureStorage getSecureStorage(boolean prompt) {
 		ISecureStorage storage = getSecureStorage();
 		RSPClient rspc = ClientThreadLocal.getActiveClient();
-		if( storage == null && prompt && !maxTriesReached.contains(rspc)) {
+		if( rspc != null && storage == null && prompt && !maxTriesReached.contains(rspc)) {
 			try {
 				authenticateClient(rspc, 4);
 				if( getSecureStorage() != null ) {
