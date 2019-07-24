@@ -68,7 +68,7 @@ public class WildFlyPublishingTest extends RSPCase {
 		startServer(client, SERVER_ID);
 		handle = new ServerHandle(SERVER_ID, wildflyType);
 		reference = new DeployableReference(warFile.getName(), warFile.getAbsolutePath());
-		Status status = serverProxy.addDeployable(new ServerDeployableReference(handle, reference)).get();
+		Status status = serverProxy.addDeployable(new ServerDeployableReference(handle, reference)).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals("Expected request status is 'ok' but was " + status, Status.OK, status.getSeverity());
 	}
 
@@ -125,29 +125,28 @@ public class WildFlyPublishingTest extends RSPCase {
 	}
 
 	@Test
-	public void testNullPublishRequest() throws InterruptedException, ExecutionException {
-		Status status = serverProxy.publish(null).get();
+	public void testNullPublishRequest() throws InterruptedException, ExecutionException, TimeoutException {
+		Status status = serverProxy.publish(null).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, status.getSeverity());
 	}
 
 	@Test
-	public void testInvalidPublishRequest() throws InterruptedException, ExecutionException {
-		Status status = serverProxy.publish(new PublishServerRequest(handle, 5000)).get();
+	public void testInvalidPublishRequest() throws InterruptedException, ExecutionException, TimeoutException {
+		Status status = serverProxy.publish(new PublishServerRequest(handle, 5000)).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, status.getSeverity());
 	}
 
 	@Test
-	public void testRemoveNullDeployment() throws InterruptedException, ExecutionException {
-		Status status = serverProxy.removeDeployable(null).get();
+	public void testRemoveNullDeployment() throws InterruptedException, ExecutionException, TimeoutException {
+		Status status = serverProxy.removeDeployable(null).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, status.getSeverity());
 	}
 
 	@Test
-	public void testRemoveInvalidDeployment() throws InterruptedException, ExecutionException {
-		Status status = serverProxy
-				.removeDeployable(
+	public void testRemoveInvalidDeployment() throws InterruptedException, ExecutionException, TimeoutException {
+		Status status = serverProxy.removeDeployable(
 						new ServerDeployableReference(handle, new DeployableReference("labelik", "/I/dont/exist")))
-				.get();
+				.get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, status.getSeverity());
 	}
 
@@ -158,7 +157,7 @@ public class WildFlyPublishingTest extends RSPCase {
 	@Test
 	public void testAddNullDeployment() throws InterruptedException, ExecutionException {
 		try {
-			Status status = serverProxy.addDeployable(null).get(2, TimeUnit.SECONDS);
+			Status status = serverProxy.addDeployable(null).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 			assertEquals(Status.ERROR, status.getSeverity());
 		} catch (TimeoutException e) {
 			log.log(Level.SEVERE, "Timeout exception occured during addDeployable call", e);
@@ -167,60 +166,60 @@ public class WildFlyPublishingTest extends RSPCase {
 	}
 
 	@Test
-	public void testAddInvalidDeployment() throws InterruptedException, ExecutionException {
+	public void testAddInvalidDeployment() throws InterruptedException, ExecutionException, TimeoutException {
 		Status status = serverProxy
 				.addDeployable(new ServerDeployableReference(handle, new DeployableReference(WAR_FILENAME, null)))
-				.get();
+				.get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, status.getSeverity());
 		status = serverProxy
 				.addDeployable(
 						new ServerDeployableReference(handle, new DeployableReference(WAR_FILENAME, "/I/dont/exist")))
-				.get();
+				.get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, status.getSeverity());
 		status = serverProxy.addDeployable(
 				new ServerDeployableReference(handle, new DeployableReference(WAR_FILENAME, getProperty("user.dir"))))
-				.get();
+				.get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, status.getSeverity());
 		status = serverProxy.addDeployable(
 				new ServerDeployableReference(handle, new DeployableReference("labelik", warFile.getAbsolutePath())))
-				.get();
+				.get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, status.getSeverity());
 
 	}
 
 	@Test
-	public void testListDeploymentOptions() throws InterruptedException, ExecutionException {
-		Attributes attrs = serverProxy.listDeploymentOptions(handle).get().getAttributes();
+	public void testListDeploymentOptions() throws InterruptedException, ExecutionException, TimeoutException  {
+		Attributes attrs = serverProxy.listDeploymentOptions(handle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS).getAttributes();
 		assertNotNull(attrs);
 	}
 
 	@Test
-	public void testListDeploymentOptionsInvalidAttributes() throws InterruptedException, ExecutionException {
+	public void testListDeploymentOptionsInvalidAttributes() throws InterruptedException, ExecutionException, TimeoutException {
 
 		ListDeploymentOptionsResponse response = serverProxy.listDeploymentOptions(new ServerHandle("foo.server.id",
-				new ServerType("some.id", "my.server", "Random server type definition"))).get();
+				new ServerType("some.id", "my.server", "Random server type definition"))).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, response.getStatus().getSeverity());
 		assertTrue(response.getAttributes().getAttributes().isEmpty());
 	}
 
 	@Test
-	public void testListDeploymentOptionsNullAttributes() throws InterruptedException, ExecutionException {
-		ListDeploymentOptionsResponse response = serverProxy.listDeploymentOptions(null).get();
+	public void testListDeploymentOptionsNullAttributes() throws InterruptedException, ExecutionException, TimeoutException {
+		ListDeploymentOptionsResponse response = serverProxy.listDeploymentOptions(null).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, response.getStatus().getSeverity());
 		assertTrue(response.getAttributes().getAttributes().isEmpty());
 	}
 
 	@Test
-	public void testGetDeployablesInvalidAttributes() throws InterruptedException, ExecutionException {
+	public void testGetDeployablesInvalidAttributes() throws InterruptedException, ExecutionException, TimeoutException {
 		ListDeployablesResponse response = serverProxy.getDeployables(new ServerHandle("foo.server.id",
-				new ServerType("some.id", "my.server", "Random server type definition"))).get();
+				new ServerType("some.id", "my.server", "Random server type definition"))).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, response.getStatus().getSeverity());
 		assertNull(response.getStates());
 	}
 
 	@Test
-	public void testGetDeployablesNullAttributes() throws InterruptedException, ExecutionException {
-		ListDeployablesResponse response = serverProxy.getDeployables(null).get();
+	public void testGetDeployablesNullAttributes() throws InterruptedException, ExecutionException, TimeoutException {
+		ListDeployablesResponse response = serverProxy.getDeployables(null).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, response.getStatus().getSeverity());
 		assertNull(response.getStates());
 	}
@@ -228,10 +227,10 @@ public class WildFlyPublishingTest extends RSPCase {
 	@Test
 	public void testGetDeployables() throws Exception {
 		DeployableReference ref2 = new DeployableReference("other_id", WAR_FILENAME);
-		Status status = serverProxy.addDeployable(new ServerDeployableReference(handle, ref2)).get();
+		Status status = serverProxy.addDeployable(new ServerDeployableReference(handle, ref2)).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals("Expected request status is 'ok' but was " + status, Status.OK, status.getSeverity());
 		waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_ADD, 10, client);
-		List<DeployableState> states = serverProxy.getDeployables(handle).get().getStates();
+		List<DeployableState> states = serverProxy.getDeployables(handle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS).getStates();
 		assertEquals(2, states.size());
 		DeployableReference actualRef = states.get(0).getReference();
 		DeployableReference actualRef2 = states.get(1).getReference();
@@ -244,9 +243,9 @@ public class WildFlyPublishingTest extends RSPCase {
 	@Test
 	public void testGetDeployablesEmptyDeployment() throws Exception {
 		waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_ADD, 10, client);
-		Status status = serverProxy.removeDeployable(new ServerDeployableReference(handle, reference)).get();
+		Status status = serverProxy.removeDeployable(new ServerDeployableReference(handle, reference)).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals("Expected request status is 'ok' but was " + status, Status.OK, status.getSeverity());
-		List<DeployableState> states = serverProxy.getDeployables(handle).get().getStates();
+		List<DeployableState> states = serverProxy.getDeployables(handle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS).getStates();
 		assertTrue(states.isEmpty());
 	}
 

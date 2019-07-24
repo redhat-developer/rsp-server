@@ -12,12 +12,17 @@ import static org.jboss.tools.rsp.itests.util.ServerStateUtil.waitForServerState
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.jboss.tools.rsp.api.RSPServer;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
@@ -58,6 +63,8 @@ public abstract class RSPCase {
 	protected static final String MODE_DEBUG = "debug";
 	protected static final String MODE_RUN = "run";
 	protected static final String STATUS_MESSAGE_OK = "ok";
+	protected static final int SERVER_OPERATION_TIMEOUT = 4000;
+	protected static final int REQUEST_TIMEOUT = 400;
 
 	protected static DummyClientLauncher launcher;
 	protected static RSPServer serverProxy;
@@ -76,6 +83,47 @@ public abstract class RSPCase {
 			fail("System property " + property + " value is not defined");
 		}
 		return val;
+	}
+	
+	public static <V> V timeConsumption(Callable<V> callable) throws Exception {
+		return timeConsumption(callable, null, 4);
+	}
+	
+	public static <V> V timeConsumption(Callable<V> callable, int level) throws Exception {
+		return timeConsumption(callable, new File(getProperty("user.dir") + "/" + "output.log"), level);
+	}
+	
+	/**
+	 * This method logs out or saves to the file output of time consumption
+	 * for anonymous callable implementation of overrided call method. 
+	 * Serves mainly for debug purposes now. 
+	 * 
+	 * @param <V> generic type that is used in callable type definition
+	 * @param callable instance of callable class on which the call function is executed in method body and time is measured on
+	 * @param file file to write output to
+	 * @return object of generic type V that is type definition of callable class
+	 * @throws Exception
+	 */
+	public static <V> V timeConsumption(Callable<V> callable, File file, int levelOfCaller) throws Exception {
+		long startTime = System.currentTimeMillis();
+		StackTraceElement [] trace = Thread.currentThread().getStackTrace();
+		StackTraceElement impl = trace[levelOfCaller-1];
+		StackTraceElement caller = trace[levelOfCaller];
+		
+		V result = callable.call();
+		
+		String output = "Calling " + caller.getClassName() + "." + caller.getMethodName() + " of " 
+						+ impl.getClassName() + "." + impl.getMethodName() 
+						+ " took: " + (System.currentTimeMillis() - startTime) / 1000.0 + " s\r\n";
+		if (file != null) {
+			try(FileWriter fw = new FileWriter(file, true)) {
+				fw.write(output);
+				fw.flush();
+			}
+		} else {
+			System.out.println(output);
+		}
+		return result;
 	}
 
 	@BeforeClass
@@ -102,8 +150,13 @@ public abstract class RSPCase {
 		Map<String, Object> attr = new HashMap<>();
 		attr.put("server.home.dir", WILDFLY_ROOT);
 		LaunchParameters params = new LaunchParameters(new ServerAttributes(wildflyType.getId(), id, attr), MODE_RUN);
-
-		StartServerResponse response = serverProxy.startServerAsync(params).get();
+		
+		StartServerResponse response = timeConsumption(new Callable<StartServerResponse>() {
+			public StartServerResponse call() throws InterruptedException, ExecutionException, TimeoutException {
+				return serverProxy.startServerAsync(params).get(SERVER_OPERATION_TIMEOUT, TimeUnit.MILLISECONDS);
+			}
+		});
+		
 
 		assertEquals(0, response.getStatus().getSeverity());
 		assertEquals(STATUS_MESSAGE_OK, response.getStatus().getMessage());
@@ -113,7 +166,12 @@ public abstract class RSPCase {
 	protected void stopServer(DummyClient client, String id) throws Exception {
 		if (client.getStateObject() != null
 				&& client.getStateObject().getState() != ServerManagementAPIConstants.STATE_STOPPED) {
-			Status status = serverProxy.stopServerAsync(new StopServerAttributes(id, true)).get();
+			
+			Status status = timeConsumption(new Callable<Status>() {
+				public Status call() throws InterruptedException, ExecutionException, TimeoutException {
+					return serverProxy.stopServerAsync(new StopServerAttributes(id, true)).get(SERVER_OPERATION_TIMEOUT, TimeUnit.MILLISECONDS);
+				}
+			});
 			assertEquals(Status.OK, status.getSeverity());
 			assertEquals(STATUS_MESSAGE_OK, status.getMessage());
 			waitForServerState(ServerManagementAPIConstants.STATE_STOPPED, 10, client);
@@ -123,11 +181,15 @@ public abstract class RSPCase {
 	}
 
 	protected Status createServer(String location, String id) throws Exception {
-		ServerBean bean = serverProxy.findServerBeans(new DiscoveryPath(location)).get().get(0);
+		ServerBean bean = serverProxy.findServerBeans(new DiscoveryPath(location)).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS).get(0);
 		Map<String, Object> attr = new HashMap<>();
 		attr.put("server.home.dir", bean.getLocation());
 		ServerAttributes serverAttr = new ServerAttributes(bean.getServerAdapterTypeId(), id, attr);
-		return serverProxy.createServer(serverAttr).get().getStatus();
+		return timeConsumption(new Callable<Status>() {
+			public Status call() throws InterruptedException, ExecutionException, TimeoutException {
+				return serverProxy.createServer(serverAttr).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS).getStatus();
+			}
+		});
 	}
 
 	protected void deleteServer(String id) throws Exception {
@@ -137,13 +199,22 @@ public abstract class RSPCase {
 		if (handle == null) {
 			return;
 		}
-		serverProxy.deleteServer(handle);
+		Status status = timeConsumption(new Callable<Status>() {
+			public Status call() throws InterruptedException, ExecutionException, TimeoutException {
+				return serverProxy.deleteServer(handle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
+			}
+		});
+		assertEquals(Status.OK, status.getSeverity());
 	}
 
 	protected void sendPublishRequest(ServerHandle handle, int publishType)
-			throws InterruptedException, ExecutionException {
+			throws Exception {
 		PublishServerRequest pubReq = new PublishServerRequest(handle, publishType);
-		Status status = serverProxy.publish(pubReq).get();
+		Status status = timeConsumption(new Callable<Status>() {
+			public Status call() throws InterruptedException, ExecutionException, TimeoutException {
+				return serverProxy.publish(pubReq).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
+			}
+		});
 		assertEquals("Expected request status is 'ok' but was " + status, Status.OK, status.getSeverity());
 	}
 
