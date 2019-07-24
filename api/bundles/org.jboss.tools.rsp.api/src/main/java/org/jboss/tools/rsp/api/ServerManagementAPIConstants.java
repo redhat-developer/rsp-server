@@ -31,6 +31,11 @@ public interface ServerManagementAPIConstants extends DefaultServerAttributes {
 	public static final String WORKFLOW_TYPE_OPEN_BROWSER = "workflow.browser.open";	
 
 
+	public static final String WORKFLOW_EDITOR_PROPERTY_PATH = "workflow.editor.file.path";
+	public static final String WORKFLOW_EDITOR_PROPERTY_CONTENT = "workflow.editor.file.content";
+	
+	
+	
 	/**
 	 * Server state constant (value 0) indicating that the
 	 * server is in an unknown state.

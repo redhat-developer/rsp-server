@@ -28,6 +28,7 @@ import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 import org.jboss.tools.rsp.server.wildfly.impl.Activator;
 import org.jboss.tools.rsp.server.wildfly.servertype.AbstractJBossServerDelegate;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
+import org.jboss.tools.rsp.server.wildfly.servertype.actions.EditServerConfigurationActionHandler;
 import org.jboss.tools.rsp.server.wildfly.servertype.actions.ShowInBrowserActionHandler;
 import org.jboss.tools.rsp.server.wildfly.servertype.publishing.IJBossPublishController;
 import org.jboss.tools.rsp.server.wildfly.servertype.publishing.WildFlyPublishController;
@@ -76,6 +77,7 @@ public class WildFlyServerDelegate extends AbstractJBossServerDelegate {
 		ret.setStatus(StatusConverter.convert(Status.OK_STATUS));
 		List<ServerActionWorkflow> allActions = new ArrayList<>();
 		allActions.add(ShowInBrowserActionHandler.getInitialWorkflow(this));
+		allActions.add(EditServerConfigurationActionHandler.getInitialWorkflow(this));
 		ret.setWorkflows(allActions);
 		return ret;
 	}
