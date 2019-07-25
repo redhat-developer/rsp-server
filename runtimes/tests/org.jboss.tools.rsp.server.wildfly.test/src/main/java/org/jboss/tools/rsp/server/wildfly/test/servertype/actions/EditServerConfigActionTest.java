@@ -11,42 +11,31 @@ package org.jboss.tools.rsp.server.wildfly.test.servertype.actions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
-import org.jboss.tools.rsp.api.dao.DeployableReference;
-import org.jboss.tools.rsp.api.dao.DeployableState;
-import org.jboss.tools.rsp.api.dao.ServerActionRequest;
 import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
-import org.jboss.tools.rsp.api.dao.ServerHandle;
-import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.server.wildfly.servertype.actions.EditServerConfigurationActionHandler;
-import org.jboss.tools.rsp.server.wildfly.servertype.actions.ShowInBrowserActionHandler;
-import org.jboss.tools.rsp.server.wildfly.servertype.impl.WildFlyServerDelegate;
 import org.junit.Test;
 
 public class EditServerConfigActionTest {
-
+	private String ACTION_ID = EditServerConfigurationActionHandler.ACTION_ID;
+	private String ACTION_LABEL = EditServerConfigurationActionHandler.ACTION_LABEL;
+	
 	@Test
 	public void testActionInitialWorkflowNoDeployments() throws IOException {
 		File configFile = Files.createTempFile("EditServerConfigActionTest", System.currentTimeMillis() + ".txt").toFile();
 		TestableEditServerConfigurationActionHandler handler = 
 				new TestableEditServerConfigurationActionHandler(configFile);
 		ServerActionWorkflow workflow = handler.getInitialWorkflowInternal();
-		assertEquals(workflow.getActionId(), handler.ACTION_ID);
-		assertEquals(workflow.getActionLabel(), handler.ACTION_LABEL);
+		assertEquals(workflow.getActionId(), ACTION_ID);
+		assertEquals(workflow.getActionLabel(), ACTION_LABEL);
 		
 		WorkflowResponse resp = workflow.getActionWorkflow();
 		assertNotNull(resp);
@@ -58,8 +47,8 @@ public class EditServerConfigActionTest {
 		assertEquals(resp.getItems().size(), 1);
 		WorkflowResponseItem item1 = resp.getItems().get(0);
 		
-		assertEquals(item1.getLabel(), handler.ACTION_LABEL);
-		assertEquals(item1.getId(), handler.ACTION_ID);
+		assertEquals(item1.getLabel(), ACTION_LABEL);
+		assertEquals(item1.getId(), ACTION_ID);
 		assertEquals(item1.getItemType(), ServerManagementAPIConstants.WORKFLOW_TYPE_OPEN_EDITOR);
 		assertNull(item1.getPrompt());
 		assertNotNull(item1.getProperties());
@@ -74,9 +63,11 @@ public class EditServerConfigActionTest {
 			super(null);
 			this.configFile = configFile;
 		}
+		@Override
 		protected String getConfigurationFile() {
 			return configFile.getAbsolutePath();
 		}
+		@Override
 		public ServerActionWorkflow getInitialWorkflowInternal() {
 			return super.getInitialWorkflowInternal();
 		}
