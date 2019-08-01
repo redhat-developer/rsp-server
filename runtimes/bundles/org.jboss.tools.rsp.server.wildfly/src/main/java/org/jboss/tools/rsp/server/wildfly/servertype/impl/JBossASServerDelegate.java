@@ -9,10 +9,7 @@
 package org.jboss.tools.rsp.server.wildfly.servertype.impl;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
-import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
-import org.jboss.tools.rsp.api.dao.ServerActionRequest;
 import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
-import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
@@ -25,8 +22,8 @@ public class JBossASServerDelegate extends AbstractJBossServerDelegate {
 		super(server);
 		setServerState(ServerManagementAPIConstants.STATE_STOPPED);
 	}
-	protected IServerStartLauncher getStartLauncher() {
-		return LauncherDiscovery.getDefault().getStartupLauncher(getServer());
+	protected IServerStartLauncher getStartLauncher(IServer server) {
+		return LauncherDiscovery.getDefault().getStartupLauncher(server);
 	}
 	
 	protected IServerShutdownLauncher getStopLauncher() {
@@ -38,8 +35,6 @@ public class JBossASServerDelegate extends AbstractJBossServerDelegate {
 	}
 	@Override
 	public void updateServer(IServer dummyServer, UpdateServerResponse resp) {
-		// TODO check modules? 
-		
 		updateServer(dummyServer, resp, 
 				new String[] {ServerManagementAPIConstants.SERVER_HOME_DIR});
 	}

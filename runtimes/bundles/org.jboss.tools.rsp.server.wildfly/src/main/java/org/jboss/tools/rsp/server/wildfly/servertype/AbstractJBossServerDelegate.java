@@ -66,7 +66,10 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		super(server);
 	}
 
-	protected abstract IServerStartLauncher getStartLauncher();
+	protected IServerStartLauncher getStartLauncher() {
+		return getStartLauncher(getServer());
+	}
+	protected abstract IServerStartLauncher getStartLauncher(IServer delegate);
 	
 	protected abstract IServerShutdownLauncher getStopLauncher();
 
@@ -372,7 +375,29 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		if( preUpdateServerValidationErrors(dummyServer, resp, unchangeableFields)) {
 			return;
 		}
+		MultiStatus ret = new MultiStatus(ServerCoreActivator.BUNDLE_ID, 0, 
+				NLS.bind("Updating Server {0}...", getServer().getName()), null);
 
+		
+		updateServerModules(dummyServer, ret);
+		updateDependentAttributes(dummyServer, ret);
+		
+		if( !ret.isOK()) {
+			resp.getValidation().setStatus(StatusConverter.convert(ret));
+		}
+	}
+	
+	protected void updateDependentAttributes(IServer dummyServer, MultiStatus ret) {
+		// Our start launcher is currently saving default vm and prog args 
+		// which is weird but whatever, it's what we got
+		try {
+			getStartLauncher(dummyServer).getLaunchCommand("run");
+		} catch(CoreException ce) {
+			ce.printStackTrace();
+		}
+	}
+
+	private void updateServerModules(IServer dummyServer, MultiStatus ret) {
 		// Now, perform any changes that need to be done at the delegate level
 		List<DeployableState> existing = getServerPublishModel().getDeployableStates();
 		List<DeployableState> updated = dummyServer.getDelegate().getServerPublishModel().getDeployableStates();
@@ -397,8 +422,6 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 				updated.remove(ds);
 			}
 		}
-		MultiStatus ret = new MultiStatus(ServerCoreActivator.BUNDLE_ID, 0, 
-				NLS.bind("Updating Server {0}...", getServer().getName()), null);
 
 		// Handle removals
 		for( DeployableReference removed1 : removed ) {
@@ -408,12 +431,8 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		for( DeployableState ds : updated ) {
 			ret.add(getServerPublishModel().addDeployable(ds.getReference()));
 		}
-		
-		if( !ret.isOK()) {
-			resp.getValidation().setStatus(StatusConverter.convert(ret));
-		}
 	}
-	
+
 	private boolean preUpdateServerValidationErrors(
 			IServer dummyServer, UpdateServerResponse resp,
 			String[] unchangeableFields) {

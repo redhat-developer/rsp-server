@@ -38,8 +38,8 @@ public class WildFlyServerDelegate extends AbstractJBossServerDelegate {
 		super(server);
 		setServerState(ServerManagementAPIConstants.STATE_STOPPED);
 	}
-	protected IServerStartLauncher getStartLauncher() {
-		return new WildFlyStartLauncher(this);
+	protected IServerStartLauncher getStartLauncher(IServer server) {
+		return new WildFlyStartLauncher(server.getDelegate());
 	}
 	
 	protected IServerShutdownLauncher getStopLauncher() {
