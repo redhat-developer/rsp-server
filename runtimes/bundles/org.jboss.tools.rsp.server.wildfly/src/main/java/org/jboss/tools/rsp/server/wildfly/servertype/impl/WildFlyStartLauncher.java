@@ -49,13 +49,20 @@ public class WildFlyStartLauncher extends AbstractLauncher {
 	protected String getVMArguments() {
 		boolean shouldOverride = getServer().getAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_BOOLEAN, false);
 		String overrideArgs = getServer().getAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_VM_ARGS, (String)null);
-		if( shouldOverride ) {
-			if( overrideArgs != null && overrideArgs.trim().length() > 0 ) {
-				return overrideArgs;
-			}
+		if( shouldOverride && overrideArgs != null && overrideArgs.trim().length() > 0 ) {
+			return overrideArgs;
 		}
 		
 		// Using defaults
+		String ret = calculateVMArgs();
+		if( !isEqual(ret, overrideArgs)) {
+			// Save these in the server just so that we have it
+			saveProperty(IJBossServerAttributes.LAUNCH_OVERRIDE_VM_ARGS, ret);
+		}
+		return ret;
+	}
+	
+	private String calculateVMArgs() {
 		IDefaultLaunchArguments largs = getLaunchArgs();
 		String ret = null;
 		if( largs != null ) {
@@ -67,17 +74,6 @@ public class WildFlyStartLauncher extends AbstractLauncher {
 				ret = ArgsUtil.setSystemProperty(ret, "jboss.http.port", ""+port);
 			}
 		}
-		
-		// Save these in the server just so that we have it
-		if( !ret.equals(overrideArgs)) {
-			IServerWorkingCopy wc = getServer().createWorkingCopy();
-					wc.setAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_VM_ARGS, ret);
-			try {
-				wc.save(new NullProgressMonitor());
-			} catch(CoreException ce) {
-				ce.printStackTrace();
-			}
-		}
 		return ret;
 	}
 	
@@ -85,12 +81,33 @@ public class WildFlyStartLauncher extends AbstractLauncher {
 	protected String getProgramArguments() {
 		boolean shouldOverride = getServer().getAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_BOOLEAN, false);
 		String overrideArgs = getServer().getAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_PROGRAM_ARGS, (String)null);
-		if( shouldOverride ) {
-			if( overrideArgs != null && overrideArgs.trim().length() > 0 ) {
-				return overrideArgs;
-			}
+		if( shouldOverride && overrideArgs != null && overrideArgs.trim().length() > 0 ) {
+			return overrideArgs;
 		}
 		
+		String ret = getCalculatedProgramArgs();
+		if( !isEqual(ret, overrideArgs)) {
+			// Save these in the server just so that we have it
+			saveProperty(IJBossServerAttributes.LAUNCH_OVERRIDE_PROGRAM_ARGS, ret);
+		}
+		return ret;
+	}
+	
+	private boolean isEqual(String one, String two) {
+		return one == null ? two == null : one.equals(two);
+	}
+	
+	private void saveProperty(String key, String val) {
+		IServerWorkingCopy wc = getServer().createWorkingCopy();
+		wc.setAttribute(key, val);
+		try {
+			wc.save(new NullProgressMonitor());
+		} catch(CoreException ce) {
+			ce.printStackTrace();
+		}
+	}
+	
+	private String getCalculatedProgramArgs() {
 		IDefaultLaunchArguments largs = getLaunchArgs();
 		String r1 = null;
 		if( largs != null ) {
@@ -107,18 +124,6 @@ public class WildFlyStartLauncher extends AbstractLauncher {
 					IJBossServerAttributes.WILDFLY_CONFIG_FILE, 
 					IJBossServerAttributes.WILDFLY_CONFIG_FILE_DEFAULT);
 			r1 = ArgsUtil.setArg(r1, null, "--server-config", configFile);
-		}
-		
-
-		// Save these in the server just so that we have it
-		if( !r1.equals(overrideArgs)) {
-			IServerWorkingCopy wc = getServer().createWorkingCopy();
-					wc.setAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_PROGRAM_ARGS, r1);
-			try {
-				wc.save(new NullProgressMonitor());
-			} catch(CoreException ce) {
-				ce.printStackTrace();
-			}
 		}
 		return r1;
 	}

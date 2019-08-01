@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
+import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
@@ -58,6 +59,10 @@ public class DummyServer extends Server {
 		}
 	}
 	
+	public void save(IProgressMonitor monitor) throws CoreException {
+		// Do nothing
+	}
+
 	public Map<String, Object> getMap() {
 		return map;
 	}
