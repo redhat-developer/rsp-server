@@ -393,7 +393,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		try {
 			getStartLauncher(dummyServer).getLaunchCommand("run");
 		} catch(CoreException ce) {
-			ce.printStackTrace();
+			LOG.error(ce.getMessage(), ce);
 		}
 	}
 
