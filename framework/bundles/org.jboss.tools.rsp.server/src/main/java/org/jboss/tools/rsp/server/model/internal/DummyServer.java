@@ -42,6 +42,7 @@ public class DummyServer extends Server {
 	public DummyServer() {
 		super(null, null, null);
 	}
+	
 	public void loadFromJson(String json) throws CoreException {
 		try(InputStream in = new ByteArrayInputStream(json.getBytes())) {
 			IMemento memento = null;
@@ -58,7 +59,7 @@ public class DummyServer extends Server {
 					NLS.bind("Error while reading server string: {0}", e.getMessage()), e));
 		}
 	}
-	
+	@Override
 	public void save(IProgressMonitor monitor) throws CoreException {
 		// Do nothing
 	}
