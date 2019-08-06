@@ -29,6 +29,9 @@ public interface IJBossServerAttributes extends DefaultServerAttributes {
 	public static final String WILDFLY_CONFIG_FILE = "wildfly.server.config.file";
 	public static final String WILDFLY_CONFIG_FILE_DEFAULT = "standalone.xml";
 	
+	public static final String WILDFLY_PUBLISH_RESTART_PATTERN_KEY = "wildfly.publish.restart.pattern";
+	public static final String WILDFLY_PUBLISH_RESTART_PATTERN_DEFAULT = "\\.class$|\\.jar$";
+	
 
 	/*
 	 * Launch attributes

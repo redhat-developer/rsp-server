@@ -20,6 +20,7 @@ import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
+import org.jboss.tools.rsp.server.model.IFullPublishRequiredCallback;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
 import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
@@ -34,14 +35,27 @@ import org.jboss.tools.rsp.server.wildfly.servertype.publishing.IJBossPublishCon
 import org.jboss.tools.rsp.server.wildfly.servertype.publishing.WildFlyPublishController;
 
 public class WildFlyServerDelegate extends AbstractJBossServerDelegate {
+	private IFullPublishRequiredCallback fullPublishCallback;
 	public WildFlyServerDelegate(IServer server) {
 		super(server);
 		setServerState(ServerManagementAPIConstants.STATE_STOPPED);
 	}
+
+	@Override
+	protected IFullPublishRequiredCallback getFullPublishRequiredCallback() {
+		if(fullPublishCallback == null ) {
+			return new WildFlyFullPublishRequiredCallback(this);
+		}
+		return fullPublishCallback;
+	}
+
+	
+	@Override
 	protected IServerStartLauncher getStartLauncher(IServer server) {
 		return new WildFlyStartLauncher(server.getDelegate());
 	}
 	
+	@Override
 	protected IServerShutdownLauncher getStopLauncher() {
 		return new WildFlyStopLauncher(this);
 	}

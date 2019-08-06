@@ -437,7 +437,12 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	
 	
 	protected IServerPublishModel createServerPublishModel() {
-		return new ServerPublishStateModel(this, getFileWatcherService());
+		return new ServerPublishStateModel(this, 
+				getFileWatcherService(), getFullPublishRequiredCallback());
+	}
+
+	protected IFullPublishRequiredCallback getFullPublishRequiredCallback() {
+		return null;
 	}
 
 	@Override

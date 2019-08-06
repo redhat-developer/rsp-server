@@ -296,11 +296,11 @@ public class FileWatcherService implements IFileWatcherService {
 			return true;
 		
 		// A request still exists for this exact path, so I'm still needed
-		if( requests.get(path) != null && !requests.get(path).isEmpty() )
+		if( requestMatchesExact(path))
 			return true;
 		
 		// A request for a subfolder (or lower) still exists, so I'm still needed
-		Set<Path> requestPaths = requests.keySet();
+		Set<Path> requestPaths = getRequestsKeySet();
 		for( Path testRequest : requestPaths) {
 			if( testRequest.startsWith(path))
 				return true;
@@ -321,7 +321,7 @@ public class FileWatcherService implements IFileWatcherService {
 		return false;
 	}
 	private boolean singlePathHasRecursiveRequest(Path p) {
-		List<RegistrationRequest> list = requests.get(p);
+		List<RegistrationRequest> list = getRequestsForPath(p);
 		if( list == null ) 
 			return false;
 		Iterator<RegistrationRequest> rit = list.iterator();
@@ -411,18 +411,20 @@ public class FileWatcherService implements IFileWatcherService {
 
 	
 	private List<Path> findAllChildRequestPaths(Path context) {
-		return requests.keySet().stream().filter(x -> x.startsWith(context))
+		return getRequestsKeySet().stream().filter(x -> x.startsWith(context))
 				.collect(Collectors.toList());
 	}
 	
 	private boolean requestMatchesExact(Path path) {
-		return requests.get(path) != null && !requests.get(path).isEmpty();
+		List<RegistrationRequest> forPath = getRequestsForPath(path);
+		return forPath != null && !forPath.isEmpty();
 	}
 	
 	private boolean recursiveRequestMatches(Path path) {
 		Path working = path;
 		while( working != null ) {
-			if( containsRecursiveRequest(requests.get(path))) {
+			List<RegistrationRequest> req = getRequestsForPath(working);
+			if( containsRecursiveRequest(req)) {
 				return true;
 			}
 			working = working.getParent();
@@ -539,7 +541,7 @@ public class FileWatcherService implements IFileWatcherService {
 	}
 
 	protected Set<IFileWatcherEventListener> findListenersForExactPath(Path p, boolean recursive) {
-		List<RegistrationRequest> forPath = requests.get(p);
+		List<RegistrationRequest> forPath = getRequestsForPath(p);
 		if( forPath != null ) {
 			return (forPath.stream().filter(x -> recursive == x.isRecursive())
 					.map(RegistrationRequest::getListener).collect(Collectors.toSet()));
@@ -548,7 +550,7 @@ public class FileWatcherService implements IFileWatcherService {
 	}
 
 	protected Set<IFileWatcherEventListener> findListenersForExactPath(Path p) {
-		List<RegistrationRequest> forPath = requests.get(p);
+		List<RegistrationRequest> forPath = getRequestsForPath(p);
 		if( forPath != null ) {
 			return (forPath.stream().map(RegistrationRequest::getListener)
 					.collect(Collectors.toSet()));
@@ -556,6 +558,14 @@ public class FileWatcherService implements IFileWatcherService {
 		return Collections.emptySet();
 	}
 
+	protected synchronized List<RegistrationRequest> getRequestsForPath(Path p) {
+		return requests.get(p);
+	}
+	
+	protected synchronized Set<Path> getRequestsKeySet() {
+		return requests.keySet();
+	}
+	
 	/*
 	 * Get all recursive listeners registered for the given path, 
 	 * in addition to all recursive listeners registered for any 
