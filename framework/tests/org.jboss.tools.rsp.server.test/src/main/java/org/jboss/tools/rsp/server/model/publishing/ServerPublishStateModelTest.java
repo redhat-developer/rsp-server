@@ -40,10 +40,13 @@ import java.util.stream.Collectors;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
+import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerState;
+import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
+import org.jboss.tools.rsp.server.model.IFullPublishRequiredCallback;
 import org.jboss.tools.rsp.server.model.ServerModel;
 import org.jboss.tools.rsp.server.model.internal.publishing.AutoPublishThread;
 import org.jboss.tools.rsp.server.model.internal.publishing.DeployableDelta;
@@ -594,12 +597,17 @@ public class ServerPublishStateModelTest {
 	@Test
 	public void shouldAlterExistingDeltaIfSameDeploymentChanged() throws IOException, CoreException {
 		// given
+		ServerHandle sh = new ServerHandle("server.one", new ServerType("servertype.id", "servertype.name", "servertype.desc"));
 		DeployableState deployableDirectoryState = 
-				mockDeployableState(ServerManagementAPIConstants.PUBLISH_STATE_NONE, deployableDirectory);
+				new DeployableState(sh, deployableDirectory, -1,
+						ServerManagementAPIConstants.PUBLISH_STATE_NONE);
 		DeployableState danglingDeployableState = 
-				mockDeployableState(ServerManagementAPIConstants.PUBLISH_STATE_NONE, danglingDeployable);
+				new DeployableState(sh, danglingDeployable,  -1,
+						ServerManagementAPIConstants.PUBLISH_STATE_NONE);
 		DeployableState deployableFileState = 
-				mockDeployableState(ServerManagementAPIConstants.PUBLISH_STATE_NONE, deployableFile);
+				new DeployableState(sh, deployableFile,  -1,
+						ServerManagementAPIConstants.PUBLISH_STATE_NONE);
+
 		TestableServerPublishStateModel modelSpy = fakeDeployableStates(
 				deployableFileState,
 				deployableDirectoryState,
@@ -625,9 +633,69 @@ public class ServerPublishStateModelTest {
 		delta = modelSpy.getDeltas().get(modelSpy.getKey(deployableDirectory));
 		assertThat(delta).isNotNull();
 		assertThat(delta.getReference()).isEqualTo(deployableDirectory);
+
+		Map<String, DeployableState> states2 = modelSpy.getStates();
+		assertEquals(states2.size(), 3);
+		DeployableState ds1 = states2.get(deployableDirectory.getPath());
+		assertEquals(ds1.getPublishState(), ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL);
 	}
 
-	
+	@Test
+	public void shouldMarkModuleRequiresFullPublishFromCallback() throws IOException, CoreException {
+		AbstractServerDelegate delegate = mock(AbstractServerDelegate.class);
+		this.model = new TestableServerPublishStateModel(delegate, fileWatcher, new IFullPublishRequiredCallback() {
+			@Override
+			public boolean requiresFullPublish(FileWatcherEvent event) {
+				return true;
+			}
+		});
+		model.initialize(Arrays.asList(deployableFile, deployableDirectory));
+
+		// given
+		ServerHandle sh = new ServerHandle("server.one", new ServerType("servertype.id", "servertype.name", "servertype.desc"));
+		DeployableState deployableDirectoryState = 
+				new DeployableState(sh, deployableDirectory, -1,
+						ServerManagementAPIConstants.PUBLISH_STATE_NONE);
+		DeployableState danglingDeployableState = 
+				new DeployableState(sh, danglingDeployable,  -1,
+						ServerManagementAPIConstants.PUBLISH_STATE_NONE);
+		DeployableState deployableFileState = 
+				new DeployableState(sh, deployableFile,  -1,
+						ServerManagementAPIConstants.PUBLISH_STATE_NONE);
+
+		
+		TestableServerPublishStateModel modelSpy = fakeDeployableStates(
+				deployableFileState,
+				deployableDirectoryState,
+				danglingDeployableState);
+		assertThat(modelSpy.getDeltas()).isEmpty();
+
+		// when 1st change
+		modelSpy.fileChanged(new FileWatcherEvent(
+				Paths.get(deployableDirectory.getPath()), 
+				StandardWatchEventKinds.ENTRY_MODIFY));
+		assertThat(modelSpy.getDeltas()).hasSize(1);
+		DeployableDelta delta = modelSpy.getDeltas().get(modelSpy.getKey(deployableDirectory));
+		assertThat(delta).isNotNull();
+		assertThat(delta.getReference()).isEqualToComparingFieldByField(deployableDirectory);
+		
+		// when 2nd change
+		modelSpy.fileChanged(new FileWatcherEvent(
+				Paths.get(deployableDirectory.getPath(), "batman"), 
+				StandardWatchEventKinds.ENTRY_CREATE));
+
+		// then
+		assertThat(modelSpy.getDeltas()).hasSize(1);
+		delta = modelSpy.getDeltas().get(modelSpy.getKey(deployableDirectory));
+		assertThat(delta).isNotNull();
+		assertThat(delta.getReference()).isEqualTo(deployableDirectory);
+		
+		Map<String, DeployableState> states2 = modelSpy.getStates();
+		assertEquals(states2.size(), 3);
+		DeployableState ds1 = states2.get(deployableDirectory.getPath());
+		assertEquals(ds1.getPublishState(), ServerManagementAPIConstants.PUBLISH_STATE_FULL);
+	}
+
 	@Test
 	public void testOrphanedModelObject() {
 		AbstractServerDelegate delegate = mock(AbstractServerDelegate.class);
@@ -731,7 +799,10 @@ public class ServerPublishStateModelTest {
 		public TestableServerPublishStateModel(AbstractServerDelegate delegate, IFileWatcherService fileWatcher) {
 			super(delegate, fileWatcher);
 		}
-
+		public TestableServerPublishStateModel(AbstractServerDelegate delegate, 
+				IFileWatcherService fileWatcher, IFullPublishRequiredCallback fullPublishRequired) {
+			super(delegate, fileWatcher, fullPublishRequired);
+		}
 		@Override
 		public Map<String, DeployableState> getStates() {
 			return super.getStates();
@@ -752,8 +823,6 @@ public class ServerPublishStateModelTest {
 		}
 
 	}
-	
-	
 
 	@Test
 	public void testAddDeployableLaunchesAutoPublish() {
