@@ -8,7 +8,6 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.wildfly.servertype.impl;
 
-import java.nio.file.Path;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -47,14 +46,7 @@ public class WildFlyFullPublishRequiredCallback implements IFullPublishRequiredC
 	@Override
 	public boolean requiresFullPublish(FileWatcherEvent event) {
 		Pattern pattern = getPattern();
-		if( pattern == null ) {
-			return false;
-		}
-		
-		Path p = event.getPath();
-		if( pattern.matcher(p.toString()).find() ) 
-			return true;
-		return false;
+		return pattern == null ? false : pattern.matcher(event.getPath().toString()).find(); 
 	}
 
     private Pattern getPattern(){

@@ -272,7 +272,6 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	@Override
 	public synchronized void fileChanged(FileWatcherEvent event) {
 		Path affected = event.getPath();
-		System.out.println(affected + " " + event.getKind());
 		List<DeployableState> ds = new ArrayList<>(getStates().values());
 		boolean changed = false;
 		for( DeployableState d : ds ) {
