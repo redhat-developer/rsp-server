@@ -64,7 +64,7 @@ public abstract class RSPCase {
 	protected static final String MODE_RUN = "run";
 	protected static final String STATUS_MESSAGE_OK = "ok";
 	protected static final int SERVER_OPERATION_TIMEOUT = 4000;
-	protected static final int REQUEST_TIMEOUT = 400;
+	protected static final int REQUEST_TIMEOUT = System.getProperty("os.name").toLowerCase().contains("win") ? 2000 : 400;
 
 	protected static DummyClientLauncher launcher;
 	protected static RSPServer serverProxy;
