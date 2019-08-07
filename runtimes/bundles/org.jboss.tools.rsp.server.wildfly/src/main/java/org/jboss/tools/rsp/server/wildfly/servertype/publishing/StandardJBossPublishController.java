@@ -262,7 +262,7 @@ public class StandardJBossPublishController implements IJBossPublishController {
 			return delegate.getServerPublishModel().getDeployableState(opts).getPublishState();
 		}
 	}
-
+	
 	protected int incrementalPublishCopyExplodedModule(DeployableReference opts,
 			IDeployableResourceDelta delta) throws CoreException {
 		File dest = getDestinationPath(opts).toFile();

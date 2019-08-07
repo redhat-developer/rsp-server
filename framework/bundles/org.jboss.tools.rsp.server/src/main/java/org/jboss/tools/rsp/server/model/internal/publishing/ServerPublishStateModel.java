@@ -26,6 +26,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
 import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
+import org.jboss.tools.rsp.server.model.IFullPublishRequiredCallback;
 import org.jboss.tools.rsp.server.spi.filewatcher.FileWatcherEvent;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherEventListener;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
@@ -46,10 +47,17 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	private int publishState = AbstractServerDelegate.PUBLISH_STATE_UNKNOWN;
 	
 	private AutoPublishThread autoPublish;
+
+	private IFullPublishRequiredCallback fullPublishRequired;
 	
 	public ServerPublishStateModel(AbstractServerDelegate delegate, IFileWatcherService fileWatcher) {
+		this(delegate, fileWatcher, null);
+	}
+	public ServerPublishStateModel(AbstractServerDelegate delegate, 
+			IFileWatcherService fileWatcher, IFullPublishRequiredCallback fullPublishRequired) {
 		this.delegate = delegate;
 		this.fileWatcher = fileWatcher;
+		this.fullPublishRequired = fullPublishRequired;
 		this.states = new LinkedHashMap<>();
 		this.deploymentOptions = new LinkedHashMap<>();
 	}
@@ -251,6 +259,8 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	 *  
 	 *  If the deployment is currently set to be 'full',
 	 *  no change is needed. It's already marked as requiring a publish.
+	 *  However it's worth registering the delta in case a server delegate 
+	 *  needs to know the list of changed resources.
 	 *  
 	 *  If the deployment is currently set to 'unknown', 
 	 *  we should not make any change, so the delegate knows the state is still uncertain.
@@ -268,12 +278,17 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 			Path deploymentPath = new File(d.getReference().getPath()).toPath();
 			if( affected.startsWith(deploymentPath)) {
 				int currentPubState = d.getPublishState();
-				if( currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_NONE) {
-					d.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL);
-					changed = true;
+				if( currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_NONE
+						|| currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL) {
+					int newState = getRequiredPublishStateOnFileChange(event);
+					if( newState > currentPubState ) {
+						d.setPublishState(newState);
+						changed = true;
+					}
 				}
-				if( currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_NONE ||
-						currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL) {
+				if( currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_NONE 
+						|| currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL
+						|| currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_FULL ) {
 					registerSingleDelta(event, d.getReference());
 				}
 			}
@@ -284,6 +299,14 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		launchOrUpdateAutopublishThread();
 	}
 
+	protected int getRequiredPublishStateOnFileChange(FileWatcherEvent event) {
+		if( fullPublishRequired != null && 
+				fullPublishRequired.requiresFullPublish(event)) {
+			return ServerManagementAPIConstants.PUBLISH_STATE_FULL;
+		}
+		return ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL;
+	}
+	
 	private void registerSingleDelta(FileWatcherEvent event, DeployableReference reference) {
 		String key = getKey(reference);
 		DeployableDelta dd = getDeltas().computeIfAbsent(key, k ->  new DeployableDelta(new DeployableReference(reference.getLabel(), reference.getPath())));

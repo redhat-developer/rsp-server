@@ -18,7 +18,8 @@ public class DeployableState {
 	public DeployableState() {
 	}
 
-	public DeployableState(ServerHandle server, DeployableReference reference, int state, int publishState) {
+	public DeployableState(ServerHandle server, DeployableReference reference, 
+			int state, int publishState) {
 		this.setServer(server);
 		this.reference = reference;
 		this.state = state;

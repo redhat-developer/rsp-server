@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 public class WildFlyPublishController extends StandardJBossPublishController implements IJBossPublishController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(WildFlyPublishController.class);
+    
 	private HashMap<String, String> markersToWrite = new HashMap<>();
 	
 	public WildFlyPublishController(IServer server, AbstractJBossServerDelegate delegate) {
@@ -54,17 +55,21 @@ public class WildFlyPublishController extends StandardJBossPublishController imp
 			throw new CoreException(new Status(IStatus.ERROR, Activator.BUNDLE_ID, "Module source does not exist"));
 		}
 		int newStatus = super.publishModule(withOptions, serverPublishRequest, modulePublishState);
+		
+		conditionallyAddDeploymentMarker(newStatus, modulePublishState, serverPublishRequest, withOptions, dest);
+		return newStatus;
+	}
+	
+	protected void conditionallyAddDeploymentMarker(int newStatus, int modulePublishState, int serverPublishRequest, DeployableReference withOptions, File dest) {
 		if( newStatus == ServerManagementAPIConstants.PUBLISH_STATE_NONE) {
 			// A successful copy / removal... then... 
 			if( modulePublishState != ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) {
 				// An actual copy was performed.
 				boolean fullPublish = getModulePublishType(serverPublishRequest, modulePublishState) == ServerManagementAPIConstants.PUBLISH_FULL;
-				
 				if( isExploded(withOptions) && fullPublish)
 					markersToWrite.put(dest.toString(), ".dodeploy");
 			}
 		}
-		return newStatus;
 	}
 	
 	protected boolean isExploded(DeployableReference withOptions) {
@@ -83,7 +88,7 @@ public class WildFlyPublishController extends StandardJBossPublishController imp
 		cleanAllMarkers(destination.getAbsolutePath());
 		return super.removeExplodedModule(reference, publishType, modulePublishType, destination);
 	}
-	
+
 	@Override
 	public void publishFinish(int publishType) throws CoreException {
 		// Add the markers where appropriate
