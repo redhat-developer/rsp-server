@@ -8,6 +8,9 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.minishift.servertype;
 
+import java.util.Map;
+
+import org.jboss.tools.rsp.server.minishift.servertype.impl.MinishiftServerDelegate;
 import org.jboss.tools.rsp.server.redhat.credentials.RedHatAccessCredentials;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
@@ -15,6 +18,14 @@ public class MinishiftPropertyUtility {
 
 	private MinishiftPropertyUtility() {
 		// inhibit instantiation
+	}
+	
+	public static String getMinishiftAppendedProgArgs(IServer server) {
+		return server.getAttribute(MinishiftServerDelegate.STARTUP_PROGRAM_ARGS_STRING, (String)null);
+	}
+
+	public static Map<String,String> getMinishiftStartupEnvironment(IServer server) {
+		return (Map<String,String>)server.getAttribute(MinishiftServerDelegate.STARTUP_ENV_VARS_MAP, (Map<String,String>)null);
 	}
 
 	public static String getMinishiftCommand(IServer server) {

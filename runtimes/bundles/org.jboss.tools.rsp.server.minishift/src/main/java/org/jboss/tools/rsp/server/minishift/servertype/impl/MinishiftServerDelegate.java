@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.server.minishift.servertype.impl;
 
 import java.io.File;
+import java.util.HashMap;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
@@ -44,6 +45,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MinishiftServerDelegate extends AbstractServerDelegate {
+	public static final String STARTUP_PROGRAM_ARGS_STRING = "startup.progargs.append.string";
+	public static final String STARTUP_ENV_VARS_MAP = "startup.envvars.map";
+	
 	private static final Logger LOG = LoggerFactory.getLogger(MinishiftServerDelegate.class);
 
 	private ILaunch startLaunch;
@@ -271,6 +275,8 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 	}
 	@Override
 	public void setDefaults(IServerWorkingCopy server) {
-		// DO nothing
+		server.setAttribute(STARTUP_PROGRAM_ARGS_STRING, "start");
+		HashMap<String,String> tmp = new HashMap<>();
+		server.setAttribute(STARTUP_ENV_VARS_MAP, tmp);
 	}
 }
