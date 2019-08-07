@@ -26,13 +26,26 @@ public class MinishiftStartLauncher extends AbstractLauncher {
 		String profileFlags = "";
 		if( supportsProfiles(getServer())) {
 			String profile = MinishiftPropertyUtility.getMinishiftProfile(getServer());
-			profileFlags = "--profile " + profile;
+			profileFlags = " --profile " + profile;
 		}
-		return "start " + vmd + " " + profileFlags;
+
+		String skipReg = getCDKCredentialArguments();
+		skipReg = isEmpty(skipReg) ? "" : " " + skipReg;
+		
+		String append = getAppendedArguments();
+		append = isEmpty(append) ? "" : " " + append;
+		
+		return "start " + vmd + profileFlags + skipReg + append;
+	}
+	protected String getAppendedArguments() {
+		String append = getServer().getAttribute(
+				MinishiftServerDelegate.STARTUP_PROGRAM_ARGS_STRING, (String)null);
+		return append == null ? "" : append;
 	}
 	
 	protected boolean supportsProfiles(IServer server) {
-		return true;
+		// TODO some earlier versions don't support profiles
+		return true; 
 	}
 	
 	protected String getCDKCredentialArguments() {
@@ -41,8 +54,6 @@ public class MinishiftStartLauncher extends AbstractLauncher {
 		String credentials = "";
 		if( isEmpty(user) || isEmpty(pass)) {
 			credentials = " --skip-registration";
-		} else {
-			credentials = " --username " + user + " --password " + pass;
 		}
 		return credentials;
 	}

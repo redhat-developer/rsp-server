@@ -52,6 +52,10 @@ public class EnvironmentUtility {
 		if( msHome != null ) {
 			ret.put(MINISHIFT_HOME, msHome);
 		}
+		
+		Map<String,String> envFromProperty = 
+				MinishiftPropertyUtility.getMinishiftStartupEnvironment(server);
+		ret.putAll(envFromProperty);
 		return ret;
 	}
 }
