@@ -9,8 +9,6 @@
 package org.jboss.tools.rsp.server.minishift.servertype.impl;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.Map;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;

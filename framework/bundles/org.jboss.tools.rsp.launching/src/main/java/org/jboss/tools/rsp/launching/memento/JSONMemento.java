@@ -25,6 +25,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 public class JSONMemento implements IMemento {
 
@@ -118,22 +119,26 @@ public class JSONMemento implements IMemento {
 
 	@Override
 	public Float getFloat(String key) {
-		return this.jsonObject.getAsJsonPrimitive(key).getAsFloat();
+		JsonPrimitive primitive = this.jsonObject.getAsJsonPrimitive(key);
+		return primitive == null ? null : primitive.getAsFloat();
 	}
 
 	@Override
 	public Integer getInteger(String key) {
-		return this.jsonObject.getAsJsonPrimitive(key).getAsInt();
+		JsonPrimitive primitive = this.jsonObject.getAsJsonPrimitive(key);
+		return primitive == null ? null : primitive.getAsInt();
 	}
 
 	@Override
 	public String getString(String key) {
-		return this.jsonObject.getAsJsonPrimitive(key).getAsString();
+		JsonPrimitive primitive = this.jsonObject.getAsJsonPrimitive(key);
+		return primitive == null ? null : primitive.getAsString();
 	}
 
 	@Override
 	public Boolean getBoolean(String key) {
-		return this.jsonObject.getAsJsonPrimitive(key).getAsBoolean();
+		JsonPrimitive primitive = this.jsonObject.getAsJsonPrimitive(key);
+		return primitive == null ? null : primitive.getAsBoolean();
 	}
 
 	@Override
