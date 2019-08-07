@@ -32,10 +32,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.launching.memento.IMemento;
 import org.jboss.tools.rsp.launching.memento.JSONMemento;
-import org.jboss.tools.rsp.launching.memento.XMLMemento;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
-
-import com.google.gson.JsonSyntaxException;
 
 /**
  * Helper class for storing runtime and server attributes.
@@ -47,7 +44,11 @@ public abstract class Base {
 	protected static final String PROP_ID = "id";
 	protected static final String PROP_ID_SET = "id-set";
 	protected static final String PROP_TIMESTAMP = "timestamp";
-
+	
+	private static final String MAP_PROPERTIES_KEY = "mapProperties";
+	private static final String LIST_PROPERTIES_KEY = "listProperties";
+	private static final String PROPERTY_KEY_VALUE_PREFIX = "value";
+	
 	protected Map<String, Object> map = new HashMap<>();
 	protected File file;
 	private transient List<PropertyChangeListener> propertyListeners;
@@ -271,23 +272,29 @@ public abstract class Base {
 	}
 
 	protected void saveMap(IMemento memento, String key, Map<String,String> map2) {
-		IMemento child = memento.createChild("map");
-		child.putString("key", key);
+		IMemento child = memento.getChild(MAP_PROPERTIES_KEY);
+		if( child == null )
+			child = memento.createChild(MAP_PROPERTIES_KEY);
+		
+		IMemento keyChild = child.createChild(key);
 		Iterator<String> iterator = map2.keySet().iterator();
 		while (iterator.hasNext()) {
 			String s = iterator.next();
-			child.putString(s, map2.get(s));
+			keyChild.putString(s, map2.get(s));
 		}
 	}
 	
 	protected void saveList(IMemento memento, String key, List<String> list) {
-		IMemento child = memento.createChild("list");
-		child.putString("key", key);
+		IMemento child = memento.getChild(LIST_PROPERTIES_KEY);
+		if( child == null )
+			child = memento.createChild(LIST_PROPERTIES_KEY);
+		
+		IMemento keyChild = child.createChild(key);
 		int i = 0;
 		Iterator<String> iterator = list.iterator();
 		while (iterator.hasNext()) {
 			String s = iterator.next();
-			child.putString("value" + (i++), s);
+			keyChild.putString(PROPERTY_KEY_VALUE_PREFIX + (i++), s);
 		}
 	}
 
@@ -332,12 +339,12 @@ public abstract class Base {
 			String key = iterator.next();
 			map.put(key, memento.getString(key));
 		}
-		IMemento[] children = memento.getChildren("list");
+		IMemento[] children = memento.getChildren(LIST_PROPERTIES_KEY);
 		if (children != null) {
 			for (IMemento child : children)
 				loadList(child);
 		}
-		IMemento[] maps = memento.getChildren("map");
+		IMemento[] maps = memento.getChildren(MAP_PROPERTIES_KEY);
 		if (maps != null) {
 			for (IMemento m : maps)
 				loadMap(m);
@@ -346,8 +353,14 @@ public abstract class Base {
 		loadState(memento);
 	}
 
-	protected void loadMap(IMemento memento) {		
-		map.put(memento.getString("key"), getMapFromMemento(memento));
+	protected void loadMap(IMemento memento) {	
+		IMemento[] kids = memento.getChildren();
+		if( kids != null ) {
+			for( int i = 0; i < kids.length; i++ ) {
+				String name = kids[i].getNodeName();
+				map.put(name, getMapFromMemento(kids[i]));
+			}
+		}
 	}
 
 	protected Map<String, String> getMapFromMemento(IMemento memento) {
@@ -362,16 +375,22 @@ public abstract class Base {
 	}
 
 	protected void loadList(IMemento memento) {
-		map.put(memento.getString("key"), getListFromMemento(memento));
+		IMemento[] kids = memento.getChildren();
+		if( kids != null ) {
+			for( int i = 0; i < kids.length; i++ ) {
+				String name = kids[i].getNodeName();
+				map.put(name, getListFromMemento(kids[i]));
+			}
+		}
 	}
 
 	protected List<String> getListFromMemento(IMemento memento) {
 		List<String> list = new ArrayList<>();
 		int i = 0;
-		String key2 = memento.getString("value" + (i++));
+		String key2 = memento.getString(PROPERTY_KEY_VALUE_PREFIX + (i++));
 		while (key2 != null) {
 			list.add(key2);
-			key2 = memento.getString("value" + (i++));
+			key2 = memento.getString(PROPERTY_KEY_VALUE_PREFIX + (i++));
 		}
 		return list;
 	}

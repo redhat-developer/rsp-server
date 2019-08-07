@@ -43,6 +43,7 @@ Import-Package: com.google.gson,
  org.osgi.service.log,
  org.slf4j
 Export-Package: org.jboss.tools.rsp.server,
+ org.jboss.tools.rsp.server.core.internal,
  org.jboss.tools.rsp.server.discovery,
  org.jboss.tools.rsp.server.discovery.serverbeans,
  org.jboss.tools.rsp.server.filewatcher,
