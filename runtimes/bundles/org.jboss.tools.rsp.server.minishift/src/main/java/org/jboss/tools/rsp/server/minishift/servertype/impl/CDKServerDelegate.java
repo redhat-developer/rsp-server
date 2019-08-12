@@ -11,7 +11,6 @@ package org.jboss.tools.rsp.server.minishift.servertype.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
 import org.jboss.tools.rsp.api.dao.ServerActionRequest;
 import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
@@ -32,20 +31,16 @@ public class CDKServerDelegate extends MinishiftServerDelegate {
 		super(server);
 	}
 	@Override
-	public ListServerActionResponse listServerActions() {
-		ListServerActionResponse ret = new ListServerActionResponse();
-		ret.setStatus(StatusConverter.convert(Status.OK_STATUS));
-		
+	protected void fillActionList(List<ServerActionWorkflow> allActions) {
+		super.fillActionList(allActions);
+
 		// setup-cdk
 		WorkflowResponse setupCdkWorkflow = new WorkflowResponse();
 		setupCdkWorkflow.setStatus(StatusConverter.convert(
 				new Status(IStatus.INFO, Activator.BUNDLE_ID, ACTION_SETUP_CDK_LABEL)));
 		ServerActionWorkflow setupCdkAction = new ServerActionWorkflow(
 				ACTION_SETUP_CDK_ID, ACTION_SETUP_CDK_LABEL, setupCdkWorkflow);
-		List<ServerActionWorkflow> allActions = new ArrayList<>();
 		allActions.add(setupCdkAction);
-		ret.setWorkflows(allActions);
-		return ret;
 	}
 	
 	@Override
@@ -53,8 +48,9 @@ public class CDKServerDelegate extends MinishiftServerDelegate {
 		if( req != null && ACTION_SETUP_CDK_ID.equals(req.getActionId() )) {
 			return runSetupCdk(req);
 		}
-		return cancelWorkflowResponse();
+		return super.executeServerAction(req);
 	}
+	
 	protected WorkflowResponse runSetupCdk(ServerActionRequest req) {
 		try {
 			ILaunch launch = new SetupCDKLauncher(this).launch("run");
