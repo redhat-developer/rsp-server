@@ -9,16 +9,24 @@
 package org.jboss.tools.rsp.server.minishift.servertype.impl;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
+import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
+import org.jboss.tools.rsp.api.dao.ServerActionRequest;
+import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
+import org.jboss.tools.rsp.api.dao.WorkflowPromptDetails;
+import org.jboss.tools.rsp.api.dao.WorkflowResponse;
+import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
@@ -47,6 +55,13 @@ import org.slf4j.LoggerFactory;
 public class MinishiftServerDelegate extends AbstractServerDelegate {
 	public static final String STARTUP_PROGRAM_ARGS_STRING = "startup.progargs.append.string";
 	public static final String STARTUP_ENV_VARS_MAP = "startup.envvars.map";
+	
+	public static final String ACTION_MINISHIFT_COMMAND_LABEL = "Run Command with arguments...";
+	public static final String ACTION_MINISHIFT_COMMAND_ID = "action.minishift.command.run.args";
+	public static final String ACTION_MINISHIFT_COMMAND_FIELD_ID = ACTION_MINISHIFT_COMMAND_ID + ".field";
+	
+	public static final String ACTION_SERVICE_CATALOG_COMMAND_LABEL = "Add Service Catalog";
+	public static final String ACTION_SERVICE_CATALOG_COMMAND_ID = "action.minishift.command.run.servicecatalog.add";
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MinishiftServerDelegate.class);
 
@@ -279,4 +294,84 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 		HashMap<String,String> tmp = new HashMap<>();
 		server.setAttribute(STARTUP_ENV_VARS_MAP, tmp);
 	}
+	
+	@Override
+	public ListServerActionResponse listServerActions() {
+		ListServerActionResponse ret = new ListServerActionResponse();
+		ret.setStatus(StatusConverter.convert(Status.OK_STATUS));
+		List<ServerActionWorkflow> allActions = new ArrayList<>();
+		fillActionList(allActions);
+		ret.setWorkflows(allActions);
+		return ret;
+	}
+	
+	protected void fillActionList(List<ServerActionWorkflow> allActions) {
+		if( ServerManagementAPIConstants.STATE_STARTED == getServerState().getState()) {
+			addGenericMinishiftCommandAction(allActions, ACTION_SERVICE_CATALOG_COMMAND_ID, ACTION_SERVICE_CATALOG_COMMAND_LABEL);
+			addArbitraryMinishiftCommandAction(allActions);
+		}
+	}
+	
+	protected void addGenericMinishiftCommandAction(List<ServerActionWorkflow> allActions,
+			String id, String label) {
+		WorkflowResponse workflow = new WorkflowResponse();
+		workflow.setStatus(StatusConverter.convert(
+				new Status(IStatus.INFO, Activator.BUNDLE_ID, label)));
+		ServerActionWorkflow action = new ServerActionWorkflow(
+				id, label, workflow);
+		workflow.setItems(new ArrayList<>());
+		allActions.add(action);
+	}
+	
+	protected void addArbitraryMinishiftCommandAction(List<ServerActionWorkflow> allActions) {
+		// minishift command.  ex:  openshift component add service-catalog
+		WorkflowResponse runCommandWorkflow = new WorkflowResponse();
+		runCommandWorkflow.setStatus(StatusConverter.convert(
+				new Status(IStatus.INFO, Activator.BUNDLE_ID, ACTION_MINISHIFT_COMMAND_LABEL)));
+		ServerActionWorkflow runCommandAction = new ServerActionWorkflow(
+				ACTION_MINISHIFT_COMMAND_ID, ACTION_MINISHIFT_COMMAND_LABEL, runCommandWorkflow);
+		List<WorkflowResponseItem> items = new ArrayList<>();
+		WorkflowResponseItem item1 = new WorkflowResponseItem();
+		item1.setId(ACTION_MINISHIFT_COMMAND_FIELD_ID);
+		item1.setItemType(ServerManagementAPIConstants.WORKFLOW_TYPE_PROMPT_SMALL);
+		item1.setLabel("Please type the command line arguments. ex: openshift component add service-catalog");
+		WorkflowPromptDetails prompt = new WorkflowPromptDetails();
+		prompt.setResponseSecret(false);
+		prompt.setResponseType(ServerManagementAPIConstants.ATTR_TYPE_STRING);
+		item1.setPrompt(prompt);
+		items.add(item1);
+		runCommandWorkflow.setItems(items);
+		allActions.add(runCommandAction);
+	}
+	
+	@Override
+	public WorkflowResponse executeServerAction(ServerActionRequest req) {
+		if( req != null ) {
+			if( ACTION_MINISHIFT_COMMAND_ID.equals(req.getActionId() ))
+				return runArbitraryMinishiftCommand(req);
+			if( ACTION_SERVICE_CATALOG_COMMAND_ID.equals(req.getActionId()))
+				return runMinishiftCommand(req, "openshift component add service-catalog");
+		}
+		return cancelWorkflowResponse();
+	}
+	protected WorkflowResponse runArbitraryMinishiftCommand(ServerActionRequest req) {
+		String args = (String)req.getData().get(ACTION_MINISHIFT_COMMAND_FIELD_ID);
+		return runMinishiftCommand(req, args);
+	}
+	
+	protected WorkflowResponse runMinishiftCommand(ServerActionRequest req, String args) {
+		try {
+			ILaunch launch = new MinishiftCommandLauncher(this, args).launch("run");
+			registerLaunch(launch);
+			return okWorkflowResponse();
+		} catch(CoreException ce) {
+			WorkflowResponse resp = new WorkflowResponse();
+			resp.setStatus(StatusConverter.convert(new Status(
+					IStatus.ERROR, Activator.BUNDLE_ID, 
+					"Error running server command: " + ce.getMessage(), ce)));
+			resp.setItems(new ArrayList<>());
+			return resp;
+		}
+	}
+
 }
