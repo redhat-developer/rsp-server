@@ -19,8 +19,8 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeRunner;
 import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
+import org.jboss.tools.rsp.server.redhat.download.stacks.AbstractStacksDownloadRuntimesProvider;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
-import org.jboss.tools.rsp.server.spi.runtimes.AbstractStacksDownloadRuntimesProvider;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
 import org.jboss.tools.rsp.stacks.core.model.StacksManager;
 

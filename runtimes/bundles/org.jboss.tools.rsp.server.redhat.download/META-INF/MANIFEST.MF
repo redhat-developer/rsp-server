@@ -49,4 +49,5 @@ Import-Package: org.eclipse.lsp4j.jsonrpc,
  org.osgi.framework,
  org.slf4j
 Export-Package: org.jboss.tools.rsp.server.redhat.credentials,
- org.jboss.tools.rsp.server.redhat.download
+ org.jboss.tools.rsp.server.redhat.download,
+ org.jboss.tools.rsp.server.redhat.download.stacks
