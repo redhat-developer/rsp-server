@@ -7,7 +7,7 @@ This protocol will allow an IDE or other client to control various types of appl
 The protocol is based on LSP4J, though the messages that can be sent or received are completely unrelated to the language server protocol itself. In short, the base protocol is the same as LSP, but the specification of the messages is different. 
 
 The base protocol of LSP can be found [here](https://microsoft.github.io/language-server-protocol/specification). 
-The RSP Extensions to the base protocol can be found [here](https://github.com/redhat-developer/rsp-server/blob/master/schema/src/main/resources/schemaMD/specification.md)
+The RSP Extensions to the base protocol can be found [here](https://github.com/redhat-developer/rsp-server/blob/master/api/docs/org.jboss.tools.rsp.schema/src/main/resources/schemaMD/specification.md)
 
 ## Install
 
