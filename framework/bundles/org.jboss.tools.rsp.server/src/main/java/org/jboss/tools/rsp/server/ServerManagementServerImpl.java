@@ -11,7 +11,6 @@ package org.jboss.tools.rsp.server;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -773,25 +772,35 @@ public class ServerManagementServerImpl implements RSPServer {
 	public CompletableFuture<WorkflowResponse> executeServerAction(ServerActionRequest req) {
 		return createCompletableFuture(() -> executeServerActionSync(req));
 	}
+	
 	private WorkflowResponse executeServerActionSync(ServerActionRequest req) {
+		if (req == null) {
+			return errorWorkflowResponse(errorStatus("Invalid Request: Request cannot be null."));
+		}
 		String serverId = req.getServerId();
 		Status s = verifyServerAndDelegate(serverId);
 		if( s != null && !s.isOK()) {
-			WorkflowResponse err = new WorkflowResponse();
-			err.setStatus(s);
-			return err;
+			return errorWorkflowResponse(s);
 		}
 		IServer server = managementModel.getServerModel().getServer(serverId);
 		IServerDelegate del = server.getDelegate();
 		try {
 			return del.executeServerAction(req);
 		} catch(RuntimeException re) {
-			Status err = errorStatus("Error loading actions: " + re.getMessage(), re);
-			WorkflowResponse resp3 = new WorkflowResponse();
-			resp3.setRequestId(req.getRequestId());
-			resp3.setStatus(err);
-			return resp3;
+			Status status = errorStatus("Error loading actions: " + re.getMessage(), re);
+			return errorWorkflowResponse(status, req.getRequestId());
 		}
+	}
+	
+	private WorkflowResponse errorWorkflowResponse(Status s) {
+		return errorWorkflowResponse(s, 0);
+	}
+	
+	private WorkflowResponse errorWorkflowResponse(Status s, long requestId) {
+		WorkflowResponse err = new WorkflowResponse();
+		err.setRequestId(requestId);
+		err.setStatus(s);
+		return err;
 	}
 
 	private Status verifyServerAndDelegate(ServerHandle handle) {
