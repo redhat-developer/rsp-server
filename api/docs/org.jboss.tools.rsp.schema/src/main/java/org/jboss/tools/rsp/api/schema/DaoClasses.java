@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -204,6 +205,9 @@ public class DaoClasses {
 
 	    	    			@Override
 	    	    			public T next() {
+	    	    				if( !hasNext()) {
+	    	    					throw new NoSuchElementException();
+	    	    				}
     	    					return enumeration.nextElement();
 	    	    	        }
 

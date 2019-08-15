@@ -372,7 +372,7 @@ public class Path implements IPath, Cloneable {
 		try {
 			return super.clone();
 		} catch (CloneNotSupportedException e) {
-			return null;
+			return new Path(this.toOSString());
 		}
 	}
 
@@ -926,7 +926,7 @@ public class Path implements IPath, Cloneable {
 	@Override
 	public IPath makeRelativeTo(IPath base) {
 		//can't make relative if devices are not equal
-		if (device != base.getDevice() && (device == null || !device.equalsIgnoreCase(base.getDevice())))
+		if( !isEqualsIgnoreCase(device, base.getDevice()))
 			return this;
 		int commonLength = matchingFirstSegments(base);
 		final int differenceLength = base.segmentCount() - commonLength;
@@ -941,6 +941,13 @@ public class Path implements IPath, Cloneable {
 		return new Path(null, newSegments, flags & (HAS_TRAILING | IS_FOR_WINDOWS));
 	}
 
+	private boolean isEqualsIgnoreCase(String a, String b) {
+		if( a == null ) {
+			return b == null;
+		}
+		return a.equalsIgnoreCase(b);
+	}
+	
 	/* (Intentionally not included in javadoc)
 	 * @see IPath#makeUNC(boolean)
 	 */

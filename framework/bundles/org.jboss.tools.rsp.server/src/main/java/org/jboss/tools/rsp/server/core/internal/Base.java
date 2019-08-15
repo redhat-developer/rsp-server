@@ -444,6 +444,16 @@ public abstract class Base {
 		
 		return true;
 	}
+	
+	@Override 
+	public int hashCode() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("Base:");
+		sb.append(getId());
+		sb.append(":");
+		sb.append(isWorkingCopy());
+		return sb.toString().hashCode();
+	}
 
 	protected void loadFromFile(IProgressMonitor monitor) throws CoreException {
 		try(InputStream in = new ByteArrayInputStream(Files.readAllBytes(file.toPath()))) {

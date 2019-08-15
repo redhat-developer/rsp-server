@@ -62,7 +62,7 @@ public class JavadocUtilities {
 		}
 		NodeList<AnnotationExpr> annotations = dec.getAnnotations();
 		for( AnnotationExpr a : annotations) {
-			String annotName = annotations.get(0).getNameAsString();
+			String annotName = a.getNameAsString();
 			if( annotName.equalsIgnoreCase("JsonNotification")) {
 				return true;
 			}

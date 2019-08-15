@@ -630,8 +630,11 @@ public class ServerModel implements IServerModel {
 			if( canPublish != null && canPublish.isOK()) {
 				return s.publish(kind);
 			} else {
-				return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
-						"Server " + server.getId() + " is not in a state that can be published to: " + canPublish.getMessage());
+				String canPublishMsg = (canPublish == null ? "null" : canPublish.getMessage());
+				return new Status(IStatus.ERROR, 
+						ServerCoreActivator.BUNDLE_ID, 
+						NLS.bind("Server {0} is not in a state that can be published to: {1}",
+								server.getId(), canPublishMsg));
 			}
 		}
 		return Status.CANCEL_STATUS;

@@ -17,7 +17,6 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.debug.core.DebugPluginConstants;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
-import org.jboss.tools.rsp.eclipse.debug.core.IProcessFactory;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.rsp.eclipse.debug.core.model.RuntimeProcess;
 
@@ -88,17 +87,17 @@ public class ExecUtil {
 	}	
 
 	public static IProcess newProcess(ILaunch launch, Process p, String label, Map<String, String> attributes) {
-		IProcessFactory fact = getProcessFactory(launch, p, label, attributes);
-		if (fact != null) {
-			return fact.newProcess(launch, p, label, attributes);
-		} else {
+//		IProcessFactory fact = getProcessFactory(launch, p, label, attributes);
+//		if (fact != null) {
+//			return fact.newProcess(launch, p, label, attributes);
+//		} else {
 			return new RuntimeProcess(launch, p, label, attributes);
-		}
+//		}
 	}
 	
-	protected static IProcessFactory getProcessFactory(ILaunch launch, Process p, String label, Map<String, String> attributes) {
-		// TODO: implement or get rid of it
-		return null;
-	}
+//	protected static IProcessFactory getProcessFactory(ILaunch launch, Process p, String label, Map<String, String> attributes) {
+//		// TODO: implement or get rid of it
+//		return null;
+//	}
 
 }

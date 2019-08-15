@@ -226,7 +226,9 @@ public class ProcessUtility {
 		Future<R> future = singleThreadExecutor.submit(callable);
 		try {
 			return future.get(millisTimeout, TimeUnit.MILLISECONDS);
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+		} catch (InterruptedException ie) {
+			Thread.currentThread().interrupt();
+		} catch( ExecutionException | TimeoutException e) {
 		} finally {
 			singleThreadExecutor.shutdown();
 		}

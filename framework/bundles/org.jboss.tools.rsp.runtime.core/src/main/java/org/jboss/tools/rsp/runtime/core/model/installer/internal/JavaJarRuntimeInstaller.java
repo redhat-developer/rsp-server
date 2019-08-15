@@ -91,9 +91,9 @@ public class JavaJarRuntimeInstaller implements IRuntimeInstaller {
 					getDownloadUrl(downloadRuntime, taskModel), deleteOnExit, user, pass, new SubProgressMonitor(monitor, 80));
 						
 			ILaunch launch = createExternalToolsLaunchConfiguration(f, unzipDirectory);
-			if (launch == null) {
-				return new Status(IStatus.ERROR, RuntimeCoreActivator.PLUGIN_ID, "Unable to launch external command java -jar " + f.getAbsolutePath());
-			}
+//			if (launch == null) {
+//				return new Status(IStatus.ERROR, RuntimeCoreActivator.PLUGIN_ID, "Unable to launch external command java -jar " + f.getAbsolutePath());
+//			}
 			IProcess[] processes = launch.getProcesses();
 			boolean finished = false;
 			while(!monitor.isCanceled() && !finished) {

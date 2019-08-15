@@ -182,7 +182,7 @@ public class ServerManagementClientImpl implements RSPClient {
 			try {
 				Thread.sleep(1000);
 			} catch(InterruptedException ie) {
-				
+				 Thread.currentThread().interrupt();
 			}
 			if( ret[0] != null ) {
 				return ret[0];

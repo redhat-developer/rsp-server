@@ -45,6 +45,11 @@ public class ServerBean {
 		return name + "," + typeCategory + "," + version + "," + location; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Override
+	public int hashCode() {
+		return toString().hashCode();
+	}
+	
 	public boolean equals(Object obj) {
 		if (obj == null)
 			return false;
