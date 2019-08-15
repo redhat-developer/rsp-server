@@ -36,8 +36,11 @@ import org.jboss.tools.rsp.server.redhat.download.AbstractDownloadManagerExecuto
 import org.jboss.tools.rsp.server.redhat.download.stacks.AbstractStacksDownloadRuntimesProvider;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CDKDownloadExecutor extends AbstractDownloadManagerExecutor {
+	private static final Logger LOG = LoggerFactory.getLogger(CDKDownloadExecutor.class);
 
 	protected static final int STEP_ATTRIBUTES = 4;
 	protected static final int STEP_DOWNLOAD = 5;
@@ -65,7 +68,9 @@ public class CDKDownloadExecutor extends AbstractDownloadManagerExecutor {
 		if( binFile == null ) {
 			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, "Unable to locate minishift binary");
 		}
-		binFile.setExecutable(true);
+		if( !binFile.setExecutable(true) ) {
+			LOG.warn("Unable to set cdk binary to executable: " + binFile.getAbsolutePath());
+		}
 		attributes.put(ServerManagementAPIConstants.SERVER_HOME_FILE, binFile.getAbsolutePath());
 		
 		// A list of keys we should copy over IF the user contributed them

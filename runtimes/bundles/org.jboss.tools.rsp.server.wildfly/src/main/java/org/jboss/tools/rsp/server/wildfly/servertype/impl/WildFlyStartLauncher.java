@@ -20,8 +20,11 @@ import org.jboss.tools.rsp.server.spi.servertype.IServerWorkingCopy;
 import org.jboss.tools.rsp.server.wildfly.servertype.AbstractLauncher;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
 import org.jboss.tools.rsp.server.wildfly.servertype.launch.IDefaultLaunchArguments;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WildFlyStartLauncher extends AbstractLauncher {
+	private static final Logger LOG = LoggerFactory.getLogger(WildFlyStartLauncher.class);
 
 	public WildFlyStartLauncher(IServerDelegate jBossServerDelegate) {
 		super(jBossServerDelegate);
@@ -103,7 +106,7 @@ public class WildFlyStartLauncher extends AbstractLauncher {
 		try {
 			wc.save(new NullProgressMonitor());
 		} catch(CoreException ce) {
-			ce.printStackTrace();
+			LOG.error(ce.getMessage(), ce);
 		}
 	}
 	

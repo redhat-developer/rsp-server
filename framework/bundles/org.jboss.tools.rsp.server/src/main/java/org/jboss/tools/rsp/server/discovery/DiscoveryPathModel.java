@@ -80,7 +80,9 @@ public class DiscoveryPathModel implements IDiscoveryPathModel {
 
 	public void saveDiscoveryPaths(File discoveryPathFile) throws IOException {
 		if (!discoveryPathFile.exists()) {
-			discoveryPathFile.createNewFile();
+			if( !discoveryPathFile.createNewFile()) {
+				throw new IOException();
+			}
 		}
 		PrintWriter pw = new PrintWriter(discoveryPathFile);
 		getPaths().forEach(path -> pw.println(path.getFilepath()));

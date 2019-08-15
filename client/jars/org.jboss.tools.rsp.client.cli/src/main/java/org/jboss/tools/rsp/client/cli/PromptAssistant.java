@@ -395,7 +395,7 @@ public class PromptAssistant {
 	
 	public static class StandardPrompt extends PromptStringHandler {
 
-		public String ret;
+		private String ret;
 		protected CountDownLatch doneSignal = new CountDownLatch(1);
 
 		public StandardPrompt(String prompt, boolean isSecret) {

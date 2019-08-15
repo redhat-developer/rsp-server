@@ -276,7 +276,9 @@ public class StandardJBossPublishController implements IJBossPublishController {
 			Path fileDest = dest.toPath().resolve(entry.getKey());
 
 			if( change == IDeployableResourceDelta.DELETED) {
-				fileDest.toFile().delete();
+				if( !fileDest.toFile().delete() ) {
+					LOG.debug("Error: Cannot delete file " + fileDest.toFile().getAbsolutePath());
+				}
 			} else if( change == IDeployableResourceDelta.CREATED || 
 					change == IDeployableResourceDelta.MODIFIED) {
 				incrementalPublishCopySingleFile(fileSrc, fileDest, errors);

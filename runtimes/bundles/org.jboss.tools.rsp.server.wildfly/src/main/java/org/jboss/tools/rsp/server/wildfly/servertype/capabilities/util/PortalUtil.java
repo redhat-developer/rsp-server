@@ -21,12 +21,12 @@ import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
 
 public class PortalUtil {
 	public static final String GATEIN = "gatein";
-	public static int TYPE_PORTAL_UNKNOWN = 0;
-	public static int TYPE_PORTAL = 1;
-	public static int TYPE_PORTAL_CLUSTER = 2;
-	public static int TYPE_PORTLET_CONTAINER = 3;
-	public static int TYPE_GATE_IN = 4;
-	public static int TYPE_JPP6 = 5;
+	public static final int TYPE_PORTAL_UNKNOWN = 0;
+	public static final int TYPE_PORTAL = 1;
+	public static final int TYPE_PORTAL_CLUSTER = 2;
+	public static final int TYPE_PORTLET_CONTAINER = 3;
+	public static final int TYPE_GATE_IN = 4;
+	public static final int TYPE_JPP6 = 5;
 	
 	private static final String SERVER_DEFAULT_DEPLOY_JBOSS_PORTAL_SAR = "deploy/jboss-portal.sar"; //$NON-NLS-1$
 	private static final String SERVER_DEFAULT_DEPLOY_JBOSS_PORTAL_HA_SAR = "deploy/jboss-portal-ha.sar"; //$NON-NLS-1$

@@ -121,7 +121,9 @@ public class WildFlyPublishController extends StandardJBossPublishController imp
 	       new FileOutputStream(file).close();
 	    }
 
-	    file.setLastModified(timestamp);
+	    if( !file.setLastModified(timestamp) ) {
+	    	LOG.debug("Unable to set timestamp on file " + file.getAbsolutePath());
+	    }
 	}
 
 	private static final String[] MARKER_FILES = {
@@ -138,8 +140,11 @@ public class WildFlyPublishController extends StandardJBossPublishController imp
 	private void cleanAllMarkers(String modulePath) {
 		for( String k : MARKER_FILES) {
 			File f = new File(modulePath + k);
-			if( f.exists()) 
-				f.delete();
+			if( f.exists()) {
+				if( !f.delete() ) {
+					LOG.error("Error: Cannot remove marker file " + f.getAbsolutePath());
+				}
+			}
 		}
 	}
 	

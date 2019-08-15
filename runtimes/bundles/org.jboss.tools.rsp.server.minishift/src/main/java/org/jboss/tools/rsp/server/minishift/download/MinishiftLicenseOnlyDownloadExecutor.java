@@ -36,9 +36,12 @@ import org.jboss.tools.rsp.server.redhat.download.stacks.AbstractStacksDownloadR
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.runtimes.AbstractLicenseOnlyDownloadExecutor;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MinishiftLicenseOnlyDownloadExecutor extends AbstractLicenseOnlyDownloadExecutor {
 
+	private static final Logger LOG = LoggerFactory.getLogger(MinishiftLicenseOnlyDownloadExecutor.class);
 	protected static final DownloadRuntimeSessionCache SESSION_STATE = new DownloadRuntimeSessionCache();
 
 	private static final int STEP_ATTR = 2;
@@ -66,7 +69,9 @@ public class MinishiftLicenseOnlyDownloadExecutor extends AbstractLicenseOnlyDow
 		if( binFile == null ) {
 			return new Status(IStatus.ERROR, Activator.BUNDLE_ID, "Unable to locate minishift binary");
 		}
-		binFile.setExecutable(true);
+		if( !binFile.setExecutable(true) ) {
+			LOG.warn("Unable to set minishift binary to executable: " + binFile.getAbsolutePath());
+		}
 
 		attributes.put(ServerManagementAPIConstants.SERVER_HOME_FILE, binFile.getAbsolutePath());
 		

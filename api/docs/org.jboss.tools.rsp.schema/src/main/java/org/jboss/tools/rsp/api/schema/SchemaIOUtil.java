@@ -16,7 +16,6 @@ import java.nio.file.Path;
 
 public class SchemaIOUtil {
 	public static String linePrefix(String original, String prefix ) {
-		String before = original;
 		String after = ("\n" + original).replace("\n", "\n" + prefix).substring(1);
 		return after;
 	}
@@ -30,11 +29,14 @@ public class SchemaIOUtil {
 		return content;
 	}
 
-	public static void cleanFolder(Path folder) {
+	public static boolean cleanFolder(Path folder) {
+		boolean ret = true;
 		File[] ts = folder.toFile().listFiles();
 		for( int i = 0; i < ts.length; i++ ) {
-			ts[i].delete();
+			if( !ts[i].delete() ) 
+				ret = false;
 		}
+		return ret;
 	}
 
 	public static String trimFirstLines(String contents, int numLines) {
