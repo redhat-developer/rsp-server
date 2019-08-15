@@ -46,8 +46,8 @@ public class JBossServerBeanLoaderTest extends TestCase {
 
 	protected HashMap<String, Data> expected = new HashMap<String, Data>();
 	protected class Data {
-		public ServerBeanType type;
-		public String version, overrideId;
+		private ServerBeanType type;
+		private String version, overrideId;
 		public Data(ServerBeanType type, String version) {
 			this.type = type;
 			this.version = version;

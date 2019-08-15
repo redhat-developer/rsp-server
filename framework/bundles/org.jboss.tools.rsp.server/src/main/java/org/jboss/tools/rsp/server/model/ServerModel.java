@@ -365,9 +365,7 @@ public class ServerModel implements IServerModel {
 			return file.canWrite();
 		} else {
 			try {
-				file.createNewFile();
-				file.delete();
-				return true;
+				return file.createNewFile() && file.delete();
 			} catch (Exception e) {
 				return false;
 			}

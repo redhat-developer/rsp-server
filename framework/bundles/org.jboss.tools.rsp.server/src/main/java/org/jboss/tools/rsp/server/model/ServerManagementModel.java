@@ -209,7 +209,10 @@ public class ServerManagementModel implements IServerManagementModel {
 			final IServer next = it.next();
 			submitShutdownServerRequest(next, force, threadExecutor, latch);
 			try {
-				latch.await(60000, TimeUnit.MILLISECONDS);
+				boolean result = latch.await(60000, TimeUnit.MILLISECONDS);
+				if( !result ) {
+					LOG.error("Waiting too long for shutdown of servers during RSP shutdown");
+				}
 			} catch(InterruptedException ie) {
 				// Ignore, do not set interrupt state again
 			}

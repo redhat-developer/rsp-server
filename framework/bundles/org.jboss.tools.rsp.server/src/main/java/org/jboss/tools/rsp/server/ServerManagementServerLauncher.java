@@ -82,7 +82,8 @@ public class ServerManagementServerLauncher {
 			System.out.println("The server management server is running on port " + port);
 			threadPool.submit(socketRunnable);
 		} catch(Throwable t) {
-			t.printStackTrace();
+			LOG.error(t.getMessage(), t);
+			throw t;
 		}
 	}
 	
@@ -138,8 +139,9 @@ public class ServerManagementServerLauncher {
 							":"+ socket.getPort() + " is connected");
 		} catch(IOException ioe) {
 			// We shouldn't fail if we're still supposed to be listening
-			if (socketRunnable != null && socketRunnable.isListening())
-				ioe.printStackTrace();
+			if (socketRunnable != null && socketRunnable.isListening()) {
+				LOG.error(ioe.getMessage(), ioe);
+			}
 		}
 	}
 	

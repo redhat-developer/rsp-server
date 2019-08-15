@@ -31,12 +31,16 @@ public class JSONUtility {
 		this.baseDir = baseDir;
 	}
 
-	public void cleanFolder() {
+	public boolean cleanFolder() {
+		boolean ret = true;
 		Path folder = getDaoJsonFolder();
 		File[] jsons = folder.toFile().listFiles();
 		for( int i = 0; i < jsons.length; i++ ) {
-			jsons[i].delete();
+			if( !jsons[i].delete() ) {
+				ret = false;
+			}
 		}
+		return ret;
 	}
 
 	public void writeJsonDAOSchemas(Class<?>[] daoClasses) throws IOException {

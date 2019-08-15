@@ -31,12 +31,14 @@ import org.jboss.tools.rsp.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.rsp.runtime.core.extract.ExtractUtility;
 import org.jboss.tools.rsp.runtime.core.extract.IOverwrite;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * Mixed class of core+ui to initiate the download, unzipping, 
  * and runtime creation for a downloaded runtime. 
  */
 public class DownloadRuntimeOperationUtility {
+	private static final Logger LOG = LoggerFactory.getLogger(DownloadRuntimeOperationUtility.class);
 
 	protected File getNextUnusedFilename(File destination, String name) {
 		String nameWithoutSuffix = null;
@@ -138,7 +140,8 @@ public class DownloadRuntimeOperationUtility {
 			downloadedFile = downloadRemoteRuntime(downloadDirectoryPath, urlString, deleteOnExit, user, pass, new SubProgressMonitor(monitor, 450));
 			return downloadedFile;
 		} catch(CoreException ce) {
-			new File(unzipDirectoryPath).delete();
+			if( !new File(unzipDirectoryPath).delete()) 
+				LOG.debug("Unable to delete file: " + unzipDirectoryPath);
 			throw new CoreException( new Status(ce.getStatus().getSeverity(), RuntimeCoreActivator.PLUGIN_ID, NLS.bind("Error while retrieving runtime from {0}", urlString), ce));  //$NON-NLS-1$
 		} finally {
 			monitor.done();
@@ -155,7 +158,9 @@ public class DownloadRuntimeOperationUtility {
 			validateInputs(downloadDirectoryPath, unzipDirectoryPath);
 			downloadedFile = downloadRemoteRuntime(downloadDirectoryPath, urlString, deleteOnExit, user, pass, new SubProgressMonitor(monitor, 450));
 		} catch(CoreException ce) {
-			new File(unzipDirectoryPath).delete();
+			if( !new File(unzipDirectoryPath).delete()) {
+				LOG.debug("Unable to delete file: " + unzipDirectoryPath);
+			}
 			return new Status(ce.getStatus().getSeverity(), RuntimeCoreActivator.PLUGIN_ID, NLS.bind("Error while retrieving runtime from {0}", urlString), ce);  //$NON-NLS-1$
 		}
 		
@@ -224,7 +229,8 @@ public class DownloadRuntimeOperationUtility {
 	private IStatus cancel(File f) {
 		if( f != null ) {
 			f.deleteOnExit();
-			f.delete();
+			if( !f.delete() )
+				LOG.debug("Unable to delete file: " + f.getAbsolutePath());
 		}
 		return Status.CANCEL_STATUS;
 	}
@@ -263,7 +269,9 @@ public class DownloadRuntimeOperationUtility {
 			}
 			out.flush();
 			if (remoteUrlModified > 0) {
-				toFile.setLastModified(remoteUrlModified);
+				if( !toFile.setLastModified(remoteUrlModified)) {
+					LOG.debug("Unable to set timestamp for " + toFile.getAbsolutePath());
+				}
 			}
 			if( result.isOK()) {
 				getCache().addToCache(url.toString(), toFile);

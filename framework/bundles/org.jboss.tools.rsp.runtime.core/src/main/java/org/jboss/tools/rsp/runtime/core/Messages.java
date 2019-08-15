@@ -13,9 +13,9 @@ package org.jboss.tools.rsp.runtime.core;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	public static String DownloadRuntime_Unable_to_fetch_license="Unable to fetch license for {0}";
-	public static String JBossRuntimeLocator_Searching="Searching";
-	public static String RuntimeExtensionManager_Invalid_runtime="Invalid runtime: id={0}, name={1}, version={2}, url={3}";
+	public static final String DownloadRuntime_Unable_to_fetch_license="Unable to fetch license for {0}";
+	public static final String JBossRuntimeLocator_Searching="Searching";
+	public static final String RuntimeExtensionManager_Invalid_runtime="Invalid runtime: id={0}, name={1}, version={2}, url={3}";
 	
 	private Messages() {
 	}

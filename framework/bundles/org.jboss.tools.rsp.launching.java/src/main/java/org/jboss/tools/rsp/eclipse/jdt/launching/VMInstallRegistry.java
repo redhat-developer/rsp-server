@@ -129,7 +129,9 @@ public class VMInstallRegistry implements IVMInstallRegistry {
 
 	public void save(File vmsFile) throws IOException {
 		if (!vmsFile.exists()) {
-			vmsFile.createNewFile();
+			if( !vmsFile.createNewFile() ) {
+				throw new IOException();
+			}
 		}
 		JSONMemento memento = JSONMemento.createWriteRoot();
 		for (IVMInstall vmInstall : getVMs()) {
