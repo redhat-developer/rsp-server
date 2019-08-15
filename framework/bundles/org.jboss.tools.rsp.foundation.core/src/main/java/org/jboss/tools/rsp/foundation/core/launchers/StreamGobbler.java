@@ -96,6 +96,7 @@ public class StreamGobbler extends Thread {
 			try {
 				Thread.sleep(delay);
 			} catch (InterruptedException ie) {
+				Thread.currentThread().interrupt();
 			}
 		}
 		if (!isComplete()) {

@@ -42,6 +42,7 @@ public class DelayableFixedResponsePoller extends AbstractPoller {
 			try {
 				Thread.sleep(delay);
 			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
 			}
 		}
 	}

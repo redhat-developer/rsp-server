@@ -387,6 +387,7 @@ public class PromptAssistant {
 				doneSignal.await();
 			} catch (InterruptedException ie) {
 				ie.printStackTrace();
+				Thread.currentThread().interrupt();
 			}
 		}
 
@@ -413,6 +414,7 @@ public class PromptAssistant {
 				doneSignal.await();
 			} catch (InterruptedException ie) {
 				ie.printStackTrace();
+				Thread.currentThread().interrupt();
 			}
 		}
 	}

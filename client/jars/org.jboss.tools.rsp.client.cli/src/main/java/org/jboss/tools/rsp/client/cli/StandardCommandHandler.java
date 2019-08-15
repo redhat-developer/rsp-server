@@ -329,7 +329,10 @@ public class StandardCommandHandler implements InputHandler {
 							}
 						}
 					}
-				} catch(InterruptedException | ExecutionException ioe) {
+				} catch(InterruptedException ie ) {
+					ie.printStackTrace();
+					Thread.currentThread().interrupt();
+				} catch( ExecutionException ioe) {
 					ioe.printStackTrace();
 				}			}
 		},
@@ -445,7 +448,10 @@ public class StandardCommandHandler implements InputHandler {
 									runStateString + " " + pubStateString); // TODO add run state?
 						}
 					}
-				} catch(InterruptedException | ExecutionException ioe) {
+				} catch(InterruptedException ie ) { 
+					ie.printStackTrace();
+					Thread.currentThread().interrupt();
+				} catch(ExecutionException ioe) {
 					ioe.printStackTrace();
 				}
 			}
@@ -509,7 +515,10 @@ public class StandardCommandHandler implements InputHandler {
 							System.out.println(ret.toString());
 						}
 					}
-				} catch(InterruptedException | ExecutionException ioe) {
+				} catch(InterruptedException ie ) { 
+					ie.printStackTrace();
+					Thread.currentThread().interrupt();
+				} catch(ExecutionException ioe) {
 					ioe.printStackTrace();
 				}
 			}
@@ -527,7 +536,10 @@ public class StandardCommandHandler implements InputHandler {
 							System.out.println(ret.toString());
 						}
 					}
-				} catch(InterruptedException | ExecutionException ioe) {
+				} catch(InterruptedException ie ) { 
+					ie.printStackTrace();
+					Thread.currentThread().interrupt();
+				} catch(ExecutionException ioe) {
 					ioe.printStackTrace();
 				}
 			}
@@ -544,7 +556,10 @@ public class StandardCommandHandler implements InputHandler {
 							System.out.println(stat.toString());
 						}
 					}
-				} catch(InterruptedException | ExecutionException ioe) {
+				} catch(InterruptedException ie ) { 
+					ie.printStackTrace();
+					Thread.currentThread().interrupt();
+				} catch(ExecutionException ioe) {
 					ioe.printStackTrace();
 				}
 			}
@@ -599,7 +614,10 @@ public class StandardCommandHandler implements InputHandler {
 							workflowResp = launcher.getServerProxy().executeServerAction(serverActionReq).get();
 						}
 					}
-				} catch(InterruptedException | ExecutionException ioe) {
+				} catch(InterruptedException ie ) { 
+					ie.printStackTrace();
+					Thread.currentThread().interrupt();
+				} catch(ExecutionException ioe) {
 					ioe.printStackTrace();
 				}
 			}
@@ -613,7 +631,10 @@ public class StandardCommandHandler implements InputHandler {
 					for( DownloadRuntimeDescription d : list ) {
 						System.out.println(d);
 					}
-				} catch(InterruptedException | ExecutionException ioe) {
+				} catch(InterruptedException ie ) { 
+					ie.printStackTrace();
+					Thread.currentThread().interrupt();
+				} catch(ExecutionException ioe) {
 					ioe.printStackTrace();
 				}
 			}
@@ -644,7 +665,10 @@ public class StandardCommandHandler implements InputHandler {
 						req2.setData(toSend);
 						resp = launcher.getServerProxy().downloadRuntime(req2).get();
 					}
-				} catch(InterruptedException | ExecutionException ioe) {
+				} catch(InterruptedException ie ) { 
+					ie.printStackTrace();
+					Thread.currentThread().interrupt();
+				} catch(ExecutionException ioe) {
 					ioe.printStackTrace();
 				}
 			}

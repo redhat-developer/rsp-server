@@ -116,7 +116,7 @@ public class AutoPublishThread extends Thread {
 				sleep(nextSleep);
 			}
 		} catch(InterruptedException ie) {
-			Thread.interrupted();
+			Thread.currentThread().interrupt();
 		}
 	}
 	

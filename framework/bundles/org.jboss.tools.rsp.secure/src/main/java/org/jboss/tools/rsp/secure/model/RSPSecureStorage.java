@@ -57,14 +57,13 @@ public class RSPSecureStorage implements ISecureStorage {
 				if (!startsWith(decrypted, magicBytes)) {
 					throw new CryptoException("Invalid key", null);
 				}
-				String test = new String(decrypted);
 				tmp.load(new ByteArrayInputStream(decrypted));
 				Arrays.fill(decrypted, (byte) 0);
 				this.secretData = tmp;
 			} catch (IOException | CryptoException e) {
 				throw new CryptoException("Unable to decrypt secure storage", e);
 			}
-		} else if (!backingFile.exists()) {
+		} else if (backingFile == null || !backingFile.exists()) {
 			// new file, it's ok to create
 			this.secretData = tmp;
 		}

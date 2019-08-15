@@ -40,6 +40,7 @@ public class ServerManagementCLI implements InputProvider, IClientConnectionClos
 	private Scanner scanner = null;
 	private ServerManagementClientLauncher launcher;
 	private ConcurrentLinkedQueue<InputHandler> queue = new ConcurrentLinkedQueue<>();
+	private boolean isComplete = false;
 	
 	private void connect(String host, String port) throws Exception {
 		if (host == null) {
@@ -92,6 +93,7 @@ public class ServerManagementCLI implements InputProvider, IClientConnectionClos
 							Thread.sleep(500);
 						} catch(InterruptedException ie) {
 							// Do nothing
+							Thread.currentThread().interrupt();
 						}
 					}
 			}
@@ -116,8 +118,16 @@ public class ServerManagementCLI implements InputProvider, IClientConnectionClos
 		return scanner.nextLine();
 	}
 	
+	private synchronized boolean isComplete() {
+		return isComplete;
+	}
+	
+	private synchronized void setComplete(boolean val) {
+		this.isComplete = val;
+	}
+	
 	private void readInputs() {
-		while (true) {
+		while (!isComplete()) {
 			if (queue.peek() != null) {
 				printUserPrompt(queue.peek());
 			}
@@ -125,19 +135,22 @@ public class ServerManagementCLI implements InputProvider, IClientConnectionClos
 			InputHandler handler = getInputHandler();
 			final String content2 = content;
 			if (!launcher.isConnectionActive()) {
-				close();
-			}
-			
-			new Thread("Handle input") {
-				@Override
-				public void run() {
-					try {
-						handler.handleInput(content2);
-					} catch (Exception e) {
-						e.printStackTrace();
+				setComplete(true);
+			} else {
+				new Thread("Handle input") {
+					@Override
+					public void run() {
+						try {
+							handler.handleInput(content2);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
-				}
-			}.start();
+				}.start();
+			}
+		}
+		if( isComplete()) {
+			close();
 		}
 	}
 

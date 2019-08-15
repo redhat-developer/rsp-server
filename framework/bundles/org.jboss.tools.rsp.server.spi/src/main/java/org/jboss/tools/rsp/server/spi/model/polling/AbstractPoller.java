@@ -42,13 +42,13 @@ public abstract class AbstractPoller implements IServerStatePoller {
 
 	private void pollerRun() {
 		setStateInternal(false, state);
-		while(!canceled && !done) {
+		while (!canceled && !done) {
 			SERVER_STATE stat = onePing(server);
 			if (expectedState == stat) {
 				setStateInternal(true, stat);
 			}
 			try {
-					Thread.sleep(POLLING_DELAY);
+				Thread.sleep(POLLING_DELAY);
 			} catch (InterruptedException e) {
 				cancel(CANCELATION_CAUSE.CANCEL);
 			}

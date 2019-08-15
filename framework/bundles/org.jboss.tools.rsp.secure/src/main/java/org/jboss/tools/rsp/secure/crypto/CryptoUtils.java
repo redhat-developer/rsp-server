@@ -94,8 +94,9 @@ public class CryptoUtils {
 	public byte[] getBytesFromFile(File f) throws FileNotFoundException, IOException {
 		try (FileInputStream inputStream = new FileInputStream(f)) {
 			byte[] inputBytes = new byte[(int) f.length()];
-			inputStream.read(inputBytes);
-			return inputBytes;
+			if( inputStream.read(inputBytes) > 0 )
+				return inputBytes;
+			return new byte[0];
 		}
 	}
 

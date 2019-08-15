@@ -279,8 +279,7 @@ public class TypescriptUtility {
 			for( int i = 0; i < methods.length; i++ ) {
 				JavadocComment jdc = map.get(methods[i]);
 				MethodDeclaration md = getMethodDeclaration(jdc);
-				if( JavadocUtilities.isNotification(md) ) {
-					
+				if( md != null && JavadocUtilities.isNotification(md) ) {
 					String methodName = md.getNameAsString();
 					String notificationName = methodNameToNotificationName(methodName);
 					
@@ -504,6 +503,10 @@ public class TypescriptUtility {
 	private void printOneRequest(String methodName, JavadocComment jdc, 
 			StringBuilder sb, String serverOrClient) {
 		if( jdc != null ) {
+			MethodDeclaration md = getMethodDeclaration(jdc);
+			if( md == null )
+				return;
+			
 			String comment = jdc.getContent().substring(1);
 			String commentTabs = comment.replaceAll("\t", "        ");
 			String removedTrailingWS = LINE_END_SPACES.matcher(commentTabs).replaceAll("");
@@ -514,8 +517,6 @@ public class TypescriptUtility {
 			sb.append(methodNameToRequestName(methodName));
 			sb.append(" {\n");
 			
-			// TODO body
-			MethodDeclaration md = getMethodDeclaration(jdc);
 			sb.append("            export const type = new RequestType<");
 			NodeList<Parameter> params = md.getParameters();
 			if (params.isEmpty()) {

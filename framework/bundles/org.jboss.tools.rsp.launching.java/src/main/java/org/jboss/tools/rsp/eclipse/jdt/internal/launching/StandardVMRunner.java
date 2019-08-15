@@ -229,6 +229,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 			// ignore and run java_swt in place
 		} catch (InterruptedException e) {
 			// ignore and run java_swt in place
+			Thread.currentThread().interrupt();
 		}
 		String[] newCmdLine= new String[cmdLine.length+1];
 		int argCount= 0;

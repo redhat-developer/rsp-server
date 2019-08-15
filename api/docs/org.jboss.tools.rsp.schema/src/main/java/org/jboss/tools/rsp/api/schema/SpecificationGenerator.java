@@ -53,9 +53,9 @@ public class SpecificationGenerator {
 			public void visit(JavadocComment comment, Object arg) {
 				super.visit(comment, arg);
 				Optional<Node> o = comment.getCommentedNode();
-				if (o.get() != null) {
-					if (!(o.get() instanceof CompilationUnit)) {
-						Node n = o.get();
+				if (o.isPresent() && o.get() != null) {
+					Node n = o.get();
+					if (!(n instanceof CompilationUnit)) {
 						if (n instanceof MethodDeclaration) {
 							printSingleMethodDeclaration((MethodDeclaration)n, comment, sb, segment, f);
 						}

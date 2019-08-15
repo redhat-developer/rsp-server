@@ -51,7 +51,7 @@ public class CoreException extends Exception {
 	  * @since 3.4
 	  */
 	@Override
-	public Throwable getCause() {
+	public synchronized Throwable getCause() {
 		return status.getException();
 	}
 
