@@ -16,7 +16,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
@@ -29,7 +28,6 @@ import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
 import org.jboss.tools.rsp.itests.RSPCase;
 import org.jboss.tools.rsp.itests.util.DummyClient;
-import org.jboss.tools.rsp.server.wildfly.servertype.actions.ShowInBrowserActionHandler;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,11 +56,7 @@ public class WildflyServerActionsTest extends RSPCase {
 			"Which deployment do you want to show in the web browser?";
 	public static final String ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT = "Welcome Page (Index)";
 	
-	
 	private ServerHandle handle;
-	
-
-	private static Logger log = Logger.getLogger(WildflyServerActionsTest.class.getName());
 
 	@Before
 	public void before() throws Exception {
@@ -78,7 +72,7 @@ public class WildflyServerActionsTest extends RSPCase {
 
 	@Test
 	public void testListServerActions() throws Exception {
-		ListServerActionResponse response = serverProxy.listServerActions(handle).get();
+		ListServerActionResponse response = serverProxy.listServerActions(handle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.OK, response.getStatus().getSeverity());
 		assertEquals(2, response.getWorkflows().size());
 		ServerActionWorkflow workflow = response.getWorkflows().get(0);
@@ -93,17 +87,17 @@ public class WildflyServerActionsTest extends RSPCase {
 	public void testListServerActionsInvalidHandle() throws Exception {
 		ServerHandle inHandle = new ServerHandle("foo.server.id",
 				new ServerType("some.id", "my.server", "Random server type definition"));
-		ListServerActionResponse response = serverProxy.listServerActions(inHandle).get();
+		ListServerActionResponse response = serverProxy.listServerActions(inHandle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, response.getStatus().getSeverity());
 		assertEquals(SERVER_TYPE_NOT_FOUND, response.getStatus().getMessage());
 		assertNull(response.getWorkflows());
 		inHandle = new ServerHandle("foo.server.id", null);
-		response = serverProxy.listServerActions(inHandle).get();
+		response = serverProxy.listServerActions(inHandle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, response.getStatus().getSeverity());
 		assertEquals(MISSING_SERVER_TYPE, response.getStatus().getMessage());
 		assertNull(response.getWorkflows());
 		inHandle = new ServerHandle("foo.server.id", new ServerType(null, "my.server", "Random server type definition"));
-		response = serverProxy.listServerActions(inHandle).get();
+		response = serverProxy.listServerActions(inHandle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, response.getStatus().getSeverity());
 		assertEquals(MISSING_SERVER_TYPE_ID, response.getStatus().getMessage());
 		assertNull(response.getWorkflows());
@@ -111,7 +105,7 @@ public class WildflyServerActionsTest extends RSPCase {
 
 	@Test
 	public void testListServerActionsNullHandle() throws Exception {
-		ListServerActionResponse response = serverProxy.listServerActions(null).get();
+		ListServerActionResponse response = serverProxy.listServerActions(null).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, response.getStatus().getSeverity());
 		assertEquals(MISSING_SERVER_HANDLE, response.getStatus().getMessage());
 		assertNull(response.getWorkflows());
@@ -125,7 +119,7 @@ public class WildflyServerActionsTest extends RSPCase {
 		Map<String, Object> data = new HashMap<>();
 		data.put(ACTION_SHOW_IN_BROWSER_SELECTED_PROMPT_ID, ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT);
 		req.setData(data);
-		WorkflowResponse response = serverProxy.executeServerAction(req).get();
+		WorkflowResponse response = serverProxy.executeServerAction(req).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertNotNull(response);
 		assertEquals(Status.OK, response.getStatus().getSeverity());
 		assertNotNull(response.getItems());
@@ -139,13 +133,13 @@ public class WildflyServerActionsTest extends RSPCase {
 	public void testInvalidExecuteServerAction() throws Exception {
 		ServerActionRequest req = new ServerActionRequest();
 		req.setServerId(null);
-		WorkflowResponse response = serverProxy.executeServerAction(req).get();
+		WorkflowResponse response = serverProxy.executeServerAction(req).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, response.getStatus().getSeverity());
 		assertEquals(MISSING_SERVER_ID, response.getStatus().getMessage());
 		assertNull(response.getItems());
 		req.setActionId("fabricated.id");
 		req.setServerId("nemo");
-		response = serverProxy.executeServerAction(req).get();
+		response = serverProxy.executeServerAction(req).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, response.getStatus().getSeverity());
 		assertEquals("Server nemo does not exist" , response.getStatus().getMessage());
 		assertNull(response.getItems());
@@ -157,13 +151,13 @@ public class WildflyServerActionsTest extends RSPCase {
 		ServerActionRequest req = new ServerActionRequest();
 		req.setServerId(SERVER_ID);
 		req.setActionId(SHOWIN_ACTION_ID);
-		WorkflowResponse response = serverProxy.executeServerAction(req).get();
+		WorkflowResponse response = serverProxy.executeServerAction(req).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.CANCEL, response.getStatus().getSeverity());
 		assertEquals("" , response.getStatus().getMessage());
 		assertTrue(response.getItems().isEmpty());
 		// empty data map send
 		req.setData(new HashMap<>());
-		response = serverProxy.executeServerAction(req).get();
+		response = serverProxy.executeServerAction(req).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.CANCEL, response.getStatus().getSeverity());
 		assertEquals("" , response.getStatus().getMessage());
 		assertTrue(response.getItems().isEmpty());
@@ -171,7 +165,7 @@ public class WildflyServerActionsTest extends RSPCase {
 
 	@Test
 	public void testNullExecuteServerAction() throws Exception {
-		WorkflowResponse response = serverProxy.executeServerAction(null).get(2000, TimeUnit.MILLISECONDS);
+		WorkflowResponse response = serverProxy.executeServerAction(null).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertNotNull(response);
 		assertEquals(Status.ERROR, response.getStatus().getSeverity());
 		assertEquals(NULL_SERVER_ACTION_REQUEST, response.getStatus().getMessage());
