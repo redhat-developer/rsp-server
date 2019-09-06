@@ -58,8 +58,13 @@ public abstract class RSPCase {
 	protected static String WILDFLY_ROOT;
 	protected static ServerType wildflyType;
 	protected static final String INVALID_PARAM = "Parameter is invalid. It may be null, missing required fields, or unacceptable values.";
+	protected static final String MISSING_SERVER_ID = "Invalid Request: Request must include server id.";
+	protected static final String SERVER_TYPE_NOT_FOUND = "Invalid Request: Server type not found.";
+	protected static final String NULL_SERVER_ACTION_REQUEST = "Invalid Request: Request cannot be null.";
+	protected static final String MISSING_SERVER_TYPE = "Invalid Request: Request must include server type.";
+	protected static final String MISSING_SERVER_TYPE_ID = "Invalid Request: Request must include server type id.";
 	protected static final String MISSING_SERVER_HANDLE = "Invalid Request: Request must include server handle.";
-
+	
 	protected static final String MODE_DEBUG = "debug";
 	protected static final String MODE_RUN = "run";
 	protected static final String STATUS_MESSAGE_OK = "ok";
