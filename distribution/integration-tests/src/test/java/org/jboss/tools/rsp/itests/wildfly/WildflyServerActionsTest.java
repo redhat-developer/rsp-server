@@ -45,12 +45,6 @@ public class WildflyServerActionsTest extends RSPCase {
 	private static final String SHOWIN_ACTION_LABEL = "Show in browser...";
 	private static final String EDITCONFIG_ACTION_ID = "EditServerConfigurationActionHandler.actionId";
 	private static final String EDITCONFIG_ACTION_LABEL = "Edit Configuration File...";
-	private static final String MISSING_SERVER_ID = "Invalid Request: Request must include server id.";
-	private static final String SERVER_TYPE_NOT_FOUND = "Invalid Request: Server type not found.";
-	private static final String NULL_SERVER_ACTION_REQUEST = "Invalid Request: Request cannot be null.";
-	private static final String MISSING_SERVER_TYPE = "Invalid Request: Request must include server type.";
-	private static final String MISSING_SERVER_TYPE_ID = "Invalid Request: Request must include server type id.";
-	private static final String MISSING_SERVER_HANDLE = "Invalid Request: Request must include server handle.";
 	public static final String ACTION_SHOW_IN_BROWSER_SELECTED_PROMPT_ID = "ShowInBrowserActionHandler.selection.id";
 	public static final String ACTION_SHOW_IN_BROWSER_SELECTED_PROMPT_LABEL = 
 			"Which deployment do you want to show in the web browser?";
