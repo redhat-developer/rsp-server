@@ -14,6 +14,7 @@ import org.jboss.tools.rsp.server.minishift.discovery.MinishiftVersionLoader.Min
 public class MinishiftVersionUtil {
 	private static final String MINISHIFT = "Minishift";
 	private static final String CDK = "CDK";
+	private static final String CRC = "CRC";
 	
 	private MinishiftVersionUtil() {
 		// Intentionally blank 
@@ -52,6 +53,22 @@ public class MinishiftVersionUtil {
 		}
 		return notCompatible(CDK, cdkVers);
 	}
+	
+	public static boolean matchesCRC1(String version) {
+		return version.startsWith("1.");
+	}
+	
+	public static String matchesCRC10(MinishiftVersions versions) {
+		String crcVers = versions.getCRCVersion();
+		if (crcVers == null) {
+			return cannotDetermine(CRC);
+		}
+		if (matchesCRC1(crcVers)) {
+			return null;
+		}
+		return notCompatible(CRC, crcVers);
+	}
+	
 	public static String matchesMinishift17(MinishiftVersions versions) {
 		if( versions.getCDKVersion() != null ) {
 			return notCompatible(CDK, versions.getCDKVersion());
