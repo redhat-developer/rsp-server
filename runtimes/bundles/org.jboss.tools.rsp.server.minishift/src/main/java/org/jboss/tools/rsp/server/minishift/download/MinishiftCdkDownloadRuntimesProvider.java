@@ -94,6 +94,11 @@ public class MinishiftCdkDownloadRuntimesProvider extends AbstractStacksDownload
 		if( "true".equalsIgnoreCase(prop))
 			// // Requires credentials is handled by another executor
 			return new CDKDownloadExecutor(dr, model);
+		
+		//for testing 
+		if( dlrt.getId().toLowerCase().startsWith("crc")) {
+			return new CRCDownloadExecutor(dr, model);
+		}
 
 		return new MinishiftLicenseOnlyDownloadExecutor(dr, model);
 	}
