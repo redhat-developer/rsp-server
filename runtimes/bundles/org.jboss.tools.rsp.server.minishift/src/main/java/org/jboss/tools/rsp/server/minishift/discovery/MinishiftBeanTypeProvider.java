@@ -15,9 +15,10 @@ public class MinishiftBeanTypeProvider implements IServerBeanTypeProvider {
 
 	ServerBeanType minishift12PlusType = new MinishiftBeanType();
 	ServerBeanType cdk3xType = new CDKBeanType();
+	ServerBeanType crc1xType = new CRCBeanType();
 	
 	@Override
 	public ServerBeanType[] getServerBeanTypes() {
-		return new ServerBeanType[] {minishift12PlusType, cdk3xType};
+		return new ServerBeanType[] {minishift12PlusType, cdk3xType, crc1xType};
 	}
 }
