@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
-import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.GetServerJsonResponse;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
