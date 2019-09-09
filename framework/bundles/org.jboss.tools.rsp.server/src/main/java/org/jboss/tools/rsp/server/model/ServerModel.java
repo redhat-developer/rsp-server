@@ -656,7 +656,6 @@ public class ServerModel implements IServerModel {
 	
 	@Override
 	public UpdateServerResponse updateServer(UpdateServerRequest req) {
-
 		UpdateServerResponse resp = new UpdateServerResponse();
 		if (req == null) {
 			resp.getValidation().setStatus(errorStatus("Update server request cannot be null"));
@@ -664,12 +663,16 @@ public class ServerModel implements IServerModel {
 		}
 		ServerHandle sh = req.getHandle();
 		if( sh == null ) {
-			resp.getValidation().setStatus(errorStatus("Server Handle cannot be null"));
+			resp.getValidation().setStatus(errorStatus("Server handle cannot be null"));
 			return resp;
 		}
 		IServer server = managementModel.getServerModel().getServer(sh.getId());
 		if( server == null ) {
 			resp.getValidation().setStatus(errorStatus("Server " + sh.getId() + " not found in model"));
+			return resp;
+		}
+		if (req.getHandle().getType() == null) {
+			resp.getValidation().setStatus(errorStatus("Update server request's server type cannot be null"));
 			return resp;
 		}
 		
@@ -696,6 +699,10 @@ public class ServerModel implements IServerModel {
 		}
 		
 		IServerType type = serverTypes.get(req.getHandle().getType().getId());
+		if (type == null) {
+			resp.getValidation().setStatus(errorStatus("Update server request contains unknown server type"));
+			return resp;
+		}
 		IStatus validAttributes = validateAttributes(type, ds.getMap(), false);
 		if( !validAttributes.isOK()) {
 			resp.getValidation().setStatus(StatusConverter.convert(validAttributes));
