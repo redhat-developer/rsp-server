@@ -58,7 +58,8 @@ public class WildFlyPublishingTest extends RSPCase {
 
 	private ServerHandle handle;
 	private DeployableReference reference;
-	private File warFile = createWar();
+	private File warFile = createWar(WAR_FILENAME, "1");
+	private File warFile2 = createWar("test2.war", "2");
 	
 	private static Logger log = Logger.getLogger(WildFlyPublishingTest.class.getName());
 
@@ -150,10 +151,6 @@ public class WildFlyPublishingTest extends RSPCase {
 		assertEquals(Status.ERROR, status.getSeverity());
 	}
 
-	/*
-	 * Test is still failing and without timeout in blocking get call, it would get stuck
-	 * Passing null value into addDeployable breaks the server.
-	 */
 	@Test
 	public void testAddNullDeployment() throws InterruptedException, ExecutionException {
 		try {
@@ -226,7 +223,7 @@ public class WildFlyPublishingTest extends RSPCase {
 
 	@Test
 	public void testGetDeployables() throws Exception {
-		DeployableReference ref2 = new DeployableReference("other_id", WAR_FILENAME);
+		DeployableReference ref2 = new DeployableReference(warFile2.getName(), warFile2.getAbsolutePath());
 		Status status = serverProxy.addDeployable(new ServerDeployableReference(handle, ref2)).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals("Expected request status is 'ok' but was " + status, Status.OK, status.getSeverity());
 		waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_ADD, 10, client);
@@ -256,12 +253,12 @@ public class WildFlyPublishingTest extends RSPCase {
 		assertEquals(publishState, ds.getPublishState());
 	}
 
-	private File createWar() {
+	private File createWar(String warName, String randomizer) {
 		Path deployments = null;
 		File war = null;
 		try {
-			deployments = Files.createTempDirectory(getClass().getName() + "5");
-			war = deployments.resolve(WAR_FILENAME).toFile();
+			deployments = Files.createTempDirectory(getClass().getName() + randomizer);
+			war = deployments.resolve(warName).toFile();
 			if (!(new DeploymentGeneration().createWar(war))) {
 				fail("Failed to create war file");
 			}

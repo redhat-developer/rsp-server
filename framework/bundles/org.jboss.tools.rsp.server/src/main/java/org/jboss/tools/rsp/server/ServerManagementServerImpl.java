@@ -372,6 +372,9 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	private UpdateServerResponse updateServerSync(UpdateServerRequest req) {
 		UpdateServerResponse resp = managementModel.getServerModel().updateServer(req);
+		if (req == null) {
+			return resp;
+		}
 		resp.setServerJson(getServerAsJsonSync(req.getHandle()));
 		return resp;
 	}
