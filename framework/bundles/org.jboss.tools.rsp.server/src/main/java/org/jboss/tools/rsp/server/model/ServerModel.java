@@ -658,6 +658,10 @@ public class ServerModel implements IServerModel {
 	public UpdateServerResponse updateServer(UpdateServerRequest req) {
 
 		UpdateServerResponse resp = new UpdateServerResponse();
+		if (req == null) {
+			resp.getValidation().setStatus(errorStatus("Update server request cannot be null"));
+			return resp;
+		}
 		ServerHandle sh = req.getHandle();
 		if( sh == null ) {
 			resp.getValidation().setStatus(errorStatus("Server Handle cannot be null"));
