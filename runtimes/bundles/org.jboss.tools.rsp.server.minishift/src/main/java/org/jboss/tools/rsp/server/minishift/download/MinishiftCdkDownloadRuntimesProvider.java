@@ -10,9 +10,12 @@
  ************************************************************************************/
 package org.jboss.tools.rsp.server.minishift.download;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.List;
 
 import org.jboss.jdf.stacks.model.Stacks;
+import org.jboss.jdf.stacks.parser.Parser;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeRunner;
@@ -40,7 +43,19 @@ public class MinishiftCdkDownloadRuntimesProvider extends AbstractStacksDownload
 
 	@Override
 	protected Stacks[] getStacks(IProgressMonitor monitor) {
-		Stacks ret = new StacksManager().getStacks(MINISHIFT_YAML_URL, "Loading CDK / Minishift Downloadable Runtimes", monitor);
+		//Stacks ret = new StacksManager().getStacks(MINISHIFT_YAML_URL, "Loading CDK / Minishift Downloadable Runtimes", monitor);
+		
+		///////for testing purpose
+		Stacks ret = null;
+		File f = new File("/home/luca/Public/github.com/redhat-developer/rsp-server/minishifttest.yaml");
+		if (f != null && f.exists()) {
+			try(FileInputStream fis = new FileInputStream(f)) {
+				Parser p = new Parser();
+				ret = p.parse(fis);
+			}catch(Exception ex) {
+				String s = "";
+			}
+		}
 		return ret == null ? null : new Stacks[] {ret};
 	}
 

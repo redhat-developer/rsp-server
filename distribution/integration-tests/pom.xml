@@ -32,134 +32,136 @@
 	<name>Runtime Server Protocol : Integration Tests</name>
 
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<!-- skip integration tests if not in integration-tests profile -->
-					<skipTests>true</skipTests>
-					<systemPropertyVariables>
-						<server.type.id>${server.type.id}</server.type.id>
-						<server.version>${server.version}</server.version>
-						<server.path>${server.path}</server.path>
-						<quickstarts.server>${quickstarts.server}</quickstarts.server>
-					</systemPropertyVariables>
-				</configuration>
-			</plugin>
-			<!-- display active profile in compile phase -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-help-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <id>show-profiles</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>active-profiles</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- display values of maven defined properties-->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.1</version>
-				<executions>
-					<execution>
-						<phase>validate</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<tasks>
-								<echo>Displaying value of properties</echo>
-								<echo>[server.id] ${server.id}</echo>
-								<echo>[server.url] ${server.url}</echo>
-								<echo>[server.sha1] ${server.sha1}</echo>
-								<echo>[server.type.id] ${server.type.id}</echo>
-								<echo>[server.version] ${server.version}</echo>
-								<echo>[server.path] ${server.path}</echo>
-								<echo>[quickstarts.server] ${quickstarts.server}</echo>
-							</tasks>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>com.googlecode.maven-download-plugin</groupId>
-				<artifactId>download-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>download-${quickstarts.dir}</id>
-						<phase>test-compile</phase>
-						<goals>
-							<goal>wget</goal>
-						</goals>
-						<configuration>
-							<url>${quickstarts.url}</url>
-							<unpack>true</unpack>
-							<outputDirectory>${project.build.directory}</outputDirectory>
-							<skip>${skipITests}</skip>
-						</configuration>
-					</execution>
-					<execution>
-						<id>${server.id}</id>
-						<phase>test-compile</phase>
-						<goals>
-							<goal>wget</goal>
-						</goals>
-						<configuration>
-							<url>${server.url}</url>
-							<sha1>${server.sha1}</sha1>
-							<unpack>true</unpack>
-							<skip>${skipITests}</skip>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-invoker-plugin</artifactId>
-			 	<version>3.2.0</version>
-			 	<configuration>
-				 	<cloneProjectsTo>${project.build.directory}/quickstarts</cloneProjectsTo>
-				 	<projectsDirectory>target/${quickstarts.dir}/</projectsDirectory>
-					<pomIncludes>
-						<pomInclude>kitchensink/pom.xml</pomInclude>
-						<pomInclude>kitchensink-ear/pom.xml</pomInclude>
-						<pomInclude>ejb-in-war/pom.xml</pomInclude>
-						<pomInclude>ejb-in-ear/pom.xml</pomInclude>
-					</pomIncludes>
-				</configuration>
-			  	<executions>
-			    	<execution>
-				      	<id>build-quickstart</id>
-				      	<phase>test-compile</phase>
-				      	<goals>
-				        	<goal>install</goal>
-				        	<goal>run</goal>
-				      	</goals>
-			    	</execution>
-			  	</executions>
-			</plugin>
-			<!-- Aggregate coverage report by default -->
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>${jacoco.version}</version>
-				<executions>
-					<execution>
-						<id>aggregate-report</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>report-aggregate</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+						<!-- skip integration tests if not in integration-tests profile -->
+						<skipTests>true</skipTests>
+						<systemPropertyVariables>
+							<server.type.id>${server.type.id}</server.type.id>
+							<server.version>${server.version}</server.version>
+							<server.path>${server.path}</server.path>
+							<quickstarts.server>${quickstarts.server}</quickstarts.server>
+						</systemPropertyVariables>
+					</configuration>
+				</plugin>
+				<!-- display active profile in compile phase -->
+	            <plugin>
+	                <groupId>org.apache.maven.plugins</groupId>
+	                <artifactId>maven-help-plugin</artifactId>
+	                <version>3.1.0</version>
+	                <executions>
+	                    <execution>
+	                        <id>show-profiles</id>
+	                        <phase>compile</phase>
+	                        <goals>
+	                            <goal>active-profiles</goal>
+	                        </goals>
+	                    </execution>
+	                </executions>
+	            </plugin>
+	            <!-- display values of maven defined properties-->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-antrun-plugin</artifactId>
+					<version>1.1</version>
+					<executions>
+						<execution>
+							<phase>validate</phase>
+							<goals>
+								<goal>run</goal>
+							</goals>
+							<configuration>
+								<tasks>
+									<echo>Displaying value of properties</echo>
+									<echo>[server.id] ${server.id}</echo>
+									<echo>[server.url] ${server.url}</echo>
+									<echo>[server.sha1] ${server.sha1}</echo>
+									<echo>[server.type.id] ${server.type.id}</echo>
+									<echo>[server.version] ${server.version}</echo>
+									<echo>[server.path] ${server.path}</echo>
+									<echo>[quickstarts.server] ${quickstarts.server}</echo>
+								</tasks>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>com.googlecode.maven-download-plugin</groupId>
+					<artifactId>download-maven-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>download-${quickstarts.dir}</id>
+							<phase>test-compile</phase>
+							<goals>
+								<goal>wget</goal>
+							</goals>
+							<configuration>
+								<url>${quickstarts.url}</url>
+								<unpack>true</unpack>
+								<outputDirectory>${project.build.directory}</outputDirectory>
+								<skip>${skipITests}</skip>
+							</configuration>
+						</execution>
+						<execution>
+							<id>${server.id}</id>
+							<phase>test-compile</phase>
+							<goals>
+								<goal>wget</goal>
+							</goals>
+							<configuration>
+								<url>${server.url}</url>
+								<sha1>${server.sha1}</sha1>
+								<unpack>true</unpack>
+								<skip>${skipITests}</skip>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<artifactId>maven-invoker-plugin</artifactId>
+				 	<version>3.2.0</version>
+				 	<configuration>
+					 	<cloneProjectsTo>${project.build.directory}/quickstarts</cloneProjectsTo>
+					 	<projectsDirectory>target/${quickstarts.dir}/</projectsDirectory>
+						<pomIncludes>
+							<pomInclude>kitchensink/pom.xml</pomInclude>
+							<pomInclude>kitchensink-ear/pom.xml</pomInclude>
+							<pomInclude>ejb-in-war/pom.xml</pomInclude>
+							<pomInclude>ejb-in-ear/pom.xml</pomInclude>
+						</pomIncludes>
+					</configuration>
+				  	<executions>
+				    	<execution>
+					      	<id>build-quickstart</id>
+					      	<phase>test-compile</phase>
+					      	<goals>
+					        	<goal>install</goal>
+					        	<goal>run</goal>
+					      	</goals>
+				    	</execution>
+				  	</executions>
+				</plugin>
+				<!-- Aggregate coverage report by default -->
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>${jacoco.version}</version>
+					<executions>
+						<execution>
+							<id>aggregate-report</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>report-aggregate</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 
 	<profiles>
