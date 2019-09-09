@@ -145,15 +145,15 @@ public class WildflyEditServerTest extends RSPCase {
 		GetServerJsonResponse jsonResponse = serverProxy.getServerAsJson(handle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		String formerString = jsonResponse.getServerJson();
 		// null request
-//		UpdateServerResponse response = serverProxy.updateServer(null).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
-//		assertEquals(Status.ERROR, response.getValidation().getStatus().getSeverity());
-//		assertEquals("Update server request cannot be null", response.getValidation().getStatus().getMessage());
-//		assertNull(response.getHandle());
+		UpdateServerResponse response = serverProxy.updateServer(null).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
+		assertEquals(Status.ERROR, response.getValidation().getStatus().getSeverity());
+		assertEquals("Update server request cannot be null", response.getValidation().getStatus().getMessage());
+		assertNull(response.getHandle());
 		// null handle in request
 		UpdateServerRequest request = new UpdateServerRequest();
 		request.setHandle(null);
 		request.setServerJson(formerString);
-		UpdateServerResponse response = serverProxy.updateServer(request).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
+		response = serverProxy.updateServer(request).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, response.getValidation().getStatus().getSeverity());
 		assertEquals(SERVER_HANDLE_NULL, response.getValidation().getStatus().getMessage());
 		assertNull(response.getHandle());
@@ -198,7 +198,6 @@ public class WildflyEditServerTest extends RSPCase {
 //		inHandle = new ServerHandle(SERVER_ID,
 //				new ServerType("some.id", "my.server", "Random server type definition"));
 //		request.setHandle(inHandle);
-//		request.setServerJson(formerString);
 //		response = serverProxy.updateServer(request).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 //		assertEquals(Status.ERROR, response.getValidation().getStatus().getSeverity());
 //		assertTrue(response.getValidation().getStatus().getMessage().contains("not found in model"));
@@ -259,7 +258,7 @@ public class WildflyEditServerTest extends RSPCase {
 		assertEquals(Status.ERROR, response.getStatus().getSeverity());
 		assertEquals(message, response.getStatus().getMessage());
 		assertNull(response.getServerHandle());
-		assertNull(response.getServerJson());	
+		assertNull(response.getServerJson());
 	}
 	
 	private static String parseJsonAndAddObject(String jsonAsString, String field, String newValue) {
@@ -271,12 +270,6 @@ public class WildflyEditServerTest extends RSPCase {
 	private static String parseJsonAndRemoveObject(String jsonAsString, String field) {
 		JsonObject json = new JsonParser().parse(jsonAsString).getAsJsonObject();
 		json.remove(field);
-		return json.toString();
-	}
-	
-	private static String parseJsonAndUpdateObject(String jsonAsString, String field, String value) {
-		JsonObject json = new JsonParser().parse(jsonAsString).getAsJsonObject();
-		json.addProperty(field, value);
 		return json.toString();
 	}
 }
