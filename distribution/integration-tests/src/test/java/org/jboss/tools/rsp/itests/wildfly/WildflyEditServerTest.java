@@ -48,7 +48,9 @@ public class WildflyEditServerTest extends RSPCase {
 	
 	private static final String SERVER_HOME_NOT_NULL = "Server home must not be null";
 	private static final String SERVER_HOME_EXISTS = "Server home must exist";
-	private static final String SERVER_HANDLE_NULL = "Server Handle cannot be null";
+	private static final String SERVER_HANDLE_NULL = "Server handle cannot be null";
+	private static final String SERVER_TYPE_NULL = "Update server request's server type cannot be null";
+	private static final String SERVER_TYPE_UNKNOWN = "Update server request contains unknown server type";
 	private static final String NULL_STRING = "Update Failed: Error while reading server string: null";
 	
 	@Before
@@ -165,11 +167,11 @@ public class WildflyEditServerTest extends RSPCase {
 		assertTrue(response.getValidation().getStatus().getMessage().contains("not found in model"));
 		
 		// null in handle - null server type
-//		inHandle = new ServerHandle(SERVER_ID, null);
-//		request.setHandle(inHandle);
-//		response = serverProxy.updateServer(request).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
-//		assertEquals(Status.ERROR, response.getValidation().getStatus().getSeverity());
-//		assertTrue(response.getValidation().getStatus().getMessage().contains("not found in model"));
+		inHandle = new ServerHandle(SERVER_ID, null);
+		request.setHandle(inHandle);
+		response = serverProxy.updateServer(request).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
+		assertEquals(Status.ERROR, response.getValidation().getStatus().getSeverity());
+		assertEquals(SERVER_TYPE_NULL, response.getValidation().getStatus().getMessage());
 		
 		// null json string in request
 		request.setHandle(handle);
@@ -195,12 +197,12 @@ public class WildflyEditServerTest extends RSPCase {
 		assertTrue(response.getValidation().getStatus().getMessage().contains("not found in model"));
 		
 		// test invalid server type in handle
-//		inHandle = new ServerHandle(SERVER_ID,
-//				new ServerType("some.id", "my.server", "Random server type definition"));
-//		request.setHandle(inHandle);
-//		response = serverProxy.updateServer(request).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
-//		assertEquals(Status.ERROR, response.getValidation().getStatus().getSeverity());
-//		assertTrue(response.getValidation().getStatus().getMessage().contains("not found in model"));
+		inHandle = new ServerHandle(SERVER_ID,
+				new ServerType("some.id", "my.server", "Random server type definition"));
+		request.setHandle(inHandle);
+		response = serverProxy.updateServer(request).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
+		assertEquals(Status.ERROR, response.getValidation().getStatus().getSeverity());
+		assertEquals(SERVER_TYPE_UNKNOWN, response.getValidation().getStatus().getMessage());
 	}
 		
 	@Test
