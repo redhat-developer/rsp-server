@@ -41,15 +41,24 @@ import com.google.gson.JsonParser;
 public class WildflyEditServerTest extends RSPCase {
 
 	private static final String SERVER_ID = "wildfly";
+	private static final String FOO_ID = "foo.server.id";
+	private static final String FOO_SERVER_ID = "my.id";
+	private static final String FOO_SERVER_NAME = "my server";
+	private static final String FOO_SERVER_TYPE_DEF = "Random server type definition";
 	private ServerHandle handle;
 	
 	private static final String SERVER_CONFIG_HOME = "server.home.dir";
-
 	private static final String SERVER_CONFIG_ID = "id";
+	private static final String SERVER_CONFIG_ID_SET = "id-set";
+	private static final String SERVER_CONFIG_SERVER_TYPE_ID = "org.jboss.tools.rsp.server.typeId";
+	private static final String SERVER_CONFIG_OVERRIDE = "args.override.boolean";
+	private static final String SERVER_CONFIG_WF_PUBLISH = "wildfly.publish.restart.pattern";
 	private static final String SERVER_HANDLE_NULL = "Server handle cannot be null";
-	private static final String SERVER_TYPE_NULL = "Update server request's server type cannot be null";
+	private static final String SERVER_REQUEST_TYPE_NULL = "Update server request's server type cannot be null";
 	private static final String SERVER_TYPE_UNKNOWN = "Update server request contains unknown server type";
 	private static final String NULL_STRING = "Update Failed: Error while reading server string: null";
+	private static final String SERVER_REQUEST_NULL = "Update server request cannot be null";
+	private static final String NOT_FOUND_MODEL = "not found in model";
 	
 	@Before
 	public void before() throws Exception {
@@ -79,12 +88,12 @@ public class WildflyEditServerTest extends RSPCase {
 }
 		 */
 		JsonObject json = new JsonParser().parse(response.getServerJson()).getAsJsonObject();
-		assertFalse(json.get("server.home.dir").getAsString().isEmpty());
-		assertFalse(json.get("id-set").getAsString().isEmpty());
-		assertEquals(WILDFLY_SERVER_ID, json.get("org.jboss.tools.rsp.server.typeId").getAsString());
-		assertEquals(SERVER_ID, json.get("id").getAsString());
-		assertFalse(json.get("wildfly.publish.restart.pattern").getAsString().isEmpty());
-		assertFalse(json.get("args.override.boolean").getAsString().isEmpty());
+		assertFalse(json.get(SERVER_CONFIG_HOME).getAsString().isEmpty());
+		assertFalse(json.get(SERVER_CONFIG_ID_SET).getAsString().isEmpty());
+		assertEquals(WILDFLY_SERVER_ID, json.get(SERVER_CONFIG_SERVER_TYPE_ID).getAsString());
+		assertEquals(SERVER_ID, json.get(SERVER_CONFIG_ID).getAsString());
+		assertFalse(json.get(SERVER_CONFIG_WF_PUBLISH).getAsString().isEmpty());
+		assertFalse(json.get(SERVER_CONFIG_OVERRIDE).getAsString().isEmpty());
 	}
 	
 	@Test
@@ -95,14 +104,14 @@ public class WildflyEditServerTest extends RSPCase {
 	
 	@Test
 	public void testInvalidGetServerAsJson() throws InterruptedException, ExecutionException, TimeoutException {
-		ServerHandle inHandle = new ServerHandle("foo.server.id",
-				new ServerType("some.id", "my.server", "Random server type definition"));
+		ServerHandle inHandle = new ServerHandle(FOO_ID,
+				new ServerType(FOO_SERVER_ID, FOO_SERVER_NAME, FOO_SERVER_TYPE_DEF));
 		GetServerJsonResponse response = serverProxy.getServerAsJson(inHandle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		verifyInvalidGetServerAsJsonRequest(response, SERVER_TYPE_NOT_FOUND);
-		inHandle = new ServerHandle("foo.server.id", null);
+		inHandle = new ServerHandle(FOO_ID, null);
 		response = serverProxy.getServerAsJson(inHandle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		verifyInvalidGetServerAsJsonRequest(response, MISSING_SERVER_TYPE);
-		inHandle = new ServerHandle("foo.server.id", new ServerType(null, "my.server", "Random server type definition"));
+		inHandle = new ServerHandle(FOO_ID, new ServerType(null, FOO_SERVER_NAME, FOO_SERVER_TYPE_DEF));
 		response = serverProxy.getServerAsJson(inHandle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		verifyInvalidGetServerAsJsonRequest(response, MISSING_SERVER_TYPE_ID);
 	}
@@ -132,12 +141,12 @@ public class WildflyEditServerTest extends RSPCase {
 		assertFalse(newconfig.contains("custom.property"));
 		
 		// update field from server config
-		request.setServerJson(parseJsonAndAddObject(formerString, "args.override.boolean", "true"));
+		request.setServerJson(parseJsonAndAddObject(formerString, SERVER_CONFIG_OVERRIDE, "true"));
 		response = serverProxy.updateServer(request).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.OK, response.getValidation().getStatus().getSeverity());
 		jsonResponse = serverProxy.getServerAsJson(handle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		json = new JsonParser().parse(jsonResponse.getServerJson()).getAsJsonObject();
-		assertEquals(true, json.get("args.override.boolean").getAsBoolean());
+		assertEquals(true, json.get(SERVER_CONFIG_OVERRIDE).getAsBoolean());
 	}
 	
 	@Test
@@ -147,7 +156,7 @@ public class WildflyEditServerTest extends RSPCase {
 		// null request
 		UpdateServerResponse response = serverProxy.updateServer(null).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, response.getValidation().getStatus().getSeverity());
-		assertEquals("Update server request cannot be null", response.getValidation().getStatus().getMessage());
+		assertEquals(SERVER_REQUEST_NULL, response.getValidation().getStatus().getMessage());
 		assertNull(response.getHandle());
 		// null handle in request
 		UpdateServerRequest request = new UpdateServerRequest();
@@ -158,18 +167,20 @@ public class WildflyEditServerTest extends RSPCase {
 		assertEquals(SERVER_HANDLE_NULL, response.getValidation().getStatus().getMessage());
 		assertNull(response.getHandle());
 		// Null in handle - null id
-		ServerHandle inHandle = new ServerHandle(null, new ServerType("some.id", "my.server", "Random server type definition"));
+		ServerHandle inHandle = new ServerHandle(null, new ServerType(FOO_SERVER_ID, FOO_SERVER_NAME, FOO_SERVER_TYPE_DEF));
 		request.setHandle(inHandle);
 		response = serverProxy.updateServer(request).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, response.getValidation().getStatus().getSeverity());
-		assertTrue(response.getValidation().getStatus().getMessage().contains("not found in model"));
+		assertTrue(response.getValidation().getStatus().getMessage().contains(NOT_FOUND_MODEL));
+		assertNull(response.getHandle());
 		
 		// null in handle - null server type
 		inHandle = new ServerHandle(SERVER_ID, null);
 		request.setHandle(inHandle);
 		response = serverProxy.updateServer(request).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, response.getValidation().getStatus().getSeverity());
-		assertEquals(SERVER_TYPE_NULL, response.getValidation().getStatus().getMessage());
+		assertEquals(SERVER_REQUEST_TYPE_NULL, response.getValidation().getStatus().getMessage());
+		assertNull(response.getHandle());
 		
 		// null json string in request
 		request.setHandle(handle);
@@ -186,17 +197,17 @@ public class WildflyEditServerTest extends RSPCase {
 		String formerString = jsonResponse.getServerJson();
 		UpdateServerRequest request = new UpdateServerRequest();
 		// test invalid handle - non existing id
-		ServerHandle inHandle = new ServerHandle("foo.server.id",
-				new ServerType("some.id", "my.server", "Random server type definition"));
+		ServerHandle inHandle = new ServerHandle(FOO_ID,
+				new ServerType(FOO_SERVER_ID, FOO_SERVER_NAME, FOO_SERVER_TYPE_DEF));
 		request.setHandle(inHandle);
 		request.setServerJson(formerString);
 		UpdateServerResponse response = serverProxy.updateServer(request).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, response.getValidation().getStatus().getSeverity());
-		assertTrue(response.getValidation().getStatus().getMessage().contains("not found in model"));
+		assertTrue(response.getValidation().getStatus().getMessage().contains(NOT_FOUND_MODEL));
 		
 		// test invalid server type in handle
 		inHandle = new ServerHandle(SERVER_ID,
-				new ServerType("some.id", "my.server", "Random server type definition"));
+				new ServerType(FOO_SERVER_ID, FOO_SERVER_NAME, FOO_SERVER_TYPE_DEF));
 		request.setHandle(inHandle);
 		response = serverProxy.updateServer(request).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, response.getValidation().getStatus().getSeverity());
