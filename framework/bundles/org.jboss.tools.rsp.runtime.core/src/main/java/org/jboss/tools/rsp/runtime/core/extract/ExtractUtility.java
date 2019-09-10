@@ -20,6 +20,7 @@ import org.jboss.tools.rsp.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.rsp.runtime.core.extract.internal.IExtractUtility;
 import org.jboss.tools.rsp.runtime.core.extract.internal.UntarGZUtility;
 import org.jboss.tools.rsp.runtime.core.extract.internal.UntarUtility;
+import org.jboss.tools.rsp.runtime.core.extract.internal.UntarXZUtility;
 import org.jboss.tools.rsp.runtime.core.extract.internal.UnzipUtility;
 
 public class ExtractUtility {
@@ -28,6 +29,7 @@ public class ExtractUtility {
 	private static final String TAR_SUFFIX = "tar"; //$NON-NLS-1$
 	private static final String TAR_GZ_SUFFIX = "tar.gz"; //$NON-NLS-1$
 	private static final String TGZ_SUFFIX = ".tgz"; //$NON-NLS-1$
+	private static final String TAR_XZ_SUFFIX = "tar.xz";
 	
 	public static final int FORMAT_UNKNOWN = -1;
 	public static final int FORMAT_ZIP = 1;
@@ -72,6 +74,8 @@ public class ExtractUtility {
 			return new UntarUtility(file);
 		} else if (name.endsWith(TAR_GZ_SUFFIX) || name.endsWith(TGZ_SUFFIX)) {
 			return new UntarGZUtility(file);
+		} else if (name.endsWith(TAR_XZ_SUFFIX)) {
+			return new UntarXZUtility(file);
 		} else {
 			return null;
 		}
