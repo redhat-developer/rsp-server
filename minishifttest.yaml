@@ -88,7 +88,7 @@ availableRuntimes:
         runtime-size: 1743236,
         additionalDownloadURLs: {
             "win32": "https://mirror.openshift.com/pub/openshift-v4/clients/crc/1.0.0-beta.3/crc-windows-amd64.zip",
-            "linux": "https://raw.githubusercontent.com/peppelinux/openWRT_BB_builds/master/dl/util-linux-2.24.1.tar.xz",
+            "linux": "https://mirror.openshift.com/pub/openshift-v4/clients/crc/1.0.0-beta.3/crc-linux-amd64.tar.xz",
             "macosx": "https://mirror.openshift.com/pub/openshift-v4/clients/crc/1.0.0-beta.3/crc-macos-amd64.tar.xz",
         },
         wtp-runtime-type: org.jboss.tools.openshift.cdk.server.runtime.type.crc.10
