@@ -30,4 +30,5 @@ Import-Package: org.apache.commons.compress.archivers.tar,
  org.jboss.tools.rsp.runtime.core.model,
  org.jboss.tools.rsp.runtime.core.model.installer,
  org.osgi.framework;version="1.9.0",
- org.slf4j
+ org.slf4j,
+ org.tukaani.xz;version="1.8.0"

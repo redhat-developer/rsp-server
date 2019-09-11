@@ -39,7 +39,7 @@ public class MinishiftServerTypes {
 			new CDKServerType(CDK_3X_ID, CDK_3X_NAME, CDK_3X_DESC);
 	
 	public static final BaseMinishiftServerType CRC_1X_SERVER_TYPE = 
-			new CDKServerType(CRC_1X_ID, CRC_1X_NAME, CRC_1X_DESC);
+			new CRCServerType(CRC_1X_ID, CRC_1X_NAME, CRC_1X_DESC);
 	
 	public static final Map<String, String> RUNTIME_TO_SERVER = new HashMap<>();
 	static {

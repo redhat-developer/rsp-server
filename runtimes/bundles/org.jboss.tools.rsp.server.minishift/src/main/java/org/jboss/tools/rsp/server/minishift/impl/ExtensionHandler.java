@@ -18,7 +18,8 @@ public class ExtensionHandler {
 
 	private static final IServerType[] TYPES = {
 			MinishiftServerTypes.MINISHIFT_1_12_SERVER_TYPE,
-			MinishiftServerTypes.CDK_3X_SERVER_TYPE
+			MinishiftServerTypes.CDK_3X_SERVER_TYPE,
+			MinishiftServerTypes.CRC_1X_SERVER_TYPE
 	};
 
 	private ExtensionHandler() {
