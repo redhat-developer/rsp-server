@@ -39,7 +39,7 @@ public class CRCServerDelegate extends MinishiftServerDelegate {
 	
 	public static final String CRC_START_LAUNCH_SHARED_DATA = "CRCServerDelegate.startLaunch";
 	
-	private static final Logger LOG = LoggerFactory.getLogger(MinishiftServerDelegate.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CRCServerDelegate.class);
 	
 	private ILaunch startLaunch;
 	
