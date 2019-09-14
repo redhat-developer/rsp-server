@@ -34,6 +34,9 @@ public interface IMinishiftServerAttributes {
 	public static final String MINISHIFT_REG_USERNAME = IServerModel.SECURE_ATTRIBUTE_PREFIX + "minishift.username";
 
 	public static final String MINISHIFT_REG_PASSWORD = IServerModel.SECURE_ATTRIBUTE_PREFIX + "minishift.password";
+	
+	//Only for CRC
+	public static final String CRC_IMAGE_PULL_SECRET = "crc.image.pull.secret";
 
 	
 	/*
