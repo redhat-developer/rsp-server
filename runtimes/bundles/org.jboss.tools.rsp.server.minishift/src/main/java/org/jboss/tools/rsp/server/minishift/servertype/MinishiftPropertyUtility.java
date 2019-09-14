@@ -10,9 +10,11 @@ package org.jboss.tools.rsp.server.minishift.servertype;
 
 import java.util.Map;
 
+import org.jboss.tools.rsp.server.minishift.servertype.impl.CRCServerDelegate;
 import org.jboss.tools.rsp.server.minishift.servertype.impl.MinishiftServerDelegate;
 import org.jboss.tools.rsp.server.redhat.credentials.RedHatAccessCredentials;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
+import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
 public class MinishiftPropertyUtility {
 
@@ -73,6 +75,29 @@ public class MinishiftPropertyUtility {
 			return RedHatAccessCredentials.getGlobalRedhatPassword(server.getServerManagementModel().getSecureStorageProvider());
 		}
 		return pass;
+	}
+	
+	/**
+	 * Get either the hard-coded password for use on this server, or, 
+	 * if that is not set, get the password stored in the global settings
+	 * for redhat access credentials 
+	 * @param server
+	 * @return
+	 */
+	public static String getMinishiftImagePullSecret(IServerDelegate jBossServerDelegate) {
+		String pullSecret = null;
+		if (jBossServerDelegate instanceof CRCServerDelegate) {
+			IServer crcServer = jBossServerDelegate.getServer();
+			pullSecret = crcServer.getAttribute(IMinishiftServerAttributes.CRC_IMAGE_PULL_SECRET, (String) null);
+			if( pullSecret == null) {
+				pullSecret = ((CRCServerDelegate) jBossServerDelegate).getPullSecret();
+				if (pullSecret != null) {
+					crcServer.createWorkingCopy().setAttribute(IMinishiftServerAttributes.CRC_IMAGE_PULL_SECRET, pullSecret);
+				}				
+			}
+		}
+		
+		return pullSecret;
 	}
 
 }
