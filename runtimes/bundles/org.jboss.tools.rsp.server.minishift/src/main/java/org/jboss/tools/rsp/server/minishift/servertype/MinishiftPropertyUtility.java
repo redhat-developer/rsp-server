@@ -104,7 +104,7 @@ public class MinishiftPropertyUtility {
 		if (server.getDelegate() instanceof CRCServerDelegate) {
 			pullSecret = server.getAttribute(IMinishiftServerAttributes.CRC_IMAGE_PULL_SECRET, (String) null);
 			if( pullSecret == null) {
-				pullSecret = ((CRCServerDelegate) server).getPullSecret();
+				pullSecret = ((CRCServerDelegate) server.getDelegate()).getPullSecret();
 				if (pullSecret != null) {
 					server.createWorkingCopy().setAttribute(IMinishiftServerAttributes.CRC_IMAGE_PULL_SECRET, pullSecret);
 				}				
