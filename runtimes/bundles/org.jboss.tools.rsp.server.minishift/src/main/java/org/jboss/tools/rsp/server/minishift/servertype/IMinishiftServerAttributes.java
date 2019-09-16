@@ -28,6 +28,10 @@ public interface IMinishiftServerAttributes {
 	public static final String MINISHIFT_HOME = "minishift.home";
 	
 	public static final String MINISHIFT_PROFILE_DEFAULT = "minishift";
+	
+	public static final String MINISHIFT_CPUS = "cpu";
+	
+	public static final String MINISHIFT_MEMORY = "memory";
 
 	
 	// Only for CDK
@@ -37,11 +41,15 @@ public interface IMinishiftServerAttributes {
 	
 	//Only for CRC
 	public static final String CRC_IMAGE_PULL_SECRET = "crc.image.pull.secret";
+	
+	public static final String CRC_BUNDLE = "crc.bundle";
 
 	
 	/*
 	 * Launch attributes
 	 */
+	
+	public static final String LAUNCH_OVERRIDE_BOOLEAN = "args.override.boolean";
 	
 	
 }
