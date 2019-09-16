@@ -8,35 +8,33 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.minishift.servertype.impl;
 
-import java.util.concurrent.ExecutionException;
-
-import org.jboss.tools.rsp.api.RSPClient;
-import org.jboss.tools.rsp.api.dao.StringPrompt;
-import org.jboss.tools.rsp.secure.crypto.CryptoException;
 import org.jboss.tools.rsp.server.minishift.servertype.AbstractLauncher;
 import org.jboss.tools.rsp.server.minishift.servertype.MinishiftPropertyUtility;
-import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
 public class StartCRCLauncher extends AbstractLauncher {
 	
-	private CRCServerDelegate crcServerDelegate;
-
 	public StartCRCLauncher(IServerDelegate jBossServerDelegate) {
 		super(jBossServerDelegate);
-		this.crcServerDelegate = (CRCServerDelegate) jBossServerDelegate;
 	}
 
 	@Override
 	public String getProgramArguments() {
-		String vmDriver = MinishiftPropertyUtility.getMinishiftVMDriver(getServer());
-		String vmd = isEmpty(vmDriver) ? "" : "--vm-driver=" + vmDriver;
-		
-		String args = getCRCArguments();
-		args = isEmpty(args) ? "" : " " + args;
+		IServer server = getServer();
 				
-		return "start " + vmd + args;
+		String cpu = MinishiftPropertyUtility.getMinishiftCPU(server, 4);
+		String cpuArg = isEmpty(cpu) ? "" : " --cpus=" + cpu;
+		
+		String memory = MinishiftPropertyUtility.getMinishiftMemory(server, 8192);
+		String memoryArg = isEmpty(memory) ? "" : " --memory=" + memory;
+		
+		String pullSecret = MinishiftPropertyUtility.getMinishiftImagePullSecret(server);
+		String pullSecretArg = isEmpty(pullSecret) ? "" : " --pull-secret-file '" + pullSecret + "'";
+		
+		String vmd = getAdditionalVMArgs(server);
+				
+		return "start" + cpuArg + memoryArg + vmd + pullSecretArg;
 	}
 	protected String getAppendedArguments() {
 		String append = getServer().getAttribute(
@@ -44,15 +42,27 @@ public class StartCRCLauncher extends AbstractLauncher {
 		return append == null ? "" : append;
 	}
 	
-	protected String getCRCArguments() {
+	private String getAdditionalVMArgs(IServer server) {
 		
-		String pullSecret = MinishiftPropertyUtility.getMinishiftImagePullSecret(crcServerDelegate);		
+		String vmDriver = MinishiftPropertyUtility.getMinishiftVMDriver(server);
+		String vmd = isEmpty(vmDriver) ? "" : " --vm-driver=" + vmDriver;
 		
-		String args = "";
-		if( !isEmpty(pullSecret)) {
-			args = " --pull-secret-file '" + pullSecret + "'";
+		String bundle = MinishiftPropertyUtility.getCRCBundle(server);
+		String bundleArg = isEmpty(bundle) ? "" : " --bundle=" + bundle;
+		
+		boolean shouldOverride = MinishiftPropertyUtility.getShouldOverride(server);
+		
+		if( shouldOverride &&
+				vmd != null && 
+				vmd.trim().length() > 0 &&
+				bundleArg != null &&
+				bundleArg.trim().length() > 0
+				) {
+			return vmd + bundleArg;
 		}
-		return args;
+		
+		return "";
+		
 	}
 	
 	private boolean isEmpty(String s) {

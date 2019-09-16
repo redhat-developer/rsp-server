@@ -1,8 +1,6 @@
 package org.jboss.tools.rsp.server.minishift.servertype.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
@@ -12,10 +10,8 @@ import org.jboss.tools.rsp.foundation.core.launchers.CommandTimeoutException;
 import org.jboss.tools.rsp.foundation.core.launchers.ProcessUtility;
 import org.jboss.tools.rsp.server.minishift.impl.Activator;
 import org.jboss.tools.rsp.server.minishift.servertype.IMinishiftServerAttributes;
-import org.jboss.tools.rsp.server.minishift.servertype.MinishiftPropertyUtility;
 import org.jboss.tools.rsp.server.spi.model.polling.AbstractPoller;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller;
-import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller.SERVER_STATE;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
 public class CRCStatusPoller extends AbstractPoller implements IServerStatePoller{
@@ -38,7 +34,7 @@ public class CRCStatusPoller extends AbstractPoller implements IServerStatePolle
 	}
 	
 	protected IStatus parseOutput(String[] lines) {
-		for (int i = 0; i < lines.length; i++) {
+		for (int i = 0; i < lines.length;) {
 			if (lines[i] != null && lines[i].toLowerCase().contains("running")) {
 				return Status.OK_STATUS;
 			} else {
