@@ -1,7 +1,6 @@
 package org.jboss.tools.rsp.server.minishift.servertype.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -18,7 +17,6 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.debug.core.DebugException;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
-import org.jboss.tools.rsp.secure.crypto.CryptoException;
 import org.jboss.tools.rsp.server.minishift.impl.Activator;
 import org.jboss.tools.rsp.server.minishift.servertype.IMinishiftServerAttributes;
 import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
@@ -126,9 +124,12 @@ public class CRCServerDelegate extends MinishiftServerDelegate {
 	
 	@Override
 	public void setDefaults(IServerWorkingCopy server) {
-		server.setAttribute(STARTUP_PROGRAM_ARGS_STRING, "--pull-secret-file");
-		HashMap<String,String> tmp = new HashMap<>();
-		server.setAttribute(STARTUP_ENV_VARS_MAP, tmp);
+		server.setAttribute(IMinishiftServerAttributes.LAUNCH_OVERRIDE_BOOLEAN, false);
+		server.setAttribute(IMinishiftServerAttributes.MINISHIFT_CPUS, 4);
+		server.setAttribute(IMinishiftServerAttributes.MINISHIFT_MEMORY, 8192);
+		server.setAttribute(IMinishiftServerAttributes.CRC_BUNDLE, (String) null);
+		server.setAttribute(IMinishiftServerAttributes.MINISHIFT_VM_DRIVER, "libvirt");
+		server.setAttribute(IMinishiftServerAttributes.CRC_IMAGE_PULL_SECRET, (String) null);
 	}
 	
 	protected IServerStatePoller getPoller(IServerStatePoller.SERVER_STATE expectedState) {

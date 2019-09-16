@@ -14,7 +14,6 @@ import org.jboss.tools.rsp.server.minishift.servertype.impl.CRCServerDelegate;
 import org.jboss.tools.rsp.server.minishift.servertype.impl.MinishiftServerDelegate;
 import org.jboss.tools.rsp.server.redhat.credentials.RedHatAccessCredentials;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
-import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
 public class MinishiftPropertyUtility {
 
@@ -45,6 +44,22 @@ public class MinishiftPropertyUtility {
 
 	public static String getMinishiftHome(IServer server) {
 		return server.getAttribute(IMinishiftServerAttributes.MINISHIFT_HOME, (String)null);
+	}
+	
+	public static String getMinishiftCPU(IServer server, int defaultCPU) {
+		return server.getAttribute(IMinishiftServerAttributes.MINISHIFT_CPUS, Integer.toString(defaultCPU));
+	}
+	
+	public static String getMinishiftMemory(IServer server, int defaultMemory) {
+		return server.getAttribute(IMinishiftServerAttributes.MINISHIFT_MEMORY, Integer.toString(defaultMemory));
+	}
+	
+	public static String getCRCBundle(IServer server) {
+		return server.getAttribute(IMinishiftServerAttributes.CRC_BUNDLE, (String) null);
+	}
+	
+	public static boolean getShouldOverride(IServer server) {
+		return server.getAttribute(IMinishiftServerAttributes.LAUNCH_OVERRIDE_BOOLEAN, false);
 	}
 
 	/**
@@ -78,21 +93,20 @@ public class MinishiftPropertyUtility {
 	}
 	
 	/**
-	 * Get either the hard-coded password for use on this server, or, 
-	 * if that is not set, get the password stored in the global settings
-	 * for redhat access credentials 
+	 * Get either the hard-coded image pull server for use on this server, or, 
+	 * if that is not set, ask the user for the correct path where the image
+	 * pull secret is stored 
 	 * @param server
 	 * @return
 	 */
-	public static String getMinishiftImagePullSecret(IServerDelegate jBossServerDelegate) {
+	public static String getMinishiftImagePullSecret(IServer server) {
 		String pullSecret = null;
-		if (jBossServerDelegate instanceof CRCServerDelegate) {
-			IServer crcServer = jBossServerDelegate.getServer();
-			pullSecret = crcServer.getAttribute(IMinishiftServerAttributes.CRC_IMAGE_PULL_SECRET, (String) null);
+		if (server.getDelegate() instanceof CRCServerDelegate) {
+			pullSecret = server.getAttribute(IMinishiftServerAttributes.CRC_IMAGE_PULL_SECRET, (String) null);
 			if( pullSecret == null) {
-				pullSecret = ((CRCServerDelegate) jBossServerDelegate).getPullSecret();
+				pullSecret = ((CRCServerDelegate) server).getPullSecret();
 				if (pullSecret != null) {
-					crcServer.createWorkingCopy().setAttribute(IMinishiftServerAttributes.CRC_IMAGE_PULL_SECRET, pullSecret);
+					server.createWorkingCopy().setAttribute(IMinishiftServerAttributes.CRC_IMAGE_PULL_SECRET, pullSecret);
 				}				
 			}
 		}
