@@ -27,13 +27,7 @@ public class UntarXZUtility extends UntarUtility{
 	
 	@Override
 	protected TarArchiveInputStream getTarArchiveInputStream(File file) throws IOException {
-		FileInputStream fI = new FileInputStream(file);
-		BufferedInputStream bI = new BufferedInputStream(fI);
-		//org.apache.commons.compress.compressors.xz.XZCompressorInputStream xI = new org.apache.commons.compress.compressors.xz.XZCompressorInputStream(bI);
-		XZCompressorInputStream xI = new XZCompressorInputStream(bI);
-		TarArchiveInputStream tI = new TarArchiveInputStream(xI);
-		return tI;
-		//return new TarArchiveInputStream(new XZCompressorInputStream(new BufferedInputStream(new FileInputStream(file))));
+		return new TarArchiveInputStream(new XZCompressorInputStream(new BufferedInputStream(new FileInputStream(file))));
 	}
 
 }
