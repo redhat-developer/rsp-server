@@ -28,11 +28,14 @@ public interface ServerManagementAPIConstants extends DefaultServerAttributes {
 	public static final String WORKFLOW_TYPE_PROMPT_SMALL = "workflow.prompt.small";
 	public static final String WORKFLOW_TYPE_PROMPT_LARGE = "workflow.prompt.large";
 	public static final String WORKFLOW_TYPE_OPEN_EDITOR = "workflow.editor.open";	
-	public static final String WORKFLOW_TYPE_OPEN_BROWSER = "workflow.browser.open";	
+	public static final String WORKFLOW_TYPE_OPEN_BROWSER = "workflow.browser.open";
+	public static final String WORKFLOW_TYPE_OPEN_TERMINAL = "workflow.terminal.open";	
 
 
 	public static final String WORKFLOW_EDITOR_PROPERTY_PATH = "workflow.editor.file.path";
 	public static final String WORKFLOW_EDITOR_PROPERTY_CONTENT = "workflow.editor.file.content";
+	
+	public static final String WORKFLOW_TERMINAL_CMD = "workflow.terminal.cmd";
 	
 	
 	

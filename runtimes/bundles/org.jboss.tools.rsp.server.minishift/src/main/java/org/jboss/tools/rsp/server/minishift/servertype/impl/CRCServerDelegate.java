@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
+import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
 import org.jboss.tools.rsp.api.dao.ServerActionRequest;
 import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
@@ -32,8 +33,8 @@ import org.slf4j.LoggerFactory;
 
 public class CRCServerDelegate extends MinishiftServerDelegate {
 	
-	private static final String ACTION_SETUP_CRC_ID = "CRCServerDelegate.setupCRC";
-	private static final String ACTION_SETUP_CRC_LABEL = "Run setup-crc";	
+	public static final String ACTION_SETUP_CRC_ID = "CRCServerDelegate.setupCRC";
+	public static final String ACTION_SETUP_CRC_LABEL = "Run setup-crc";	
 	
 	public static final String CRC_START_LAUNCH_SHARED_DATA = "CRCServerDelegate.startLaunch";
 	
@@ -48,14 +49,8 @@ public class CRCServerDelegate extends MinishiftServerDelegate {
 	@Override
 	protected void fillActionList(List<ServerActionWorkflow> allActions) {
 		super.fillActionList(allActions);
-
 		// setup-crc
-		WorkflowResponse setupCrcWorkflow = new WorkflowResponse();
-		setupCrcWorkflow.setStatus(StatusConverter.convert(
-				new Status(IStatus.INFO, Activator.BUNDLE_ID, ACTION_SETUP_CRC_LABEL)));
-		ServerActionWorkflow setupCrcAction = new ServerActionWorkflow(
-				ACTION_SETUP_CRC_ID, ACTION_SETUP_CRC_LABEL, setupCrcWorkflow);
-		allActions.add(setupCrcAction);
+		allActions.add(SetupCRCActionHandler.getInitialWorkflow());		
 	}
 	
 	@Override
@@ -68,6 +63,7 @@ public class CRCServerDelegate extends MinishiftServerDelegate {
 	
 	protected WorkflowResponse runSetupCrc(ServerActionRequest req) {
 		try {
+			SetupCRCActionHandler.getInitialWorkflow();
 			ILaunch launch = new SetupCRCLauncher(this).launch("run");
 			registerLaunch(launch);
 			return okWorkflowResponse();
