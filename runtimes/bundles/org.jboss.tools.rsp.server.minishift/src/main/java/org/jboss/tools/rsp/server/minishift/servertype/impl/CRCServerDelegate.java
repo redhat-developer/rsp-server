@@ -54,30 +54,6 @@ public class CRCServerDelegate extends MinishiftServerDelegate {
 	}
 	
 	@Override
-	public WorkflowResponse executeServerAction(ServerActionRequest req) {
-		if( req != null && ACTION_SETUP_CRC_ID.equals(req.getActionId() )) {
-			return runSetupCrc(req);
-		}
-		return super.executeServerAction(req);
-	}
-	
-	protected WorkflowResponse runSetupCrc(ServerActionRequest req) {
-		try {
-			SetupCRCActionHandler.getInitialWorkflow();
-			ILaunch launch = new SetupCRCLauncher(this).launch("run");
-			registerLaunch(launch);
-			return okWorkflowResponse();
-		} catch(CoreException ce) {
-			WorkflowResponse resp = new WorkflowResponse();
-			resp.setStatus(StatusConverter.convert(new Status(
-					IStatus.ERROR, Activator.BUNDLE_ID, 
-					"Error running setup-cdk: " + ce.getMessage(), ce)));
-			resp.setItems(new ArrayList<>());
-			return resp;
-		}
-	}
-	
-	@Override
 	public StartServerResponse start(String mode) {
 		IStatus stat = canStart(mode);
 		if( !stat.isOK()) {
