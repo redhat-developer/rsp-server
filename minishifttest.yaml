@@ -91,7 +91,7 @@ availableRuntimes:
             "linux": "https://mirror.openshift.com/pub/openshift-v4/clients/crc/latest/crc-linux-amd64.tar.xz",
             "macosx": "https://mirror.openshift.com/pub/openshift-v4/clients/crc/latest/crc-macos-amd64.tar.xz",
         },
-        wtp-runtime-type: org.jboss.tools.openshift.cdk.server.runtime.type.crc.10
+        wtp-runtime-type: org.jboss.tools.openshift.cdk.server.runtime.type.crc.100
    }
 
   
