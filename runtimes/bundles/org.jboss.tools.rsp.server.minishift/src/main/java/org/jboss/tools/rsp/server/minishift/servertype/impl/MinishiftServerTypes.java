@@ -30,7 +30,7 @@ public class MinishiftServerTypes {
 	public static final String RUNTIME_MINISHIFT_17_ID = "org.jboss.tools.openshift.cdk.server.runtime.type.minishift.17";
 	public static final String RUNTIME_CDK_30_ID = "org.jboss.tools.openshift.cdk.server.runtime.type.cdk.30";
 	public static final String RUNTIME_CDK_32_ID = "org.jboss.tools.openshift.cdk.server.runtime.type.cdk.32";
-	public static final String RUNTIME_CRC_10_ID = "org.jboss.tools.openshift.cdk.server.runtime.type.crc.100";
+	public static final String RUNTIME_CRC_10_ID = "org.jboss.tools.openshift.crc.server.runtime.type.crc.100";
 	
 	public static final BaseMinishiftServerType MINISHIFT_1_12_SERVER_TYPE = 
 			new MinishiftServerType(MINISHIFT_1_12_ID, MINISHIFT_1_12_NAME, MINISHIFT_1_12_DESC);

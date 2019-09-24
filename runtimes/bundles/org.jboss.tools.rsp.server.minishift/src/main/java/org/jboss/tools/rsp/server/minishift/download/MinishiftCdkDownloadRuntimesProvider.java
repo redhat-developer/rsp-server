@@ -47,7 +47,7 @@ public class MinishiftCdkDownloadRuntimesProvider extends AbstractStacksDownload
 		
 		///////for testing purpose
 		Stacks ret = null;
-		File f = new File("/home/luca/Public/github.com/redhat-developer/rsp-server/minishifttest.yaml");
+		File f = new File("/home/rob/tmp/minishift_crc/minishifttest.yaml");
 		if (f != null && f.exists()) {
 			try(FileInputStream fis = new FileInputStream(f)) {
 				Parser p = new Parser();
