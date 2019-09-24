@@ -20,7 +20,7 @@ public class MinishiftDiscovery {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MinishiftDiscovery.class);
 
-	private static final Pattern WHITELIST_PATTERN = Pattern.compile("(cdk-[0-9][.][0-9].*-minishift-(linux|darwin|windows)-amd64(.exe)?|crc)");
+	private static final Pattern WHITELIST_PATTERN = Pattern.compile("(crc|cdk-[0-9][.][0-9].*-minishift-(linux|darwin|windows)-amd64)(.exe)?");
 
 	private static final String MINISHIFT = "minishift";
 	private static final String MINISHIFT_EXE = "minishift.exe";
