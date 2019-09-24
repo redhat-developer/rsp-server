@@ -15,6 +15,9 @@ import org.jboss.tools.rsp.server.minishift.impl.Activator;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 
 public class SetupCRCActionHandler {
+	
+	private static final String ACTION_SETUP_CRC_ID = "CRCServerDelegate.setupCRC";
+	private static final String ACTION_SETUP_CRC_LABEL = "Run setup-crc";	
 
 	public static final ServerActionWorkflow getInitialWorkflow() {
 		return new SetupCRCActionHandler().getInitialWorkflowInternal();
@@ -23,7 +26,7 @@ public class SetupCRCActionHandler {
 	protected ServerActionWorkflow getInitialWorkflowInternal() {
 		WorkflowResponse workflow = new WorkflowResponse();
 		ServerActionWorkflow action = new ServerActionWorkflow(
-				CRCServerDelegate.ACTION_SETUP_CRC_ID, CRCServerDelegate.ACTION_SETUP_CRC_LABEL, workflow);
+				ACTION_SETUP_CRC_ID, ACTION_SETUP_CRC_LABEL, workflow);
 		
 		List<WorkflowResponseItem> items = new ArrayList<>();
 		workflow.setItems(items);
@@ -34,12 +37,12 @@ public class SetupCRCActionHandler {
 		Map<String,String> propMap = new HashMap<>();
 		propMap.put(ServerManagementAPIConstants.WORKFLOW_TERMINAL_CMD, "crc setup");
 		item1.setProperties(propMap);
-		item1.setId(CRCServerDelegate.ACTION_SETUP_CRC_ID);
-		item1.setLabel(CRCServerDelegate.ACTION_SETUP_CRC_LABEL);
+		item1.setId(ACTION_SETUP_CRC_ID);
+		item1.setLabel(ACTION_SETUP_CRC_LABEL);
 		
 		items.add(item1);
 		workflow.setStatus(StatusConverter.convert(
-				new Status(IStatus.OK, Activator.BUNDLE_ID, CRCServerDelegate.ACTION_SETUP_CRC_LABEL)));
+				new Status(IStatus.OK, Activator.BUNDLE_ID, ACTION_SETUP_CRC_LABEL)));
 		return action;
 	}
 }
