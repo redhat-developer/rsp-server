@@ -1,24 +1,19 @@
 package org.jboss.tools.rsp.server.minishift.servertype.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
-import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
-import org.jboss.tools.rsp.api.dao.ServerActionRequest;
 import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.StringPrompt;
-import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.debug.core.DebugException;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
-import org.jboss.tools.rsp.server.minishift.impl.Activator;
 import org.jboss.tools.rsp.server.minishift.servertype.IMinishiftServerAttributes;
 import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
@@ -32,9 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CRCServerDelegate extends MinishiftServerDelegate {
-	
-	public static final String ACTION_SETUP_CRC_ID = "CRCServerDelegate.setupCRC";
-	public static final String ACTION_SETUP_CRC_LABEL = "Run setup-crc";	
 	
 	public static final String CRC_START_LAUNCH_SHARED_DATA = "CRCServerDelegate.startLaunch";
 	
