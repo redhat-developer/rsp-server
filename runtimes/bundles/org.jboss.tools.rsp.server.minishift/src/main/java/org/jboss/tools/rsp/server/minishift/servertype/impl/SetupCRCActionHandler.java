@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jboss.tools.rsp.api.DefaultServerAttributes;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
@@ -19,8 +20,14 @@ public class SetupCRCActionHandler {
 	private static final String ACTION_SETUP_CRC_ID = "CRCServerDelegate.setupCRC";
 	private static final String ACTION_SETUP_CRC_LABEL = "Run setup-crc";	
 
-	public static final ServerActionWorkflow getInitialWorkflow() {
-		return new SetupCRCActionHandler().getInitialWorkflowInternal();
+	public static final ServerActionWorkflow getInitialWorkflow(CRCServerDelegate crcServerDelegate) {
+		return new SetupCRCActionHandler(crcServerDelegate).getInitialWorkflowInternal();
+	}
+	
+
+	private CRCServerDelegate crcServerDelegate;
+	public SetupCRCActionHandler(CRCServerDelegate crcServerDelegate) {
+		this.crcServerDelegate = crcServerDelegate;		
 	}
 	
 	protected ServerActionWorkflow getInitialWorkflowInternal() {
@@ -32,10 +39,11 @@ public class SetupCRCActionHandler {
 		workflow.setItems(items);
 		
 		// Simple action entirely on the UI side
+		String crcPath = this.crcServerDelegate.getServer().getAttribute(DefaultServerAttributes.SERVER_HOME_FILE, "crc");
 		WorkflowResponseItem item1 = new WorkflowResponseItem();
 		item1.setItemType(ServerManagementAPIConstants.WORKFLOW_TYPE_OPEN_TERMINAL);
 		Map<String,String> propMap = new HashMap<>();
-		propMap.put(ServerManagementAPIConstants.WORKFLOW_TERMINAL_CMD, "crc setup");
+		propMap.put(ServerManagementAPIConstants.WORKFLOW_TERMINAL_CMD, crcPath + " setup");
 		item1.setProperties(propMap);
 		item1.setId(ACTION_SETUP_CRC_ID);
 		item1.setLabel(ACTION_SETUP_CRC_LABEL);

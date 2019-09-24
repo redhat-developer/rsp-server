@@ -42,7 +42,7 @@ public class CRCServerDelegate extends MinishiftServerDelegate {
 	protected void fillActionList(List<ServerActionWorkflow> allActions) {
 		super.fillActionList(allActions);
 		// setup-crc
-		allActions.add(SetupCRCActionHandler.getInitialWorkflow());		
+		allActions.add(SetupCRCActionHandler.getInitialWorkflow(this));		
 	}
 	
 	@Override
