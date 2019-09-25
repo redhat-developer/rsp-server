@@ -27,14 +27,15 @@ public class ExtractUtility {
 
 	private static final String ZIP_SUFFIX = "zip"; //$NON-NLS-1$
 	private static final String TAR_SUFFIX = "tar"; //$NON-NLS-1$
-	private static final String TAR_GZ_SUFFIX = "tar.gz"; //$NON-NLS-1$
+	private static final String TAR_GZ_SUFFIX = ".gz"; //$NON-NLS-1$
 	private static final String TGZ_SUFFIX = ".tgz"; //$NON-NLS-1$
-	private static final String TAR_XZ_SUFFIX = "tar.xz";
+	private static final String TAR_XZ_SUFFIX = ".xz";
 	
 	public static final int FORMAT_UNKNOWN = -1;
 	public static final int FORMAT_ZIP = 1;
 	public static final int FORMAT_TAR = 2;
 	public static final int FORMAT_TGZ = 3;
+	public static final int FORMAT_XZ = 4;
 	
 	
 	private final File file;
@@ -61,6 +62,8 @@ public class ExtractUtility {
 				return new UntarUtility(file);
 			case FORMAT_TGZ:
 				return new UntarGZUtility(file);
+			case FORMAT_XZ:
+				return new UntarXZUtility(file);
 			default:
 				return null;
 		}
