@@ -23,8 +23,7 @@ public class MinishiftVersionLoader {
 	public static final String VERSION_KEY2 = "minishift";
 	public static final String CDK_VERSION_KEY = "CDK";
 	public static final String CDK_VERSION_KEY_OLD = "CDK Version";
-	public static final String CRC_VERSION_KEY = "CRC";
-	public static final String CRC_VERSION_KEY_OLD = "CRC Version";
+	public static final String CRC_VERSION_KEY = "version";
 
 	private MinishiftVersionLoader() {
 		// inhibit instantiation
@@ -96,9 +95,6 @@ public class MinishiftVersionLoader {
 		
 		public String getCRCVersion() {
 			String v = p.getProperty(CRC_VERSION_KEY);
-			if (v == null) {
-				v = p.getProperty(CRC_VERSION_KEY_OLD);
-			}
 			return cleanVersion(v);
 		}
 

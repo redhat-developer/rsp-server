@@ -23,7 +23,6 @@ public class CRCBeanType extends MinishiftBeanType {
 	protected String getFullVersion(MinishiftVersions props) {
 		if (props != null
 				&& isSupported(props)
-				&& props.getMinishiftVersion() != null
 				&& props.getCRCVersion() != null) {
 			return props.getCRCVersion();
 		}
