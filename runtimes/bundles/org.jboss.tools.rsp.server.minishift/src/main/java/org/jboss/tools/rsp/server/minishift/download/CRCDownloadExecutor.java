@@ -72,6 +72,7 @@ public class CRCDownloadExecutor extends AbstractDownloadManagerExecutor {
 			LOG.warn("Unable to set cdk binary to executable: " + binFile.getAbsolutePath());
 		}
 		attributes.put(ServerManagementAPIConstants.SERVER_HOME_FILE, binFile.getAbsolutePath());
+		attributes.put(IMinishiftServerAttributes.CRC_IMAGE_PULL_SECRET, tm.getObject(IMinishiftServerAttributes.CRC_IMAGE_PULL_SECRET));
 		
 		CreateServerResponse response = getServerModel().createServer(serverType, chosenId, attributes);
 		return StatusConverter.convert(response.getStatus());
@@ -146,4 +147,13 @@ public class CRCDownloadExecutor extends AbstractDownloadManagerExecutor {
 				req.getRequestId(), STEP_DOWNLOAD, req.getData());
 		return executeDownload(req);
 	}
+	
+	@Override
+	protected TaskModel createDownloadTaskModel(DownloadSingleRuntimeRequest req) {
+		TaskModel tm = new TaskModel();
+		String key = IMinishiftServerAttributes.CRC_IMAGE_PULL_SECRET;
+		tm.putObject(key, req.getData().get(key));
+		return tm;
+	}
+
 }
