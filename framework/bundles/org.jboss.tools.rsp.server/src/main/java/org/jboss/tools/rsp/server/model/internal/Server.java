@@ -66,10 +66,10 @@ public class Server extends SecuredBase implements IServer, IServerWorkingCopy {
 			setAttribute(TYPE_ID, type.getId());
 			this.delegate = this.serverType.createServerDelegate(this);
 		}
-		setAttributes(attributes);
 		if( this.delegate != null ) {
 			this.delegate.setDefaults(this);
 		}
+		setAttributes(attributes);
 	}
 
 	@Override

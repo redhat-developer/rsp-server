@@ -91,9 +91,6 @@ public class CRCServerDelegate extends MinishiftServerDelegate {
 		server.setAttribute(IMinishiftServerAttributes.LAUNCH_OVERRIDE_BOOLEAN, false);
 		server.setAttribute(IMinishiftServerAttributes.MINISHIFT_CPUS, 4);
 		server.setAttribute(IMinishiftServerAttributes.MINISHIFT_MEMORY, 8192);
-		server.setAttribute(IMinishiftServerAttributes.CRC_BUNDLE, (String) null);
-		server.setAttribute(IMinishiftServerAttributes.MINISHIFT_VM_DRIVER, (String)null);
-		server.setAttribute(IMinishiftServerAttributes.CRC_IMAGE_PULL_SECRET, (String) null);
 	}
 	
 	protected IServerStatePoller getPoller(IServerStatePoller.SERVER_STATE expectedState) {
