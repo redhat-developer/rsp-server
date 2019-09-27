@@ -10,12 +10,9 @@
  ************************************************************************************/
 package org.jboss.tools.rsp.server.minishift.download;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.List;
 
 import org.jboss.jdf.stacks.model.Stacks;
-import org.jboss.jdf.stacks.parser.Parser;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeRunner;
@@ -26,9 +23,10 @@ import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.stacks.core.model.StacksManager;
 
 public class MinishiftCdkDownloadRuntimesProvider extends AbstractStacksDownloadRuntimesProvider {
-
-	private static final String MINISHIFT_YAML_URL = 
-			"https://raw.githubusercontent.com/jboss-developer/jboss-stacks/1.0.0.Final/minishift.yaml";
+    private static final String MINISHIFT_YAML_DEFAULT_URL = 
+    		"https://raw.githubusercontent.com/jboss-developer/jboss-stacks/1.0.0.Final/minishift.yaml";
+    private static final String URL_PROPERTY_MINISHIFT_STACKS = "org.jboss.tools.stacks.minishift.url";
+    private static final String MINISHIFT_YAML_URL = System.getProperty(URL_PROPERTY_MINISHIFT_STACKS, MINISHIFT_YAML_DEFAULT_URL);
 	private IServerManagementModel model;
 
 	public MinishiftCdkDownloadRuntimesProvider(IServerManagementModel model) {
@@ -43,19 +41,8 @@ public class MinishiftCdkDownloadRuntimesProvider extends AbstractStacksDownload
 
 	@Override
 	protected Stacks[] getStacks(IProgressMonitor monitor) {
-		//Stacks ret = new StacksManager().getStacks(MINISHIFT_YAML_URL, "Loading CDK / Minishift Downloadable Runtimes", monitor);
-		
-		///////for testing purpose
-		Stacks ret = null;
-		File f = new File("/home/rob/tmp/minishift_crc/minishifttest.yaml");
-		if (f != null && f.exists()) {
-			try(FileInputStream fis = new FileInputStream(f)) {
-				Parser p = new Parser();
-				ret = p.parse(fis);
-			}catch(Exception ex) {
-				String s = "";
-			}
-		}
+		Stacks ret = new StacksManager().getStacks(MINISHIFT_YAML_URL, 
+				"Loading CDK / Minishift / CRC Downloadable Runtimes", monitor);
 		return ret == null ? null : new Stacks[] {ret};
 	}
 
