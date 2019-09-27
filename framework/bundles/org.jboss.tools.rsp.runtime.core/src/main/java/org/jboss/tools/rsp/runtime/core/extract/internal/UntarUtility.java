@@ -50,6 +50,9 @@ public class UntarUtility implements IExtractUtility {
 				if (tarEntry.isDirectory()) {
 					destPath.mkdirs();
 				} else {
+					if( !destPath.getParentFile().exists()) {
+						destPath.getParentFile().mkdirs();
+					}
 					if( !destPath.createNewFile() ) {
 						String msg = NLS.bind("Error extracting runtime: Could not create file {0}", destPath.toString());
 						throw new CoreException(
