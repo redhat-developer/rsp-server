@@ -387,7 +387,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		}
 	}
 	
-	protected void updateDependentAttributes(IServer dummyServer, MultiStatus ret) {
+	public void updateDependentAttributes(IServer dummyServer, MultiStatus ret) {
 		// Our start launcher is currently saving default vm and prog args 
 		// which is weird but whatever, it's what we got
 		try {

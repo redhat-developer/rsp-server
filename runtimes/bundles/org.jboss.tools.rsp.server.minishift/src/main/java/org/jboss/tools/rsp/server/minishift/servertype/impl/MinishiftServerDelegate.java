@@ -291,8 +291,7 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 	@Override
 	public void setDefaults(IServerWorkingCopy server) {
 		server.setAttribute(STARTUP_PROGRAM_ARGS_STRING, "start");
-		HashMap<String,String> tmp = new HashMap<>();
-		server.setAttribute(STARTUP_ENV_VARS_MAP, tmp);
+		server.setAttribute(STARTUP_ENV_VARS_MAP, new HashMap<>());
 	}
 	
 	@Override

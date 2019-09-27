@@ -337,13 +337,8 @@ public interface IServerDelegate {
 
 
 	/**
-	 * Allow the delegate the opportunity to fill any of the server's 
-	 * attribute values that have not been set but for which 
-	 * explicit values are desired.  
-	 * 
-	 * Remember, this is done *AFTER* the server has been initialized
-	 * with values from a file or from a user, so take care not to overwrite
-	 * those attributes unless necessary.
+	 * Allow the delegate the opportunity to fill default values for any 
+	 * of the server's attributes  
 	 * 
 	 * @param server
 	 */
