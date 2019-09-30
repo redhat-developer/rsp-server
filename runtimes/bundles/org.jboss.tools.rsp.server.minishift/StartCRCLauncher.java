@@ -30,7 +30,7 @@ public class StartCRCLauncher extends AbstractLauncher {
 		String memoryArg = isEmpty(memory) ? "" : " --memory=" + memory;
 		
 		String pullSecret = MinishiftPropertyUtility.getMinishiftImagePullSecret(server);
-		String pullSecretArg = isEmpty(pullSecret) ? "" : " --pull-secret-file=" + pullSecret;
+		String pullSecretArg = isEmpty(pullSecret) ? "" : " --pull-secret-file '" + pullSecret + "'";
 		
 		String vmd = getAdditionalVMArgs(server);
 				
