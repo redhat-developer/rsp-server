@@ -19,10 +19,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
@@ -248,7 +250,10 @@ public abstract class Base {
 	
 	protected void save(IMemento memento) {
 		IMemento child = memento;
-		Iterator<String> iterator = map.keySet().iterator();
+		Set<String> keys = map.keySet();
+		ArrayList<String> keyList = new ArrayList(keys);
+		Collections.sort(keyList);
+		Iterator<String> iterator = keyList.iterator();
 		while (iterator.hasNext()) {
 			String key = iterator.next();
 			Object obj = map.get(key);
