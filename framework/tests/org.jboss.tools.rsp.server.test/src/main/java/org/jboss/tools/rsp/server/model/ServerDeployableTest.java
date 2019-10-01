@@ -345,7 +345,7 @@ public class ServerDeployableTest {
 			IMemento[] deployablesMemento = memento.getChildren(MEMENTO_DEPLOYABLES);
 			assertNotNull(deployablesMemento);
 			assertEquals(1, deployablesMemento.length);
-			IMemento[] deployableMemento = deployablesMemento[0].getChildren(MEMENTO_DEPLOYABLE);
+			IMemento[] deployableMemento = deployablesMemento[0].getChildren();
 			assertNotNull(deployableMemento);
 			assertEquals(1, deployableMemento.length);
 			assertEquals(DEPLOYABLE_LABEL, deployableMemento[0].getString(MEMENTO_DEPLOYABLE_LABEL));
