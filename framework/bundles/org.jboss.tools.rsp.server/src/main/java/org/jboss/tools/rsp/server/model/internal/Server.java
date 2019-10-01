@@ -103,7 +103,7 @@ public class Server extends SecuredBase implements IServer, IServerWorkingCopy {
 	}
 	
 	private void fillMemento(IMemento deployables, DeployableState oneState, IServerPublishModel pubMod) {
-		IMemento deployable = deployables.createChild(MEMENTO_DEPLOYABLE);
+		IMemento deployable = deployables.createChild(oneState.getReference().getLabel());
 		deployable.putString(MEMENTO_DEPLOYABLE_LABEL, oneState.getReference().getLabel());
 		deployable.putString(MEMENTO_DEPLOYABLE_PATH, oneState.getReference().getPath());
 		IMemento options = deployable.createChild(MEMENTO_DEPLOYABLE_OPTIONS);
@@ -121,7 +121,7 @@ public class Server extends SecuredBase implements IServer, IServerWorkingCopy {
 		List<DeployableReference> references = new ArrayList<>();
 		IMemento deployables = memento.getChild(MEMENTO_DEPLOYABLES);
 		if( deployables != null ) {
-			IMemento[] deployableArray = deployables.getChildren(MEMENTO_DEPLOYABLE);
+			IMemento[] deployableArray = deployables.getChildren();
 			if( deployableArray != null) {
 				for( int i = 0; i < deployableArray.length; i++ ) {
 					String path = deployableArray[i].getString(MEMENTO_DEPLOYABLE_PATH);
