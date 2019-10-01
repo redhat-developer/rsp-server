@@ -186,6 +186,9 @@ public abstract class RSPCase {
 	}
 
 	protected Status createServer(String location, String id) throws Exception {
+		System.out.println("Creating server " + id + " at location " + location);
+		System.out.println("Location " + location + "exists? " + new File(location).exists());
+		
 		ServerBean bean = serverProxy.findServerBeans(new DiscoveryPath(location)).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS).get(0);
 		Map<String, Object> attr = new HashMap<>();
 		attr.put("server.home.dir", bean.getLocation());
