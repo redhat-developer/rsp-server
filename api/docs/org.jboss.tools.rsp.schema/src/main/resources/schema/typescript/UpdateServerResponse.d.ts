@@ -1,6 +1,7 @@
 export interface UpdateServerResponse {
     handle: ServerHandle;
     validation: CreateServerResponse;
+    serverJson: GetServerJsonResponse;
 }
 
 export interface ServerHandle {
@@ -11,6 +12,12 @@ export interface ServerHandle {
 export interface CreateServerResponse {
     status: Status;
     invalidKeys: string[];
+}
+
+export interface GetServerJsonResponse {
+    status: Status;
+    serverJson: string;
+    serverHandle: ServerHandle;
 }
 
 export interface ServerType {
