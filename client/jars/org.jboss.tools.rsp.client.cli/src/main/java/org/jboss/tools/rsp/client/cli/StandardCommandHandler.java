@@ -355,7 +355,8 @@ public class StandardCommandHandler implements InputHandler {
 				if (sh != null) {
 					launcher.getServerProxy().deleteServer(sh);
 				} else {
-					System.out.println(SERVER_NOT_FOUND.format(suffix.trim()));
+					String ending = suffix.trim().isEmpty() ? "null" : suffix.trim();
+					System.out.println(SERVER_NOT_FOUND.format(new Object[] {ending}));
 				}
 			}
 		},
@@ -385,7 +386,8 @@ public class StandardCommandHandler implements InputHandler {
 						System.out.println(resp.getStatus().toString());
 					}
 				} else {
-					System.out.println(SERVER_NOT_FOUND.format(suffix.trim()));
+					String ending = suffix.trim().isEmpty() ? "null" : suffix.trim();
+					System.out.println(SERVER_NOT_FOUND.format(new Object[] {ending}));
 				}
 			}
 		},
@@ -426,7 +428,8 @@ public class StandardCommandHandler implements InputHandler {
 						System.out.println(resp.getStatus().toString());
 					}
 				} else {
-					System.out.println(SERVER_NOT_FOUND.format(suffix.trim()));
+					String ending = suffix.trim().isEmpty() ? "null" : suffix.trim();
+					System.out.println(SERVER_NOT_FOUND.format(new Object[] {ending}));
 				}
 			}
 		},
