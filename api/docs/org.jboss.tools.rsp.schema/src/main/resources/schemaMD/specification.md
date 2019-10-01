@@ -1040,11 +1040,65 @@ This endpoint returns the following schema as a return value:
           }
         }
       }
+    },
+    "serverJson" : {
+      "type" : "object",
+      "properties" : {
+        "status" : {
+          "type" : "object",
+          "properties" : {
+            "severity" : {
+              "type" : "integer"
+            },
+            "plugin" : {
+              "type" : "string"
+            },
+            "code" : {
+              "type" : "integer"
+            },
+            "message" : {
+              "type" : "string"
+            },
+            "trace" : {
+              "type" : "string"
+            },
+            "ok" : {
+              "type" : "boolean"
+            }
+          }
+        },
+        "serverJson" : {
+          "type" : "string"
+        },
+        "serverHandle" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "type" : {
+              "type" : "object",
+              "properties" : {
+                "id" : {
+                  "type" : "string"
+                },
+                "visibleName" : {
+                  "type" : "string"
+                },
+                "description" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }</pre></td><td><pre>export interface UpdateServerResponse {
     handle: ServerHandle;
     validation: CreateServerResponse;
+    serverJson: GetServerJsonResponse;
 }
 
 export interface ServerHandle {
@@ -1055,6 +1109,12 @@ export interface ServerHandle {
 export interface CreateServerResponse {
     status: Status;
     invalidKeys: string[];
+}
+
+export interface GetServerJsonResponse {
+    status: Status;
+    serverJson: string;
+    serverHandle: ServerHandle;
 }
 
 export interface ServerType {

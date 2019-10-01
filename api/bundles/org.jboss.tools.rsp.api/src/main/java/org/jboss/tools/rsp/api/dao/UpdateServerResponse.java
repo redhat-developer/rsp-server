@@ -11,6 +11,8 @@ package org.jboss.tools.rsp.api.dao;
 public class UpdateServerResponse {
 	private ServerHandle handle;
 	private CreateServerResponse validation;
+	private GetServerJsonResponse serverJson;
+	
 	public UpdateServerResponse() {
 		validation = new CreateServerResponse();
 	}
@@ -26,5 +28,10 @@ public class UpdateServerResponse {
 	public void setValidation(CreateServerResponse validation) {
 		this.validation = validation;
 	}
-
+	public GetServerJsonResponse getServerJson() {
+		return serverJson;
+	}
+	public void setServerJson(GetServerJsonResponse serverJson) {
+		this.serverJson = serverJson;
+	}
 }

@@ -3,7 +3,7 @@
  */
 export namespace Protocol {
     /* tslint:disable */
-    // Generated using typescript-generator version 2.2.413 on 2019-06-25 15:20:46.
+    // Generated using typescript-generator version 2.2.413 on 2019-10-01 13:02:55.
     
     export interface Attribute {
         type: string;
@@ -236,6 +236,7 @@ export namespace Protocol {
     export interface UpdateServerResponse {
         handle: ServerHandle;
         validation: CreateServerResponse;
+        serverJson: GetServerJsonResponse;
     }
     
     export interface VMDescription {
