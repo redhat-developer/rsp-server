@@ -44,7 +44,7 @@ public class DataLocationCore implements IDataStoreModel {
 			data = new File(home, SYSPROP_DATA_DEFAULT_LOCATION);
 		}
 
-		if (data != null && !data.exists()) {
+		if (!data.exists()) {
 			data.mkdirs();
 		}
 

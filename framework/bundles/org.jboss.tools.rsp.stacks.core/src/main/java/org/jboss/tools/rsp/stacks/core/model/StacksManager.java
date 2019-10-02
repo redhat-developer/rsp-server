@@ -219,11 +219,15 @@ public class StacksManager {
 	 * @return
 	 */
 	protected File getCachedFileForURL(String url, String jobName, IProgressMonitor monitor) throws CoreException {
-		if( getCache().isCacheOutdated(url, monitor)) {
-			return cache.downloadAndCache(url,jobName, 10000, true, monitor);
+		URLTransportCache c = getCache();
+		if( c == null )
+			return null;
+		
+		if( c.isCacheOutdated(url, monitor)) {
+			return c.downloadAndCache(url,jobName, 10000, true, monitor);
 		} else {
 			// Else use the local cache
-			return cache.getCachedFile(url);
+			return c.getCachedFile(url);
 		}
 	}
 	

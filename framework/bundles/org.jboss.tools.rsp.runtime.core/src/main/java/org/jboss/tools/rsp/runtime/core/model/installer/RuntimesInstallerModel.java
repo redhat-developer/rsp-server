@@ -18,7 +18,6 @@ import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
 import org.jboss.tools.rsp.runtime.core.model.installer.internal.BinaryInstaller;
 import org.jboss.tools.rsp.runtime.core.model.installer.internal.ExtractionRuntimeInstaller;
 import org.jboss.tools.rsp.runtime.core.model.installer.internal.JavaJarRuntimeInstaller;
-import org.jboss.tools.rsp.runtime.core.model.internal.DownloadRuntimesModel;
 
 public class RuntimesInstallerModel {
 	private IDownloadRuntimesModel downloadRuntimesModel;
