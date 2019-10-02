@@ -27,10 +27,16 @@ import org.jboss.tools.rsp.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeConnectionFactory;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
+import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesModel;
 import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
 import org.jboss.tools.rsp.runtime.core.util.internal.DownloadRuntimeOperationUtility;
 
 public class BinaryInstaller implements IRuntimeInstaller {
+
+	private IDownloadRuntimesModel downloadRuntimesModel;
+	public BinaryInstaller(IDownloadRuntimesModel downloadRuntimesModel) {
+		this.downloadRuntimesModel = downloadRuntimesModel;
+	}
 
 	@Override
 	public IStatus installRuntime(DownloadRuntime downloadRuntime, String unzipDirectory, String downloadDirectory,
@@ -71,9 +77,9 @@ public class BinaryInstaller implements IRuntimeInstaller {
 		IDownloadRuntimeConnectionFactory fact = (IDownloadRuntimeConnectionFactory)tm.getObject(
 				IDownloadRuntimeWorkflowConstants.CONNECTION_FACTORY);
 		if( fact == null ) {
-			return new DownloadRuntimeOperationUtility();
+			return new DownloadRuntimeOperationUtility(downloadRuntimesModel);
 		} else {
-			return new DownloadRuntimeOperationUtility() {
+			return new DownloadRuntimeOperationUtility(downloadRuntimesModel) {
 	
 				@Override
 				protected InputStream createDownloadInputStream(URL url, String user, String pass) {

@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -36,7 +37,6 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.eclipse.core.runtime.SubProgressMonitor;
 import org.jboss.tools.rsp.foundation.core.transport.URLTransportCache;
-import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +71,18 @@ public class StacksManager {
 				System.getProperty(StacksClientConfiguration.REPO_PROPERTY, getStacksDefaultUrlFromJar())));
 		PRESTACKS_URL = System.getProperty(URL_PROPERTY_PRESTACKS,
 				System.getProperty("jdf.prestacks.client.repo", getPreStacksDefaultUrlFromJar()));
+	}
+
+	private File dataFolder;
+
+	@Deprecated
+	private StacksManager() {
+		super();
+	}
+
+	public StacksManager(File dataFolder) {
+		super();
+		this.dataFolder = dataFolder;
 	}
 
 	/**
@@ -218,9 +230,19 @@ public class StacksManager {
 	private URLTransportCache cache;
 	private URLTransportCache getCache() {
 		if( cache == null ) {
-			File data = LaunchingCore.getDataLocation();
-			File stacks = new File(data, "stacks");
-			cache = URLTransportCache.getCache(new Path(stacks.getAbsolutePath()));
+			if( dataFolder != null ) {
+				File stacks = new File(dataFolder, "stacks");
+				cache = URLTransportCache.getCache(new Path(stacks.getAbsolutePath()));
+			} else {
+				try {
+					File tmpDir = Files.createTempDirectory("rsp-stacks").toFile();
+					tmpDir.mkdirs();
+					File stacks = new File(dataFolder, "stacks");
+					cache = URLTransportCache.getCache(new Path(stacks.getAbsolutePath()));
+				} catch(IOException ioe) {
+					LOG.error(ioe.getMessage(), ioe);
+				}
+			}
 		}
 		return cache;
 	}

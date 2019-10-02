@@ -38,7 +38,6 @@ import org.jboss.tools.rsp.eclipse.core.runtime.MultiStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
-import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
 import org.jboss.tools.rsp.server.model.internal.DaoUtilities;
@@ -161,7 +160,7 @@ public class ServerModel implements IServerModel {
 	
 	@Override
 	public void loadServers() throws CoreException {
-		File data = LaunchingCore.getDataLocation();
+		File data = this.managementModel.getDataStoreModel().getDataLocation();
 		File servers = new File(data, SERVERS_DIRECTORY);
 		loadServers(servers);
 	}
@@ -350,7 +349,7 @@ public class ServerModel implements IServerModel {
 	}
 	
 	private File getServerFile(String id) {
-		File data = LaunchingCore.getDataLocation();
+		File data = this.managementModel.getDataStoreModel().getDataLocation();
 		File serversDirectory = new File(data, SERVERS_DIRECTORY);
 		if( !serversDirectory.exists()) {
 			serversDirectory.mkdirs();

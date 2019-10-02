@@ -23,9 +23,9 @@ import java.util.concurrent.CountDownLatch;
 
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.SocketLauncher;
-import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.server.ShutdownExecutor.IShutdownHandler;
 import org.jboss.tools.rsp.server.model.ServerManagementModel;
+import org.jboss.tools.rsp.server.persistence.DataLocationCore;
 import org.jboss.tools.rsp.server.util.ClientLauncher;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -44,10 +44,10 @@ public class RSPStartupShutdownTest {
 	
 	@BeforeClass 
 	public static void beforeClass() {
-		ORIGINAL_DATA_LOC = System.getProperty(LaunchingCore.SYSPROP_DATA_LOCATION);
+		ORIGINAL_DATA_LOC = System.getProperty(DataLocationCore.SYSPROP_DATA_LOCATION);
 		try {
 			File tmp = Files.createTempDirectory("RSPStartupShutdownTest").toFile();
-			System.setProperty(LaunchingCore.SYSPROP_DATA_LOCATION, tmp.getAbsolutePath());
+			System.setProperty(DataLocationCore.SYSPROP_DATA_LOCATION, tmp.getAbsolutePath());
 		} catch(IOException ioe) {
 			throw new RuntimeException(ioe);
 		}
@@ -56,9 +56,9 @@ public class RSPStartupShutdownTest {
 	@AfterClass
 	public static void afterClass() {
 		if( ORIGINAL_DATA_LOC == null )
-			System.clearProperty(LaunchingCore.SYSPROP_DATA_LOCATION);
+			System.clearProperty(DataLocationCore.SYSPROP_DATA_LOCATION);
 		else
-			System.setProperty(LaunchingCore.SYSPROP_DATA_LOCATION, ORIGINAL_DATA_LOC);
+			System.setProperty(DataLocationCore.SYSPROP_DATA_LOCATION, ORIGINAL_DATA_LOC);
 	}
 	
 	@Before

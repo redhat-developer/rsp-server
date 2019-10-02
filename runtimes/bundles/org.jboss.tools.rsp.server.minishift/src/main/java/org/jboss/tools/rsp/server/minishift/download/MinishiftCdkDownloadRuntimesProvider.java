@@ -10,6 +10,7 @@
  ************************************************************************************/
 package org.jboss.tools.rsp.server.minishift.download;
 
+import java.io.File;
 import java.util.List;
 
 import org.jboss.jdf.stacks.model.Stacks;
@@ -38,10 +39,13 @@ public class MinishiftCdkDownloadRuntimesProvider extends AbstractStacksDownload
 	public String getId() {
 		return "Minishift-CDK";
 	}
+	protected File getDataFolder() {
+		return model.getDataStoreModel().getDataLocation();
+	}
 
 	@Override
 	protected Stacks[] getStacks(IProgressMonitor monitor) {
-		Stacks ret = new StacksManager().getStacks(MINISHIFT_YAML_URL, 
+		Stacks ret = new StacksManager(getDataFolder()).getStacks(MINISHIFT_YAML_URL, 
 				"Loading CDK / Minishift / CRC Downloadable Runtimes", monitor);
 		return ret == null ? null : new Stacks[] {ret};
 	}

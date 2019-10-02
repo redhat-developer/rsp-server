@@ -21,7 +21,6 @@ import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.eclipse.jdt.internal.launching.LibraryInfo;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.StandardVMType;
-import org.jboss.tools.rsp.launching.utils.FileUtil;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -46,9 +45,8 @@ public class LaunchingJarTest {
 		LaunchingSupportUtils util = new LaunchingSupportUtils();
 		File launchingJar = getAssertedLaunchingSupportFile(util);
 
-		FileUtil.deleteDirectory(util.getLaunchingSupportFile().getParentFile(), true);
+		launchingJar.delete();
 		assertFalse(launchingJar.exists());
-
 		getAssertedLaunchingSupportFile(util);
 	}
 
