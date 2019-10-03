@@ -35,11 +35,12 @@ import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.launching.memento.IMemento;
 import org.jboss.tools.rsp.launching.memento.JSONMemento;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
+import org.jboss.tools.rsp.server.spi.servertype.IServerAttributes;
 
 /**
  * Helper class for storing runtime and server attributes.
  */
-public abstract class Base {
+public abstract class Base implements IServerAttributes {
 	protected static final String PROP_LOCKED = "locked";
 	protected static final String PROP_PRIVATE = "private";
 	protected static final String PROP_NAME = "name";

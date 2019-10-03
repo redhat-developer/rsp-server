@@ -48,8 +48,8 @@ public interface IMinishiftServerAttributes {
 	/*
 	 * Launch attributes
 	 */
-	
-	public static final String LAUNCH_OVERRIDE_BOOLEAN = "args.override.boolean";
+	public static final String LAUNCH_OVERRIDE_BOOLEAN 			= "server.args.launch.override.boolean";
+	public static final String OLD_LAUNCH_OVERRIDE_BOOLEAN = "args.override.boolean";
 	
 	
 }

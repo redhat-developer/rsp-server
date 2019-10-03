@@ -36,8 +36,12 @@ public interface IJBossServerAttributes extends DefaultServerAttributes {
 	/*
 	 * Launch attributes
 	 */
-	public static final String LAUNCH_OVERRIDE_BOOLEAN = "args.override.boolean";
-	public static final String LAUNCH_OVERRIDE_PROGRAM_ARGS = "program.args.override.string";
-	public static final String LAUNCH_OVERRIDE_VM_ARGS = "vm.args.override.string";
-	
+	public static final String LAUNCH_OVERRIDE_BOOLEAN 			= "server.args.launch.override.boolean";
+	public static final String LAUNCH_OVERRIDE_PROGRAM_ARGS 	= "server.args.prog.string";
+	public static final String LAUNCH_OVERRIDE_VM_ARGS 			= "server.args.vm.string";
+
+	public static final String OLD_LAUNCH_OVERRIDE_BOOLEAN = "args.override.boolean";
+	public static final String OLD_LAUNCH_OVERRIDE_PROGRAM_ARGS = "program.args.override.string";
+	public static final String OLD_LAUNCH_OVERRIDE_VM_ARGS = "vm.args.override.string";
+
 }

@@ -133,6 +133,13 @@ public interface IServerAttributes {
 	 * @param defaultValue the default value if the given attribute is not defined.
 	 * @return the value of the given attribute.
 	 */
-	public Map getAttribute(String attributeName, Map defaultValue);
+	public Map<?,?> getAttribute(String attributeName, Map<?,?> defaultValue);
+	
+	/**
+	 * Return true if an attribute with the given key exists in this object
+	 * @param attributeName
+	 * @return
+	 */
+	public boolean containsAttribute(String attributeName);
 
 }

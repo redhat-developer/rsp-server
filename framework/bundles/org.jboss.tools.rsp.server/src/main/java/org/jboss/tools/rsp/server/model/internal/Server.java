@@ -228,4 +228,9 @@ public class Server extends SecuredBase implements IServer, IServerWorkingCopy {
 	public IServerWorkingCopy createWorkingCopy() {
 		return this;
 	}
+
+	@Override
+	public boolean containsAttribute(String attributeName) {
+		return this.map.containsKey(attributeName);
+	}
 }
