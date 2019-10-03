@@ -51,7 +51,7 @@ public class WildflyEditServerTest extends RSPCase {
 	private static final String SERVER_CONFIG_ID = "id";
 	private static final String SERVER_CONFIG_ID_SET = "id-set";
 	private static final String SERVER_CONFIG_SERVER_TYPE_ID = "org.jboss.tools.rsp.server.typeId";
-	private static final String SERVER_CONFIG_OVERRIDE = "args.override.boolean";
+	private static final String SERVER_CONFIG_OVERRIDE = "server.args.launch.override.boolean";
 	private static final String SERVER_CONFIG_WF_PUBLISH = "wildfly.publish.restart.pattern";
 	private static final String SERVER_HANDLE_NULL = "Server handle cannot be null";
 	private static final String SERVER_REQUEST_TYPE_NULL = "Update server request's server type cannot be null";
