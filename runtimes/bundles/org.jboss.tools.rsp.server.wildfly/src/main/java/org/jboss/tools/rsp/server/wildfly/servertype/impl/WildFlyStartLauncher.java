@@ -58,7 +58,8 @@ public class WildFlyStartLauncher extends AbstractLauncher {
 		
 		// Using defaults
 		String ret = calculateVMArgs();
-		if( !isEqual(ret, overrideArgs)) {
+		boolean eq = isEqual(ret, overrideArgs);
+		if( !eq || !getServer().containsAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_VM_ARGS)) {
 			// Save these in the server just so that we have it
 			String[] keys = new String[] { IJBossServerAttributes.LAUNCH_OVERRIDE_VM_ARGS, 
 					IJBossServerAttributes.OLD_LAUNCH_OVERRIDE_VM_ARGS};
@@ -92,7 +93,8 @@ public class WildFlyStartLauncher extends AbstractLauncher {
 		}
 		
 		String ret = getCalculatedProgramArgs();
-		if( !isEqual(ret, overrideArgs)) {
+		boolean eq = isEqual(ret, overrideArgs);
+		if( !eq || !getServer().containsAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_PROGRAM_ARGS)) {
 			// Save these in the server just so that we have it
 			String[] keys = new String[] { IJBossServerAttributes.LAUNCH_OVERRIDE_PROGRAM_ARGS, 
 					IJBossServerAttributes.OLD_LAUNCH_OVERRIDE_PROGRAM_ARGS};
