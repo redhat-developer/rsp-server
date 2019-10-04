@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.stream.Stream;
 
 import org.jboss.tools.rsp.server.spi.model.IDataStoreModel;
 import org.slf4j.Logger;
@@ -83,8 +84,9 @@ public class DataLocationCore implements IDataStoreModel {
 	}
 	
 	public  void copyFolder(Path src, Path dest) throws IOException {
-	    Files.walk(src)
-	        .forEach(source -> copy(source, dest.resolve(src.relativize(source))));
+		try(Stream<Path> st = Files.walk(src)) {
+			st.forEach(source -> copy(source, dest.resolve(src.relativize(source))));
+		}
 	}
 
 	private void copy(Path source, Path dest) {
