@@ -18,6 +18,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,6 +36,7 @@ import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
+import org.jboss.tools.rsp.server.persistence.DataLocationCore;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.model.ServerModelListenerAdapter;
@@ -489,7 +491,10 @@ public class ServerModelTest {
 	}
 
 	private IServerModel createServerModel(IServerType serverType) {
-		IServerModel serverModel = new TestableServerModel(mock(IServerManagementModel.class), 
+		IServerManagementModel mgmt = mock(IServerManagementModel.class);
+		DataLocationCore dlc = new DataLocationCore();
+		when(mgmt.getDataStoreModel()).thenReturn(dlc);
+		IServerModel serverModel = new TestableServerModel(mgmt, 
 				new HashMap<String, IServerType>() {{
 					put(serverType.getId(), serverType);
 				}}, 

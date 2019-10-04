@@ -23,7 +23,6 @@ import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.eclipse.jdt.launching.VMInstallRegistry;
-import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesModel;
 import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
@@ -32,12 +31,14 @@ import org.jboss.tools.rsp.server.discovery.DiscoveryPathModel;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanTypeManager;
 import org.jboss.tools.rsp.server.filewatcher.FileWatcherService;
 import org.jboss.tools.rsp.server.jobs.JobManager;
+import org.jboss.tools.rsp.server.persistence.DataLocationCore;
 import org.jboss.tools.rsp.server.secure.SecureStorageGuardian;
 import org.jboss.tools.rsp.server.spi.discovery.IDiscoveryPathModel;
 import org.jboss.tools.rsp.server.spi.discovery.IServerBeanTypeManager;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
 import org.jboss.tools.rsp.server.spi.jobs.IJobManager;
 import org.jboss.tools.rsp.server.spi.model.ICapabilityManagement;
+import org.jboss.tools.rsp.server.spi.model.IDataStoreModel;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModelListener;
@@ -61,15 +62,21 @@ public class ServerManagementModel implements IServerManagementModel {
 	private IFileWatcherService fileWatcherService;
 	private IDownloadRuntimesModel downloadRuntimeModel;
 	private IJobManager jobManager;
-
+	private IDataStoreModel fDataStoreModel;
+	
 	public ServerManagementModel() {
-		this(LaunchingCore.getDataLocation());
+		this(new DataLocationCore());
 	}
 	
 	/** protected for testing purposes **/
 	public ServerManagementModel(File dataLocation) {
+		this(new DataLocationCore(dataLocation));
+	}
+	public ServerManagementModel(IDataStoreModel dataLocation) {
 		this.capabilities = createCapabilityManagement();
-		this.secureStorage = createSecureStorageProvider(getSecureStorageFile(dataLocation), capabilities);
+		this.fDataStoreModel = dataLocation;
+		File dLocFile = dataLocation.getDataLocation();
+		this.secureStorage = createSecureStorageProvider(getSecureStorageFile(dLocFile), capabilities);
 		this.rpm = createDiscoveryPathModel();
 		this.serverBeanTypeManager = createServerBeanTypeManager();
 		this.serverModel = createServerModel();
@@ -171,7 +178,9 @@ public class ServerManagementModel implements IServerManagementModel {
 	}
 
 	protected IDownloadRuntimesModel createDownloadRuntimesModel() {
-		return RuntimeCoreActivator.createDownloadRuntimesModel();
+		IDownloadRuntimesModel ret = RuntimeCoreActivator.createDownloadRuntimesModel();
+		ret.setDataLocation(this.fDataStoreModel.getDataLocation());
+		return ret;
 	}
 
 	protected IFileWatcherService createFileWatcherService() {
@@ -247,5 +256,10 @@ public class ServerManagementModel implements IServerManagementModel {
 		return serverModel.getServers().values().stream()
 				.filter(s -> s.getDelegate().getServerRunState() != ServerManagementAPIConstants.STATE_STOPPED)
 				.collect(Collectors.toList());
+	}
+
+	@Override
+	public IDataStoreModel getDataStoreModel() {
+		return fDataStoreModel;
 	}
 }

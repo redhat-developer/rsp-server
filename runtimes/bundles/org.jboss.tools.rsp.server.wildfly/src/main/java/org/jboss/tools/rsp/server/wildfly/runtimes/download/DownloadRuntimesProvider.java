@@ -10,6 +10,7 @@
  ************************************************************************************/
 package org.jboss.tools.rsp.server.wildfly.runtimes.download;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,8 +63,11 @@ public class DownloadRuntimesProvider extends AbstractStacksDownloadRuntimesProv
 		LEGACY_HASHMAP.put("jboss-as711runtime", "org.jboss.tools.runtime.core.as.711" );
 	}
 
+	protected File getDataFolder() {
+		return model.getDataStoreModel().getDataLocation();
+	}
 	protected Stacks[] getStacks(IProgressMonitor monitor) {
-		return new StacksManager().getStacks("Loading Downloadable Runtimes", monitor, StacksManager.StacksType.PRESTACKS_TYPE, StacksManager.StacksType.STACKS_TYPE);
+		return new StacksManager(getDataFolder()).getStacks("Loading Downloadable Runtimes", monitor, StacksManager.StacksType.PRESTACKS_TYPE, StacksManager.StacksType.STACKS_TYPE);
 	}
 
 	protected void traverseStacks(Stacks stacks, List<DownloadRuntime> list, IProgressMonitor monitor) {

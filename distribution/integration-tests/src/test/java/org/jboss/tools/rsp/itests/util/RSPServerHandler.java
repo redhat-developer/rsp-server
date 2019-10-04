@@ -14,7 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 
-import org.jboss.tools.rsp.launching.LaunchingCore;
+import org.jboss.tools.rsp.server.persistence.DataLocationCore;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -36,7 +36,7 @@ public class RSPServerHandler {
     		SERVER_ROOT_SYSPROP_RESOLVED != null ? SERVER_ROOT_SYSPROP_RESOLVED : 
     		(DISTRIBUTION_PATH + "/rsp-distribution");
     
-    private static final File SERVER_DATA = LaunchingCore.getDataLocation();
+    private static final File SERVER_DATA = new DataLocationCore().getDataLocation();
     private static final String DATA_BACKUP = SERVER_DATA + ".backup";
 
     private static Process serverProcess;

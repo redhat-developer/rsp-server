@@ -26,11 +26,11 @@ import org.jboss.tools.rsp.eclipse.core.runtime.SubProgressMonitor;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.foundation.core.tasks.TaskModel;
 import org.jboss.tools.rsp.foundation.core.transport.URLTransportCache;
-import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.rsp.runtime.core.extract.ExtractUtility;
 import org.jboss.tools.rsp.runtime.core.extract.IOverwrite;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
+import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
@@ -39,7 +39,13 @@ import org.slf4j.LoggerFactory;
  */
 public class DownloadRuntimeOperationUtility {
 	private static final Logger LOG = LoggerFactory.getLogger(DownloadRuntimeOperationUtility.class);
+	private IDownloadRuntimesModel model;
 
+	public DownloadRuntimeOperationUtility(IDownloadRuntimesModel model) {
+		super();
+		this.model = model;
+	}
+	
 	protected File getNextUnusedFilename(File destination, String name) {
 		String nameWithoutSuffix = null;
 		if( name.indexOf('.') == -1 ) {
@@ -316,8 +322,8 @@ public class DownloadRuntimeOperationUtility {
 		return cache;
 	}
 	
-	public static final URLTransportCache getDefaultDownloadRuntimeCache() {
-		File data = LaunchingCore.getDataLocation();
+	private final URLTransportCache getDefaultDownloadRuntimeCache() {
+		File data = this.model.getDataLocation();
 		File transportCache = new File(data, "runtimes");
 		return URLTransportCache.getCache(new Path(transportCache.getAbsolutePath()));
 	}

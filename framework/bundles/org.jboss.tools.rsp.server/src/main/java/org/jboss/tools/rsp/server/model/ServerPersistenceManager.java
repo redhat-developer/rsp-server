@@ -16,7 +16,6 @@ import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallChangedListener;
 import org.jboss.tools.rsp.eclipse.jdt.launching.PropertyChangeEvent;
-import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.server.ServerManagementServerLauncher;
 import org.jboss.tools.rsp.server.spi.discovery.IDiscoveryPathListener;
 import org.jboss.tools.rsp.server.spi.discovery.IDiscoveryPathModel;
@@ -96,24 +95,28 @@ public class ServerPersistenceManager implements IDiscoveryPathListener, IVMInst
 	}
 	
 	private void loadDiscoveryPaths() throws IOException {
-		File discoveryPathFile = new File(LaunchingCore.getDataLocation(), "discovery-paths");
+		File dataLoc = serverLauncher.getModel().getDataStoreModel().getDataLocation();
+		File discoveryPathFile = new File(dataLoc, "discovery-paths");
 		IDiscoveryPathModel discoveryPathModel = serverLauncher.getModel().getDiscoveryPathModel();
 		discoveryPathModel.loadDiscoveryPaths(discoveryPathFile);
 	}
 
 	public void saveDiscoveryPaths() throws IOException {
-		File discoveryPathFile = new File(LaunchingCore.getDataLocation(), "discovery-paths");
+		File dataLoc = serverLauncher.getModel().getDataStoreModel().getDataLocation();
+		File discoveryPathFile = new File(dataLoc, "discovery-paths");
 		IDiscoveryPathModel discoveryPathModel = serverLauncher.getModel().getDiscoveryPathModel();
 		discoveryPathModel.saveDiscoveryPaths(discoveryPathFile);
 	}
 	
 	public void saveVMs() throws IOException {
-		File vmsFile = new File(LaunchingCore.getDataLocation(), "vms");
+		File dataLoc = serverLauncher.getModel().getDataStoreModel().getDataLocation();
+		File vmsFile = new File(dataLoc, "vms");
 		serverLauncher.getModel().getVMInstallModel().save(vmsFile);
 	}
 	
 	public void loadVMs() throws InstantiationException, IllegalAccessException, ClassNotFoundException, FileNotFoundException {
-		File vmsFile = new File(LaunchingCore.getDataLocation(), "vms");
+		File dataLoc = serverLauncher.getModel().getDataStoreModel().getDataLocation();
+		File vmsFile = new File(dataLoc, "vms");
 		serverLauncher.getModel().getVMInstallModel().load(vmsFile);
 	}
 }

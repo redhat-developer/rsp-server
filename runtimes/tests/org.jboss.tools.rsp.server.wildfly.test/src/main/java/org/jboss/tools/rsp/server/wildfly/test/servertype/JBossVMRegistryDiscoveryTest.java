@@ -24,7 +24,7 @@ import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.eclipse.jdt.launching.StandardVMType;
 import org.jboss.tools.rsp.eclipse.jdt.launching.VMInstallRegistry;
-import org.jboss.tools.rsp.launching.LaunchingCore;
+import org.jboss.tools.rsp.server.persistence.DataLocationCore;
 import org.jboss.tools.rsp.server.wildfly.servertype.JBossVMRegistryDiscovery;
 import org.junit.Before;
 import org.junit.Test;
@@ -98,7 +98,7 @@ public class JBossVMRegistryDiscoveryTest {
 		assertTrue(discovery.ensureVMInstallAdded(null, registry));
 		registry.removeVMInstall(registry.getDefaultVMInstall());
 		
-		File dataFolder = LaunchingCore.getDataLocation();
+		File dataFolder = new DataLocationCore().getDataLocation();
 		File dne = new File(dataFolder, "doesnotexist");
 		assertFalse(discovery.ensureVMInstallAdded(dne.getAbsolutePath(), registry));
 		try {

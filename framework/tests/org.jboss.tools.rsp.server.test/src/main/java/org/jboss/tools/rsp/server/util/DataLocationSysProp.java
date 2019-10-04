@@ -12,14 +12,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import org.jboss.tools.rsp.launching.LaunchingCore;
+import org.jboss.tools.rsp.server.persistence.DataLocationCore;
 
 public class DataLocationSysProp {
 
 	private String backup = null;
 	
 	public DataLocationSysProp backup() {
-		backup = System.getProperty(LaunchingCore.SYSPROP_DATA_LOCATION);
+		backup = System.getProperty(DataLocationCore.SYSPROP_DATA_LOCATION);
 		return this;
 	}
 
@@ -33,15 +33,15 @@ public class DataLocationSysProp {
 	}
 
 	public DataLocationSysProp set(File file) {
-		System.setProperty(LaunchingCore.SYSPROP_DATA_LOCATION, file.getAbsolutePath());
+		System.setProperty(DataLocationCore.SYSPROP_DATA_LOCATION, file.getAbsolutePath());
 		return this;
 	}
 
 	public void restore() {
 		if (backup == null) {
-			System.clearProperty(LaunchingCore.SYSPROP_DATA_LOCATION);
+			System.clearProperty(DataLocationCore.SYSPROP_DATA_LOCATION);
 		} else {
-			System.setProperty(LaunchingCore.SYSPROP_DATA_LOCATION, backup);
+			System.setProperty(DataLocationCore.SYSPROP_DATA_LOCATION, backup);
 		}
 	}
 }

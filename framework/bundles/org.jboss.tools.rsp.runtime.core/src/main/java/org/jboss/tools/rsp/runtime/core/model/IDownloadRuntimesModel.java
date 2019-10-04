@@ -10,11 +10,26 @@
  ************************************************************************************/
 package org.jboss.tools.rsp.runtime.core.model;
 
+import java.io.File;
 import java.util.Map;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 
 public interface IDownloadRuntimesModel {
+
+	/**
+	 * Set the main data location folder if this bundle needs to store any state there
+	 * or have a temporary directory to store stuff
+	 * @param loc
+	 */
+	public void setDataLocation(File loc);
+
+	/**
+	 * Get the main data location folder if this bundle needs to store any state there
+	 * or have a temporary directory to store stuff
+	 * @param loc
+	 */
+	public File getDataLocation();
 
 	/**
 	 * Get an array of the currently-registered download runtime providers
@@ -80,4 +95,11 @@ public interface IDownloadRuntimesModel {
 	 * @return
 	 */
 	public IDownloadRuntimesProvider findProviderForRuntime(String id, IProgressMonitor monitor);
+
+	/**
+	 * Get the runtime installer model
+	 * @param installationMethod
+	 * @return
+	 */
+	public IRuntimeInstaller getRuntimeInstaller(String installationMethod);
 }

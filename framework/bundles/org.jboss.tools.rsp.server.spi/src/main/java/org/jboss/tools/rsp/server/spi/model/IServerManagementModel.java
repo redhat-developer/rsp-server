@@ -72,6 +72,12 @@ public interface IServerManagementModel {
 	 */
 	public IDownloadRuntimesModel getDownloadRuntimeModel();
 	
+	/**
+	 * Get the sub model for where to store things
+	 * @return
+	 */
+	public IDataStoreModel getDataStoreModel();
+	
 	
 	/**
 	 * Get the sub-model for managing long-running tasks
@@ -95,5 +101,5 @@ public interface IServerManagementModel {
 	 * Dispose all sub-models
 	 */
 	public void dispose();
-	
+
 }

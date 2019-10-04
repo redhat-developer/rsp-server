@@ -14,6 +14,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +29,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.launching.internal.LaunchingActivator;
 import org.jboss.tools.rsp.launching.java.ILaunchModes;
+import org.jboss.tools.rsp.server.persistence.DataLocationCore;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
@@ -57,7 +59,10 @@ public class ServerTypeTest {
 
 	@Before
 	public void before() {
-		this.sm = new ServerModel(mock(IServerManagementModel.class));
+		IServerManagementModel mgmt = mock(IServerManagementModel.class);
+		DataLocationCore dlc = new DataLocationCore();
+		when(mgmt.getDataStoreModel()).thenReturn(dlc);
+		this.sm = new ServerModel(mgmt);
 	}
 	
 	@Test

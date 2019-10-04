@@ -45,6 +45,7 @@ public class RuntimesInstallerModelTest {
 		private List<RuntimeInstallerWrapper> installers2;
 
 		public TestableRuntimesInstallerModel(List<RuntimeInstallerWrapper>  installers) {
+			super(null);
 			this.installers2 = installers;
 		}
 

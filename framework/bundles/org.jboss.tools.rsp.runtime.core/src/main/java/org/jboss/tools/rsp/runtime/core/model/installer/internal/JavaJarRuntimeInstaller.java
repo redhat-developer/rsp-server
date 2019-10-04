@@ -40,6 +40,7 @@ import org.jboss.tools.rsp.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeConnectionFactory;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
+import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesModel;
 import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
 import org.jboss.tools.rsp.runtime.core.util.internal.DownloadRuntimeOperationUtility;
 
@@ -50,20 +51,23 @@ import org.jboss.tools.rsp.runtime.core.util.internal.DownloadRuntimeOperationUt
 public class JavaJarRuntimeInstaller implements IRuntimeInstaller {
 
 	public static final String ID = IRuntimeInstaller.JAVA_JAR_INSTALLER;
+	private IDownloadRuntimesModel downloadRuntimesModel;
 	
 	public JavaJarRuntimeInstaller() {
 		// for debugging
 	}
 	
-
+	public JavaJarRuntimeInstaller(IDownloadRuntimesModel downloadRuntimesModel) {
+		this.downloadRuntimesModel = downloadRuntimesModel;
+	}
 
 	protected DownloadRuntimeOperationUtility createDownloadRuntimeOperationUtility(TaskModel tm) {
 		IDownloadRuntimeConnectionFactory fact = (IDownloadRuntimeConnectionFactory)tm.getObject(
 				IDownloadRuntimeWorkflowConstants.CONNECTION_FACTORY);
 		if (fact == null) {
-			return new DownloadRuntimeOperationUtility();
+			return new DownloadRuntimeOperationUtility(downloadRuntimesModel);
 		} else {
-			return new DownloadRuntimeOperationUtility() {
+			return new DownloadRuntimeOperationUtility(downloadRuntimesModel) {
 
 				@Override
 				protected InputStream createDownloadInputStream(URL url, String user, String pass) {

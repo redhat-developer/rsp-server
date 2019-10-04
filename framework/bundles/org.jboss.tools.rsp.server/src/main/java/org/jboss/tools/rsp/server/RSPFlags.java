@@ -8,15 +8,15 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server;
 
-import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.logging.LoggingConstants;
+import org.jboss.tools.rsp.server.persistence.DataLocationCore;
 
 /**
  * Collect all flags people may want to know about here
  */
 public class RSPFlags {
-	public static final String SYSPROP_DATA_LOCATION = LaunchingCore.SYSPROP_DATA_LOCATION;
-	public static final String SYSPROP_DATA_DEFAULT_LOCATION = LaunchingCore.SYSPROP_DATA_DEFAULT_LOCATION;
+	public static final String SYSPROP_DATA_LOCATION = DataLocationCore.SYSPROP_DATA_LOCATION;
+	public static final String SYSPROP_DATA_DEFAULT_LOCATION = DataLocationCore.DATA_LOCATION_LEGACY_DEFAULT;
 	public static final String LOG_LEVEL_FLAG = LoggingConstants.SYSPROP_LOG_LEVEL_FLAG;
 	public static final String SYSPROP_SERVER_PORT = "rsp.server.port";
 	public static final int DEFAULT_PORT = 27511;

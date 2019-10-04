@@ -32,7 +32,6 @@ import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.core.runtime.SubMonitor;
 import org.jboss.tools.rsp.foundation.core.tasks.TaskModel;
-import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.launching.utils.IStatusRunnableWithProgress;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeRunner;
@@ -107,14 +106,13 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 		// Now find an installer for this file type (jar, zip, runnable binary, etc)
 		String installationMethod = dlrt.getInstallationMethod();
 		installationMethod = (installationMethod == null ? IRuntimeInstaller.EXTRACT_INSTALLER : installationMethod);
-		final IRuntimeInstaller installer = RuntimesInstallerModel.getDefault()
-					.getRuntimeInstaller(installationMethod);
+		final IRuntimeInstaller installer = model.getDownloadRuntimeModel().getRuntimeInstaller(installationMethod);
 		if( installer == null ) {
 			return quickResponse(IStatus.ERROR,  "No installer found for runtime "  + dlrt.getId(), req);
 		}
 		
 		// Set up the folders where we'll store automatic downloads of runtimes
-		File runtimes = new File(LaunchingCore.getDataLocation(), "runtimes");
+		File runtimes = getDownloadRuntimesRootFolder();
 		File downloads = new File(runtimes, "downloads");
 		File installations = new File(runtimes, "installations");
 		if( !runtimes.exists())
@@ -131,6 +129,11 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 		WorkflowResponse rsp = quickResponse(IStatus.OK,  "Download In Progress", req);
 		rsp.setJobId(jobId);
 		return rsp;
+	}
+	
+	private File getDownloadRuntimesRootFolder() {
+		File f = model.getDataStoreModel().getDataLocation();
+		return new File(f, "runtimes");
 	}
 	
 	/*

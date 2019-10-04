@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,7 +40,6 @@ import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallChangedListener;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMRunner;
 import org.jboss.tools.rsp.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
-import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.launching.utils.ExecUtil;
 import org.jboss.tools.rsp.launching.utils.NativeEnvironmentUtils;
 import org.jboss.tools.rsp.launching.utils.OSUtils;
@@ -93,31 +93,38 @@ public class LaunchingSupportUtils {
 		return fgXMLParser;
 	}
 	
-	
+	private static File launchingSupportJarTemporaryFile = null;
+	private static synchronized File getLaunchingJarLocation() {
+		if( launchingSupportJarTemporaryFile == null ) {
+			try {
+				File dest = File.createTempFile("rsp", "launchingsupport.jar");
+				dest.getParentFile().mkdirs();
+				launchingSupportJarTemporaryFile = dest;
+			} catch(IOException ioe) {
+				log(ioe);
+			}
+		} 
+		return launchingSupportJarTemporaryFile;
+	}
 	
 	public File getLaunchingSupportFile() {
-		File data = LaunchingCore.getDataLocation();
-		if( data == null ) {
+		File destination = getLaunchingJarLocation();
+		if( destination == null ) {
 			log("Data location is null!!");
+			return null;
 		} else {
-			File libs = new File(data, "libs");
-			if( !libs.exists()) {
-				libs.mkdirs();
-			}
-			File launchingSupport = new File(libs, "launchingsupport.jar");
-			if( !launchingSupport.exists()) {
+			if( !destination.exists() || destination.length() <= 0 ) {
 				ClassLoader classLoader = getClass().getClassLoader();
 				InputStream is = classLoader.getResourceAsStream("launchingsupport.jar");
 				try {
-					Files.copy(is, launchingSupport.toPath());
+					Files.copy(is, destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
 				} catch(IOException ioe) {
 					log(ioe);
 				}
 				
 			}
-			return launchingSupport;
+			return destination;
 		}
-		return null;
 	}
 
 	private IProcess runLaunchingSupportSysprops(
@@ -244,7 +251,7 @@ public class LaunchingSupportUtils {
 		HashMap<String, String> map = new HashMap<String, String>();
 		// launch VM to evaluate properties
 		File file = getLaunchingSupportFile();
-		if (file != null && file.exists()) {
+		if (file != null && file.exists() && file.length() > 0) {
 			IProcess process = runLaunchingSupportSysprops(file, runner, properties, monitor);
 			if( process == null || monitor.isCanceled()) {
 				return map;

@@ -10,6 +10,7 @@
  ************************************************************************************/
 package org.jboss.tools.rsp.runtime.core.model.internal;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,6 +24,8 @@ import org.jboss.tools.rsp.eclipse.core.runtime.SubProgressMonitor;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesModel;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesProvider;
+import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
+import org.jboss.tools.rsp.runtime.core.model.installer.RuntimesInstallerModel;
 
 public class DownloadRuntimesModel implements IDownloadRuntimesModel {
 
@@ -30,9 +33,12 @@ public class DownloadRuntimesModel implements IDownloadRuntimesModel {
 	private Map<String, Map<String, DownloadRuntime>> cachedDownloadRuntimesByProvider = null;
 	
 	private List<IDownloadRuntimesProvider> downloadRuntimeProviders = null;
+	private RuntimesInstallerModel installers = null;
+	private File dataLocationRoot = null;
 	
 	public DownloadRuntimesModel() {
 		this.downloadRuntimeProviders = new ArrayList<>();
+		this.installers = new RuntimesInstallerModel(this);
 	}
 
 	@Override
@@ -173,6 +179,21 @@ public class DownloadRuntimesModel implements IDownloadRuntimesModel {
 				return all[i];
 		}
 		return null;
+	}
+
+	@Override
+	public void setDataLocation(File loc) {
+		this.dataLocationRoot = loc;
+	}
+
+	@Override
+	public File getDataLocation() {
+		return this.dataLocationRoot;
+	}
+
+	@Override
+	public IRuntimeInstaller getRuntimeInstaller(String installationMethod) {
+		return installers.getRuntimeInstaller(installationMethod);
 	}
 
 }

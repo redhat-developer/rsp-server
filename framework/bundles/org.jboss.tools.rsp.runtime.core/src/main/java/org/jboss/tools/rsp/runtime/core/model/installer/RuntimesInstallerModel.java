@@ -13,23 +13,17 @@ package org.jboss.tools.rsp.runtime.core.model.installer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesModel;
 import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
 import org.jboss.tools.rsp.runtime.core.model.installer.internal.BinaryInstaller;
 import org.jboss.tools.rsp.runtime.core.model.installer.internal.ExtractionRuntimeInstaller;
 import org.jboss.tools.rsp.runtime.core.model.installer.internal.JavaJarRuntimeInstaller;
 
 public class RuntimesInstallerModel {
+	private IDownloadRuntimesModel downloadRuntimesModel;
 
-	private static RuntimesInstallerModel manager = null;
-
-	public static RuntimesInstallerModel getDefault() {
-		if( manager == null )
-			manager = new RuntimesInstallerModel();
-		return manager;
-	}
-	
-	/** default for testing purposes **/
-	protected RuntimesInstallerModel() {
+	public RuntimesInstallerModel(IDownloadRuntimesModel downloadRuntimesModel) {
+		this.downloadRuntimesModel = downloadRuntimesModel;
 	}
 
 	/** default for testing purposes **/
@@ -55,14 +49,14 @@ public class RuntimesInstallerModel {
 	private List<RuntimeInstallerWrapper> installers;
 
 	/** protected for testing purposes **/
-	protected List<RuntimeInstallerWrapper> loadInstallers() {
+	public List<RuntimeInstallerWrapper> loadInstallers() {
 		List<RuntimeInstallerWrapper> list = new ArrayList<>();
 		list.add(new RuntimeInstallerWrapper(
-				IRuntimeInstaller.EXTRACT_INSTALLER, new ExtractionRuntimeInstaller()));
+				IRuntimeInstaller.EXTRACT_INSTALLER, new ExtractionRuntimeInstaller(downloadRuntimesModel)));
 		list.add(new RuntimeInstallerWrapper(
-				IRuntimeInstaller.BINARY_INSTALLER, new BinaryInstaller()));
+				IRuntimeInstaller.BINARY_INSTALLER, new BinaryInstaller(downloadRuntimesModel)));
 		list.add(new RuntimeInstallerWrapper(
-				IRuntimeInstaller.JAVA_JAR_INSTALLER, new JavaJarRuntimeInstaller()));
+				IRuntimeInstaller.JAVA_JAR_INSTALLER, new JavaJarRuntimeInstaller(downloadRuntimesModel)));
 		return list;
 	}
 	
