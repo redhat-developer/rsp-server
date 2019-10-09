@@ -14,9 +14,17 @@ import java.io.File;
 
 import org.jboss.tools.rsp.server.wildfly.impl.util.JBossManifestUtility;
 
-public class ServerBeanTypeWildfly90 extends JBossServerBeanType {
-	public ServerBeanTypeWildfly90() {
-		super(ID_WILDFLY, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN);
+public class ServerBeanTypeWildflyX extends JBossServerBeanType {
+	private boolean web;
+	private String versionPrefix;
+	private String serverAdapterId;
+
+	public ServerBeanTypeWildflyX( String id, String name, String systemJarPath,
+			boolean web, String versionPrefix, String serverAdapterId) {
+		super(id, name, systemJarPath);
+		this.web = web;
+		this.versionPrefix = versionPrefix;
+		this.serverAdapterId = serverAdapterId;
 	}
 	
 	protected String getServerTypeBaseName() {
@@ -25,8 +33,20 @@ public class ServerBeanTypeWildfly90 extends JBossServerBeanType {
 	
 	@Override
 	public String getFullVersion(File location, File systemFile) {
-		return ServerBeanTypeWildfly90.getFullVersion(location, systemFile, "9.");
+		if( !this.web ) 
+			return getFullVersion(location, systemFile, this.versionPrefix);
+		else
+			return getFullVersionWeb(location, systemFile, this.versionPrefix);
 	}
+
+	public boolean isServerRoot(File location) {
+		return getFullVersion(location, null) != null;
+	}
+	
+	public String getServerAdapterTypeId(String version) {	
+		return this.serverAdapterId;
+	}
+	
 
 	public static String getFullVersion(File location, File systemFile, String prefix) {
 		String vers = JBossManifestUtility.getManifestPropFromJBossModulesFolder(
@@ -38,14 +58,16 @@ public class ServerBeanTypeWildfly90 extends JBossServerBeanType {
 		}
 		return null;
 	}
-	
-	
-	public boolean isServerRoot(File location) {
-		return getFullVersion(location, null) != null;
+
+	public static String getFullVersionWeb(File location, File systemFile, String prefix) {
+		String vers = JBossManifestUtility.getManifestPropFromJBossModulesFolder(
+				new File[]{new File(location, MODULES)}, 
+				"org.jboss.as.product", 
+				"wildfly-web/dir/META-INF", MANIFEST_PROD_RELEASE_VERS);
+		if( vers != null && vers.startsWith(prefix)) {
+			return vers;
+		}
+		return null;
 	}
-	
-	public String getServerAdapterTypeId(String version) {	
-		// Just return adapter type wf8 until we discover incompatibility. 
-		return IServerConstants.SERVER_WILDFLY_90;
-	}
+
 }

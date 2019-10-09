@@ -11,6 +11,8 @@ package org.jboss.tools.rsp.server.wildfly.impl;
 import org.jboss.tools.rsp.server.spi.discovery.IServerBeanTypeProvider;
 import org.jboss.tools.rsp.server.spi.discovery.ServerBeanType;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.DataVirtualization6ServerBeanType;
+import org.jboss.tools.rsp.server.wildfly.beans.impl.IJBossServerResourceConstants;
+import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeAS;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeAS7;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeAS72;
@@ -32,27 +34,10 @@ import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeSOAP;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeSOAPStandalone;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeUnknownAS71Product;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeUnknownAS72Product;
-import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly100;
-import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly100Web;
-import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly110;
-import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly110Web;
-import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly120;
-import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly120Web;
-import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly13;
-import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly130Web;
-import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly14;
-import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly140Web;
-import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly15;
-import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly150Web;
-import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly16;
-import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly160Web;
-import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly17;
-import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly170Web;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly80;
-import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly90;
-import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly90Web;
+import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildflyX;
 
-public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider {
+public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider, IJBossServerResourceConstants {
 
 
 	public static final ServerBeanType AS = new ServerBeanTypeAS();
@@ -63,24 +48,79 @@ public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider {
 	public static final ServerBeanType UNKNOWN_AS72_PRODUCT = new ServerBeanTypeUnknownAS72Product();
 	public static final ServerBeanType AS72 = new ServerBeanTypeAS72();
 	public static final ServerBeanType WILDFLY80 = new ServerBeanTypeWildfly80();
-	public static final ServerBeanType WILDFLY90 = new ServerBeanTypeWildfly90();
-	public static final ServerBeanType WILDFLY90_WEB = new ServerBeanTypeWildfly90Web();
-	public static final ServerBeanType WILDFLY100 = new ServerBeanTypeWildfly100();
-	public static final ServerBeanType WILDFLY100_WEB = new ServerBeanTypeWildfly100Web();
-	public static final ServerBeanType WILDFLY110 = new ServerBeanTypeWildfly110();
-	public static final ServerBeanType WILDFLY110_WEB = new ServerBeanTypeWildfly110Web();
-	public static final ServerBeanType WILDFLY120 = new ServerBeanTypeWildfly120();
-	public static final ServerBeanType WILDFLY120_WEB = new ServerBeanTypeWildfly120Web();
-	public static final ServerBeanType WILDFLY130 = new ServerBeanTypeWildfly13();
-	public static final ServerBeanType WILDFLY130_WEB = new ServerBeanTypeWildfly130Web();
-	public static final ServerBeanType WILDFLY140 = new ServerBeanTypeWildfly14();
-	public static final ServerBeanType WILDFLY140_WEB = new ServerBeanTypeWildfly140Web();
-	public static final ServerBeanType WILDFLY150 = new ServerBeanTypeWildfly15();
-	public static final ServerBeanType WILDFLY150_WEB = new ServerBeanTypeWildfly150Web();
-	public static final ServerBeanType WILDFLY160 = new ServerBeanTypeWildfly16();
-	public static final ServerBeanType WILDFLY160_WEB = new ServerBeanTypeWildfly160Web();
-	public static final ServerBeanType WILDFLY170 = new ServerBeanTypeWildfly17();
-	public static final ServerBeanType WILDFLY170_WEB = new ServerBeanTypeWildfly170Web();
+	
+	
+	public static final ServerBeanTypeWildflyX WILDFLY90 = new ServerBeanTypeWildflyX(
+			ID_WILDFLY, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			false, "9.", IServerConstants.SERVER_WILDFLY_90);
+	public static final ServerBeanTypeWildflyX WILDFLY90_WEB = new ServerBeanTypeWildflyX(
+			ID_WILDFLY_WEB, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN, 
+			true, "9.", IServerConstants.SERVER_WILDFLY_90);
+
+	public static final ServerBeanTypeWildflyX WILDFLY100 = new ServerBeanTypeWildflyX(
+			ID_WILDFLY, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			false, "10.", IServerConstants.SERVER_WILDFLY_100);
+	public static final ServerBeanTypeWildflyX WILDFLY100_WEB = new ServerBeanTypeWildflyX(
+			ID_WILDFLY_WEB, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			true, "10.", IServerConstants.SERVER_WILDFLY_100);
+
+	public static final ServerBeanTypeWildflyX WILDFLY110 = new ServerBeanTypeWildflyX(
+			ID_WILDFLY, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			false, "11.", IServerConstants.SERVER_WILDFLY_110);
+	public static final ServerBeanTypeWildflyX WILDFLY110_WEB = new ServerBeanTypeWildflyX(
+			ID_WILDFLY_WEB, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			true, "11.", IServerConstants.SERVER_WILDFLY_110);
+
+	public static final ServerBeanTypeWildflyX WILDFLY120 = new ServerBeanTypeWildflyX(
+			ID_WILDFLY, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			false, "12.", IServerConstants.SERVER_WILDFLY_120);
+	public static final ServerBeanTypeWildflyX WILDFLY120_WEB = new ServerBeanTypeWildflyX(
+			ID_WILDFLY_WEB, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			true, "12.", IServerConstants.SERVER_WILDFLY_120);
+
+	public static final ServerBeanTypeWildflyX WILDFLY130 = new ServerBeanTypeWildflyX(
+			ID_WILDFLY, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			false, "13.", IServerConstants.SERVER_WILDFLY_130);
+	public static final ServerBeanTypeWildflyX WILDFLY130_WEB = new ServerBeanTypeWildflyX(
+			ID_WILDFLY_WEB, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			true, "13.", IServerConstants.SERVER_WILDFLY_130);
+
+	public static final ServerBeanTypeWildflyX WILDFLY140 = new ServerBeanTypeWildflyX(
+			ID_WILDFLY, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			false, "14.", IServerConstants.SERVER_WILDFLY_140);
+	public static final ServerBeanTypeWildflyX WILDFLY140_WEB = new ServerBeanTypeWildflyX(
+			ID_WILDFLY_WEB, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			true, "14.", IServerConstants.SERVER_WILDFLY_140);
+
+	public static final ServerBeanTypeWildflyX WILDFLY150 = new ServerBeanTypeWildflyX(
+			ID_WILDFLY, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			false, "15.", IServerConstants.SERVER_WILDFLY_150);
+	public static final ServerBeanTypeWildflyX WILDFLY150_WEB = new ServerBeanTypeWildflyX(
+			ID_WILDFLY_WEB, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			true, "15.", IServerConstants.SERVER_WILDFLY_150);
+
+	public static final ServerBeanTypeWildflyX WILDFLY160 = new ServerBeanTypeWildflyX(
+			ID_WILDFLY, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			false, "16.", IServerConstants.SERVER_WILDFLY_160);
+	public static final ServerBeanTypeWildflyX WILDFLY160_WEB = new ServerBeanTypeWildflyX(
+			ID_WILDFLY_WEB, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			true, "16.", IServerConstants.SERVER_WILDFLY_160);
+
+	public static final ServerBeanTypeWildflyX WILDFLY170 = new ServerBeanTypeWildflyX(
+			ID_WILDFLY, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			false, "17.", IServerConstants.SERVER_WILDFLY_170);
+	public static final ServerBeanTypeWildflyX WILDFLY170_WEB = new ServerBeanTypeWildflyX(
+			ID_WILDFLY_WEB, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			true, "17.", IServerConstants.SERVER_WILDFLY_170);
+
+	public static final ServerBeanTypeWildflyX WILDFLY180 = new ServerBeanTypeWildflyX(
+			ID_WILDFLY, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			false, "18.", IServerConstants.SERVER_WILDFLY_180);
+	public static final ServerBeanTypeWildflyX WILDFLY180_WEB = new ServerBeanTypeWildflyX(
+			ID_WILDFLY_WEB, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			true, "18.", IServerConstants.SERVER_WILDFLY_180);
+
+
 	public static final ServerBeanType EAP70 = new ServerBeanTypeEAP70();
 	public static final ServerBeanType EAP71 = new ServerBeanTypeEAP71();
 	public static final ServerBeanType EAP72 = new ServerBeanTypeEAP72();
@@ -121,6 +161,7 @@ public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider {
 		WILDFLY150, WILDFLY150_WEB,
 		WILDFLY160, WILDFLY160_WEB,
 		WILDFLY170, WILDFLY170_WEB,
+		WILDFLY180, WILDFLY180_WEB,
 		WILDFLY80, 
 		FSW6, EAP61, SOA6, JPP61,  DV6, 
 		UNKNOWN_AS72_PRODUCT,

@@ -65,6 +65,7 @@ public class MockServerCreationUtilities extends Assert {
 	private static final String wildfly_15_0_jar = "wf15.0.0.mf.jboss-as-server.jar";
 	private static final String wildfly_16_0_jar = "wf16.0.0.mf.jboss-as-server.jar";
 	private static final String wildfly_17_0_jar = "wf17.0.0.mf.jboss-as-server.jar";
+	private static final String wildfly_18_0_jar = "wf18.0.0.mf.jboss-as-server.jar";
 	private static final String twiddle_eap_4_3 = "eap4.3" + twiddle_suffix;
 	private static final String twiddle_eap_5_0 = "eap5.0" + twiddle_suffix;
 	private static final String twiddle_eap_5_1 = "eap5.1" + twiddle_suffix;
@@ -122,6 +123,7 @@ public class MockServerCreationUtilities extends Assert {
 		asSystemJar.put(IServerConstants.SERVER_WILDFLY_150, wildfly_15_0_jar);
 		asSystemJar.put(IServerConstants.SERVER_WILDFLY_160, wildfly_16_0_jar);
 		asSystemJar.put(IServerConstants.SERVER_WILDFLY_170, wildfly_17_0_jar);
+		asSystemJar.put(IServerConstants.SERVER_WILDFLY_180, wildfly_18_0_jar);
 		asSystemJar.put(IServerConstants.SERVER_EAP_43, twiddle_eap_4_3);
 		asSystemJar.put(IServerConstants.SERVER_EAP_50, twiddle_eap_5_1);
 		asSystemJar.put(IServerConstants.SERVER_EAP_60, eap_server_6_0_jar);
@@ -223,6 +225,8 @@ public class MockServerCreationUtilities extends Assert {
 			serverDir = createWildfly160MockServerDirectory(name, serverType, asSystemJar.get(serverType));
 		} else if (IServerConstants.SERVER_WILDFLY_170.equals(serverType)) {
 			serverDir = createWildfly170MockServerDirectory(name, serverType, asSystemJar.get(serverType));
+		} else if (IServerConstants.SERVER_WILDFLY_180.equals(serverType)) {
+			serverDir = createWildfly180MockServerDirectory(name, serverType, asSystemJar.get(serverType));
 		} else if (TEST_SERVER_TYPE_GATEIN_34.equals(serverType)) {
 			serverDir = createGateIn34MockServerDirectory(name);
 		} else if (TEST_SERVER_TYPE_GATEIN_35.equals(serverType)) {
@@ -356,6 +360,11 @@ public class MockServerCreationUtilities extends Assert {
 	private static File createWildfly170MockServerDirectory(String name, String serverTypeId, String serverJar) {
 		return createWildflyServerDirectory(name, serverTypeId, serverJar,
 				"JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 17.0.0.Final\n");
+	}
+
+	private static File createWildfly180MockServerDirectory(String name, String serverTypeId, String serverJar) {
+		return createWildflyServerDirectory(name, serverTypeId, serverJar,
+				"JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 18.0.0.Final\n");
 	}
 
 	private static File createWildflyServerDirectory(String name, String serverTypeId, String serverJar, String manString) {
