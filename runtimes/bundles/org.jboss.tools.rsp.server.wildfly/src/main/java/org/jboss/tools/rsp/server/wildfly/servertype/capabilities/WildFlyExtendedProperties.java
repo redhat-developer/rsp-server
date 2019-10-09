@@ -72,5 +72,10 @@ public class WildFlyExtendedProperties {
 			super("17.0", "1.8", "13.", HTTP_REMOTING_JMX_NEW, new Wildfly110DefaultLaunchArguments(server), server);
 		}
 	}
+	public static class Wildfly180ExtendedProperties extends AbstractWildflyExtendedProperties {
+		public Wildfly180ExtendedProperties(IServer server) {
+			super("18.0", "1.8", "13.", HTTP_REMOTING_JMX_NEW, new Wildfly110DefaultLaunchArguments(server), server);
+		}
+	}
 
 }
