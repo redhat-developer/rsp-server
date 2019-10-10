@@ -101,6 +101,9 @@ public class WildFlyServerDelegate extends AbstractJBossServerDelegate {
 		if( ShowInBrowserActionHandler.ACTION_SHOW_IN_BROWSER_ID.equals(req.getActionId() )) {
 			return new ShowInBrowserActionHandler(this).handle(req);
 		}
+		if( EditServerConfigurationActionHandler.ACTION_ID.equals(req.getActionId() )) {
+			return new EditServerConfigurationActionHandler(this).handle(req);
+		}
 		return cancelWorkflowResponse();
 	}
 	

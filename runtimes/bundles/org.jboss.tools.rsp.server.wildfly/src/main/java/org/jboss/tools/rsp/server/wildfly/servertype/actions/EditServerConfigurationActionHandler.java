@@ -77,7 +77,7 @@ public class EditServerConfigurationActionHandler {
 
 	public WorkflowResponse handle(ServerActionRequest req) {
 		if( req == null || req.getData() == null ) 
-			return AbstractServerDelegate.cancelWorkflowResponse();
+			return AbstractServerDelegate.okWorkflowResponse();
 		return null;
 	}
 	
