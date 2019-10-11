@@ -792,7 +792,7 @@ public class ServerManagementServerImpl implements RSPServer {
 		try {
 			return del.executeServerAction(req);
 		} catch(RuntimeException re) {
-			Status status = errorStatus("Error loading actions: " + re.getMessage(), re);
+			Status status = errorStatus("Error executing actions: " + re.getMessage(), re);
 			return errorWorkflowResponse(status, req.getRequestId());
 		}
 	}
