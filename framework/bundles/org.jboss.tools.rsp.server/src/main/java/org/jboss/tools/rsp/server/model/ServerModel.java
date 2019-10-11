@@ -235,7 +235,7 @@ public class ServerModel implements IServerModel {
 			return new CreateServerResponse(createDaoErrorStatus("Server Type " + serverType + " not found"), 
 					Collections.emptyList());
 		}
-		IStatus validAttributes = validateAttributes(type, attributes, true);
+		IStatus validAttributes = validateAttributes(type, attributes, true, false);
 		if( !validAttributes.isOK()) {
 			return new CreateServerResponse(StatusConverter.convert(validAttributes), 
 					getInvalidAttributeKeys(validAttributes));
@@ -265,28 +265,34 @@ public class ServerModel implements IServerModel {
 	}
 	
 	private IStatus validateAttributes(IServerType type, 
-			Map<String, Object> map, boolean updateMapWithConversions) {
+			Map<String, Object> map, boolean updateMapWithConversions,
+			boolean ignoreSecureAttributes) {
 		MultiStatus ms = new MultiStatus(ServerCoreActivator.BUNDLE_ID, 0, 
-				NLS.bind("There are missing/invalid required attributes for server type {0}", type), null);
-		runValidateAttributes(type, map, type.getRequiredAttributes(), true, ms, updateMapWithConversions);
-		runValidateAttributes(type, map, type.getOptionalAttributes(), false, ms, updateMapWithConversions);
+				NLS.bind("There are missing/invalid required attributes for server type {0}", type.getId()), null);
+		runValidateAttributes(type, map, type.getRequiredAttributes(), true, ignoreSecureAttributes, ms, updateMapWithConversions);
+		runValidateAttributes(type, map, type.getOptionalAttributes(), false, ignoreSecureAttributes, ms, updateMapWithConversions);
 		return ms;
 	}
 	
 	private void runValidateAttributes(IServerType type, Map<String, Object> map, 
-			 Attributes attr, boolean areRequired, 
+			 Attributes attr, boolean areRequired, boolean ignoreSecureAttributes,
 			MultiStatus ms, boolean updateMapWithConversions) {
 		CreateServerAttributesUtility util = new CreateServerAttributesUtility(attr);
 		Set<String> required = util.listAttributes();
 		for (String attrKey : required) {
 			String attributeType = util.getAttributeType(attrKey);
-			validateAttribute(attrKey, map, attributeType , ms, areRequired, updateMapWithConversions);
+			validateAttribute(attrKey, map, attributeType , ms, areRequired, 
+					ignoreSecureAttributes, updateMapWithConversions);
 		}
 	}
 
 	private void validateAttribute(String attrKey, Map<String, Object> attributeValues, String attributeType, 
-			MultiStatus multiStatus, boolean required, boolean updateMapWithConversions) {
+			MultiStatus multiStatus, boolean required, boolean ignoreSecureAttributes, boolean updateMapWithConversions) {
+		
 		Object value = attributeValues.get(attrKey);
+		if( value == null && ignoreSecureAttributes && attrKey.startsWith(SECURE_ATTRIBUTE_PREFIX))
+			return;
+
 		if (required && value == null) {
 			multiStatus.add(
 					new Status(IStatus.ERROR, attrKey, NLS.bind("Attribute {0} must not be null", attrKey)));
@@ -702,7 +708,7 @@ public class ServerModel implements IServerModel {
 			resp.getValidation().setStatus(errorStatus("Update server request contains unknown server type"));
 			return resp;
 		}
-		IStatus validAttributes = validateAttributes(type, ds.getMap(), false);
+		IStatus validAttributes = validateAttributes(type, ds.getMap(), false, true);
 		if( !validAttributes.isOK()) {
 			resp.getValidation().setStatus(StatusConverter.convert(validAttributes));
 			return resp;
