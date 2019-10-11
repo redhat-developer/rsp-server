@@ -15,6 +15,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
@@ -220,7 +222,18 @@ public class Server extends SecuredBase implements IServer, IServerWorkingCopy {
 	}
 
 	public void updateAttributes(Map<String, Object> newValues) {
-		// TODO smart to just clone the map? Idk
+		if( newValues == null ) {
+			this.map = null;
+			return;
+		}
+			
+		List<String> list = newValues.keySet().stream().filter(
+				str -> str.startsWith(IServerModel.SECURE_ATTRIBUTE_PREFIX))
+				.collect(Collectors.toList());
+		for(String s : list ) {
+			setAttribute(s, newValues.get(s));
+			newValues.remove(s);
+		}
 		this.map = newValues;
 	}
 
