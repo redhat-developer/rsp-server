@@ -55,6 +55,8 @@ public class WildFlyServerModelTest extends RSPCase {
                 "WildFly 16.x", "A server adapter capable of discovering and controlling a WildFly 16.x runtime instance.");
         ServerType wfly17 = new ServerType("org.jboss.ide.eclipse.as.wildfly.170",
                 "WildFly 17.x", "A server adapter capable of discovering and controlling a WildFly 17.x runtime instance.");
+        ServerType wfly18 = new ServerType("org.jboss.ide.eclipse.as.wildfly.180",
+                "WildFly 18.x", "A server adapter capable of discovering and controlling a WildFly 18.x runtime instance.");
 
         
         assertTrue(types.contains(wfly10));
@@ -65,6 +67,7 @@ public class WildFlyServerModelTest extends RSPCase {
         assertTrue(types.contains(wfly15));
         assertTrue(types.contains(wfly16));
         assertTrue(types.contains(wfly17));
+        assertTrue(types.contains(wfly18));
         assertTrue(types.contains(wildflyType));
     }
     

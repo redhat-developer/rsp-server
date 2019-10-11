@@ -15,18 +15,18 @@
 
 	<properties>
 		<skipITests>true</skipITests>
-		<server.id>install-wildfly-17.0.0.Final</server.id>
-		<server.url>http://download.jboss.org/wildfly/17.0.0.Final/wildfly-17.0.0.Final.zip</server.url>
-		<server.sha1>f3d9f92856c7a35d27b7c5ad6423a1dfa7f1f9e7</server.sha1>
-		<server.type.id>org.jboss.ide.eclipse.as.wildfly.170</server.type.id>
-		<server.version>17.0.0.Final</server.version>
+		<server.id>install-wildfly-18.0.0.Final</server.id>
+		<server.url>http://download.jboss.org/wildfly/18.0.0.Final/wildfly-18.0.0.Final.zip</server.url>
+		<server.sha1>28a1769ebf48faa44cbc77476fa98ceceb382d18</server.sha1>
+		<server.type.id>org.jboss.ide.eclipse.as.wildfly.180</server.type.id>
+		<server.version>18.0.0.Final</server.version>
 		<server.path>${project.build.directory}/wildfly-${server.version}</server.path>
 		<!-- Sonar report property for code coverage -->
 		<sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 		<!-- Quickstarts properties -->
 		<quickstarts.server>wildfly</quickstarts.server>
-		<quickstarts.url>https://github.com/wildfly/quickstart/archive/17.0.0.Final.zip</quickstarts.url>
-		<quickstarts.dir>quickstart-17.0.0.Final</quickstarts.dir>
+		<quickstarts.url>https://github.com/wildfly/quickstart/archive/18.0.0.Final.zip</quickstarts.url>
+		<quickstarts.dir>quickstart-18.0.0.Final</quickstarts.dir>
 	</properties>
 
 	<name>Runtime Server Protocol : Integration Tests</name>
@@ -194,7 +194,7 @@
 			</activation>
 			<properties>
 				<server.id>install-wildfly-14.0.1.Final</server.id>
-				<server.url>http://download.jboss.org/wildfly/14.0.1.Final/wildfly-14.0.1.Final.zip</server.url>
+				<server.url>https://download.jboss.org/wildfly/14.0.1.Final/wildfly-14.0.1.Final.zip</server.url>
 				<server.sha1>a6bafc5c8c6c148648d9229c2066f041f8dc656c</server.sha1>
 				<server.type.id>org.jboss.ide.eclipse.as.wildfly.140</server.type.id>
 				<server.version>14.0.1.Final</server.version>
@@ -210,7 +210,7 @@
 			</activation>
 			<properties>
 				<server.id>install-wildfly-15.0.1.Final</server.id>
-				<server.url>http://download.jboss.org/wildfly/15.0.1.Final/wildfly-15.0.1.Final.zip</server.url>
+				<server.url>https://download.jboss.org/wildfly/15.0.1.Final/wildfly-15.0.1.Final.zip</server.url>
 				<server.sha1>d30d603b3f25a0d2b080f94dd5af11869b81663b</server.sha1>
 				<server.type.id>org.jboss.ide.eclipse.as.wildfly.150</server.type.id>
 				<server.version>15.0.1.Final</server.version>
@@ -226,7 +226,7 @@
 			</activation>
 			<properties>
 				<server.id>install-wildfly-16.0.0.Final</server.id>
-				<server.url>http://download.jboss.org/wildfly/16.0.0.Final/wildfly-16.0.0.Final.zip</server.url>
+				<server.url>https://download.jboss.org/wildfly/16.0.0.Final/wildfly-16.0.0.Final.zip</server.url>
 				<server.sha1>b55ed374ab4f8534c2343ac9a283c71fa6d22dfe</server.sha1>
 				<server.type.id>org.jboss.ide.eclipse.as.wildfly.160</server.type.id>
 				<server.version>16.0.0.Final</server.version>
@@ -241,11 +241,27 @@
 				</property>
 			</activation>
 			<properties>
-				<server.id>install-wildfly-17.0.0.Final</server.id>
-				<server.url>http://download.jboss.org/wildfly/17.0.0.Final/wildfly-17.0.0.Final.zip</server.url>
-				<server.sha1>f3d9f92856c7a35d27b7c5ad6423a1dfa7f1f9e7</server.sha1>
+				<server.id>install-wildfly-17.0.1.Final</server.id>
+				<server.url>https://download.jboss.org/wildfly/17.0.1.Final/wildfly-17.0.1.Final.zip</server.url>
+				<server.sha1>6d3dd603eb3e177c6e7e06c649997ec182445789</server.sha1>
 				<server.type.id>org.jboss.ide.eclipse.as.wildfly.170</server.type.id>
-				<server.version>17.0.0.Final</server.version>
+				<server.version>17.0.1.Final</server.version>
+			</properties>
+		</profile>
+		<profile>
+			<id>wildfly-18</id>
+			<activation>
+				<property>
+					<name>wildfly</name>
+					<value>18</value>
+				</property>
+			</activation>
+			<properties>
+				<server.id>install-wildfly-18.0.0.Final</server.id>
+				<server.url>https://download.jboss.org/wildfly/18.0.0.Final/wildfly-18.0.0.Final.zip</server.url>
+				<server.sha1>28a1769ebf48faa44cbc77476fa98ceceb382d18</server.sha1>
+				<server.type.id>org.jboss.ide.eclipse.as.wildfly.180</server.type.id>
+				<server.version>18.0.0.Final</server.version>
 			</properties>
 		</profile>
 		<profile>
@@ -257,8 +273,8 @@
 			</activation>
 			<properties>
 				<quickstarts.server>wildfly</quickstarts.server>
-				<quickstarts.dir>quickstart-17.0.0.Final</quickstarts.dir>
-				<quickstarts.url>https://github.com/wildfly/quickstart/archive/17.0.0.Final.zip</quickstarts.url>
+				<quickstarts.dir>quickstart-18.0.0.Final</quickstarts.dir>
+				<quickstarts.url>https://github.com/wildfly/quickstart/archive/18.0.0.Final.zip</quickstarts.url>
 			</properties>
 		</profile>
 		<profile>
@@ -271,7 +287,7 @@
 			<properties>
 				<quickstarts.server>eap</quickstarts.server>
 				<quickstarts.dir>jboss-eap-7.2.1.GA-quickstarts</quickstarts.dir>
-				<quickstarts.url>http://download.eng.brq.redhat.com/released/JBoss-middleware/eap7/7.2.1/jboss-eap-7.2.1-quickstarts.zip</quickstarts.url>
+				<quickstarts.url>https://download.eng.brq.redhat.com/released/JBoss-middleware/eap7/7.2.1/jboss-eap-7.2.1-quickstarts.zip</quickstarts.url>
 			</properties>
 		</profile>
 	</profiles>
