@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.jboss.tools.rsp.server.spi.model.IDataStoreModel;
@@ -62,19 +65,26 @@ public class DataLocationCore implements IDataStoreModel {
 		File oldDefault = getLegacy1DefaultDataLocation();
 		File newDefault = getCurrentDefaultDataLocation();
 		if( shouldMigrate(oldDefault,newDefault) ) {
-			// There's data in the old default that can be copied to the new one
-			try {
-				newDefault.mkdirs();
-				copyFolder(oldDefault.toPath(), newDefault.toPath());
-			} catch(IOException ioe) {
-				// TODO log
-				LOG.error("Unable to migrate workspace to new location", ioe);
+			if( !migrateFolders(oldDefault, newDefault)) {
 				return oldDefault;
 			}
 		}
 		return newDefault;
 	}
 	
+	private boolean migrateFolders(File oldDefault, File newDefault) {
+		// There's data in the old default that can be copied to the new one
+		try {
+			newDefault.mkdirs();
+			copyFolder(oldDefault.toPath(), newDefault.toPath());
+			return true;
+		} catch(IOException ioe) {
+			// TODO log
+			LOG.error("Unable to migrate workspace to new location", ioe);
+			return false;
+		}
+	}
+
 	private boolean shouldMigrate(File old, File newLoc) {
 		if( old.exists() && old.list().length > 0 ) {
 			if( !newLoc.exists() || newLoc.list().length == 0 ) {
@@ -84,18 +94,27 @@ public class DataLocationCore implements IDataStoreModel {
 		return false;
 	}
 	
-	public  void copyFolder(Path src, Path dest) throws IOException {
+	public void copyFolder(Path src, Path dest) throws IOException {
+		List<IOException> all = new ArrayList<>();
 		try(Stream<Path> st = Files.walk(src)) {
-			st.forEach(source -> copy(source, dest.resolve(src.relativize(source))));
+			Iterator<Path> stIt = st.iterator();
+			while(stIt.hasNext()) {
+				Path srcIt = stIt.next();
+				Path destIt = dest.resolve(src.relativize(srcIt));
+				try {
+					Files.copy(srcIt, destIt, StandardCopyOption.REPLACE_EXISTING);
+				} catch(IOException ioe) {
+					all.add(ioe);
+				}
+			}
 		}
-	}
-
-	private void copy(Path source, Path dest) {
-	    try {
-	        Files.copy(source, dest, StandardCopyOption.REPLACE_EXISTING);
-	    } catch (Exception e) {
-	        throw new RuntimeException(e.getMessage(), e);
-	    }
+		if( all.size() > 0 ) {
+			String msg = "";
+			for( IOException one : all ) {
+				msg += one.getMessage() + "\n";
+			}
+			throw new IOException(msg);
+		}
 	}
 	
 	protected File getDefaultDataLocation() {
@@ -115,12 +134,12 @@ public class DataLocationCore implements IDataStoreModel {
 		return data;
 	}
 	
-	private File getLegacy1DefaultDataLocation() {
+	protected File getLegacy1DefaultDataLocation() {
 		File home = new File(System.getProperty(SYSPROP_USER_HOME));
 		return new File(home, DATA_LOCATION_LEGACY_DEFAULT);
 	}
 
-	private File getCurrentDefaultDataLocation() {
+	protected File getCurrentDefaultDataLocation() {
 		File home = new File(System.getProperty(SYSPROP_USER_HOME));
 		File root = new File(home, DATA_LOCATION_DEFAULT);
 		String rspId = System.getProperty(SYSPROP_RSP_ID);
