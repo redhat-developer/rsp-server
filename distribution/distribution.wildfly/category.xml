@@ -5,7 +5,7 @@
    </description>
    <bundle id="ch.qos.logback.classic"/>
    <bundle id="ch.qos.logback.core"/>
-   <bundle id="org.slf4j.api"/>
+   <bundle id="slf4j.api"/>
    <bundle id="org.eclipse.lsp4j.jsonrpc"/>
    <bundle id="com.google.gson"/>
    <bundle id="org.apache.commons.compress"/>
