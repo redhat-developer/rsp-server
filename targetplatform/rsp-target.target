@@ -20,6 +20,7 @@
 			<unit id="org.mockito" version="1.9.5.v201605172210" />
 		</location>
 
+
 		<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 			<repository location="http://oxbeef.net/permanent/p2/20191022/repository/" />
 
@@ -27,6 +28,12 @@
 			<unit id="ch.qos.logback.classic" version="1.2.3" />
 			<unit id="ch.qos.logback.core" version="1.2.3" />
 			<unit id="slf4j.api" version="1.7.28" />
+		</location>
+
+		<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+			<repository location="https://download.jboss.org/jbosstools/updates/requirements/lsp4j/0.8.1.v20190925-0747/" />
+			<!-- lsp4j -->
+			<unit id="org.eclipse.lsp4j.jsonrpc" version="0.8.1.v20190925-0746" />
 		</location>
 
 
@@ -70,10 +77,6 @@
 			<!-- org.eclipse.linuxtools.docker.reddeer 2.1.0.201805161441 requires org.hamcrest.library 1.3.0 -->
 			<unit id="org.hamcrest.core" version="1.3.0.v20180420-1519" />
 			<unit id="org.hamcrest.library" version="1.3.0.v20180524-2246" />
-
-			<!-- lsp4e -->
-			<unit id="org.eclipse.lsp4j.jsonrpc" version="0.7.0.v20190228-1517" />
-
 
 			<!-- required for java 11 -->
 			<unit id="javax.annotation" version="1.2.0.v201602091430" />
