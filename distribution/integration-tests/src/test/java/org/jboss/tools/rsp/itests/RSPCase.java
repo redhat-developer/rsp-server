@@ -201,15 +201,15 @@ public abstract class RSPCase {
 	}
 
 	protected void deleteServer(String id) throws Exception {
-		CompletableFuture<List<ServerHandle>> handles = serverProxy.getServerHandles();
-		ServerHandle handle = handles.get().stream().filter(server -> id.equals(server.getId())).findFirst()
+		List<ServerHandle> handles = serverProxy.getServerHandles().get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
+		ServerHandle handle = handles.stream().filter(server -> id.equals(server.getId())).findFirst()
 				.orElse(null);
 		if (handle == null) {
 			return;
 		}
 		Status status = timeConsumption(new Callable<Status>() {
 			public Status call() throws InterruptedException, ExecutionException, TimeoutException {
-				return serverProxy.deleteServer(handle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
+				return serverProxy.deleteServer(handle).get(SERVER_OPERATION_TIMEOUT, TimeUnit.MILLISECONDS);
 			}
 		});
 		assertEquals(Status.OK, status.getSeverity());
