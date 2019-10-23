@@ -154,28 +154,32 @@ public class ServerManagementServerLauncher {
 					createLoggingPrintWriter());
 	}
 	
-	private class LoggingStringWriter extends StringWriter {
-	    public void flush() {
-	    	String val = null;
-	    	synchronized(this) {
-	    		val = getBuffer().toString();
-	    		getBuffer().setLength(0);
-	    	}
-	    	LOG.debug(val);
-	    }
-	}
+
 	private LoggingPrintWriter createLoggingPrintWriter() {
 		LoggingStringWriter sw = new LoggingStringWriter();
 		LoggingPrintWriter writer = new LoggingPrintWriter(sw);
 		return writer;
 	}
+	private class LoggingStringWriter extends StringWriter {
+		@Override
+	    public synchronized void flush() {
+    		String val = getBuffer().toString();
+    		getBuffer().setLength(0);
+	    	LOG.debug(val);
+	    }
+	}
 	private static class LoggingPrintWriter extends PrintWriter {
-		private StringWriter sw;
 		public LoggingPrintWriter(LoggingStringWriter writer) {
 			super(writer);
-			this.sw = writer;
 		}
-		
+		@Override
+		public synchronized void print(String val) {
+			super.print(val);
+		}
+		@Override
+		public synchronized void flush() {
+			super.flush();
+		}
 	}
 	
 	public void shutdown() {
