@@ -56,6 +56,7 @@ public class RSPServerHandler {
 //	        		"-Xdebug", 
 //	        		"-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8001",
 //	        		"-Xnoagent",
+        		"-Drsp.log.level=1",
         		"-jar", "bin/felix.jar"
         		);
         
