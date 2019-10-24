@@ -8,8 +8,11 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.itests.util;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -40,35 +43,73 @@ public class RSPServerHandler {
     private static final String DATA_BACKUP = SERVER_DATA + ".backup";
 
     private static Process serverProcess;
+	private static InputStream serverErr;
+	private static InputStream serverOut;
 
     public static void prepareServer() throws ZipException {
     	if( SERVER_ROOT_SYSPROP_RESOLVED == null || !(new File(SERVER_ROOT_SYSPROP_RESOLVED).exists())) {
 	    	ZipFile zipFile = new ZipFile(new File(DISTRIBUTION_PATH, DISTRIBUTION_FILENAME));
 	        zipFile.extractAll(DISTRIBUTION_PATH);
     	}
-    }
+	}
 
-    public static void startServer() throws Exception {
-    	// Debug on port 8001
-        ProcessBuilder builder = new ProcessBuilder(
-        		"java", 
-        			// debug flags
+	public static void startServer() throws Exception {
+		// Debug on port 8001
+		ProcessBuilder builder = new ProcessBuilder("java",
+		// debug flags
 //	        		"-Xdebug", 
 //	        		"-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8001",
 //	        		"-Xnoagent",
-        		"-Drsp.log.level=1",
-        		"-jar", "bin/felix.jar"
-        		);
-        
-        // No debugging
-        //ProcessBuilder builder = new ProcessBuilder("java", "-jar", "bin/felix.jar");
+				"-Drsp.log.level=1", "-jar", "bin/felix.jar");
 
-        builder.directory(new File(SERVER_ROOT));
-        serverProcess = builder.start();
-        Thread.sleep(WAIT_SERVER_STARTED);
-    }
+		// No debugging
+		// ProcessBuilder builder = new ProcessBuilder("java", "-jar", "bin/felix.jar");
+
+		builder.directory(new File(SERVER_ROOT));
+		serverProcess = builder.start();
+		serverOut = serverProcess.getInputStream();
+		serverErr = serverProcess.getErrorStream();
+		readForever(serverOut);
+		readForever(serverErr);
+		Thread.sleep(WAIT_SERVER_STARTED);
+	}
+
+	private static void readForever(InputStream is) {
+    	new Thread("Read Server streams") {
+    		public void run() {
+    			BufferedReader br = null;
+    			 try {
+    		            br = new BufferedReader(new InputStreamReader(is));
+    		            String line = null;
+    		            while ((line = br.readLine()) != null) {
+    		            }
+    		        } catch (IOException ioe) {
+    		        } finally {
+    		            // close the streams using close method
+    		            try {
+    		                if (br != null) {
+    		                    br.close();
+    		                }
+    		            } catch (IOException ioe) {
+    		            }
+    		        }
+    		         
+    		    }
+    	}.start();
+	}
 
     public static void stopServer() {
+
+    	try {
+    		if( serverOut != null )
+    			serverOut.close();
+    	} catch(IOException ioe) {
+    	}
+    	try {
+    		if( serverErr != null )
+    			serverErr.close();
+    	} catch(IOException ioe) {
+    	}
     	if (serverProcess != null) {
     		serverProcess.destroy();
     	}
