@@ -160,14 +160,20 @@ public class ServerManagementServerLauncher {
 		LoggingPrintWriter writer = new LoggingPrintWriter(sw);
 		return writer;
 	}
+
 	private class LoggingStringWriter extends StringWriter {
 		@Override
-	    public synchronized void flush() {
-    		String val = getBuffer().toString();
-    		getBuffer().setLength(0);
-	    	LOG.debug(val);
-	    }
+		public void flush() {
+			String val = null;
+			synchronized (this) {
+				val = getBuffer().toString();
+				getBuffer().setLength(0);
+			}
+			if (val != null)
+				LOG.debug(val);
+		}
 	}
+	
 	private static class LoggingPrintWriter extends PrintWriter {
 		public LoggingPrintWriter(LoggingStringWriter writer) {
 			super(writer);

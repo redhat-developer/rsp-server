@@ -6,7 +6,7 @@
             <pattern>%d{HH:mm:ss.SSS} [%.15thread] %-5level %logger{36}:%line - %msg%n</pattern>
         </encoder>
     </appender>
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <appender name="FILE" class="ch.qos.logback.classic.AsyncAppender">
         <file>logs/rsp-server.log</file>
         <append>true</append>
         <encoder>
@@ -29,7 +29,7 @@
     <!-- log DEBUG from any log API using a logger name starting with `org.my.foo` -->
     <logger name="org.my.foo" level="DEBUG"/>
 
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="FILE" />
     </root>
 </configuration>
