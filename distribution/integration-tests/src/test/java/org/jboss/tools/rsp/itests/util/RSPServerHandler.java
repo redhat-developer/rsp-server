@@ -99,7 +99,9 @@ public class RSPServerHandler {
 	}
 
     public static void stopServer() {
-
+    	if (serverProcess != null) {
+    		serverProcess.destroy();
+    	}
     	try {
     		if( serverOut != null )
     			serverOut.close();
@@ -109,9 +111,6 @@ public class RSPServerHandler {
     		if( serverErr != null )
     			serverErr.close();
     	} catch(IOException ioe) {
-    	}
-    	if (serverProcess != null) {
-    		serverProcess.destroy();
     	}
     }
 
