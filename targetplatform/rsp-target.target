@@ -22,7 +22,7 @@
 
 
 		<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
-			<repository location="http://oxbeef.net/permanent/p2/20191022/repository/" />
+			<repository location="https://download.jboss.org/jbosstools/updates/requirements/logback/1.2.3/" />
 
 			<!-- qos.logback 1.2.3 requires org.slf4j.spi [1.7.10,1.8.0) -->
 			<unit id="ch.qos.logback.classic" version="1.2.3" />
