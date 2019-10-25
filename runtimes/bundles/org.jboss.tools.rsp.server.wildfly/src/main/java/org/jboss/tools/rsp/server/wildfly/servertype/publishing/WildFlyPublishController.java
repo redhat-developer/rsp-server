@@ -49,15 +49,18 @@ public class WildFlyPublishController extends StandardJBossPublishController imp
 	public int publishModule(DeployableReference withOptions, 
 			int serverPublishRequest, int modulePublishState)
 			throws CoreException {
-		File src = new File(withOptions.getPath());
+		
+		// Check error conditions
+		String withOptionsPath = withOptions.getPath(); 
 		File dest = getDestinationPath(withOptions).toFile();
-		if( src == null || !src.exists()) {
+		if( withOptionsPath == null || !(new File(withOptionsPath).exists())) {
 			// Source doesn't need to exist when deleting deployments, only when copying them
 			if( modulePublishState != ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) 
 				throw new CoreException(new Status(IStatus.ERROR, Activator.BUNDLE_ID, "Module source does not exist"));
 		}
-		int newStatus = super.publishModule(withOptions, serverPublishRequest, modulePublishState);
 		
+		// Do the publish and possibly add deployment markers
+		int newStatus = super.publishModule(withOptions, serverPublishRequest, modulePublishState);
 		conditionallyAddDeploymentMarker(newStatus, modulePublishState, serverPublishRequest, withOptions, dest);
 		return newStatus;
 	}
