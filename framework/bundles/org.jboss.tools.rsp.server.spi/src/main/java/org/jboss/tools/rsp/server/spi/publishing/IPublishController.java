@@ -6,13 +6,13 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.rsp.server.wildfly.servertype.publishing;
+package org.jboss.tools.rsp.server.spi.publishing;
 
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 
-public interface IJBossPublishController {
+public interface IPublishController {
 
 	public IStatus canAddDeployable(DeployableReference ref);
 	

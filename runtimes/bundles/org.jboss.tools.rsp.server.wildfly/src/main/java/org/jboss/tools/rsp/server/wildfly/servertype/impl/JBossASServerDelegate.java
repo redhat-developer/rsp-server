@@ -12,9 +12,9 @@ import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
+import org.jboss.tools.rsp.server.spi.publishing.IPublishController;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.wildfly.servertype.AbstractJBossServerDelegate;
-import org.jboss.tools.rsp.server.wildfly.servertype.publishing.IJBossPublishController;
 import org.jboss.tools.rsp.server.wildfly.servertype.publishing.StandardJBossPublishController;
 
 public class JBossASServerDelegate extends AbstractJBossServerDelegate {
@@ -30,7 +30,7 @@ public class JBossASServerDelegate extends AbstractJBossServerDelegate {
 		return LauncherDiscovery.getDefault().getShutdownLauncher(getServer());
 	}
 	@Override
-	protected IJBossPublishController createPublishController() {
+	protected IPublishController createPublishController() {
 		return new StandardJBossPublishController(getServer(), this);
 	}
 	@Override

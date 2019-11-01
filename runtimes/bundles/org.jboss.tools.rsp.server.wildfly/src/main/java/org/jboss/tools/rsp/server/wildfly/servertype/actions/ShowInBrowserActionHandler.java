@@ -133,7 +133,7 @@ public class ShowInBrowserActionHandler {
 		}
 		return null;
 	}
-	// copied from StandardJBossPublishController
+	// copied from AbstractPublishController
 	protected String getOutputName(DeployableReference ref) {
 		Map<String, Object> options = ref.getOptions();
 		String def = null;

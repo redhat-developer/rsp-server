@@ -26,7 +26,7 @@ import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WildFlyPublishController extends StandardJBossPublishController implements IJBossPublishController {
+public class WildFlyPublishController extends StandardJBossPublishController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(WildFlyPublishController.class);
     
