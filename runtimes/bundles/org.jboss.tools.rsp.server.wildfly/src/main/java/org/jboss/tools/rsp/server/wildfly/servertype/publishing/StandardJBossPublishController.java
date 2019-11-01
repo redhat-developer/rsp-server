@@ -11,14 +11,14 @@ package org.jboss.tools.rsp.server.wildfly.servertype.publishing;
 import java.io.File;
 import java.nio.file.Path;
 
-import org.jboss.tools.rsp.server.spi.publishing.AbstractPublishController;
+import org.jboss.tools.rsp.server.spi.publishing.AbstractFilesystemPublishController;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.wildfly.servertype.AbstractJBossServerDelegate;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class StandardJBossPublishController extends AbstractPublishController {
+public class StandardJBossPublishController extends AbstractFilesystemPublishController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StandardJBossPublishController.class);
 	

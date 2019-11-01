@@ -36,13 +36,13 @@ import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractPublishController implements IPublishController {
+public abstract class AbstractFilesystemPublishController implements IPublishController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(AbstractPublishController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AbstractFilesystemPublishController.class);
 	
 	private IServer server;
 	private IServerDelegate delegate;
-	public AbstractPublishController(IServer server, IServerDelegate delegate) {
+	public AbstractFilesystemPublishController(IServer server, IServerDelegate delegate) {
 		this.server = server;
 		this.delegate = delegate;
 	}
