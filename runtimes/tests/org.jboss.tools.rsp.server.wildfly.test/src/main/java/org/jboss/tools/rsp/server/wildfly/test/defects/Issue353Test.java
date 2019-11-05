@@ -20,10 +20,10 @@ import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
+import org.jboss.tools.rsp.server.spi.publishing.IPublishController;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
 import org.jboss.tools.rsp.server.wildfly.servertype.impl.WildFlyServerDelegate;
-import org.jboss.tools.rsp.server.wildfly.servertype.publishing.IJBossPublishController;
 import org.jboss.tools.rsp.server.wildfly.servertype.publishing.WildFlyPublishController;
 import org.junit.Test;
 
@@ -51,7 +51,7 @@ public class Issue353Test extends AbstractMockServerTest {
 			public IStatus canRemoveDeployable(DeployableReference reference) {
 				return super.canRemoveDeployable(reference);
 			}
-			protected IJBossPublishController getOrCreatePublishController() {
+			protected IPublishController getOrCreatePublishController() {
 				return new WildFlyPublishController(s, null) {
 					public IStatus canRemoveDeployable(DeployableReference ref) {
 						if( ref.getOptions() == null ) {

@@ -23,6 +23,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.server.model.IFullPublishRequiredCallback;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
+import org.jboss.tools.rsp.server.spi.publishing.IPublishController;
 import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
@@ -31,7 +32,6 @@ import org.jboss.tools.rsp.server.wildfly.servertype.AbstractJBossServerDelegate
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
 import org.jboss.tools.rsp.server.wildfly.servertype.actions.EditServerConfigurationActionHandler;
 import org.jboss.tools.rsp.server.wildfly.servertype.actions.ShowInBrowserActionHandler;
-import org.jboss.tools.rsp.server.wildfly.servertype.publishing.IJBossPublishController;
 import org.jboss.tools.rsp.server.wildfly.servertype.publishing.WildFlyPublishController;
 
 public class WildFlyServerDelegate extends AbstractJBossServerDelegate {
@@ -60,7 +60,7 @@ public class WildFlyServerDelegate extends AbstractJBossServerDelegate {
 		return new WildFlyStopLauncher(this);
 	}
 	@Override
-	protected IJBossPublishController createPublishController() {
+	protected IPublishController createPublishController() {
 		return new WildFlyPublishController(getServer(), this);
 	}
 	

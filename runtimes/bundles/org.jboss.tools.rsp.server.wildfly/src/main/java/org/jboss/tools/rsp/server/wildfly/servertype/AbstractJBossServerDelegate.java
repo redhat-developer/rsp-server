@@ -41,6 +41,7 @@ import org.jboss.tools.rsp.server.spi.model.polling.IPollResultListener;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller;
 import org.jboss.tools.rsp.server.spi.model.polling.PollThreadUtils;
 import org.jboss.tools.rsp.server.spi.model.polling.WebPortPoller;
+import org.jboss.tools.rsp.server.spi.publishing.IPublishController;
 import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
@@ -51,7 +52,6 @@ import org.jboss.tools.rsp.server.wildfly.impl.Activator;
 import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.ExtendedServerPropertiesAdapterFactory;
 import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.JBossExtendedProperties;
 import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.ServerExtendedProperties;
-import org.jboss.tools.rsp.server.wildfly.servertype.publishing.IJBossPublishController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +60,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractJBossServerDelegate.class);
 	public static final String START_LAUNCH_SHARED_DATA = "AbstractJBossServerDelegate.startLaunch";
 	
-	private IJBossPublishController publishController;
+	private IPublishController publishController;
 	
 	public AbstractJBossServerDelegate(IServer server) {
 		super(server);
@@ -304,14 +304,14 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		return Status.OK_STATUS;
 	}
 
-	protected IJBossPublishController getOrCreatePublishController() {
+	protected IPublishController getOrCreatePublishController() {
 		if( publishController == null ) {
 			publishController = createPublishController();
 		}
 		return publishController;
 	}
 	
-	protected abstract IJBossPublishController createPublishController();
+	protected abstract IPublishController createPublishController();
 	
 	@Override
 	public IStatus canAddDeployable(DeployableReference ref) {

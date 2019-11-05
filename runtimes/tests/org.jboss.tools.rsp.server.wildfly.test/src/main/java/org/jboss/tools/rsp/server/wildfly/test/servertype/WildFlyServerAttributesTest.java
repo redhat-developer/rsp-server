@@ -20,6 +20,7 @@ import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.eclipse.jdt.launching.StandardVMType;
 import org.jboss.tools.rsp.server.model.internal.publishing.ServerPublishStateModel;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
+import org.jboss.tools.rsp.server.spi.publishing.IPublishController;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
@@ -27,7 +28,6 @@ import org.jboss.tools.rsp.server.spi.servertype.IServerWorkingCopy;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
 import org.jboss.tools.rsp.server.wildfly.servertype.impl.ServerTypeStringConstants;
 import org.jboss.tools.rsp.server.wildfly.servertype.impl.WildFlyServerDelegate;
-import org.jboss.tools.rsp.server.wildfly.servertype.publishing.IJBossPublishController;
 import org.junit.Test;
 
 public class WildFlyServerAttributesTest {
@@ -130,7 +130,7 @@ public class WildFlyServerAttributesTest {
 		}
 		
 		@Override
-		public 	IJBossPublishController getOrCreatePublishController() {
+		public 	IPublishController getOrCreatePublishController() {
 			return super.getOrCreatePublishController();
 		}
 

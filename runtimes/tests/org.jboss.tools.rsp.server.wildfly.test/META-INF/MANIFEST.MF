@@ -34,6 +34,7 @@ Import-Package: org.assertj.core.api,
  org.jboss.tools.rsp.server.spi.launchers,
  org.jboss.tools.rsp.server.spi.model,
  org.jboss.tools.rsp.server.spi.model.polling,
+ org.jboss.tools.rsp.server.spi.publishing,
  org.jboss.tools.rsp.server.spi.servertype,
  org.jboss.tools.rsp.server.spi.util,
  org.osgi.framework
