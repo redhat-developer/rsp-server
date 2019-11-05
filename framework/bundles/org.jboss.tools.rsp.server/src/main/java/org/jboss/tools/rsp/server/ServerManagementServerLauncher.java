@@ -21,6 +21,7 @@ import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.SocketLauncher;
 import org.jboss.tools.rsp.server.model.ServerManagementModel;
 import org.jboss.tools.rsp.server.model.ServerPersistenceManager;
+import org.jboss.tools.rsp.server.persistence.DataLocationCore;
 import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.slf4j.Logger;
@@ -52,7 +53,16 @@ public class ServerManagementServerLauncher {
 	}
 	
 	protected ServerManagementServerImpl createImpl() {
-		return new ServerManagementServerImpl(this, new ServerManagementModel());
+		DataLocationCore dlc = new DataLocationCore();
+		if( !dlc.isInUse()) {
+			try {
+				dlc.lock();
+				return new ServerManagementServerImpl(this, new ServerManagementModel(dlc));
+			} catch(IOException ioe) {
+				LOG.error("Error locking workspace", ioe.getMessage(), ioe);
+			}
+		}
+		throw new RuntimeException("Workspace is locked. Please verify workspace is not in use, or, remove the .lock file in the folder " + dlc.getDataLocation().getAbsolutePath());
 	}
 	
 	public IServerManagementModel getModel() {
@@ -197,6 +207,11 @@ public class ServerManagementServerLauncher {
 			if( serverSocket != null )
 				serverSocket.close();
 		} catch(IOException ioe) {
+		}
+		try {
+			serverImpl.getModel().getDataStoreModel().unlock();
+		} catch(IOException ioe) {
+			
 		}
 		ShutdownExecutor.getExecutor().shutdown();
 	}

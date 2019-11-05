@@ -9,9 +9,12 @@
 package org.jboss.tools.rsp.server.spi.model;
 
 import java.io.File;
+import java.io.IOException;
 
 public interface IDataStoreModel {
 
-	File getDataLocation();
-
+	public File getDataLocation();
+	public boolean isInUse();
+	public boolean lock() throws IOException;
+	public boolean unlock() throws IOException;
 }

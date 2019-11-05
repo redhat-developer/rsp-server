@@ -30,6 +30,7 @@ public class DataLocationCore implements IDataStoreModel {
 	private static final String SYSPROP_USER_HOME = "user.home";
 
 	private File fLocation = null;
+	private boolean lockedByUs = false;
 	public DataLocationCore() {
 		this(null);
 	}
@@ -127,5 +128,36 @@ public class DataLocationCore implements IDataStoreModel {
 			rspId = RSP_ID_DEFAULT;
 		File dataDir = new File(root, rspId);
 		return dataDir;
+	}
+
+	public synchronized boolean isInUse() {
+		return new File(getDataLocation(), ".lock").exists();
+	}
+
+	public synchronized boolean lock() throws IOException {
+		File f = new File(getDataLocation(), ".lock");
+		if( f.exists()) {
+			throw new IOException("Workspace already locked");
+		}
+		f.deleteOnExit();
+		boolean b = f.createNewFile();
+		if( b ) {
+			lockedByUs = true;
+		}
+		return b;
+	}
+	public synchronized boolean unlock() throws IOException {
+		File f = new File(getDataLocation(), ".lock"); 
+		if( f.exists()) {
+			if( !lockedByUs ) {
+				throw new IOException("Workspace can only be unlocked by its locker.");
+			}
+			boolean b = f.delete();
+			if( b ) {
+				lockedByUs = false;
+			}
+			return b;
+		}
+		return true;
 	}
 }
