@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
@@ -43,6 +44,7 @@ import org.jboss.tools.rsp.server.ServerCoreActivator;
 import org.jboss.tools.rsp.server.model.internal.DaoUtilities;
 import org.jboss.tools.rsp.server.model.internal.DummyServer;
 import org.jboss.tools.rsp.server.model.internal.Server;
+import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModelListener;
@@ -617,32 +619,63 @@ public class ServerModel implements IServerModel {
 
 	@Override
 	public IStatus publish(IServer server, int kind) throws CoreException {
-		if(kind != ServerManagementAPIConstants.PUBLISH_INCREMENTAL &&
-				kind != ServerManagementAPIConstants.PUBLISH_FULL &&
-						kind != ServerManagementAPIConstants.PUBLISH_CLEAN &&
-								kind != ServerManagementAPIConstants.PUBLISH_AUTO) {
-			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+		IStatus canPublish = checkCanPublishError(server, kind);
+		if( !canPublish.isOK())
+			return canPublish;
+		return getServerDelegate(server).publish(kind);
+	}
+	
+	private IServerDelegate getServerDelegate(IServer server) {
+		return serverDelegates.get(server.getId());
+	}
+	
+	@Override
+	public IStatus publishAsync(IServer server, int kind) throws CoreException {
+		IStatus canPublish = checkCanPublishError(server, kind);
+		if( !canPublish.isOK())
+			return canPublish;
+		
+		final RSPClient rspc = ClientThreadLocal.getActiveClient();;
+		new Thread("Asynchronous Publish") {
+			public void run() {
+				ClientThreadLocal.setActiveClient(rspc);
+				IStatus stat = getServerDelegate(server).publish(kind);
+				// TODO
+				// RSPClient only has prompt, no ability to just send a message / information
+				if( !stat.isOK()) {
+					LOG.error("Error publishing to server {0}: " + stat.getMessage(), server.getId());
+				}
+				ClientThreadLocal.setActiveClient(null);
+			}
+		}.start();
+		return getServerDelegate(server).publish(kind);
+	}
+
+	private IStatus checkCanPublishError(IServer server, int kind) throws CoreException {
+		if (kind != ServerManagementAPIConstants.PUBLISH_INCREMENTAL
+				&& kind != ServerManagementAPIConstants.PUBLISH_FULL
+				&& kind != ServerManagementAPIConstants.PUBLISH_CLEAN
+				&& kind != ServerManagementAPIConstants.PUBLISH_AUTO) {
+			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID,
 					NLS.bind("Publish request for server {0} failed: Publish kind constant {1} is invalid.",
 							server.getId(), kind));
 		}
-		
 
 		IServerDelegate s = serverDelegates.get(server.getId());
-		if( s != null ) {
-			IStatus canPublish = s.canPublish();
-			if( canPublish != null && canPublish.isOK()) {
-				return s.publish(kind);
-			} else {
-				String canPublishMsg = (canPublish == null ? "null" : canPublish.getMessage());
-				return new Status(IStatus.ERROR, 
-						ServerCoreActivator.BUNDLE_ID, 
-						NLS.bind("Server {0} is not in a state that can be published to: {1}",
-								server.getId(), canPublishMsg));
-			}
+		if (s == null) {
+			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID,
+					NLS.bind("Server Delegate for server {0} is not found.", server.getId()));
 		}
-		return Status.CANCEL_STATUS;
-	}
 
+		IStatus canPublish = s.canPublish();
+		if (canPublish == null || !canPublish.isOK()) {
+			String canPublishMsg = (canPublish == null ? "null" : canPublish.getMessage());
+			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, NLS
+					.bind("Server {0} is not in a state that can be published to: {1}", server.getId(), canPublishMsg));
+		}
+
+		return Status.OK_STATUS;
+	}
 	private org.jboss.tools.rsp.api.dao.Status createDaoErrorStatus(String message) {
 		return new org.jboss.tools.rsp.api.dao.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, message, null);
 	}
