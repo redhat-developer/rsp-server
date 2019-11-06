@@ -113,6 +113,17 @@ public interface IServerModel {
 	IStatus publish(IServer server, int kind) throws CoreException;
 
 	/**
+	 * Publish the server asynchronously
+	 * 
+	 * @param server
+	 * @param kind
+	 * @return
+	 * @throws CoreException
+	 */
+	IStatus publishAsync(IServer server, int kind) throws CoreException;
+
+
+	/**
 	 * Update the server from the given remote request
 	 * @param req
 	 * @return

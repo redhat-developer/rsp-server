@@ -370,6 +370,17 @@ public interface RSPServer {
 	@JsonRequest
 	public CompletableFuture<Status> publish(PublishServerRequest request);
 
+	/**
+	 * The `server/publishAsync` request is sent by the client to the server
+	 * to instruct the server adapter to publish any changes to the backing runtime
+	 * in an asynchronous fashion, ie, guaranteed to respond quickly.
+	 *
+	 * @param request
+	 * @return
+	 */
+	@JsonRequest
+	public CompletableFuture<Status> publishAsync(PublishServerRequest request);
+
 
 	/*
 	 * Downloading Runtimes

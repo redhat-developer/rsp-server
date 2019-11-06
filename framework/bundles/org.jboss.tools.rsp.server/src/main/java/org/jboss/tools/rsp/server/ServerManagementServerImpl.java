@@ -661,18 +661,43 @@ public class ServerManagementServerImpl implements RSPServer {
 		return createCompletableFuture(() -> publishSync(request));
 	}
 
-	private Status publishSync(PublishServerRequest request) {
+	private Status checkPublishRequestError(PublishServerRequest request) {
 		if( request == null || request.getServer() == null 
 				|| request.getServer().getId() == null) {
 			return errorStatus("Invalid request; Expected fields not present.", null);
 		}
+		IServer server = managementModel.getServerModel().getServer(request.getServer().getId());
+		if( server == null ) {
+			return errorStatus("Server not found: " + request.getServer().getId(), null);
+		}
+		return null;
+	}
+	private Status publishSync(PublishServerRequest request) {
+		Status stat = checkPublishRequestError(request);
+		if( stat != null )
+			return stat;
 		try {
 			IServer server = managementModel.getServerModel().getServer(request.getServer().getId());
-			if( server == null ) {
-				return errorStatus("Server not found: " + request.getServer().getId(), null);
-			}
-			IStatus stat = managementModel.getServerModel().publish(server, request.getKind());
-			return StatusConverter.convert(stat);
+			IStatus stat2 = managementModel.getServerModel().publish(server, request.getKind());
+			return StatusConverter.convert(stat2);
+		} catch(CoreException ce) {
+			return StatusConverter.convert(ce.getStatus());
+		}
+	}
+
+	@Override
+	public CompletableFuture<Status> publishAsync(PublishServerRequest request) {
+		return createCompletableFuture(() -> publishAsyncInternal(request));
+	}
+
+	private Status publishAsyncInternal(PublishServerRequest request) {
+		Status stat = checkPublishRequestError(request);
+		if( stat != null )
+			return stat;
+		try {
+			IServer server = managementModel.getServerModel().getServer(request.getServer().getId());
+			IStatus stat2 = managementModel.getServerModel().publishAsync(server, request.getKind());
+			return StatusConverter.convert(stat2);
 		} catch(CoreException ce) {
 			return StatusConverter.convert(ce.getStatus());
 		}

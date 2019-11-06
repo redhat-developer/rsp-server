@@ -128,6 +128,10 @@ export class Outgoing {
         return Common.sendSimpleRequest(this.connection, Messages.Server.PublishRequest.type,
             param, timeout, ErrorMessages.PUBLISH_TIMEOUT);
     }
+    publishAsync(param: Protocol.PublishServerRequest, timeout: number = Common.DEFAULT_TIMEOUT): Promise<Protocol.Status> {
+        return Common.sendSimpleRequest(this.connection, Messages.Server.PublishAsyncRequest.type,
+            param, timeout, ErrorMessages.PUBLISHASYNC_TIMEOUT);
+    }
     listDownloadableRuntimes(timeout: number = Common.DEFAULT_TIMEOUT): Promise<Protocol.ListDownloadRuntimeResponse> {
         return Common.sendSimpleRequest(this.connection, Messages.Server.ListDownloadableRuntimesRequest.type,
             null, timeout, ErrorMessages.LISTDOWNLOADABLERUNTIMES_TIMEOUT);
@@ -185,6 +189,7 @@ export namespace ErrorMessages {
     export const ADDDEPLOYABLE_TIMEOUT = 'Failed to add deployable in time';
     export const REMOVEDEPLOYABLE_TIMEOUT = 'Failed to remove deployable in time';
     export const PUBLISH_TIMEOUT = 'Failed to publish in time';
+    export const PUBLISHASYNC_TIMEOUT = 'Failed to publish async in time';
     export const LISTDOWNLOADABLERUNTIMES_TIMEOUT = 'Failed to list downloadable runtimes in time';
     export const DOWNLOADRUNTIME_TIMEOUT = 'Failed to download runtime in time';
     export const LISTSERVERACTIONS_TIMEOUT = 'Failed to list server actions in time';

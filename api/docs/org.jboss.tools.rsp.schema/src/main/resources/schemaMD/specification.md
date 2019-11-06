@@ -2452,6 +2452,92 @@ This endpoint returns the following schema as a return value:
     ok: boolean;
 }</pre></td></tr></table>
 
+#### server/publishAsync
+
+ The `server/publishAsync` request is sent by the client to the server to instruct the server adapter to publish any changes to the backing runtime in an asynchronous fashion, ie, guaranteed to respond quickly. @param request @return 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "server" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "visibleName" : {
+              "type" : "string"
+            },
+            "description" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    },
+    "kind" : {
+      "type" : "integer"
+    }
+  }
+}</pre></td><td><pre>export interface PublishServerRequest {
+    server: ServerHandle;
+    kind: number;
+}
+
+export interface ServerHandle {
+    id: string;
+    type: ServerType;
+}
+
+export interface ServerType {
+    id: string;
+    visibleName: string;
+    description: string;
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "severity" : {
+      "type" : "integer"
+    },
+    "plugin" : {
+      "type" : "string"
+    },
+    "code" : {
+      "type" : "integer"
+    },
+    "message" : {
+      "type" : "string"
+    },
+    "trace" : {
+      "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
+    }
+  }
+}</pre></td><td><pre>export interface Status {
+    severity: number;
+    plugin: string;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+}</pre></td></tr></table>
+
 #### server/listDownloadableRuntimes
 
  Get a list of all downloadable runtimes @return 

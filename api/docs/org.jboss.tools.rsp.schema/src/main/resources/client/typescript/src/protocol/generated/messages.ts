@@ -308,6 +308,17 @@ export namespace Messages {
             export const type = new RequestType<Protocol.PublishServerRequest, Protocol.Status, void, void>('server/publish');
         }
         /**
+         * The `server/publishAsync` request is sent by the client to the server
+         * to instruct the server adapter to publish any changes to the backing runtime
+         * in an asynchronous fashion, ie, guaranteed to respond quickly.
+         *
+         * @param request
+         * @return
+         */
+        export namespace PublishAsyncRequest {
+            export const type = new RequestType<Protocol.PublishServerRequest, Protocol.Status, void, void>('server/publishAsync');
+        }
+        /**
          * Get a list of all downloadable runtimes
          * @return
          */
