@@ -26,6 +26,7 @@ import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
+import org.jboss.tools.rsp.api.dao.MessageBoxNotification;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerState;
@@ -43,6 +44,7 @@ import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
 import org.jboss.tools.rsp.server.model.internal.DaoUtilities;
 import org.jboss.tools.rsp.server.model.internal.DummyServer;
+import org.jboss.tools.rsp.server.model.internal.MessageBoxNotificationManager;
 import org.jboss.tools.rsp.server.model.internal.Server;
 import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
@@ -640,10 +642,15 @@ public class ServerModel implements IServerModel {
 			public void run() {
 				ClientThreadLocal.setActiveClient(rspc);
 				IStatus stat = getServerDelegate(server).publish(kind);
-				// TODO
-				// RSPClient only has prompt, no ability to just send a message / information
 				if( !stat.isOK()) {
-					LOG.error("Error publishing to server {0}: " + stat.getMessage(), server.getId());
+					String msg = String.format("Error publishing to server %s: %s", server.getId(), stat.getMessage());
+					MessageBoxNotification msgbox = new MessageBoxNotification(msg);
+					MessageBoxNotificationManager.messageClient(rspc, msgbox);
+					LOG.error(msg);
+				} else { 
+					String msg = String.format("Publishing to server %s has completed.", server.getId());
+					MessageBoxNotification msgbox = new MessageBoxNotification(msg);
+					MessageBoxNotificationManager.messageClient(rspc, msgbox);
 				}
 				ClientThreadLocal.setActiveClient(null);
 			}

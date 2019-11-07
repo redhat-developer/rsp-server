@@ -25,6 +25,10 @@ export class Incoming {
      * Subscribes to notifications sent by the server
      */
     private listen() {
+        this.connection.onNotification(Messages.Client.MessageBoxNotification.type, param => {
+            this.emitter.emit('messageBox', param);
+        });
+
         this.connection.onNotification(Messages.Client.DiscoveryPathAddedNotification.type, param => {
             this.emitter.emit('discoveryPathAdded', param);
         });
@@ -77,6 +81,14 @@ export class Incoming {
 
     onPromptString(listener: (arg: Protocol.StringPrompt) => Promise<string>): void {
         this.connection.onRequest(Messages.Client.PromptStringRequest.type, listener);
+    }
+
+    onMessageBox(listener: (arg: Protocol.MessageBoxNotification) => void): void {
+        this.emitter.on('messageBox', listener);
+    }
+
+    removeOnMessageBox(listener: (arg: Protocol.MessageBoxNotification) => void): void {
+        this.emitter.removeListener('messageBox', listener);
     }
 
     onDiscoveryPathAdded(listener: (arg: Protocol.DiscoveryPath) => void): void {

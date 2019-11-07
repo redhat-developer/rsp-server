@@ -373,6 +373,13 @@ export namespace Messages {
             export const type = new RequestType<Protocol.StringPrompt, string, void, void>('client/promptString');
         }
         /**
+         * The `client/messageBox` notification is sent by the server to all
+         * clients or specific clients to inform the users of anything that may be of interest.
+         */
+        export namespace MessageBoxNotification {
+            export const type = new NotificationType<Protocol.MessageBoxNotification, void>('client/messageBox');
+        }
+        /**
          * The `client/discoveryPathAdded` notification is sent by the server to all
          * clients in response to the `server/addDiscoveryPath` notification.
          *

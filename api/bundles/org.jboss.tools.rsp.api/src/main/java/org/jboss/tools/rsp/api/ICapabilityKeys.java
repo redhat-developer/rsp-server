@@ -20,13 +20,20 @@ public interface ICapabilityKeys {
 	public static final String PROTOCOL_VERSION_0_9_0 = "0.9.0";
 	public static final String PROTOCOL_VERSION_0_10_0 = "0.10.0";
 	public static final String PROTOCOL_VERSION_0_13_0 = "0.13.0";
-	public static final String PROTOCOL_VERSION_CURRENT = PROTOCOL_VERSION_0_13_0;
+	public static final String PROTOCOL_VERSION_0_22_0 = "0.22.0";
+	public static final String PROTOCOL_VERSION_CURRENT = PROTOCOL_VERSION_0_22_0;
 	
 	/**
 	 * A capability key expecting a boolean in string form 
 	 * whether the client can prompt the user for a string with a given message
 	 */
 	public static final String BOOLEAN_STRING_PROMPT = "prompt.string";
+
+	/**
+	 * A capability key expecting a boolean in string form 
+	 * whether the client can display a message to the user. 
+	 */
+	public static final String BOOLEAN_MESSAGEBOX = "messagebox";
 
 	/**
 	 * A capability key expecting a boolean in string form 

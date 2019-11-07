@@ -86,6 +86,7 @@ public class CapabilityManagement implements ICapabilityManagement, ICapabilityK
         ret.put(ICapabilityKeys.STRING_PROTOCOL_VERSION, ICapabilityKeys.PROTOCOL_VERSION_CURRENT);
         ret.put(ICapabilityKeys.BOOLEAN_STRING_PROMPT, Boolean.toString(true));
         ret.put(ICapabilityKeys.BOOLEAN_PUBLISH_ARCHIVE, Boolean.toString(true));
+        ret.put(ICapabilityKeys.BOOLEAN_MESSAGEBOX, Boolean.toString(true));
         return ret;
 	}
 }

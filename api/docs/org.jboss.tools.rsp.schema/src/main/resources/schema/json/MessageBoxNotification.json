@@ -1,0 +1,20 @@
+{
+  "type" : "object",
+  "properties" : {
+    "code" : {
+      "type" : "integer"
+    },
+    "severity" : {
+      "type" : "integer"
+    },
+    "message" : {
+      "type" : "string"
+    },
+    "properties" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "any"
+      }
+    }
+  }
+}
