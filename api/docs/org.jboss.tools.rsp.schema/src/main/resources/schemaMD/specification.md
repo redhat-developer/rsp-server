@@ -3221,6 +3221,41 @@ This endpoint returns the following schema as a return value:
 <table><tr><th>json</th><th>typescript</th></tr>
 <tr><td><pre></pre></td><td><pre></pre></td></tr></table>
 
+#### client/messageBox
+
+ The `client/messageBox` notification is sent by the server to all clients or specific clients to inform the users of anything that may be of interest. 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "code" : {
+      "type" : "integer"
+    },
+    "severity" : {
+      "type" : "integer"
+    },
+    "message" : {
+      "type" : "string"
+    },
+    "properties" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "any"
+      }
+    }
+  }
+}</pre></td><td><pre>export interface MessageBoxNotification {
+    code: number;
+    severity: number;
+    message: string;
+    properties: { [index: string]: any };
+}</pre></td></tr></table>
+
+This endpoint returns no value
+
 #### client/discoveryPathAdded
 
  The `client/discoveryPathAdded` notification is sent by the server to all clients in response to the `server/addDiscoveryPath` notification. This call indicates that a discovery path has been added to the RSP model which keeps track of filesystem paths that may be searched for server runtimes. 

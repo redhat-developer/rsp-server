@@ -14,6 +14,7 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
+import org.jboss.tools.rsp.api.dao.MessageBoxNotification;
 import org.jboss.tools.rsp.api.dao.JobHandle;
 import org.jboss.tools.rsp.api.dao.JobProgress;
 import org.jboss.tools.rsp.api.dao.JobRemoved;
@@ -32,6 +33,13 @@ public interface RSPClient {
 	@JsonRequest
 	CompletableFuture<String> promptString(StringPrompt prompt);
 
+	/**
+	 * The `client/messageBox` notification is sent by the server to all
+	 * clients or specific clients to inform the users of anything that may be of interest.
+	 */
+	@JsonNotification
+	void messageBox(MessageBoxNotification notify);
+	
 	/**
 	 * The `client/discoveryPathAdded` notification is sent by the server to all
 	 * clients in response to the `server/addDiscoveryPath` notification.

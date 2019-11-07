@@ -19,6 +19,7 @@ import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.JobHandle;
 import org.jboss.tools.rsp.api.dao.JobProgress;
 import org.jboss.tools.rsp.api.dao.JobRemoved;
+import org.jboss.tools.rsp.api.dao.MessageBoxNotification;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerProcess;
 import org.jboss.tools.rsp.api.dao.ServerProcessOutput;
@@ -68,6 +69,11 @@ public class ServerManagementClientImpl implements RSPClient {
 	@Override
 	public void serverAttributesChanged(ServerHandle server) {
 		System.out.println("Server attribute changed: " + server.getType().getId() + ":" + server.getId());
+	}
+	
+	@Override
+	public void messageBox(MessageBoxNotification notify) {
+		System.out.println("MessageBoxNotification: " + notify.getMessage());
 	}
 
 	@Override
