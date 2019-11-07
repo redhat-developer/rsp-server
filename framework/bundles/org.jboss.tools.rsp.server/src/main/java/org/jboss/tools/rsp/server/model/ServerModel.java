@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.server.model;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,11 +36,14 @@ import org.jboss.tools.rsp.api.dao.UpdateServerRequest;
 import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
+import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
+import org.jboss.tools.rsp.eclipse.core.runtime.IRunnableWithProgress;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.MultiStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
+import org.jboss.tools.rsp.launching.utils.IStatusRunnableWithProgress;
 import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
 import org.jboss.tools.rsp.server.model.internal.DaoUtilities;
@@ -637,25 +641,21 @@ public class ServerModel implements IServerModel {
 		if( !canPublish.isOK())
 			return canPublish;
 		
-		final RSPClient rspc = ClientThreadLocal.getActiveClient();;
-		new Thread("Asynchronous Publish") {
-			public void run() {
+		final RSPClient rspc = ClientThreadLocal.getActiveClient();
+		IStatusRunnableWithProgress irwp = new IStatusRunnableWithProgress() {
+			@Override
+			public IStatus run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				ClientThreadLocal.setActiveClient(rspc);
-				IStatus stat = getServerDelegate(server).publish(kind);
-				if( !stat.isOK()) {
-					String msg = String.format("Error publishing to server %s: %s", server.getId(), stat.getMessage());
-					MessageBoxNotification msgbox = new MessageBoxNotification(msg);
-					MessageBoxNotificationManager.messageClient(rspc, msgbox);
-					LOG.error(msg);
-				} else { 
-					String msg = String.format("Publishing to server %s has completed.", server.getId());
-					MessageBoxNotification msgbox = new MessageBoxNotification(msg);
-					MessageBoxNotificationManager.messageClient(rspc, msgbox);
+				try {
+					return getServerDelegate(server).publish(kind);
+				} finally {
+					ClientThreadLocal.setActiveClient(null);
 				}
-				ClientThreadLocal.setActiveClient(null);
 			}
-		}.start();
-		return getServerDelegate(server).publish(kind);
+		};
+		String jobName = "Asynchronous Publish for Server " + server.getId();
+		this.managementModel.getJobManager().scheduleJob(jobName, irwp);
+		return Status.OK_STATUS;
 	}
 
 	private IStatus checkCanPublishError(IServer server, int kind) throws CoreException {

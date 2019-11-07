@@ -567,6 +567,26 @@ public class StandardCommandHandler implements InputHandler {
 				}
 			}
 		},
+		PUBLISH_ASYNC("publish server async") {  // Temporary title, may just replace publish
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
+				try {
+					ServerHandle server = assistant.selectServer();
+					if( server != null ) {
+						int publishType = assistant.selectPublishType();
+						if( publishType != -1 ) {
+							Status stat = launcher.getServerProxy().publishAsync(new PublishServerRequest(server, publishType)).get();
+							System.out.println(stat.toString());
+						}
+					}
+				} catch(InterruptedException ie ) { 
+					ie.printStackTrace();
+					Thread.currentThread().interrupt();
+				} catch(ExecutionException ioe) {
+					ioe.printStackTrace();
+				}
+			}
+		},
 
 		RUN_SERVER_ACTION("server action") {
 			@Override
