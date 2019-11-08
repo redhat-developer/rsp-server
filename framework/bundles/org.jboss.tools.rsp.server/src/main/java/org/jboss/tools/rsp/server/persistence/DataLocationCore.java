@@ -34,11 +34,14 @@ public class DataLocationCore implements IDataStoreModel {
 
 	private File fLocation = null;
 	private boolean lockedByUs = false;
-	public DataLocationCore() {
-		this(null);
-	}
+	private String lockContent;
 
-	public DataLocationCore(File loc) {
+	public DataLocationCore(String lockContent) {
+		this(null, lockContent);
+	}
+	
+	public DataLocationCore(File loc, String lockContent) {
+		this.lockContent = lockContent;
 		if( loc == null ) {
 			checkUpdateWorkspace(loc);
 			this.fLocation = getDefaultDataLocation();
@@ -159,11 +162,9 @@ public class DataLocationCore implements IDataStoreModel {
 			throw new IOException("Workspace already locked");
 		}
 		f.deleteOnExit();
-		boolean b = f.createNewFile();
-		if( b ) {
-			lockedByUs = true;
-		}
-		return b;
+		Files.write(f.toPath(), this.lockContent.getBytes());
+		this.lockedByUs = true;
+		return true;
 	}
 	public synchronized boolean unlock() throws IOException {
 		File f = new File(getDataLocation(), ".lock"); 

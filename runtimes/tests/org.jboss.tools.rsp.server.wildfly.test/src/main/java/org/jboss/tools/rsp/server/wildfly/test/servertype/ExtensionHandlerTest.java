@@ -16,6 +16,8 @@ import java.nio.file.Files;
 
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.server.model.ServerManagementModel;
+import org.jboss.tools.rsp.server.persistence.DataLocationCore;
+import org.jboss.tools.rsp.server.spi.model.IDataStoreModel;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
 import org.jboss.tools.rsp.server.wildfly.impl.ExtensionHandler;
 import org.junit.Test;
@@ -44,7 +46,8 @@ public class ExtensionHandlerTest {
 	
 	private ServerManagementModel createServerManagementModel() throws IOException {
 		File location = Files.createTempDirectory("ServerManagementModelTest").toFile();
-		return new ServerManagementModel(location) {};
+		IDataStoreModel store = new DataLocationCore(location, "27511");
+		return new ServerManagementModel(store);
 	}
 
 }

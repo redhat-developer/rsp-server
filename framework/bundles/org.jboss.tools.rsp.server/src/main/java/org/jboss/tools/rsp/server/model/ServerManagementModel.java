@@ -31,7 +31,6 @@ import org.jboss.tools.rsp.server.discovery.DiscoveryPathModel;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanTypeManager;
 import org.jboss.tools.rsp.server.filewatcher.FileWatcherService;
 import org.jboss.tools.rsp.server.jobs.JobManager;
-import org.jboss.tools.rsp.server.persistence.DataLocationCore;
 import org.jboss.tools.rsp.server.secure.SecureStorageGuardian;
 import org.jboss.tools.rsp.server.spi.discovery.IDiscoveryPathModel;
 import org.jboss.tools.rsp.server.spi.discovery.IServerBeanTypeManager;
@@ -64,14 +63,6 @@ public class ServerManagementModel implements IServerManagementModel {
 	private IJobManager jobManager;
 	private IDataStoreModel fDataStoreModel;
 	
-	public ServerManagementModel() {
-		this(new DataLocationCore());
-	}
-	
-	/** protected for testing purposes **/
-	public ServerManagementModel(File dataLocation) {
-		this(new DataLocationCore(dataLocation));
-	}
 	public ServerManagementModel(IDataStoreModel dataLocation) {
 		this.capabilities = createCapabilityManagement();
 		this.fDataStoreModel = dataLocation;

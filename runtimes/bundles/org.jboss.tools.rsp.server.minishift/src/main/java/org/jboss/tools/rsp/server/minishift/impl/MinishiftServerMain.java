@@ -18,12 +18,15 @@ import org.jboss.tools.rsp.server.ServerManagementServerLauncher;
  */
 public class MinishiftServerMain extends ServerManagementServerLauncher {
 	public static void main(String[] args) throws Exception {
-		MinishiftServerMain instance = new MinishiftServerMain();
+		MinishiftServerMain instance = new MinishiftServerMain(args[0]);
 		LauncherSingleton.getDefault().setLauncher(instance);
-		instance.launch(args[0]);
+		instance.launch();
 		instance.shutdownOnInput();
 	}
-	
+	public MinishiftServerMain(String string) {
+		super(string);
+	}
+
 	@Override
 	public void launch(int port) throws Exception {
 		// create the chat server

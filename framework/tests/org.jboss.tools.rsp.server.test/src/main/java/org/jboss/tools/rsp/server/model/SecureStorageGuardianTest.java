@@ -25,6 +25,7 @@ import org.jboss.tools.rsp.api.ICapabilityKeys;
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
 import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
+import org.jboss.tools.rsp.server.persistence.DataLocationCore;
 import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
 import org.junit.Test;
 
@@ -92,7 +93,7 @@ public class SecureStorageGuardianTest {
 
 	private ServerManagementModel createServerManagementModel() throws IOException {
 		File location = Files.createTempDirectory("ServerManagementModelTest").toFile();
-		return new ServerManagementModel(location) {};
+		return new ServerManagementModel(new DataLocationCore(location, "27511")) {};
 	}
 
 }

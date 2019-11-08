@@ -163,13 +163,14 @@ public class RSPStartupShutdownTest {
 	}
 	
 	protected ServerManagementServerLauncher defaultLauncher() {
-		return new ServerManagementServerLauncher();
+		return new ServerManagementServerLauncher("27511");
 	}
 	
 	protected ServerManagementServerLauncher countdownLauncher() {
-		return new ServerManagementServerLauncher() {
+		return new ServerManagementServerLauncher("27511") {
 			protected ServerManagementServerImpl createImpl() {
-				return new ServerManagementServerImpl(this, new ServerManagementModel()) {
+				DataLocationCore dlc = new DataLocationCore(this.portString);
+				return new ServerManagementServerImpl(this, new ServerManagementModel(dlc)) {
 					@Override
 					protected void removeClient(SocketLauncher<RSPClient> launcher) {
 						try {
@@ -203,7 +204,7 @@ public class RSPStartupShutdownTest {
 		rspInstance = countdown ? countdownLauncher() : defaultLauncher();
 		LauncherSingleton.getDefault().setLauncher(rspInstance);
 		try {
-			rspInstance.launch(""+port);
+			rspInstance.launch(port);
 		} catch(Exception e) {
 			e.printStackTrace();
 			cleanup(rspInstance, null);

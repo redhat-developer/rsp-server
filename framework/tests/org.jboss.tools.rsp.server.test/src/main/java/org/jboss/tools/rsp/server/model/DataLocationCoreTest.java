@@ -64,7 +64,7 @@ public class DataLocationCoreTest {
 	}
 
 	private void copyAndVerify(Path src, Path dest, int copied, boolean mayThrowException) {
-		copyAndVerify(new DataLocationCore(), src, dest, copied, mayThrowException);
+		copyAndVerify(new DataLocationCore("27511"), src, dest, copied, mayThrowException);
 	}
 	private void copyAndVerify(DataLocationCore dlc, Path src, Path dest, int copied, boolean mayThrowException) {
 		if( dlc != null ) {
@@ -99,7 +99,7 @@ public class DataLocationCoreTest {
 			boolean notReadable = f2Outter.toFile().setReadable(false);
 			int copiedFiles = (notReadable ? 7 : 8);
 			// Instantiation should migrate it
-			DataLocationCore dlc = new DataLocationCore() {
+			DataLocationCore dlc = new DataLocationCore("27511") {
 				protected File getLegacy1DefaultDataLocation() {
 					return src.toFile();
 				}
@@ -125,7 +125,7 @@ public class DataLocationCoreTest {
 			Path workspace1 = p.resolve("workspace1");
 			workspace1.toFile().mkdirs();
 			
-			DataLocationCore dlc = new DataLocationCore(workspace1.toFile());
+			DataLocationCore dlc = new DataLocationCore(workspace1.toFile(), "27511");
 			assertFalse(dlc.isInUse());
 			dlc.lock();
 			assertTrue(dlc.isInUse());
@@ -162,7 +162,7 @@ public class DataLocationCoreTest {
 			workspace1.toFile().mkdirs();
 			File lock = new File(workspace1.toFile(), ".lock");
 			lock.createNewFile();
-			dlc = new DataLocationCore(workspace1.toFile());
+			dlc = new DataLocationCore(workspace1.toFile(), "27511");
 		} catch (IOException e) {
 			fail(e.getMessage());
 		}

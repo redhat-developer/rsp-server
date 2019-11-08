@@ -33,8 +33,8 @@ public class ServerManagementServerLauncher {
 	private final ServerPersistenceManager persistenceEventManager;
 	
 	public static void main(String[] args) throws Exception {
-		ServerManagementServerLauncher instance = new ServerManagementServerLauncher();
-		instance.launch(args[0]);
+		ServerManagementServerLauncher instance = new ServerManagementServerLauncher(args[0]);
+		instance.launch();
 		instance.shutdownOnInput();
 	}
 
@@ -47,13 +47,15 @@ public class ServerManagementServerLauncher {
 	protected ServerManagementServerImpl serverImpl;
 	private ListenOnSocketRunnable socketRunnable;
 	private ServerSocket serverSocket;
-	public ServerManagementServerLauncher() {
+	protected String portString;
+	public ServerManagementServerLauncher(String portString) {
+		this.portString = portString;
 		this.serverImpl = createImpl();
 		this.persistenceEventManager = new ServerPersistenceManager(this);
 	}
 	
 	protected ServerManagementServerImpl createImpl() {
-		DataLocationCore dlc = new DataLocationCore();
+		DataLocationCore dlc = new DataLocationCore(this.portString);
 		if( !dlc.isInUse()) {
 			try {
 				dlc.lock();
@@ -73,8 +75,8 @@ public class ServerManagementServerLauncher {
 		return serverImpl.getClients();
 	}
 	
-	public void launch(String portString) throws Exception {
-		launch(Integer.parseInt(portString));
+	public void launch() throws Exception {
+		launch(Integer.parseInt(this.portString));
 	}
 
 	public void launch(int port) throws Exception {

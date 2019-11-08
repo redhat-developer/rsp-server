@@ -29,6 +29,7 @@ import org.jboss.tools.rsp.api.dao.UpdateServerRequest;
 import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.server.ServerManagementServerImpl;
+import org.jboss.tools.rsp.server.persistence.DataLocationCore;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
@@ -45,7 +46,8 @@ public class EditServerTest {
 	@Test
 	public void testStuff() throws IOException {
 		final Path serversDir = Files.createTempDirectory("servers");
-		IServerManagementModel mgmtModel = new ServerManagementModel(serversDir.toFile());
+		DataLocationCore dlc = new DataLocationCore(serversDir.toFile(), "27511");
+		IServerManagementModel mgmtModel = new ServerManagementModel(dlc);
 		ServerManagementServerImpl impl = new ServerManagementServerImpl(null, mgmtModel);
 		
 		final String REQUIRED_PROP = "wonka.prop1";

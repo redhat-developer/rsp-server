@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -21,6 +22,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
@@ -75,9 +78,9 @@ public abstract class AbstractFilesystemPublishController implements IPublishCon
 			return new Status(IStatus.ERROR, SPIActivator.BUNDLE_ID, 
 					NLS.bind("Server {0} does not support deployments that do not exist in the filesystem.", server.getId()));
 
-		if( mustExist && !supportsExplodedDeployment() && !f.isFile())
-			return new Status(IStatus.ERROR, SPIActivator.BUNDLE_ID, 
-					NLS.bind("Server {0} does not support exploded deployment, and deployment path is a directory.", server.getId()));
+//		if( mustExist && !supportsExplodedDeployment() && !f.isFile())
+//			return new Status(IStatus.ERROR, SPIActivator.BUNDLE_ID, 
+//					NLS.bind("Server {0} does not support exploded deployment, and deployment path is a directory.", server.getId()));
 		
 		String[] supportedSuffix = getSupportedSuffixes();
 		if( supportedSuffix != null ) {
@@ -199,7 +202,11 @@ public abstract class AbstractFilesystemPublishController implements IPublishCon
 			return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 		
 		if( src.exists() && src.isDirectory()) {
-			return incrementalPublishCopyExplodedModule(opts, delta);
+			if( supportsExplodedDeployment()) {
+				return incrementalPublishCopyExplodedModule(opts, delta);
+			} else {
+				return zipAndCopyExplodedModule(opts);
+			}
 		}
 		return ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN;
 	}
@@ -229,7 +236,11 @@ public abstract class AbstractFilesystemPublishController implements IPublishCon
 			return fullPublishCopyZippedModule(opts, publishType, modulePublishType);
 		}
 		if( src.exists() && src.isDirectory()) {
-			return fullPublishCopyExplodedModule(opts, publishType, modulePublishType);
+			if( supportsExplodedDeployment()) {
+				return fullPublishCopyExplodedModule(opts, publishType, modulePublishType);
+			} else {
+				return zipAndCopyExplodedModule(opts);
+			}
 		}
 		return ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN;
 	}
@@ -285,6 +296,37 @@ public abstract class AbstractFilesystemPublishController implements IPublishCon
 		return incrementalExplodedPublishResult(opts, errors);
 	}
 	
+	private int zipAndCopyExplodedModule(DeployableReference opts) {
+		File dest = getDestinationPath(opts).toFile();
+		Path src = new File(opts.getPath()).toPath();
+		try {
+			completeDelete(dest.toPath());
+			pack(src.toString(), dest.getAbsolutePath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
+	}
+	private static void pack(String sourceDirPath, String zipFilePath) throws IOException {
+	    Path p = Files.createFile(Paths.get(zipFilePath));
+	    try (ZipOutputStream zs = new ZipOutputStream(Files.newOutputStream(p))) {
+	        Path pp = Paths.get(sourceDirPath);
+	        Files.walk(pp)
+	          .filter(path -> !Files.isDirectory(path))
+	          .forEach(path -> {
+	              ZipEntry zipEntry = new ZipEntry(pp.relativize(path).toString());
+	              try {
+	                  zs.putNextEntry(zipEntry);
+	                  Files.copy(path, zs);
+	                  zs.closeEntry();
+	            } catch (IOException e) {
+	                System.err.println(e);
+	            }
+	          });
+	    }
+	}
+
 	private void incrementalPublishCopySingleFile(Path fileSrc, Path fileDest, List<String> errors) {
 		if( !fileSrc.toFile().exists()) {
 			errors.add("Source path does not exist: " + fileSrc.toString());
