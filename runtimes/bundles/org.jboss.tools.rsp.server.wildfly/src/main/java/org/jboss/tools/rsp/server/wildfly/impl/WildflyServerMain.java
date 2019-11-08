@@ -18,10 +18,14 @@ import org.jboss.tools.rsp.server.ServerManagementServerLauncher;
  */
 public class WildflyServerMain extends ServerManagementServerLauncher {
 	public static void main(String[] args) throws Exception {
-		WildflyServerMain instance = new WildflyServerMain();
+		WildflyServerMain instance = new WildflyServerMain(args[0]);
 		LauncherSingleton.getDefault().setLauncher(instance);
-		instance.launch(args[0]);
+		instance.launch();
 		instance.shutdownOnInput();
+	}
+	
+	public WildflyServerMain(String string) {
+		super(string);
 	}
 	
 	@Override

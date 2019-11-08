@@ -492,7 +492,7 @@ public class ServerModelTest {
 
 	private IServerModel createServerModel(IServerType serverType) {
 		IServerManagementModel mgmt = mock(IServerManagementModel.class);
-		DataLocationCore dlc = new DataLocationCore();
+		DataLocationCore dlc = new DataLocationCore("27511");
 		when(mgmt.getDataStoreModel()).thenReturn(dlc);
 		IServerModel serverModel = new TestableServerModel(mgmt, 
 				new HashMap<String, IServerType>() {{

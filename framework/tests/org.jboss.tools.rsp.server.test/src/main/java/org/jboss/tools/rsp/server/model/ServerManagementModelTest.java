@@ -14,6 +14,7 @@ import static org.mockito.Mockito.mock;
 
 import org.jboss.tools.rsp.api.ICapabilityKeys;
 import org.jboss.tools.rsp.api.RSPClient;
+import org.jboss.tools.rsp.server.persistence.DataLocationCore;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +25,7 @@ public class ServerManagementModelTest {
 
 	@Before
 	public void before() {
-		this.model = new ServerManagementModel();
+		this.model = new ServerManagementModel(new DataLocationCore("27511"));
 	}
 	
 	@Test

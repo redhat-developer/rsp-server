@@ -39,7 +39,7 @@ public class RSPServerHandler {
     		SERVER_ROOT_SYSPROP_RESOLVED != null ? SERVER_ROOT_SYSPROP_RESOLVED : 
     		(DISTRIBUTION_PATH + "/rsp-distribution");
     
-    private static final File SERVER_DATA = new DataLocationCore().getDataLocation();
+    private static final File SERVER_DATA = new DataLocationCore("27511").getDataLocation();
     private static final String DATA_BACKUP = SERVER_DATA + ".backup";
 
     private static Process serverProcess;

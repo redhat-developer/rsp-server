@@ -60,7 +60,7 @@ public class ServerTypeTest {
 	@Before
 	public void before() {
 		IServerManagementModel mgmt = mock(IServerManagementModel.class);
-		DataLocationCore dlc = new DataLocationCore();
+		DataLocationCore dlc = new DataLocationCore("27511");
 		when(mgmt.getDataStoreModel()).thenReturn(dlc);
 		this.sm = new ServerModel(mgmt);
 	}

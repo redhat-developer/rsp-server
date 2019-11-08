@@ -37,7 +37,7 @@ public class ServerCoreActivator implements BundleActivator {
 
 	private void startServer() {
 		int port = getPort();
-		ServerManagementServerLauncher launcher = new ServerManagementServerLauncher();
+		ServerManagementServerLauncher launcher = new ServerManagementServerLauncher(""+port);
 		LauncherSingleton.getDefault().setLauncher(launcher);
 		
 		new Thread(() -> {

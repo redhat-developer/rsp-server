@@ -98,7 +98,7 @@ public class JBossVMRegistryDiscoveryTest {
 		assertTrue(discovery.ensureVMInstallAdded(null, registry));
 		registry.removeVMInstall(registry.getDefaultVMInstall());
 		
-		File dataFolder = new DataLocationCore().getDataLocation();
+		File dataFolder = new DataLocationCore("27511").getDataLocation();
 		File dne = new File(dataFolder, "doesnotexist");
 		assertFalse(discovery.ensureVMInstallAdded(dne.getAbsolutePath(), registry));
 		try {
