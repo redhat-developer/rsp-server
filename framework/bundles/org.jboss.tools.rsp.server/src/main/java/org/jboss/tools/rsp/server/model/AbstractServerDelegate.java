@@ -50,6 +50,7 @@ import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.model.polling.IPollResultListener;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller;
+import org.jboss.tools.rsp.server.spi.publishing.IFullPublishRequiredCallback;
 import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;

@@ -6,7 +6,7 @@
  * 
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
-package org.jboss.tools.rsp.server.model;
+package org.jboss.tools.rsp.server.spi.publishing;
 
 import org.jboss.tools.rsp.server.spi.filewatcher.FileWatcherEvent;
 

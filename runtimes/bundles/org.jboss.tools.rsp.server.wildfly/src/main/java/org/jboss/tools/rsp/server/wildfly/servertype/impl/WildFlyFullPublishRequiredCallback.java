@@ -12,8 +12,8 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
-import org.jboss.tools.rsp.server.model.IFullPublishRequiredCallback;
 import org.jboss.tools.rsp.server.spi.filewatcher.FileWatcherEvent;
+import org.jboss.tools.rsp.server.spi.publishing.IFullPublishRequiredCallback;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
 import org.slf4j.Logger;
