@@ -123,10 +123,15 @@ public class RSPServerHandler {
                 Files.walk(dataFolder.toPath())
                     .sorted(Comparator.reverseOrder())
                     .map(Path::toFile)
-                    .forEach(File::delete);
+                    .forEach(f -> safeDelete(f));
                 dataFolder.delete();
             }
         }
+    }
+    
+    private static void safeDelete(File f) {
+    	if( f.exists())
+    		f.delete();
     }
 
     public static void restoreBackupData(boolean force) throws IOException {        
