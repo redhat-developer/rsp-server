@@ -16,7 +16,7 @@ pipeline {
         stage('Checkout SCM') {
 			steps {
 				deleteDir()
-				git url: "https://github.com/${params.FORK}/rsp-server.git", branch: params.BRANCH
+				git url: "https://github.com/${params.FORK}/rsp-server", branch: params.BRANCH
 				stash includes: '**', name: 'source'
 			}
         }
