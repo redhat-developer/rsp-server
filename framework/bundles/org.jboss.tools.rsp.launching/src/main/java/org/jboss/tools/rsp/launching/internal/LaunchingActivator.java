@@ -25,12 +25,13 @@ public class LaunchingActivator implements BundleActivator {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		this.bc = context;
-		LOG.info(NLS.bind("{0} bundle activated.", BUNDLE_ID));
+		LOG.debug(NLS.bind("{0} bundle started.", BUNDLE_ID));
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		this.bc = null;
+		LOG.debug(NLS.bind("{0} bundle stopped.", BUNDLE_ID));
 	}
 	
 	public Bundle getBundle() {

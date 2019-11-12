@@ -11,41 +11,25 @@ package org.jboss.tools.rsp.launching.java;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JavaLaunchingActivator implements BundleActivator {
 
 	public static final String BUNDLE_ID = "org.jboss.tools.rsp.launching.java.java";
+	private static final Logger LOG = LoggerFactory.getLogger(JavaLaunchingActivator.class);
 
 	private BundleContext bc = null;
 
 	@Override
 	public void start(BundleContext context) throws Exception {
 		this.bc = context;
-		log(LogService.LOG_INFO, NLS.bind("{0} bundle activated.", BUNDLE_ID));
+		LOG.debug(NLS.bind("{0} bundle started.", BUNDLE_ID));
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		this.bc = null;
+		LOG.debug(NLS.bind("{0} bundle stopped.", BUNDLE_ID));
 	}
-
-	private void log(int level, String message) {
-		LogService log = getService(LogService.class);
-		if (log == null) {
-			return;
-		}
-		log.log(level, message);
-	}
-
-	private <T> T getService(Class<T> clazz) {
-		if (bc == null )
-			return null;
-		ServiceReference<?> ref = bc.getServiceReference(clazz.getName());
-		if( ref != null )
-			return (T)bc.getService(ref);
-		return null;
-	}
-	
 }

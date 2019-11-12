@@ -10,17 +10,25 @@
  ************************************************************************************/
 package org.jboss.tools.rsp.stacks.core;
 
+import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StacksCoreActivator implements BundleActivator {
 
 	public static final String PLUGIN_ID = "org.jboss.tools.rsp.stacks.core";
+	private static final Logger LOG = LoggerFactory.getLogger(StacksCoreActivator.class);
 
-	public void start(BundleContext bundleContext) throws Exception {
+	@Override
+	public void start(BundleContext context) throws Exception {
+		LOG.debug(NLS.bind("{0} bundle started.", PLUGIN_ID));
 	}
 
-	public void stop(BundleContext bundleContext) throws Exception {
+	@Override
+	public void stop(BundleContext context) throws Exception {
+		LOG.debug(NLS.bind("{0} bundle stopped.", PLUGIN_ID));
 	}
 	
 }
