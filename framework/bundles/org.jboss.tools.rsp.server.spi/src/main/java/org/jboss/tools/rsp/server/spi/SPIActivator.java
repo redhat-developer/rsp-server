@@ -8,19 +8,24 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.spi;
 
+import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SPIActivator implements BundleActivator {
 
 	public static final String BUNDLE_ID = "org.jboss.tools.rsp.server.spi";
+	private static final Logger LOG = LoggerFactory.getLogger(SPIActivator.class);
 
 	@Override
 	public void start(BundleContext context) throws Exception {
+		LOG.debug(NLS.bind("{0} bundle started.", BUNDLE_ID));
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
+		LOG.debug(NLS.bind("{0} bundle stopped.", BUNDLE_ID));
 	}
-
 }

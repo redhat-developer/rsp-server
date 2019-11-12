@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: org.jboss.tools.rsp.server.test
 Bundle-SymbolicName: org.jboss.tools.rsp.server.test
 Automatic-Module-Name: org.jboss.tools.rsp.server.test
-Bundle-Version: 0.22.0.Final
+Bundle-Version: 0.22.1.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: org.eclipse.lsp4j.jsonrpc,
  org.jboss.tools.rsp.api,

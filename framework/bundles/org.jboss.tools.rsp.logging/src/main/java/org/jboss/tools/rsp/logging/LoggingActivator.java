@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.logging;
 
 
+import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.logging.internal.OSGILogReaderInitializer;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -17,14 +18,14 @@ import org.slf4j.LoggerFactory;
 
 public class LoggingActivator implements BundleActivator, LoggingConstants {
 
-
+	private static final String BUNDLE_ID = "org.jboss.tools.rsp.logging";
 	private static final Logger LOG = LoggerFactory.getLogger(LoggingActivator.class);
 
 	private OSGILogReaderInitializer initializer;
 
 	@Override
 	public void start(BundleContext context) throws Exception {
-		LOG.debug("Activating bundle");
+		LOG.debug(NLS.bind("{0} bundle started.", BUNDLE_ID));
 		LogLevelInitializer.initLogLevel();
 		initializer = new OSGILogReaderInitializer();
 		initializer.init(context);
@@ -33,7 +34,7 @@ public class LoggingActivator implements BundleActivator, LoggingConstants {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		initializer.dispose(context);
-		LOG.debug("Bundle stopped");
+		LOG.debug(NLS.bind("{0} bundle stopped.", BUNDLE_ID));
 	}
 
 }

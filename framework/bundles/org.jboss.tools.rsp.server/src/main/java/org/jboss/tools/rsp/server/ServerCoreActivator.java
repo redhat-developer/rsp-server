@@ -24,7 +24,7 @@ public class ServerCoreActivator implements BundleActivator {
 	public void start(final BundleContext context) throws Exception {
 		setShutdownHandler(context);
 		startServer();
-		LOG.info(NLS.bind("{0} bundle activated.", BUNDLE_ID));
+		LOG.debug(NLS.bind("{0} bundle started.", BUNDLE_ID));
 	}
 
 	public ServerManagementServerLauncher getLauncher() {
@@ -63,5 +63,6 @@ public class ServerCoreActivator implements BundleActivator {
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
+		LOG.debug(NLS.bind("{0} bundle stopped.", BUNDLE_ID));
 	}
 }

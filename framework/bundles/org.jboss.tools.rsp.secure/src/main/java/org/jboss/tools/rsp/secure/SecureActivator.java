@@ -8,11 +8,15 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.secure;
 
+import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SecureActivator implements BundleActivator {
-
+	private static final String PLUGIN_ID = "org.jboss.tools.rsp.secure";
+	private static final Logger LOG = LoggerFactory.getLogger(SecureActivator.class);
 	private static BundleContext context;
 
 	static BundleContext getContext() {
@@ -27,6 +31,8 @@ public class SecureActivator implements BundleActivator {
 	 */
 	public void start(BundleContext bundleContext) throws Exception {
 		SecureActivator.context = bundleContext;
+		LOG.debug(NLS.bind("{0} bundle started.", PLUGIN_ID));
+
 	}
 
 	/*
@@ -37,6 +43,7 @@ public class SecureActivator implements BundleActivator {
 	 */
 	public void stop(BundleContext bundleContext) throws Exception {
 		SecureActivator.context = null;
+		LOG.debug(NLS.bind("{0} bundle stopped.", PLUGIN_ID));
 	}
 
 }

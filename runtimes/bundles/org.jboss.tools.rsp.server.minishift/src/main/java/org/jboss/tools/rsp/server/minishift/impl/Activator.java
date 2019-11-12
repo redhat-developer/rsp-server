@@ -8,6 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.minishift.impl;
 
+import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.server.LauncherSingleton;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
 import org.jboss.tools.rsp.server.spi.RSPExtensionBundle;
@@ -21,15 +22,13 @@ public class Activator extends RSPExtensionBundle {
 
 	@Override
 	public void start(BundleContext context) throws Exception {
-		LOG.info("Bundle {} starting...", context.getBundle().getSymbolicName());
-
+		LOG.debug(NLS.bind("{0} bundle started.", BUNDLE_ID));
 		addExtensions(ServerCoreActivator.BUNDLE_ID, context);
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		LOG.info("Bundle {} stopping...", context.getBundle().getSymbolicName());
-
+		LOG.debug(NLS.bind("{0} bundle stopped.", BUNDLE_ID));
 		removeExtensions(ServerCoreActivator.BUNDLE_ID, context);
 	}
 

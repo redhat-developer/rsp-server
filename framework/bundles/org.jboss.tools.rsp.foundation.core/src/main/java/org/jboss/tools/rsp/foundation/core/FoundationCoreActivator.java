@@ -8,6 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.foundation.core;
 
+import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -21,12 +22,12 @@ public class FoundationCoreActivator implements BundleActivator {
 
 	@Override
 	public void start(BundleContext context) throws Exception {
-		LOG.debug("Activating bundle " + PLUGIN_ID);
+		LOG.debug(NLS.bind("{0} bundle started.", PLUGIN_ID));
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		LOG.debug("Stopping bundle " + PLUGIN_ID);
+		LOG.debug(NLS.bind("{0} bundle stopped.", PLUGIN_ID));
 	}
 
 }
