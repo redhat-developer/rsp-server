@@ -61,26 +61,6 @@ public class JavaJarRuntimeInstaller implements IRuntimeInstaller {
 		this.downloadRuntimesModel = downloadRuntimesModel;
 	}
 
-	protected DownloadRuntimeOperationUtility createDownloadRuntimeOperationUtility(TaskModel tm) {
-		IDownloadRuntimeConnectionFactory fact = (IDownloadRuntimeConnectionFactory)tm.getObject(
-				IDownloadRuntimeWorkflowConstants.CONNECTION_FACTORY);
-		if (fact == null) {
-			return new DownloadRuntimeOperationUtility(downloadRuntimesModel);
-		} else {
-			return new DownloadRuntimeOperationUtility(downloadRuntimesModel) {
-
-				@Override
-				protected InputStream createDownloadInputStream(URL url, String user, String pass) {
-					return fact.createConnection(url, user, pass);
-				}
-
-				@Override
-				protected int getContentLength(URL url, String user, String pass) {
-					return fact.getContentLength(url, user, pass);
-				}
-			};
-		}
-	}
 	@Override
 	public IStatus installRuntime(DownloadRuntime downloadRuntime, String unzipDirectory, String downloadDirectory,
 			boolean deleteOnExit, TaskModel taskModel, IProgressMonitor monitor) {
@@ -91,7 +71,9 @@ public class JavaJarRuntimeInstaller implements IRuntimeInstaller {
 		monitor.beginTask("Install Runtime '" + downloadRuntime.getName() + "' ...", 100);//$NON-NLS-1$ //$NON-NLS-2$
 		monitor.worked(1);
 		try {
-			File f = createDownloadRuntimeOperationUtility(taskModel).download(unzipDirectory, downloadDirectory, 
+			DownloadRuntimeOperationUtility opUtil = DownloadRuntimeOperationUtilFactory
+					.createDownloadRuntimeOperationUtility(taskModel, downloadRuntimesModel);
+			File f = opUtil.download(unzipDirectory, downloadDirectory, 
 					getDownloadUrl(downloadRuntime, taskModel), deleteOnExit, user, pass, new SubProgressMonitor(monitor, 80));
 						
 			ILaunch launch = createExternalToolsLaunchConfiguration(f, unzipDirectory);

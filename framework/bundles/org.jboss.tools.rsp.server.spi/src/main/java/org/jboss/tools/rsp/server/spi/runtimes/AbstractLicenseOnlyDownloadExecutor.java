@@ -37,7 +37,6 @@ import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeRunner;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
 import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
-import org.jboss.tools.rsp.runtime.core.model.installer.RuntimesInstallerModel;
 import org.jboss.tools.rsp.server.spi.SPIActivator;
 import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
 import org.jboss.tools.rsp.server.spi.client.MessageContextStore.MessageContext;
@@ -157,6 +156,11 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 				SubMonitor sub = SubMonitor.convert(monitor, 100);
 				
 				TaskModel tm2 = createDownloadTaskModel(req);
+				String sSize = dlrt.getSize();
+				if(sSize != null && !sSize.isEmpty()) {
+					tm2.putObject(IDownloadRuntimeWorkflowConstants.DL_RUNTIME_SIZE, Long.parseLong(sSize));
+				}
+
 				IStatus ret = installer.installRuntime(dlrt, uniqueLoc.getAbsolutePath(), downloads.getAbsolutePath(), 
 						true, tm2, sub.split(90));
 				if( !ret.isOK()) {

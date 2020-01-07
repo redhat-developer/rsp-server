@@ -270,7 +270,7 @@ public class DownloadRuntimeOperationUtility {
 			if( override == null ) {
 				result = getCache().download(toFile.getName(), url.toExternalForm(), user, pass, out, -1, monitor);
 			} else {
-				int cLength = getContentLength(url, user, pass);
+				long cLength = getContentLength(url, user, pass);
 				result = getCache().download(toFile.getName(), override, out, -1, cLength, monitor);
 			}
 			out.flush();
@@ -291,7 +291,7 @@ public class DownloadRuntimeOperationUtility {
 		return null;
 	}
 	
-	protected int getContentLength(URL url, String user, String pass) {
+	protected long getContentLength(URL url, String user, String pass) {
 		return -1;
 	}
 	

@@ -391,12 +391,13 @@ public class URLTransportCache {
 		return download(name, istream, out, timeout, -1, monitor);
 	}
 
-	public IStatus download(String name, InputStream istream, FileOutputStream out, int timeout, int contentLength,
+	public IStatus download(String name, InputStream istream, FileOutputStream out, 
+			int timeout, long contentLength,
 			final IProgressMonitor monitor) throws IOException {
 		// TODO respect timeout
 		monitor.beginTask(name, 100);
 		
-		final Integer[] worked = new Integer[] { Integer.valueOf(0) };
+		final Long[] worked = new Long[] { Long.valueOf(0) };
 		try(ReadableByteChannel readableByteChannel = Channels.newChannel(istream);
 				FileChannel fileChannel = out.getChannel()) {
 			if (contentLength == -1) {
@@ -409,12 +410,12 @@ public class URLTransportCache {
 				public void callback(CallbackByteChannel rbc, double progress) throws CancellationException {
 					if( monitor.isCanceled()) 
 						throw new CancellationException("Operation has been canceled.");
-					int oldWorked = worked[0];
-					int progInt = (int) Math.floor(progress);
+					long oldWorked = worked[0];
+					long progInt = (int) Math.floor(progress);
 					if( progInt > oldWorked ) {
-						int diff = progInt - oldWorked;
-						monitor.worked(diff);
-						worked[0] = Integer.valueOf(progInt);
+						long diff = progInt - oldWorked;
+						monitor.worked((int)diff);
+						worked[0] = Long.valueOf(progInt);
 					}
 				}
 			};
@@ -444,10 +445,10 @@ public class URLTransportCache {
 		return contentLength;
 	}
 
-	private int contentLength(HttpURLConnection connection) {
-		int contentLength = -1;
+	private long contentLength(HttpURLConnection connection) {
+		long contentLength = -1;
 		try {
-			contentLength = connection.getContentLength();
+			contentLength = connection.getContentLengthLong();
 		} catch (Exception e) {
 			// ignore
 		}

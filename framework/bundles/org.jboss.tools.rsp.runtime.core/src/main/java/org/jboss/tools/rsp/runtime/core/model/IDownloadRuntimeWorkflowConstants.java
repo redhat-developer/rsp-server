@@ -35,7 +35,12 @@ public interface IDownloadRuntimeWorkflowConstants {
 	 * The value should be of type String
 	 */
 	public static final String DL_RUNTIME_URL = "dl.runtime.url"; //$NON-NLS-1$
-
+	
+	/**
+	 * A constant where the value should be the size of the dl in long
+	 */
+	public static final String DL_RUNTIME_SIZE = "dl.runtime.size.expected";
+	
 	/**
 	 * Username key
 	 */
@@ -88,5 +93,6 @@ public interface IDownloadRuntimeWorkflowConstants {
 	 * A constant representing an IOverwrite object to be queried for questions on overwriting files
 	 */
 	public static final String OVERWRITE = "dl.runtime.overwrite"; //$NON-NLS-1$
+
 	
 }

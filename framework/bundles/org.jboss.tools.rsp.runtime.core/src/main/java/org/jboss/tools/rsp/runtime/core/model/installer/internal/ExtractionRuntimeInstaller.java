@@ -40,34 +40,16 @@ public class ExtractionRuntimeInstaller implements IRuntimeInstaller {
 		
 		String user = (String)taskModel.getObject(IDownloadRuntimeWorkflowConstants.USERNAME_KEY);
 		String pass = (String)taskModel.getObject(IDownloadRuntimeWorkflowConstants.PASSWORD_KEY);
-		
+
 		monitor.beginTask("Download '" + downloadRuntime.getName() + "' ...", 100);//$NON-NLS-1$ //$NON-NLS-2$
 		monitor.worked(1);
-		return createDownloadRuntimeOperationUtility(taskModel).downloadAndUnzip(unzipDirectory, downloadDirectory, 
-				getDownloadUrl(downloadRuntime, taskModel), deleteOnExit, user, pass, taskModel, new SubProgressMonitor(monitor, 99));
+		DownloadRuntimeOperationUtility opUtil = DownloadRuntimeOperationUtilFactory
+				.createDownloadRuntimeOperationUtility(taskModel, downloadRuntimesModel);
+		return opUtil.downloadAndUnzip(unzipDirectory, downloadDirectory, 
+				getDownloadUrl(downloadRuntime, taskModel), deleteOnExit, 
+				user, pass, taskModel, new SubProgressMonitor(monitor, 99));
 	}
 
-	protected DownloadRuntimeOperationUtility createDownloadRuntimeOperationUtility(TaskModel tm) {
-		IDownloadRuntimeConnectionFactory fact = (IDownloadRuntimeConnectionFactory)tm.getObject(
-				IDownloadRuntimeWorkflowConstants.CONNECTION_FACTORY);
-		if (fact == null) {
-			return new DownloadRuntimeOperationUtility(downloadRuntimesModel);
-		} else {
-			return new DownloadRuntimeOperationUtility(downloadRuntimesModel) {
-				
-				@Override
-				protected InputStream createDownloadInputStream(URL url, String user, String pass) {
-					return fact.createConnection(url, user, pass);
-				}
-
-				@Override
-				protected int getContentLength(URL url, String user, String pass) {
-					return fact.getContentLength(url, user, pass);
-				}
-			};
-		}
-	}
-	
 	private String getDownloadUrl(DownloadRuntime downloadRuntime, TaskModel taskModel) {
 		if( downloadRuntime != null ) {
 			String dlUrl = downloadRuntime.getUrl();

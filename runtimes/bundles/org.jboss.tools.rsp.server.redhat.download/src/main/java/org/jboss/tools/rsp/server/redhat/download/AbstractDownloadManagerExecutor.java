@@ -362,11 +362,11 @@ public abstract class AbstractDownloadManagerExecutor
 		IDownloadRuntimeConnectionFactory fact = new IDownloadRuntimeConnectionFactory() {
 			
 			@Override
-			public int getContentLength(URL url, String user, String pass) {
+			public long getContentLength(URL url, String user, String pass) {
 				HttpURLConnection ret = null;
 				try {
 					ret = DownloadManagerWorkflowUtility.getWorkflowConnection(url.toString(), user, pass, "GET", true, true, 60*60*1000);
-					return ret.getContentLength();
+					return ret.getContentLengthLong();
 				} catch(IOException ioe) {
 					LOG.error(MessageFormat.format("Could not get workflow connection for url {0}", url), ioe);
 				}
