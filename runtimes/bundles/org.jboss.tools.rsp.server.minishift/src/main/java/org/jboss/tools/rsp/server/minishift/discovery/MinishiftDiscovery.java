@@ -32,6 +32,10 @@ public class MinishiftDiscovery {
 	public boolean isMinishiftBinaryFile(File file, boolean checkPermissions) {
 
 		try {
+			// must exist and be a file
+			if(!file.exists() || !file.isFile())
+				return false;
+
 			File resolvedFile = file.toPath().toRealPath().toFile();
 			// must exist and be a file
 			if(!resolvedFile.exists() || !resolvedFile.isFile())
@@ -45,7 +49,7 @@ public class MinishiftDiscovery {
 			return name.equals(MINISHIFT) || name.equals(MINISHIFT_EXE) 
 					|| whitelistMatchesName(name);
 		} catch (IOException e) {
-			LOG.error("Could not determine if {} is a minishift binary.", file.getAbsolutePath());
+			LOG.debug("Could not determine if {} is a minishift binary.", file.getAbsolutePath());
 		}
 		return false;
 	}
