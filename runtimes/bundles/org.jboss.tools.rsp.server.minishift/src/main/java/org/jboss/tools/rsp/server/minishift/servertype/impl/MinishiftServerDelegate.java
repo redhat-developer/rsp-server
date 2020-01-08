@@ -306,7 +306,10 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 	
 	protected void fillActionList(List<ServerActionWorkflow> allActions) {
 		if( ServerManagementAPIConstants.STATE_STARTED == getServerState().getState()) {
-			addGenericMinishiftCommandAction(allActions, ACTION_SERVICE_CATALOG_COMMAND_ID, ACTION_SERVICE_CATALOG_COMMAND_LABEL);
+			if( supportsOpenshiftSubcommand()) {
+				// add service catalog action
+				addGenericMinishiftCommandAction(allActions, ACTION_SERVICE_CATALOG_COMMAND_ID, ACTION_SERVICE_CATALOG_COMMAND_LABEL);
+			}
 			addArbitraryMinishiftCommandAction(allActions);
 		}
 	}
@@ -348,11 +351,17 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 		if( req != null ) {
 			if( ACTION_MINISHIFT_COMMAND_ID.equals(req.getActionId() ))
 				return runArbitraryMinishiftCommand(req);
+			
 			if( ACTION_SERVICE_CATALOG_COMMAND_ID.equals(req.getActionId()))
 				return runMinishiftCommand(req, "openshift component add service-catalog");
 		}
 		return cancelWorkflowResponse();
 	}
+	
+	protected boolean supportsOpenshiftSubcommand() {
+		return true;
+	}
+	
 	protected WorkflowResponse runArbitraryMinishiftCommand(ServerActionRequest req) {
 		String args = (String)req.getData().get(ACTION_MINISHIFT_COMMAND_FIELD_ID);
 		return runMinishiftCommand(req, args);

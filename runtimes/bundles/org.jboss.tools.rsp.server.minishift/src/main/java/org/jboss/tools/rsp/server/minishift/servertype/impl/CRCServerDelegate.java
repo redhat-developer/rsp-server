@@ -37,7 +37,10 @@ public class CRCServerDelegate extends MinishiftServerDelegate {
 	public CRCServerDelegate(IServer server) {
 		super(server);
 	}
-	
+	protected boolean supportsOpenshiftSubcommand() {
+		return false;
+	}
+
 	@Override
 	protected void fillActionList(List<ServerActionWorkflow> allActions) {
 		super.fillActionList(allActions);
