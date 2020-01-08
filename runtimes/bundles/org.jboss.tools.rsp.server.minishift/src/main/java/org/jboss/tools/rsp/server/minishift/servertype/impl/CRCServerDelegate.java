@@ -37,6 +37,8 @@ public class CRCServerDelegate extends MinishiftServerDelegate {
 	public CRCServerDelegate(IServer server) {
 		super(server);
 	}
+	
+	@Override
 	protected boolean supportsOpenshiftSubcommand() {
 		return false;
 	}
