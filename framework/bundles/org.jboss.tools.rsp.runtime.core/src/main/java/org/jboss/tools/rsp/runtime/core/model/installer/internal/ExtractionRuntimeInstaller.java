@@ -10,15 +10,11 @@
  *******************************************************************************/
 package org.jboss.tools.rsp.runtime.core.model.installer.internal;
 
-import java.io.InputStream;
-import java.net.URL;
-
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.SubProgressMonitor;
 import org.jboss.tools.rsp.foundation.core.tasks.TaskModel;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
-import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeConnectionFactory;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesModel;
 import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;

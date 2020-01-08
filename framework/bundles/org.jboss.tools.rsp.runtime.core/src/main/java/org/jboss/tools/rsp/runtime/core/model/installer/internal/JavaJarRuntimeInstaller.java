@@ -11,8 +11,6 @@
 package org.jboss.tools.rsp.runtime.core.model.installer.internal;
 
 import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.HashMap;
 
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
@@ -36,9 +34,7 @@ import org.jboss.tools.rsp.foundation.core.launchers.GenericProcessRunner;
 import org.jboss.tools.rsp.foundation.core.tasks.TaskModel;
 import org.jboss.tools.rsp.launching.utils.NativeEnvironmentUtils;
 import org.jboss.tools.rsp.launching.utils.OSUtils;
-import org.jboss.tools.rsp.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
-import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeConnectionFactory;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesModel;
 import org.jboss.tools.rsp.runtime.core.model.IRuntimeInstaller;
