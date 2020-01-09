@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.jboss.tools.rsp.launching.java.test
 Automatic-Module-Name: org.jboss.tools.rsp.launching.java.test
-Bundle-Version: 0.22.2.qualifier
+Bundle-Version: 0.22.2.Final
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .
 Import-Package: com.google.gson,
