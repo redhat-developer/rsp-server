@@ -5,9 +5,11 @@ import java.util.concurrent.ExecutionException;
 
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
+import org.jboss.tools.rsp.api.dao.ServerActionRequest;
 import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.StringPrompt;
+import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
@@ -159,5 +161,13 @@ public class CRCServerDelegate extends MinishiftServerDelegate {
 		
 		return null;
 		
+	}
+	
+	@Override
+	public WorkflowResponse executeServerAction(ServerActionRequest req) {
+		if( req != null && SetupCRCActionHandler.ACTION_SETUP_CRC_ID.equals(req.getActionId() )) {
+			return new SetupCRCActionHandler(this).handle(req);
+		}
+		return super.executeServerAction(req);
 	}
 }
