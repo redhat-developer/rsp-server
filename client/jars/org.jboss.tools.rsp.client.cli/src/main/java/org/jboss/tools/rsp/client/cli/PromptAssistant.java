@@ -32,8 +32,10 @@ import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
 import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
+import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
+import org.jboss.tools.rsp.client.bindings.ServerManagementClientImpl;
 import org.jboss.tools.rsp.client.bindings.ServerManagementClientImpl.PromptStringHandler;
 import org.jboss.tools.rsp.client.bindings.ServerManagementClientLauncher;
 
@@ -99,18 +101,38 @@ public class PromptAssistant {
 	}
 
 	public ServerHandle selectServer() throws InterruptedException, ExecutionException {
+		return selectServerWithState();
+	}
+	public ServerHandle selectServerNoState() throws InterruptedException, ExecutionException {
 		List<ServerHandle> servers = launcher.getServerProxy().getServerHandles().get();
-		List<String> collectorCollection = servers.stream()
+		List<String> collector = servers.stream()
 				.map(ServerHandle::getId)
 				.collect(Collectors.toList());
-		String ret = promptUser(collectorCollection, "Please select a server:");
-		if( ret != null && collectorCollection.contains(ret)) {
-			int ind = collectorCollection.indexOf(ret);
+		String ret = promptUser(collector, "Please select a server:");
+		if( ret != null && collector.contains(ret)) {
+			int ind = collector.indexOf(ret);
 			return servers.get(ind);
 		}
 		return null;
 	}
-	
+
+	public ServerHandle selectServerWithState() throws InterruptedException, ExecutionException {
+		List<ServerHandle> servers = launcher.getServerProxy().getServerHandles().get();
+		List<String> collector = new ArrayList<String>();
+		for( ServerHandle s : servers ) {
+			ServerState ss = launcher.getServerProxy().getServerState(s).get();
+			String runState = ServerManagementClientImpl.getRunStateString(ss.getState());
+			String pubState = ServerManagementClientImpl.getPublishStateString(ss.getPublishState());
+			collector.add(s.getId() + " [" + runState + "] [" + pubState + "]");
+		}
+		String ret = promptUser(collector, "Please select a server:");
+		if( ret != null && collector.contains(ret)) {
+			int ind = collector.indexOf(ret);
+			return servers.get(ind);
+		}
+		return null;
+	}
+
 	public JobHandle selectJob() throws InterruptedException, ExecutionException {
 		List<JobProgress> jobs = launcher.getServerProxy().getJobs().get();
 		List<String> collector = new ArrayList<>();

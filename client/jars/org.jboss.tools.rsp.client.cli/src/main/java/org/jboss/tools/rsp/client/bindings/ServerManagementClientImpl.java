@@ -105,7 +105,7 @@ public class ServerManagementClientImpl implements RSPClient {
 				+ process.getProcessId());
 	}
 	
-	private String getRunStateString(int state) {
+	public static String getRunStateString(int state) {
 		String stateString = null;
 		switch(state) {
 		case ServerManagementAPIConstants.STATE_UNKNOWN:
@@ -128,7 +128,7 @@ public class ServerManagementClientImpl implements RSPClient {
 		return stateString;
 	}
 
-	private String getPublishStateString(int state) {
+	public static String getPublishStateString(int state) {
 		String stateString = null;
 		switch(state) {
 		case ServerManagementAPIConstants.PUBLISH_STATE_ADD:
