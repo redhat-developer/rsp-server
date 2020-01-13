@@ -157,8 +157,13 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 				
 				TaskModel tm2 = createDownloadTaskModel(req);
 				String sSize = dlrt.getSize();
-				if(sSize != null && !sSize.isEmpty()) {
-					tm2.putObject(IDownloadRuntimeWorkflowConstants.DL_RUNTIME_SIZE, Long.parseLong(sSize));
+				if(sSize != null && !sSize.isEmpty() && !sSize.equals(DownloadRuntime.SIZE_UNKNOWN)) {
+					try {
+						long l = Long.parseLong(sSize);
+						tm2.putObject(IDownloadRuntimeWorkflowConstants.DL_RUNTIME_SIZE, l);
+					} catch(NumberFormatException nfe) {
+						// Ignore
+					}
 				}
 
 				IStatus ret = installer.installRuntime(dlrt, uniqueLoc.getAbsolutePath(), downloads.getAbsolutePath(), 
