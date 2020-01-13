@@ -30,6 +30,7 @@ public class DownloadRuntimeDescription {
 	 */
 	public static final String PROPERTY_INSTALLATION_METHOD = "installationMethod"; //$NON-NLS-1$
 	
+	public static final String SIZE_UNKNOWN = "?";
 	
 	private String name;
 	private String id;
@@ -40,7 +41,7 @@ public class DownloadRuntimeDescription {
 	private boolean disclaimer = true;
 	private Map<String, String> properties;
 	
-	private String size = "?"; //$NON-NLS-1$
+	private String size = SIZE_UNKNOWN; //$NON-NLS-1$
 	private String installationMethod;
 	
 	public DownloadRuntimeDescription() {
