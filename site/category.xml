@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+	<description>
+	To install these features, point Eclipse at this site.
+	</description>
+
+   <bundle id="org.jboss.tools.rsp.api"/>
+   <bundle id="org.jboss.tools.rsp.logging"/>
+   <bundle id="org.jboss.tools.rsp.launching.java"/>
+   <bundle id="org.jboss.tools.rsp.launching"/>
+   <bundle id="org.jboss.tools.rsp.stacks.core"/>
+   <bundle id="org.jboss.tools.rsp.secure"/>
+   <bundle id="org.jboss.tools.rsp.server.spi"/>
+   <bundle id="org.jboss.tools.rsp.foundation.core"/>
+   <bundle id="org.jboss.tools.rsp.runtime.core"/>
+   <bundle id="org.jboss.tools.rsp.server"/>
+   <bundle id="org.jboss.tools.rsp.server.minishift"/>
+   <bundle id="org.jboss.tools.rsp.server.redhat.download"/>
+   <bundle id="org.jboss.tools.rsp.server.wildfly"/>
+
+</site>
+
