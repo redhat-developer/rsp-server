@@ -125,7 +125,8 @@
 				 	<version>3.2.0</version>
 				 	<configuration>
 					 	<cloneProjectsTo>${project.build.directory}/quickstarts</cloneProjectsTo>
-					 	<projectsDirectory>target/${quickstarts.dir}/</projectsDirectory>
+						<projectsDirectory>target/${quickstarts.dir}/</projectsDirectory>
+						<streamLogs>true</streamLogs>
 						<pomIncludes>
 							<pomInclude>kitchensink/pom.xml</pomInclude>
 							<pomInclude>kitchensink-ear/pom.xml</pomInclude>
