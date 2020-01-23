@@ -94,6 +94,9 @@ pipeline {
 				def siteFilesToPush = findFiles(glob: 'site/target/repository/**')
 				
 				echo "${distroVersion}"
+				sh "echo \"P2 Repositories\" >> README"
+				sh "rsync -Pzrlt --rsh=ssh --protocol=28 README ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/snapshots/rsp-server/p2/"
+				
 				sh "ssh ${UPLOAD_USER_AT_HOST} \"mkdir -p ${UPLOAD_PATH}/snapshots/rsp-server/p2/${distroVersion}/\""
 				for (i = 0; i < siteFilesToPush.length; i++) {
 					sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${siteFilesToPush[i].path} ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/snapshots/rsp-server/p2/${distroVersion}/"
