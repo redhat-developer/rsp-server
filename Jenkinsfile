@@ -93,8 +93,8 @@ pipeline {
 
 				// First empty the remote dirs
 				def emptyDir = sh script: "mktemp -d | tr -d '\n'", returnStdout: true
-				sh "rsync -Pzrlt --rsh=ssh --protocol=28 --delete ${emptyDir} ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/snapshots/rsp-server/p2/${distroVersion}/plugins/"
-				sh "rsync -Pzrlt --rsh=ssh --protocol=28 --delete ${emptyDir} ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/snapshots/rsp-server/p2/${distroVersion}/"
+				sh "rsync -Pzrlt --rsh=ssh --protocol=28 --delete ${emptyDir}/ ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/snapshots/rsp-server/p2/${distroVersion}/plugins/"
+				sh "rsync -Pzrlt --rsh=ssh --protocol=28 --delete ${emptyDir}/ ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/snapshots/rsp-server/p2/${distroVersion}/"
     
     			// Upload the p2 update site.  This logic only works because all plugins are jars. 
     			// If we ever have exploded bundles here, this will need to be redone
