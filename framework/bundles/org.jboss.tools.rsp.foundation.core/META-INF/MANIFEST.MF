@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Secure
+Bundle-Name: org.jboss.tools.rsp.foundation.core
 Bundle-SymbolicName: org.jboss.tools.rsp.foundation.core
 Bundle-Version: 0.22.3.qualifier
 Bundle-Activator: org.jboss.tools.rsp.foundation.core.FoundationCoreActivator
