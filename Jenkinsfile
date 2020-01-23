@@ -91,17 +91,18 @@ pipeline {
 				unstash 'zips'
 				def distroVersion = sh script: "ls distribution/distribution/target/*.zip | cut --complement -f 1 -d '-' | rev | cut -c5- | rev | tr -d '\n'", returnStdout: true
     
-				def siteFilesToPush = findFiles(glob: 'site/target/repository/**')
-				
-				echo "${distroVersion}"
-				sh "echo \"P2 Repositories\" >> README"
-				sh "rsync -Pzrlt --rsh=ssh --protocol=28 README ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/snapshots/rsp-server/p2/"
-				
-				sh "ssh ${UPLOAD_USER_AT_HOST} \"mkdir -p ${UPLOAD_PATH}/snapshots/rsp-server/p2/${distroVersion}/\""
-				for (i = 0; i < siteFilesToPush.length; i++) {
-					sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${siteFilesToPush[i].path} ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/snapshots/rsp-server/p2/${distroVersion}/"
+    			// Upload the p2 update site.  This logic only works because all plugins are jars. 
+    			// If we ever have exploded bundles here, this will need to be redone
+				def siteRepositoryFilesToPush = findFiles(glob: 'site/target/repository/*')
+				def sitePluginFilesToPush = findFiles(glob: 'site/target/repository/plugins/*')
+				for (i = 0; i < siteRepositoryFilesToPush.length; i++) {
+					sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${siteRepositoryFilesToPush[i].path} ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/snapshots/rsp-server/p2/${distroVersion}/"
+				}
+				for (i = 0; i < sitePluginFilesToPush.length; i++) {
+					sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${sitePluginFilesToPush[i].path} ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/snapshots/rsp-server/p2/${distroVersion}/plugins/"
 				}
 
+				// Upload distributions / zips
 				def filesToPush = findFiles(glob: '**/*.zip')
 				for (i = 0; i < filesToPush.length; i++) {
 					sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${filesToPush[i].path} ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/snapshots/rsp-server/"
