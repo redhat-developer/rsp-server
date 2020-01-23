@@ -94,13 +94,14 @@ pipeline {
 				def siteFilesToPush = findFiles(glob: 'site/target/repository/**')
 				
 				echo "${distroVersion}"
+				sh "ssh ${UPLOAD_USER_AT_HOST} \"mkdir -p ${UPLOAD_PATH}/snapshots/rsp-server/p2/${distroVersion}/\""
 				for (i = 0; i < siteFilesToPush.length; i++) {
-					sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${siteFilesToPush[i].path} ${UPLOAD_LOCATION}/snapshots/rsp-server/p2/${distroVersion}/"
+					sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${siteFilesToPush[i].path} ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/snapshots/rsp-server/p2/${distroVersion}/"
 				}
 
 				def filesToPush = findFiles(glob: '**/*.zip')
 				for (i = 0; i < filesToPush.length; i++) {
-					sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${filesToPush[i].path} ${UPLOAD_LOCATION}/snapshots/rsp-server/"
+					sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${filesToPush[i].path} ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/snapshots/rsp-server/"
 				}
 
 			}
