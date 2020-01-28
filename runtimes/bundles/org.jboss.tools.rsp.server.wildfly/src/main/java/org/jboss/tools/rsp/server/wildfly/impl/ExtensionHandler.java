@@ -53,6 +53,7 @@ public class ExtensionHandler {
 			WildFlyServerTypes.EAP70_SERVER_TYPE,
 			WildFlyServerTypes.EAP71_SERVER_TYPE,
 			WildFlyServerTypes.EAP72_SERVER_TYPE,
+			WildFlyServerTypes.EAP73_SERVER_TYPE,
 	};
 
 	private ExtensionHandler() {

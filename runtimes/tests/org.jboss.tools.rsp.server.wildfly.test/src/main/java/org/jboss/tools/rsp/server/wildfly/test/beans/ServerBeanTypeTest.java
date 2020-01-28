@@ -70,6 +70,7 @@ public class ServerBeanTypeTest {
 		map.put(IServerConstants.SERVER_EAP_70, new ServerBeanTypeMock(ID_EAP, NAME_EAP, IServerConstants.SERVER_EAP_70, "7.0"));
 		map.put(IServerConstants.SERVER_EAP_71, new ServerBeanTypeMock(ID_EAP, NAME_EAP, IServerConstants.SERVER_EAP_71, "7.1"));
 		map.put(IServerConstants.SERVER_EAP_72, new ServerBeanTypeMock(ID_EAP, NAME_EAP, IServerConstants.SERVER_EAP_72, "7.2"));
+		map.put(IServerConstants.SERVER_EAP_73, new ServerBeanTypeMock(ID_EAP, NAME_EAP, IServerConstants.SERVER_EAP_73, "7.3"));
 		map.put(IServerConstants.SERVER_WILDFLY_80, new ServerBeanTypeMock(ID_WILDFLY, NAME_WILDFLY, IServerConstants.SERVER_WILDFLY_80, "8.0"));
 		map.put(IServerConstants.SERVER_WILDFLY_90, new ServerBeanTypeMock(ID_WILDFLY, NAME_WILDFLY, IServerConstants.SERVER_WILDFLY_90, "9.0"));
 		map.put(IServerConstants.SERVER_WILDFLY_100, new ServerBeanTypeMock(ID_WILDFLY, NAME_WILDFLY, IServerConstants.SERVER_WILDFLY_100, "10.0"));
