@@ -46,6 +46,7 @@ public interface IServerConstants {
 	public static final String SERVER_EAP_70 = "org.jboss.ide.eclipse.as.eap.70"; //$NON-NLS-1$
 	public static final String SERVER_EAP_71 = "org.jboss.ide.eclipse.as.eap.71"; //$NON-NLS-1$
 	public static final String SERVER_EAP_72 = "org.jboss.ide.eclipse.as.eap.72"; //$NON-NLS-1$
+	public static final String SERVER_EAP_73 = "org.jboss.ide.eclipse.as.eap.73"; //$NON-NLS-1$
 
 	public static final String[] ALL_JBOSS_SERVERS = new String[] {
 			SERVER_AS_32,SERVER_AS_40,SERVER_AS_42,SERVER_AS_50,SERVER_AS_51,
@@ -53,7 +54,8 @@ public interface IServerConstants {
 			SERVER_WILDFLY_80,SERVER_WILDFLY_90,SERVER_WILDFLY_100,
 			SERVER_WILDFLY_110,SERVER_WILDFLY_120,SERVER_WILDFLY_130,
 			SERVER_WILDFLY_140, SERVER_WILDFLY_150, SERVER_WILDFLY_160, SERVER_WILDFLY_170, SERVER_WILDFLY_180,
-			SERVER_EAP_43,SERVER_EAP_50,SERVER_EAP_60, SERVER_EAP_61, SERVER_EAP_70, SERVER_EAP_71, SERVER_EAP_72
+			SERVER_EAP_43,SERVER_EAP_50,SERVER_EAP_60, SERVER_EAP_61, 
+			SERVER_EAP_70, SERVER_EAP_71, SERVER_EAP_72, SERVER_EAP_73
 		};
 		// NEW_SERVER_ADAPTER Add the new server id above this line
 
@@ -93,6 +95,7 @@ public interface IServerConstants {
 	public static final String RUNTIME_EAP_70 = "org.jboss.ide.eclipse.as.runtime.eap.70"; //$NON-NLS-1$
 	public static final String RUNTIME_EAP_71 = "org.jboss.ide.eclipse.as.runtime.eap.71"; //$NON-NLS-1$
 	public static final String RUNTIME_EAP_72 = "org.jboss.ide.eclipse.as.runtime.eap.72"; //$NON-NLS-1$
+	public static final String RUNTIME_EAP_73 = "org.jboss.ide.eclipse.as.runtime.eap.73"; //$NON-NLS-1$
 
 	public static final Map<String, String> RUNTIME_TO_SERVER = new HashMap<String, String>() {{
 		put(RUNTIME_AS_32, SERVER_AS_32);
@@ -122,6 +125,7 @@ public interface IServerConstants {
 		put(RUNTIME_EAP_70, SERVER_EAP_70);
 		put(RUNTIME_EAP_71, SERVER_EAP_71);
 		put(RUNTIME_EAP_72, SERVER_EAP_72);
+		put(RUNTIME_EAP_73, SERVER_EAP_73);
     }};
 	
 	

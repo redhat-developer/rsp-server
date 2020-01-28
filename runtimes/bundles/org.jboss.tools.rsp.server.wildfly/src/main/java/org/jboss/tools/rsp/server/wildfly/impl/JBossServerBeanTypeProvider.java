@@ -23,6 +23,7 @@ import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeEAP61;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeEAP70;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeEAP71;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeEAP72;
+import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeEAP73;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeEAPStandalone;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeEPP;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeEWP;
@@ -124,6 +125,7 @@ public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider, IJB
 	public static final ServerBeanType EAP70 = new ServerBeanTypeEAP70();
 	public static final ServerBeanType EAP71 = new ServerBeanTypeEAP71();
 	public static final ServerBeanType EAP72 = new ServerBeanTypeEAP72();
+	public static final ServerBeanType EAP73 = new ServerBeanTypeEAP73();
 	
 	public static final ServerBeanType JPP6 = new ServerBeanTypeJPP6();
 	
@@ -151,7 +153,7 @@ public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider, IJB
 	 */
 	public static final ServerBeanType[] KNOWN_TYPES =
 		{
-		AS,  EAP70, EAP71, EAP72,
+		AS,  EAP70, EAP71, EAP72, EAP73,
 		WILDFLY90,  WILDFLY90_WEB, 
 		WILDFLY100, WILDFLY100_WEB,
 		WILDFLY110, WILDFLY110_WEB,

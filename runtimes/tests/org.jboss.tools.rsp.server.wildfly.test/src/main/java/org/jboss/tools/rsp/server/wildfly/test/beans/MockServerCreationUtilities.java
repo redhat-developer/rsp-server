@@ -74,6 +74,7 @@ public class MockServerCreationUtilities extends Assert {
 	private static final String eap_server_7_0_jar = "eap7.0.0.mf.jboss-as-server.jar";
 	private static final String eap_server_7_1_jar = "eap7.1.0.mf.jboss-as-server.jar";
 	private static final String eap_server_7_2_jar = "eap7.2.0.mf.jboss-as-server.jar";
+	private static final String eap_server_7_3_jar = "eap7.3.0.mf.jboss-as-server.jar";
 	private static final String jpp_server_6_0_jar = "jpp6.0.0.mf.jboss-as-server.jar";
 	private static final String jpp_server_6_1_jar = "jpp6.1.0.mf.jboss-as-server.jar";
 	private static final String gatein_3_4_0_jar = "gatein3.4.0.mf.jboss-as7-integration.jar";
@@ -131,6 +132,7 @@ public class MockServerCreationUtilities extends Assert {
 		asSystemJar.put(IServerConstants.SERVER_EAP_70, eap_server_7_0_jar);
 		asSystemJar.put(IServerConstants.SERVER_EAP_71, eap_server_7_1_jar);
 		asSystemJar.put(IServerConstants.SERVER_EAP_72, eap_server_7_2_jar);
+		asSystemJar.put(IServerConstants.SERVER_EAP_73, eap_server_7_3_jar);
 		asSystemJar.put(TEST_SERVER_TYPE_EAP_65, eap_server_6_1_jar);
 		asSystemJar.put(TEST_SERVER_TYPE_JPP_60, jpp_server_6_0_jar);
 		asSystemJar.put(TEST_SERVER_TYPE_JPP_61, jpp_server_6_1_jar);
@@ -205,6 +207,8 @@ public class MockServerCreationUtilities extends Assert {
 			serverDir = createEAP71StyleMockServerDirectory(name, serverType, asSystemJar.get(serverType));
 		} else if (IServerConstants.SERVER_EAP_72.equals(serverType)) {
 			serverDir = createEAP72StyleMockServerDirectory(name, serverType, asSystemJar.get(serverType));
+		} else if (IServerConstants.SERVER_EAP_73.equals(serverType)) {
+			serverDir = createEAP73StyleMockServerDirectory(name, serverType, asSystemJar.get(serverType));
 		} else if (IServerConstants.SERVER_WILDFLY_80.equals(serverType)) {
 			serverDir = createWildfly80MockServerDirectory(name, serverType, asSystemJar.get(serverType));
 		} else if (IServerConstants.SERVER_WILDFLY_90.equals(serverType)) {
@@ -404,6 +408,12 @@ public class MockServerCreationUtilities extends Assert {
 	private static File createEAP72StyleMockServerDirectory(String name, String serverTypeId, String serverJar) {
 		File loc = new File(getMocksBaseDir(), name);
 		String manString = "JBoss-Product-Release-Name: JBoss EAP\nJBoss-Product-Release-Version: 7.2.0.GA\nJBoss-Product-Console-Slot: eap";
+		createAS7xProductStructure(loc, true, serverJar, "eap", manString);
+		return loc;
+	}
+	private static File createEAP73StyleMockServerDirectory(String name, String serverTypeId, String serverJar) {
+		File loc = new File(getMocksBaseDir(), name);
+		String manString = "JBoss-Product-Release-Name: JBoss EAP\nJBoss-Product-Release-Version: 7.3.0.GA\nJBoss-Product-Console-Slot: eap";
 		createAS7xProductStructure(loc, true, serverJar, "eap", manString);
 		return loc;
 	}
