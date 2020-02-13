@@ -9,6 +9,8 @@
 package org.jboss.tools.rsp.server;
 
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
+import org.jboss.tools.rsp.server.spi.model.DelayedExtensionManager;
+import org.jboss.tools.rsp.server.spi.model.DelayedExtensionManager.IDelayedExtension;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -41,6 +43,7 @@ public class ServerCoreActivator implements BundleActivator {
 		LauncherSingleton.getDefault().setLauncher(launcher);
 		
 		new Thread(() -> {
+				addDelayedExtensions();
 				try {
 					launcher.launch(port);
 				} catch (Exception e) {
@@ -51,6 +54,13 @@ public class ServerCoreActivator implements BundleActivator {
 		.start();
 	}
 
+	private void addDelayedExtensions() {
+		IDelayedExtension[] addToModel = DelayedExtensionManager.getDefault().getDelayedExtensions();
+		for( int i = 0; i < addToModel.length; i++ ) {
+			addToModel[i].addExtensionsToModel();
+		}
+	}
+	
 	private void setShutdownHandler(final BundleContext context) {
 		ShutdownExecutor.getExecutor().setHandler(() -> {
 			try {

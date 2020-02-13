@@ -71,6 +71,7 @@ public class ServerModel implements IServerModel {
 	private final List<IServerModelListener> listeners = new ArrayList<>();
 	private final Set<String> approvedAttributeTypes = new HashSet<>();
 	private final IServerManagementModel managementModel;
+	private final List<File> failedServerLoads = new ArrayList<>();
 
 	public ServerModel(IServerManagementModel managementModel) {
 		this(managementModel, 
@@ -111,9 +112,11 @@ public class ServerModel implements IServerModel {
 	}
 
 	@Override
-	public void addServerType(IServerType type) {
+	public synchronized void addServerType(IServerType type) {
 		if( type != null && type.getId() != null ) {
 			serverTypes.put(type.getId(), type);
+			// Try again to load any failed servers
+			loadFailedServers();
 		}
 	}
 	
@@ -170,6 +173,17 @@ public class ServerModel implements IServerModel {
 		loadServers(servers);
 	}
 
+	protected void loadFailedServers() {
+		File[] failed = failedServerLoads.toArray(new File[failedServerLoads.size()]);
+		for( File serverFile : failed) {
+			Server loaded = loadServer(serverFile);
+			if( loaded != null ) {
+				failedServerLoads.remove(serverFile);
+				addServer(loaded, loaded.getDelegate());
+			}
+		}
+	}
+	
 	public void loadServers(File folder) {
 		if (!folder.exists()) {
 			return;
@@ -178,7 +192,9 @@ public class ServerModel implements IServerModel {
 			Server server = loadServer(serverFile);
 			if( server != null )
 				addServer(server, server.getDelegate());
-
+			else {
+				failedServerLoads.add(serverFile);
+			}
 		}
 	}
 
@@ -199,7 +215,7 @@ public class ServerModel implements IServerModel {
 					log(new Exception(
 							"Unable to load server from file " + serverFile.getAbsolutePath() + "; server type is missing or null."));
 				} else if( createServerTypeDAO(typeId) == null ) {
-					log(new Exception(
+					logDebug(new Exception(
 							"Unable to load server from file " + serverFile.getAbsolutePath() + "; server type " + typeId + " is not found in model."));
 				}
 				return null;
@@ -211,9 +227,13 @@ public class ServerModel implements IServerModel {
 			return null;
 		}
 	}
-	
+
 	private void log(Exception e) {
 		LOG.error(e.getMessage(), e);
+	}
+
+	private void logDebug(Exception e) {
+		LOG.debug(e.getMessage(), e);
 	}
 	
 	@Override

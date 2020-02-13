@@ -26,12 +26,14 @@ public class DataLocationCore implements IDataStoreModel {
 	private static final Logger LOG = LoggerFactory.getLogger(DataLocationCore.class);
 	public static final String SYSPROP_DATA_LOCATION = "org.jboss.tools.rsp.data";
 	public static final String SYSPROP_RSP_ID = "org.jboss.tools.rsp.id";
+	private static final String SYSPROP_USER_HOME = "user.home";
+	
+	
+	
 	public static final String DATA_LOCATION_LEGACY_DEFAULT = ".org.jboss.tools.rsp.data";
 	public static final String DATA_LOCATION_DEFAULT = ".rsp";
 	public static final String RSP_ID_DEFAULT = "no_id";
 	
-	private static final String SYSPROP_USER_HOME = "user.home";
-
 	private File fLocation = null;
 	private boolean lockedByUs = false;
 	private String lockContent;
