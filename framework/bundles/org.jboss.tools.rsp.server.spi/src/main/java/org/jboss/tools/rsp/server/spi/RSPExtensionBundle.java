@@ -8,19 +8,17 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.spi;
 
+import org.jboss.tools.rsp.server.spi.model.DelayedExtensionManager;
+import org.jboss.tools.rsp.server.spi.model.DelayedExtensionManager.IDelayedExtension;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class RSPExtensionBundle implements BundleActivator {
+public abstract class RSPExtensionBundle implements BundleActivator, IDelayedExtension {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(RSPExtensionBundle.class);
-	
-	private BundleListener listener = null;
 
 	protected abstract void addExtensions();
 	protected abstract void removeExtensions();
@@ -37,23 +35,13 @@ public abstract class RSPExtensionBundle implements BundleActivator {
 			addExtensions();
 		} else {
 			LOG.debug("Adding extensions once server bundle is started. Registering bundle listener");
-			this.listener = event -> onBundleStarted(event, symbolicName, context);
-			context.addBundleListener(listener);
+			DelayedExtensionManager.getDefault().addDelayedExtension(this);
 		}
 	}
 
-	private void onBundleStarted(BundleEvent event, String symbolicName, BundleContext context) {
-		if (event.getBundle().getSymbolicName().equals(symbolicName) 
-				&& event.getType() == BundleEvent.STARTED) {
-				LOG.debug("Adding extensions. Bundle {} is started.", symbolicName);
-				addExtensions();
-				removeBundleListener(context);
-		}
-	}
-
-	private void removeBundleListener(BundleContext context) {
-		context.removeBundleListener(listener);
-		this.listener = null;
+	@Override
+	public void addExtensionsToModel() {
+		addExtensions();
 	}
 
 	protected void removeExtensions(final String symbolicName, final BundleContext context) {
