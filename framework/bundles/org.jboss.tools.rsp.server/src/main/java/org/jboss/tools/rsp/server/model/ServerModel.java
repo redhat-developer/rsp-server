@@ -71,7 +71,7 @@ public class ServerModel implements IServerModel {
 	private final List<IServerModelListener> listeners = new ArrayList<>();
 	private final Set<String> approvedAttributeTypes = new HashSet<>();
 	private final IServerManagementModel managementModel;
-	private final List<File> failedServerLoads = new ArrayList<>();
+	private final Map<String, List<File>> failedServerLoads = new HashMap<String, List<File>>();
 
 	public ServerModel(IServerManagementModel managementModel) {
 		this(managementModel, 
@@ -116,7 +116,7 @@ public class ServerModel implements IServerModel {
 		if( type != null && type.getId() != null ) {
 			serverTypes.put(type.getId(), type);
 			// Try again to load any failed servers
-			loadFailedServers();
+			loadFailedServers(type.getId());
 		}
 	}
 	
@@ -173,12 +173,14 @@ public class ServerModel implements IServerModel {
 		loadServers(servers);
 	}
 
-	protected void loadFailedServers() {
-		File[] failed = failedServerLoads.toArray(new File[failedServerLoads.size()]);
-		for( File serverFile : failed) {
+	protected void loadFailedServers(String id) {
+		List<File> failed = failedServerLoads.get(id);
+		failed = (failed == null ? Collections.emptyList() : failed);
+		List<File> failedClone = new ArrayList<>(failed);
+		for( File serverFile : failedClone) {
 			Server loaded = loadServer(serverFile);
 			if( loaded != null ) {
-				failedServerLoads.remove(serverFile);
+				failed.remove(serverFile);
 				addServer(loaded, loaded.getDelegate());
 			}
 		}
@@ -192,9 +194,6 @@ public class ServerModel implements IServerModel {
 			Server server = loadServer(serverFile);
 			if( server != null )
 				addServer(server, server.getDelegate());
-			else {
-				failedServerLoads.add(serverFile);
-			}
 		}
 	}
 
@@ -217,6 +216,13 @@ public class ServerModel implements IServerModel {
 				} else if( createServerTypeDAO(typeId) == null ) {
 					logDebug(new Exception(
 							"Unable to load server from file " + serverFile.getAbsolutePath() + "; server type " + typeId + " is not found in model."));
+					List<File> failedType = failedServerLoads.get(typeId);
+					if( failedType == null ) {
+						failedType = new ArrayList<File>();
+						failedServerLoads.put(typeId,  failedType);
+					}
+					if( !failedType.contains(serverFile))
+						failedType.add(serverFile);
 				}
 				return null;
 			} else {
