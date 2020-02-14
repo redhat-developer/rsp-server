@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.jboss.tools.rsp.client</groupId>
 		<artifactId>jars</artifactId>
-		<version>0.22.5.Final</version>
+		<version>0.22.6-SNAPSHOT</version>
 	</parent>
 	<groupId>org.jboss.tools.rsp.client.jars</groupId>
 	<artifactId>org.jboss.tools.rsp.client.cli</artifactId>
@@ -74,7 +74,7 @@
 		<dependency>
 			<groupId>org.jboss.tools.rsp.api.bundles</groupId>
 			<artifactId>org.jboss.tools.rsp.api</artifactId>
-			<version>0.22.5.Final</version>
+			<version>0.22.6-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.xtend</groupId>
