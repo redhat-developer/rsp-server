@@ -35,7 +35,9 @@ import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerType;
+import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
+import org.jboss.tools.rsp.server.model.EditServerTest.EditServerServerDelegate;
 import org.jboss.tools.rsp.server.persistence.DataLocationCore;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
@@ -46,6 +48,7 @@ import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
 import org.jboss.tools.rsp.server.util.DataLocationSysProp;
+import org.jboss.tools.rsp.server.util.TestServerUtils;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -130,8 +133,38 @@ public class ServerModelTest {
 			fail();
 		}
 	}
-
 	
+
+	@Test
+	public void testMissingServerTypeInModelThenAddType() {
+		Path dir = null;
+		Path s1 = null;
+		try {
+			dir = Files.createTempDirectory("servermodeltest");
+			s1 = dir.resolve("s1");
+			String contents = getServerString("abc123", "wonka5"); 
+			Files.write(s1, contents.getBytes());
+			sm.loadServers(dir.toFile());
+			assertEquals(sm.getServers().size(), 0);
+			
+			IServerType sType = TestServerUtils.createServerType("wonka5", 
+					ServerModelTestDummyDelegate::new, new CreateServerAttributesUtility().toPojo());
+			sm.addServerType(sType);
+			assertEquals(sm.getServers().size(), 1);
+		} catch(IOException e) {
+			removeFile(s1);
+			fail();
+		}
+	}
+
+
+	public class ServerModelTestDummyDelegate extends AbstractServerDelegate {
+	
+		public ServerModelTestDummyDelegate(IServer server) {
+			super(server);
+		}
+
+	}
 
 	@Test
 	public void testLoadServer() {
