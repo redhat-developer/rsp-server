@@ -28,11 +28,11 @@ public class LauncherSingleton {
 	}
 	
 	private ServerManagementServerLauncher launcher;
-	public ServerManagementServerLauncher getLauncher() {
+	public synchronized ServerManagementServerLauncher getLauncher() {
 		return launcher;
 	}
 	
-	public void setLauncher(ServerManagementServerLauncher launcher) {
+	public synchronized void setLauncher(ServerManagementServerLauncher launcher) {
 		this.launcher = launcher;
 	}
 }

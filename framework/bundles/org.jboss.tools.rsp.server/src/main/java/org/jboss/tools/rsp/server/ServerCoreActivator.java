@@ -21,10 +21,12 @@ public class ServerCoreActivator implements BundleActivator {
 
 	public static final String BUNDLE_ID = "org.jboss.tools.rsp.server";
 	private static final Logger LOG = LoggerFactory.getLogger(ServerCoreActivator.class);
+	private BundleContext context;
 
 	@Override
 	public void start(final BundleContext context) throws Exception {
-		setShutdownHandler(context);
+		this.context = context;
+		ShutdownExecutor.getExecutor().setHandler(() -> { performStop(); });
 		startServer();
 		LOG.debug(NLS.bind("{0} bundle started.", BUNDLE_ID));
 	}
@@ -39,13 +41,21 @@ public class ServerCoreActivator implements BundleActivator {
 
 	private void startServer() {
 		int port = getPort();
-		ServerManagementServerLauncher launcher = new ServerManagementServerLauncher(""+port);
-		LauncherSingleton.getDefault().setLauncher(launcher);
+		ServerManagementServerLauncher launcher = null;
 		
+		try {
+			launcher = new ServerManagementServerLauncher(""+port);
+			LauncherSingleton.getDefault().setLauncher(launcher);
+		} catch(RuntimeException re) {
+			LOG.error("Unable to launch RSP server", re);
+			performStop();
+			return;
+		}
+		ServerManagementServerLauncher launcher2 = launcher;
 		new Thread(() -> {
 				addDelayedExtensions();
 				try {
-					launcher.launch(port);
+					launcher2.launch(port);
 				} catch (Exception e) {
 					LOG.error("Unable to launch RSP server", e);
 				}
@@ -61,16 +71,13 @@ public class ServerCoreActivator implements BundleActivator {
 		}
 	}
 	
-	private void setShutdownHandler(final BundleContext context) {
-		ShutdownExecutor.getExecutor().setHandler(() -> {
-			try {
-				context.getBundle(0).stop();
-			} catch (BundleException e) {
-				LOG.error(NLS.bind("Stopping bundle {0} failed.", BUNDLE_ID), e);
-			}
-		});
+	private void performStop() {
+		try {
+			context.getBundle(0).stop();
+		} catch (BundleException e) {
+			LOG.error(NLS.bind("Stopping bundle {0} failed.", BUNDLE_ID), e);
+		}
 	}
-
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		LOG.debug(NLS.bind("{0} bundle stopped.", BUNDLE_ID));
