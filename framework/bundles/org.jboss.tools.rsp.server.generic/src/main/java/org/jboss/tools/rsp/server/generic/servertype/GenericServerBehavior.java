@@ -11,6 +11,7 @@ package org.jboss.tools.rsp.server.generic.servertype;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 import org.jboss.tools.rsp.api.DefaultServerAttributes;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
@@ -35,6 +36,7 @@ import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.rsp.server.generic.GenericServerActivator;
 import org.jboss.tools.rsp.server.generic.IPublishControllerWithOptions;
 import org.jboss.tools.rsp.server.generic.servertype.launch.GenericJavaLauncher;
+import org.jboss.tools.rsp.server.generic.servertype.launch.NoOpLauncher;
 import org.jboss.tools.rsp.server.generic.servertype.launch.TerminateShutdownLauncher;
 import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
@@ -47,6 +49,8 @@ import org.jboss.tools.rsp.server.spi.model.polling.WebPortPoller;
 import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
+import org.jboss.tools.rsp.server.spi.servertype.IServerType;
+import org.jboss.tools.rsp.server.spi.servertype.IServerWorkingCopy;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,8 +103,10 @@ public class GenericServerBehavior extends AbstractServerDelegate {
 			IServerStartLauncher launcher = getStartLauncher();
 			ILaunch startLaunch2 = launcher.launch(mode);
 			launchedDetails = launcher.getLaunchedDetails();
-			setStartLaunch(startLaunch2);
-			registerLaunch(startLaunch2);
+			if( startLaunch2 != null ) {
+				setStartLaunch(startLaunch2);
+				registerLaunch(startLaunch2);
+			}
 		} catch(CoreException ce) {
 			if( getStartLaunch() != null ) {
 				IProcess[] processes = getStartLaunch().getProcesses();
@@ -162,16 +168,10 @@ public class GenericServerBehavior extends AbstractServerDelegate {
 	
 	@Override
 	public CreateServerValidation validate() {
-		String key = getServerHomeKey();
-		if( key != null ) {
-			String path = getServer().getAttribute(key, (String)null); // Should not be null
-			if( path != null ) {
-				IStatus stat = validateServerHome(path);
-				if( stat != null ) {
-					return new CreateServerValidation(stat, Arrays.asList(new String[] {key}));
-				}
-			}
-		}
+		CreateServerValidation stat = validateServerHome(getServer());
+		if( stat != null && stat.getStatus() != null && stat.getStatus().getSeverity() != IStatus.OK)
+			return stat;
+
 		return new CreateServerValidation(Status.OK_STATUS, new ArrayList<String>());
 	}
 
@@ -186,11 +186,54 @@ public class GenericServerBehavior extends AbstractServerDelegate {
 		return null;
 	}
 	
-	private IStatus validateServerHome(String path) {
+	private CreateServerValidation validateServerHome(IServer server) {
+		String validationType = getServer().getAttribute("server.home.validation", "discovery");
+		// Should never happen. If it does, just don't validate I guess
+		if( validationType == null )
+			return null;
+		
+		if( "discovery".equals(validationType)) {
+			return validateServerHomeDiscovery(getServer());
+		}
+		
+		if( "isFolder".equals(validationType)) {
+			return validateServerHomeFolderExists(getServer());
+		}
+		return null;
+	}
+	
+	private String findServerHome(IServer server) {
+		String key = getServerHomeKey();
+		return key == null ? null : getServer().getAttribute(key, (String)null); // Should not be null
+	}
+	
+	private CreateServerValidation validateServerHomeFolderExists(IServer server) {
+		IStatus failedStat = new Status(IStatus.ERROR, GenericServerActivator.BUNDLE_ID, "Server type not found at given server home");
+		String path = findServerHome(server);
+		if( path == null ) {
+			return new CreateServerValidation(failedStat, Arrays.asList(new String[] {getServerHomeKey()}));
+		}
+		if( !(new File(path).exists())) {
+			return new CreateServerValidation(failedStat, Arrays.asList(new String[] {getServerHomeKey()}));
+		}
+		if( !(new File(path).isDirectory())) {
+			return new CreateServerValidation(failedStat, Arrays.asList(new String[] {getServerHomeKey()}));
+		}
+		return null;
+	}
+	
+	private CreateServerValidation validateServerHomeDiscovery(IServer server) {
+		IStatus failedStat = new Status(IStatus.ERROR, GenericServerActivator.BUNDLE_ID, "Server type not found at given server home");
+
+		String path = findServerHome(server);
+		if( path == null ) {
+			return new CreateServerValidation(failedStat, Arrays.asList(new String[] {getServerHomeKey()}));
+		}
+
 		ServerBeanLoader sbl = new ServerBeanLoader(new File(path), getServer().getServerManagementModel());
 		String foundType = sbl.getServerAdapterId();
 		if( !getServer().getServerType().getId().equals(foundType))  {
-			return new Status(IStatus.ERROR, GenericServerActivator.BUNDLE_ID, "Server type not found at given server home");
+			return new CreateServerValidation(failedStat, Arrays.asList(new String[] {getServerHomeKey()}));
 		}
 		return null;
 	}
@@ -203,6 +246,9 @@ public class GenericServerBehavior extends AbstractServerDelegate {
 		if( "terminateProcess".equals(launchType)) {
 			ILaunch startLaunch = getStartLaunch();
 			return new TerminateShutdownLauncher(this, startLaunch);
+		}
+		if( "noOp".equals(launchType)) {
+			return new NoOpLauncher(this);
 		}
 		return null;
 	}
@@ -394,6 +440,23 @@ public class GenericServerBehavior extends AbstractServerDelegate {
 	@Override
 	public WorkflowResponse executeServerAction(ServerActionRequest req) {
 		return getServerActionSupport().executeServerAction(req);
+	}
+
+	@Override
+	public void setDefaults(IServerWorkingCopy server) {
+		IServerType st = getServer().getServerType();
+		if( st instanceof GenericServerType) {
+			Map<String, Object> m = ((GenericServerType)st).getDefaults();
+			for(String s : m.keySet()) {
+				Object val = m.get(s);
+				if( val instanceof String )
+					server.setAttribute(s, (String)val);
+				else if( val instanceof Boolean )
+					server.setAttribute(s, (Boolean)val);
+				else if( val instanceof Integer)
+					server.setAttribute(s, (Integer)val);
+			}
+		}
 	}
 
 }

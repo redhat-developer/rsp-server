@@ -56,12 +56,15 @@ public class GenericServerTypeExtensionModel implements IServerBehaviorFromJSONP
 		JSONMemento attributes = type.getChild("attributes");
 		JSONMemento required = null;
 		JSONMemento optional = null;
+		JSONMemento staticVals = null;
+		
 		if( attributes != null ) {
 			required = attributes.getChild("required");
 			optional = attributes.getChild("optional");
+			staticVals = attributes.getChild("static");
 		}
 		this.myServerType = new GenericServerType(serverTypeId, name, 
-				desc, launchModes, required, optional, delegateProvider);
+				desc, launchModes, required, optional, staticVals, delegateProvider);
 	}
 
 	private void loadDiscovery(String serverTypeId, JSONMemento discoveries) {

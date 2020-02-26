@@ -31,6 +31,7 @@ public class StandardJBossPublishController extends AbstractFilesystemPublishCon
 		super(server, delegate);
 	}
 	
+	@Override
 	protected Path getDeploymentFolder() {
 		// TODO this may need to be abstracted out eventually if we 
 		// support things like custom config folders etc. 
