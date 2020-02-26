@@ -1,5 +1,8 @@
 package org.jboss.tools.rsp.server.generic.servertype;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
@@ -18,15 +21,18 @@ public class GenericServerType extends AbstractServerType {
 	private String runModes;
 	private JSONMemento requiredAttributes;
 	private JSONMemento optionalAttributes;
+	private JSONMemento staticAttributes;
 	private IServerBehaviorProvider delegateProvider;
 	
 	public GenericServerType(String id, String name, String desc,
-			String runModes, JSONMemento requiredAttributes, JSONMemento optionalAttributes,
+			String runModes, JSONMemento requiredAttributes, 
+			JSONMemento optionalAttributes, JSONMemento staticAttributes,
 			IServerBehaviorProvider delegateProvider) {
 		super(id, name, desc);
 		this.runModes = runModes;
 		this.requiredAttributes = requiredAttributes;
 		this.optionalAttributes = optionalAttributes;
+		this.staticAttributes = staticAttributes;
 		this.delegateProvider = delegateProvider;
 	}
 
@@ -121,5 +127,19 @@ public class GenericServerType extends AbstractServerType {
 			return Boolean.parseBoolean(val);
 		// TODO list and map?? 
 		return val; 
+	}
+	
+	public Map<String, Object> getDefaults() {
+		HashMap<String, Object> ret = new HashMap<>();
+		if( staticAttributes != null ) {
+			JSONMemento[] attrKeys = staticAttributes.getChildren();
+			for( int i = 0; i < attrKeys.length; i++ ) {
+				String type = attrKeys[i].getString("type");
+				String val = attrKeys[i].getString("value");
+				Object dValObj = convertDefaultValue(val, type);
+				ret.put(attrKeys[i].getNodeName(),  dValObj);
+			}
+		}
+		return ret;
 	}
 }
