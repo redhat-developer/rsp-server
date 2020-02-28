@@ -38,13 +38,40 @@ public class WildFlyPublishController extends StandardJBossPublishController {
 	
 	@Override
 	protected Path getDeploymentFolder() {
+		Path fromServer = getDeploymentFolderFromServer();
+		if( fromServer != null )
+			return fromServer;
+		return getDefaultDeploymentFolder();
+	}
+
+	protected Path getDefaultDeploymentFolder() {
 		// TODO this may need to be abstracted out eventually if we 
 		// support things like custom config folders etc. 
 		String home = getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
-		Path p = new File(home).toPath().resolve("standalone").resolve("deployments");
+		return new File(home).toPath().resolve("standalone").resolve("deployments");
+	}
+
+	protected Path getDeploymentFolderFromServer() {
+		// TODO this may need to be abstracted out eventually if we 
+		// support things like custom config folders etc. 
+		String deploy = getServer().getAttribute(IJBossServerAttributes.WILDFLY_DEPLOY_DIR, (String)null);
+		if( deploy == null || deploy.isEmpty())
+			return null;
+		// Absolute
+		if( !isRelativePath(deploy)) {
+			return new File(deploy).toPath();
+		}
+		// Relative
+		String home = getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
+		Path p = new File(home).toPath().resolve(deploy);
 		return p;
 	}
 	
+	private boolean isRelativePath(String s) {
+		org.jboss.tools.rsp.eclipse.core.runtime.Path p = new org.jboss.tools.rsp.eclipse.core.runtime.Path(s);
+		return !p.isAbsolute();
+	}
+
 	@Override
 	public int publishModule(DeployableReference withOptions, 
 			int serverPublishRequest, int modulePublishState)
