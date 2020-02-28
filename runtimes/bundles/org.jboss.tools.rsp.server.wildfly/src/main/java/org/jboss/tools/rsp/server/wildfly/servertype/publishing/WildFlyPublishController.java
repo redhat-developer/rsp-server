@@ -19,6 +19,7 @@ import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
+import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.wildfly.impl.Activator;
 import org.jboss.tools.rsp.server.wildfly.servertype.AbstractJBossServerDelegate;
@@ -135,10 +136,12 @@ public class WildFlyPublishController extends StandardJBossPublishController {
 	}
 
 	private void createMarker(String modulePath, String marker) {
+		File toTouch = new File(modulePath+marker);
 		try {
-			touch(new File(modulePath + marker));
+			touch(toTouch);
 		} catch(IOException ioe) {
-			LOG.error("Error publishing module {0} to server {1}", ioe);
+			String errMsg = NLS.bind("Error creating deployment marker file: {0}", toTouch.getAbsolutePath());
+			LOG.error(errMsg, ioe);
 		}
 		
 	}
