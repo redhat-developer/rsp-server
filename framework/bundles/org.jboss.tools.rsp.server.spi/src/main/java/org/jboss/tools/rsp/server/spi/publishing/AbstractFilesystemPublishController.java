@@ -252,7 +252,8 @@ public abstract class AbstractFilesystemPublishController implements IPublishCon
 			Files.copy(src, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 		} catch(IOException ioe) {
-			LOG.error("Error publishing module {0} to server {1}", ioe);
+			String errMsg = NLS.bind("Error publishing module {0} to server {1}", opts.getLabel(), getServer().getName());
+			LOG.error(errMsg, ioe);
 			return delegate.getServerPublishModel().getDeployableState(opts).getPublishState();
 		}
 	}
@@ -266,7 +267,8 @@ public abstract class AbstractFilesystemPublishController implements IPublishCon
 			Files.walkFileTree(src, new CopyFileVisitor(dest.toPath()));
 			return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 		} catch(IOException ioe) {
-			LOG.error("Error publishing module {0} to server {1}", ioe);
+			String errMsg = NLS.bind("Error publishing module {0} to server {1}", opts.getLabel(), getServer().getName());
+			LOG.error(errMsg, ioe);
 			return delegate.getServerPublishModel().getDeployableState(opts).getPublishState();
 		}
 	}
@@ -354,7 +356,8 @@ public abstract class AbstractFilesystemPublishController implements IPublishCon
 		if( !errors.isEmpty() ) {
 			String[] arr = errors.toArray(new String[errors.size()]);
 			String errorString = String.join("\n", arr);
-			LOG.error("Error publishing module {0} to server {1}:\n{2}", opts.getLabel(), getServer().getName(), errorString);
+			String errMsg = NLS.bind("Error publishing module {0} to server {1}:\n{2}", new Object[] {opts.getLabel(), getServer().getName(), errorString});
+			LOG.error(errMsg);
 			// TODO maybe throw core exception here?? 
 			return getServerPublishModel().getDeployableState(opts).getPublishState();
 		}
