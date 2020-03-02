@@ -12,6 +12,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.jboss.tools.rsp.api.DefaultServerAttributes;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
@@ -187,7 +188,7 @@ public class GenericServerBehavior extends AbstractServerDelegate {
 	}
 	
 	private CreateServerValidation validateServerHome(IServer server) {
-		String validationType = getServer().getAttribute("server.home.validation", "discovery");
+		String validationType = server.getAttribute("server.home.validation", "discovery");
 		// Should never happen. If it does, just don't validate I guess
 		if( validationType == null )
 			return null;
@@ -204,20 +205,20 @@ public class GenericServerBehavior extends AbstractServerDelegate {
 	
 	private String findServerHome(IServer server) {
 		String key = getServerHomeKey();
-		return key == null ? null : getServer().getAttribute(key, (String)null); // Should not be null
+		return key == null ? null : server.getAttribute(key, (String)null); // Should not be null
 	}
 	
 	private CreateServerValidation validateServerHomeFolderExists(IServer server) {
 		IStatus failedStat = new Status(IStatus.ERROR, GenericServerActivator.BUNDLE_ID, "Server type not found at given server home");
 		String path = findServerHome(server);
 		if( path == null ) {
-			return new CreateServerValidation(failedStat, Arrays.asList(new String[] {getServerHomeKey()}));
+			return new CreateServerValidation(failedStat, Arrays.asList(getServerHomeKey()));
 		}
 		if( !(new File(path).exists())) {
-			return new CreateServerValidation(failedStat, Arrays.asList(new String[] {getServerHomeKey()}));
+			return new CreateServerValidation(failedStat, Arrays.asList(getServerHomeKey()));
 		}
 		if( !(new File(path).isDirectory())) {
-			return new CreateServerValidation(failedStat, Arrays.asList(new String[] {getServerHomeKey()}));
+			return new CreateServerValidation(failedStat, Arrays.asList(getServerHomeKey()));
 		}
 		return null;
 	}
@@ -227,13 +228,13 @@ public class GenericServerBehavior extends AbstractServerDelegate {
 
 		String path = findServerHome(server);
 		if( path == null ) {
-			return new CreateServerValidation(failedStat, Arrays.asList(new String[] {getServerHomeKey()}));
+			return new CreateServerValidation(failedStat, Arrays.asList(getServerHomeKey()));
 		}
 
 		ServerBeanLoader sbl = new ServerBeanLoader(new File(path), getServer().getServerManagementModel());
 		String foundType = sbl.getServerAdapterId();
 		if( !getServer().getServerType().getId().equals(foundType))  {
-			return new CreateServerValidation(failedStat, Arrays.asList(new String[] {getServerHomeKey()}));
+			return new CreateServerValidation(failedStat, Arrays.asList(getServerHomeKey()));
 		}
 		return null;
 	}
@@ -447,14 +448,14 @@ public class GenericServerBehavior extends AbstractServerDelegate {
 		IServerType st = getServer().getServerType();
 		if( st instanceof GenericServerType) {
 			Map<String, Object> m = ((GenericServerType)st).getDefaults();
-			for(String s : m.keySet()) {
-				Object val = m.get(s);
+			for(Entry<String,Object> s : m.entrySet()) {
+				Object val = s.getValue();
 				if( val instanceof String )
-					server.setAttribute(s, (String)val);
+					server.setAttribute(s.getKey(), (String)val);
 				else if( val instanceof Boolean )
-					server.setAttribute(s, (Boolean)val);
+					server.setAttribute(s.getKey(), (Boolean)val);
 				else if( val instanceof Integer)
-					server.setAttribute(s, (Integer)val);
+					server.setAttribute(s.getKey(), (Integer)val);
 			}
 		}
 	}

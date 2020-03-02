@@ -64,8 +64,7 @@ public class WildFlyPublishController extends StandardJBossPublishController {
 		}
 		// Relative
 		String home = getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
-		Path p = new File(home).toPath().resolve(deploy);
-		return p;
+		return new File(home).toPath().resolve(deploy);
 	}
 	
 	private boolean isRelativePath(String s) {
