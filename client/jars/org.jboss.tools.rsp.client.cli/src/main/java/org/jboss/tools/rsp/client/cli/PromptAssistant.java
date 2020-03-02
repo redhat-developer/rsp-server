@@ -64,7 +64,7 @@ public class PromptAssistant {
 		List<String> collectorCollection = modes.stream()
 				.map(ServerLaunchMode::getMode)
 				.collect(Collectors.toList());
-		if(collectorCollection.size() == 0 )
+		if(collectorCollection.isEmpty() )
 			return null;
 		String ret = promptUser(collectorCollection, "Please select a launch mode:");
 		if( ret != null && collectorCollection.contains(ret)) {

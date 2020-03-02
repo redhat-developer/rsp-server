@@ -43,13 +43,11 @@ public class NoOpLauncher implements IServerShutdownLauncher, IServerStartLaunch
 
 	@Override
 	public CommandLineDetails getLaunchedDetails() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public CommandLineDetails getLaunchCommand(String mode) throws CoreException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
