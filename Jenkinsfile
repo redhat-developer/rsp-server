@@ -59,7 +59,7 @@ pipeline {
 				stage ('Java 11 runtime') {
 					agent { label 'rhel7' }
 					tools {
-						jdk 'openjdk11'
+						jdk 'openjdk-11'
 					}
 					stages {
 				 		stage('Build Java 11 & unit tests') {
