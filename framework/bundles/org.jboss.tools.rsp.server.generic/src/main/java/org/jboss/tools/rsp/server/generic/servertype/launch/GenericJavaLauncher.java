@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2020 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v2.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v20.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.rsp.server.generic.servertype.launch;
 
 import java.io.File;
@@ -11,6 +19,7 @@ import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.launching.memento.JSONMemento;
 import org.jboss.tools.rsp.server.generic.servertype.GenericServerBehavior;
+import org.jboss.tools.rsp.server.generic.servertype.GenericServerType;
 import org.jboss.tools.rsp.server.generic.servertype.variables.IDynamicVariable;
 import org.jboss.tools.rsp.server.generic.servertype.variables.IStringVariableManager;
 import org.jboss.tools.rsp.server.generic.servertype.variables.IValueVariable;
@@ -22,6 +31,7 @@ import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
 public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 		implements IServerStartLauncher, IServerShutdownLauncher {
+
 
 	private JSONMemento startupMemento;
 
@@ -101,6 +111,13 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 
 	@Override
 	protected String getVMArguments() {
+		String def = getDefaultVMArguments();
+		if(getServer().getAttribute(GenericServerType.LAUNCH_OVERRIDE_BOOLEAN, false)) {
+			return getServer().getAttribute(GenericServerType.JAVA_LAUNCH_OVERRIDE_VM_ARGS, def);
+		}
+		return def;
+	}
+	protected String getDefaultVMArguments() {
 		JSONMemento launchProperties = startupMemento.getChild("launchProperties");
 		if (launchProperties != null) {
 			String vmArgs = launchProperties.getString("vmArgs");
@@ -117,6 +134,14 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 
 	@Override
 	protected String getProgramArguments() {
+		String def = getDefaultProgramArguments();
+		if(getServer().getAttribute(GenericServerType.LAUNCH_OVERRIDE_BOOLEAN, false)) {
+			return getServer().getAttribute(GenericServerType.LAUNCH_OVERRIDE_PROGRAM_ARGS, def);
+		}
+		return def;
+	}
+	
+	protected String getDefaultProgramArguments() {
 		JSONMemento launchProperties = startupMemento.getChild("launchProperties");
 		if (launchProperties != null) {
 			String programArgs = launchProperties.getString("programArgs");
