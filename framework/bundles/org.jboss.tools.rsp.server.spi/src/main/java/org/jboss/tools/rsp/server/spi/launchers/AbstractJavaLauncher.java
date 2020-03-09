@@ -34,6 +34,11 @@ import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
 public abstract class AbstractJavaLauncher implements IServerStartLauncher {
+	
+	public static final String PROPERTY_PROGRAM_ARGS = "property.program.args";
+	public static final String PROPERTY_VM_ARGS = "property.vm.args";
+	
+
 	private IServerDelegate delegate;
 	private IVMRunner runner;
 	private ILaunch launch;
@@ -69,6 +74,10 @@ public abstract class AbstractJavaLauncher implements IServerStartLauncher {
 		this.launch = createLaunch(mode);
 		this.runConfig = configureRunner();
 		this.launchedDetails = createLaunchedDetails();
+		HashMap<String,String> props = new HashMap<>();
+		props.put(PROPERTY_PROGRAM_ARGS, getProgramArguments());
+		props.put(PROPERTY_VM_ARGS, getVMArguments());
+		this.launchedDetails.setProperties(props);
 		return launchedDetails;
 	}
 

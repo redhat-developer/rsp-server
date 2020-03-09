@@ -344,5 +344,13 @@ public interface IServerDelegate {
 	 */
 	public void setDefaults(IServerWorkingCopy server);
 
+	/** 
+	 * Allow the delegate the opportunity to fill in any additional attributes
+	 * that DEPEND ON user-defined attributes. 
+	 * 
+	 * @param server
+	 */
+	public void setDependentDefaults(IServerWorkingCopy server);
+
 
 }

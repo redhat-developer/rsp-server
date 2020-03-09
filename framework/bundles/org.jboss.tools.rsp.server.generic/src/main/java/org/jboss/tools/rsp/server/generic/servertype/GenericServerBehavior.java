@@ -154,7 +154,7 @@ public class GenericServerBehavior extends AbstractServerDelegate {
 		return Status.OK_STATUS;
 
 	}
-	private IServerStartLauncher getStartLauncher() {
+	protected IServerStartLauncher getStartLauncher() {
 		JSONMemento startupMemento = behaviorMemento.getChild("startup");
 		// TODO casting is dumb. Should be smarter than this
 		return (IServerStartLauncher)getLauncher(startupMemento);

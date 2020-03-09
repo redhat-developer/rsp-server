@@ -609,4 +609,9 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	public void setDefaults(IServerWorkingCopy server) {
 		// DO nothing
 	}
+	
+	@Override
+	public void setDependentDefaults(IServerWorkingCopy server) {
+		// Do nothing
+	}
 }

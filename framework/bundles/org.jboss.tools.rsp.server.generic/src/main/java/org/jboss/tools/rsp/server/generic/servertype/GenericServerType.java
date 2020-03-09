@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2020 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * All rights reserved. This program is made available under the terms of the
+ * Eclipse Public License v2.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v20.html
+ * 
+ * Contributors: Red Hat, Inc.
+ ******************************************************************************/
 package org.jboss.tools.rsp.server.generic.servertype;
 
 import java.util.HashMap;
@@ -15,7 +23,10 @@ import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
 public class GenericServerType extends AbstractServerType {
-	
+	public static final String LAUNCH_OVERRIDE_BOOLEAN = "args.override.boolean";
+	public static final String LAUNCH_OVERRIDE_PROGRAM_ARGS = "program.args.override.string";
+	public static final String JAVA_LAUNCH_OVERRIDE_VM_ARGS = "vm.args.override.string";
+
 	protected Attributes required = null;
 	protected Attributes optional = null;
 	private String runModes;
