@@ -74,10 +74,13 @@ public abstract class AbstractJavaLauncher implements IServerStartLauncher {
 		this.launch = createLaunch(mode);
 		this.runConfig = configureRunner();
 		this.launchedDetails = createLaunchedDetails();
-		HashMap<String,String> props = new HashMap<>();
+		Map<String,String> props = this.launchedDetails.getProperties();
+		if( props == null ) {
+			props = new HashMap<>();
+			this.launchedDetails.setProperties(props);
+		}
 		props.put(PROPERTY_PROGRAM_ARGS, getProgramArguments());
 		props.put(PROPERTY_VM_ARGS, getVMArguments());
-		this.launchedDetails.setProperties(props);
 		return launchedDetails;
 	}
 
