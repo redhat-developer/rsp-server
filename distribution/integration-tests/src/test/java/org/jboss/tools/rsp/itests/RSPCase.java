@@ -14,13 +14,11 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -233,6 +231,14 @@ public abstract class RSPCase {
 		}
 
 		return states.stream().filter(state -> reference.equals(state.getReference())).findFirst().orElse(null);
+	}
+	
+	public void sleep(long miliseconds) {
+		try {
+			Thread.sleep(miliseconds);
+		} catch (InterruptedException exc) {
+			throw new RuntimeException(exc.getCause());
+		}
 	}
 
 }
