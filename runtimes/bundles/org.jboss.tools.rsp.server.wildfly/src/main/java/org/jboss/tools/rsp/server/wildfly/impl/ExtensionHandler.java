@@ -26,6 +26,8 @@ import org.jboss.tools.rsp.server.wildfly.servertype.impl.WildFlyServerTypes;
 public class ExtensionHandler {
 
 	private static final IServerType[] TYPES = {
+			// NEW_SERVER_ADAPTER
+			WildFlyServerTypes.WF19_SERVER_TYPE,
 			WildFlyServerTypes.WF18_SERVER_TYPE,
 			WildFlyServerTypes.WF17_SERVER_TYPE,
 			WildFlyServerTypes.WF16_SERVER_TYPE,
