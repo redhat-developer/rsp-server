@@ -18,7 +18,7 @@ import org.jboss.tools.rsp.server.wildfly.servertype.impl.ServerTypeStringConsta
  *
  */
 public class RSPServerUtility {
-
+	// NEW_SERVER_ADAPTER
 	public static ServerType getServerType(String serverID) {
 		switch (serverID) {
 			case IServerConstants.SERVER_WILDFLY_130:
@@ -33,6 +33,8 @@ public class RSPServerUtility {
 				return createServerType(serverID, ServerTypeStringConstants.WF17_NAME, ServerTypeStringConstants.WF17_DESC);
 			case IServerConstants.SERVER_WILDFLY_180:
 				return createServerType(serverID, ServerTypeStringConstants.WF18_NAME, ServerTypeStringConstants.WF18_DESC);
+			case IServerConstants.SERVER_WILDFLY_190:
+				return createServerType(serverID, ServerTypeStringConstants.WF19_NAME, ServerTypeStringConstants.WF19_DESC);
 			default:
 				return createServerType(IServerConstants.SERVER_WILDFLY_120, ServerTypeStringConstants.WF12_NAME, ServerTypeStringConstants.WF12_DESC);
 		}

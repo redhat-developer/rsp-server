@@ -35,7 +35,17 @@ public class ServerManagementServerLauncher {
 	public static void main(String[] args) throws Exception {
 		ServerManagementServerLauncher instance = new ServerManagementServerLauncher(args[0]);
 		instance.launch();
+		instance.addShutdownHook();
 		instance.shutdownOnInput();
+	}
+
+	private void addShutdownHook() {
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+            	shutdown();
+            }
+        });
 	}
 
 	public void shutdownOnInput() throws IOException {
