@@ -727,6 +727,11 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	private WorkflowResponse downloadRuntimeInternal(DownloadSingleRuntimeRequest req) {
+		if (req == null) {
+			WorkflowResponse resp = errorWorkflowResponse(errorStatus("Invalid Request: Request cannot be null."));
+			resp.setItems(new ArrayList<>());
+			return resp;
+		}
 		String id = req.getDownloadRuntimeId();
 		IDownloadRuntimesProvider provider = managementModel.getDownloadRuntimeModel().findProviderForRuntime(id);
 		if( provider != null ) {
