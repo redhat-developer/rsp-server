@@ -44,4 +44,20 @@ public class RSPServerUtility {
 		return new ServerType(id, name, description);
 	}
 	
+	public static void waitFor(long time, WaitCondition condition) {
+		int treshold = 1000;
+		long cycles = time / treshold;
+		while (cycles-- > 0) {
+			if(condition.test() ) {
+				return;
+			}
+			try {
+				Thread.sleep(treshold);
+			} catch(InterruptedException exc) {
+				
+			}
+		}
+		throw new RuntimeException("Wait condition was not fulfilled.");
+	}
+	
 }
