@@ -771,6 +771,9 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 	
 	protected Status cancelJobSync(JobHandle job) {
+		if (job == null) {
+			return errorStatus("Job handle cannot be null");
+		}
 		IStatus s =  managementModel.getJobManager().cancelJob(job);
 		return StatusConverter.convert(s);
 	}
