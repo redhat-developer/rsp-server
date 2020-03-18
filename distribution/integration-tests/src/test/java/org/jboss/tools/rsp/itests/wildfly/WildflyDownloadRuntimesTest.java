@@ -12,27 +12,31 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
 import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
 import org.jboss.tools.rsp.api.dao.JobProgress;
 import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
+import org.jboss.tools.rsp.api.dao.ServerHandle;
+import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.itests.RSPCase;
+import org.jboss.tools.rsp.itests.util.RSPServerUtility;
+import org.jboss.tools.rsp.itests.util.WaitCondition;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 public class WildflyDownloadRuntimesTest extends RSPCase {
-
-	private static final String SERVER_ID = "wildfly";
 	private static final String WILDFLY_RUNTIME_ID = "wildfly-1801finalruntime";
+	private static final String WILDFLY_DOWNLOADED_ID = "wildfly-18.0.1.Final";
 	
 	private static final String DOWNLOAD_REQUEST_EMPTY = "Unable to find an executor for the given download runtime";
 	private static final String INFO_REQUIRED_MESSAGE = "Please fill the requried information";
@@ -40,15 +44,10 @@ public class WildflyDownloadRuntimesTest extends RSPCase {
 	private static final String WORKFLOW_LICENSE_URL = "workflow.license.url";
 	private static final String WORKFLOW_LICENSE_SIGN = "workflow.license.sign";
 	private static final String DOWNLOAD_IN_PROGRESS = "Download In Progress";
-	
-	@Before
-	public void before() throws Exception {
-		createServer(WILDFLY_ROOT, SERVER_ID);
-	}
 
 	@After
 	public void after() throws Exception {
-		deleteServer(SERVER_ID);
+		deleteServer(WILDFLY_DOWNLOADED_ID);
 	}
 	
 	@Test
@@ -115,7 +114,7 @@ public class WildflyDownloadRuntimesTest extends RSPCase {
 		// prepare request that confirms licenses and is a parameter of runtime download process
 		DownloadSingleRuntimeRequest request3 = new DownloadSingleRuntimeRequest();
 		data.put(WORKFLOW_LICENSE_URL, "Continue...");
-		data.put(WORKFLOW_LICENSE_SIGN, true);	
+		data.put(WORKFLOW_LICENSE_SIGN, true);
 		request3.setRequestId(response2.getRequestId());
 		request3.setDownloadRuntimeId(request2.getDownloadRuntimeId());
 		request3.setData(data);
@@ -124,27 +123,28 @@ public class WildflyDownloadRuntimesTest extends RSPCase {
 		assertNotNull(response3);
 		assertEquals(Status.OK, response3.getStatus().getSeverity());
 		assertEquals(DOWNLOAD_IN_PROGRESS, response3.getStatus().getMessage());
-		// download job id
+		// get download job id
 		String downloadJobId = response3.getJobId();
 		assertNotNull(downloadJobId);
-		// list all running jobs on the rsp server
-		// actual job progress (from getJobs) could be 0.0 as downloading takes some time to start
-		List<JobProgress> jobs = serverProxy.getJobs().get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
-		assertTrue(jobs != null && jobs.size() > 0);
-		// verify that it is our downloading job
-		JobProgress jobProgress = jobs.stream().filter(job -> job.getHandle().getId().equals(downloadJobId)).findAny().orElse(null);
-		double actualProgress = jobProgress.getPercent();
-		assertTrue(actualProgress >= 0.0);
-		// check that there is progress in bits downloading. wait for a while
-		sleep(5000);
-		jobs = serverProxy.getJobs().get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
-		jobProgress = jobs.stream().filter(job -> job.getHandle().getId().equals(downloadJobId)).findAny().orElse(null);
-		assertTrue(jobProgress.getPercent() > 0.0 && jobProgress.getPercent() != actualProgress);
-		// Cancel downloading
-		Status cancelStatus = serverProxy.cancelJob(jobProgress.getHandle()).get(SERVER_OPERATION_TIMEOUT, TimeUnit.MILLISECONDS);
-		assertEquals(Status.OK, cancelStatus.getSeverity());
-		jobs = serverProxy.getJobs().get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
-		assertNotNull(jobs != null && jobs.size() == 0);
+		// wait for downloading job to finish
+		RSPServerUtility.waitFor(120000, new WaitCondition() {
+			
+			@Override
+			public boolean test() {
+				List<JobProgress> jobs = new ArrayList<>();
+				try {
+					jobs = serverProxy.getJobs().get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
+				} catch (InterruptedException | ExecutionException | TimeoutException e) {
+					e.printStackTrace();
+				}
+				JobProgress jobProgress = jobs.stream().filter(job -> job.getHandle().getId().equals(downloadJobId)).findAny().orElse(null);
+				return jobProgress == null ? true : false;
+			}
+		});
+		// check server state (for predefined server id of the downloaded server) 
+		ServerState state = serverProxy.getServerState(new ServerHandle(WILDFLY_DOWNLOADED_ID, wildflyType)).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
+		assertNotNull(state);
+		assertEquals(ServerManagementAPIConstants.STATE_STOPPED, state.getState());
 	}
 	
 	private DownloadRuntimeDescription getRuntimeById(List<DownloadRuntimeDescription> runtimes, String id) {
