@@ -111,7 +111,7 @@ public class ServerJavaVersionTest {
 		 * @see https://docs.jboss.org/author/display/AS7/Getting+Started+Guide
 		 */
 		serverTypeTest(IServerConstants.SERVER_AS_70, 
-				JAVA_6,JAVA_7,JAVA_8);
+				JAVA_6,JAVA_7);
 	}
 
 	@Test
