@@ -116,8 +116,7 @@ public class ServerJavaVersionTest {
 
 	@Test
 	public void testAS71() {
-		serverTypeTest(IServerConstants.SERVER_AS_71, 
-				JAVA_6,JAVA_7,JAVA_8);
+		serverTypeTest(IServerConstants.SERVER_AS_71, JAVA_6,JAVA_7);
 	}
 
 	@Test
