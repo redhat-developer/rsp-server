@@ -51,7 +51,7 @@ public class WildFlyStartLauncher extends AbstractLauncher {
 	@Override
 	protected String getVMArguments() {
 		boolean shouldOverride = getServer().getAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_BOOLEAN, false);
-		String overrideArgs = getServer().getAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_VM_ARGS, (String)null);
+		String overrideArgs = getVMArgsFromAttributes();
 		if( shouldOverride && overrideArgs != null && overrideArgs.trim().length() > 0 ) {
 			return overrideArgs;
 		}
@@ -63,6 +63,13 @@ public class WildFlyStartLauncher extends AbstractLauncher {
 			saveProperty(IJBossServerAttributes.LAUNCH_OVERRIDE_VM_ARGS, ret);
 		}
 		return ret;
+	}
+
+	private String getVMArgsFromAttributes() {
+		String overrideArgs = getServer().getAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_VM_ARGS, (String)null);
+		if( overrideArgs == null ) 
+			overrideArgs = getServer().getAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_VM_ARGS_V1, (String)null);
+		return overrideArgs;
 	}
 	
 	private String calculateVMArgs() {
@@ -83,7 +90,7 @@ public class WildFlyStartLauncher extends AbstractLauncher {
 	@Override
 	protected String getProgramArguments() {
 		boolean shouldOverride = getServer().getAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_BOOLEAN, false);
-		String overrideArgs = getServer().getAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_PROGRAM_ARGS, (String)null);
+		String overrideArgs = getProgramArgsFromAttributes();
 		if( shouldOverride && overrideArgs != null && overrideArgs.trim().length() > 0 ) {
 			return overrideArgs;
 		}
@@ -94,6 +101,13 @@ public class WildFlyStartLauncher extends AbstractLauncher {
 			saveProperty(IJBossServerAttributes.LAUNCH_OVERRIDE_PROGRAM_ARGS, ret);
 		}
 		return ret;
+	}
+	
+	private String getProgramArgsFromAttributes() {
+		String overrideArgs = getServer().getAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_PROGRAM_ARGS, (String)null);
+		if( overrideArgs == null ) 
+			overrideArgs = getServer().getAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_PROGRAM_ARGS_V1, (String)null);
+		return overrideArgs;
 	}
 	
 	private boolean isEqual(String one, String two) {

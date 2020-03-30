@@ -24,8 +24,8 @@ import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
 public class GenericServerType extends AbstractServerType {
 	public static final String LAUNCH_OVERRIDE_BOOLEAN = "args.override.boolean";
-	public static final String LAUNCH_OVERRIDE_PROGRAM_ARGS = "program.args.override.string";
-	public static final String JAVA_LAUNCH_OVERRIDE_VM_ARGS = "vm.args.override.string";
+	public static final String LAUNCH_OVERRIDE_PROGRAM_ARGS = "args.program.override.string";
+	public static final String JAVA_LAUNCH_OVERRIDE_VM_ARGS = "args.vm.override.string";
 
 	protected Attributes required = null;
 	protected Attributes optional = null;
