@@ -60,42 +60,58 @@ public class ExplodedManifestDiscovery extends ServerBeanType {
 	
 	@Override
 	public boolean isServerRoot(File location) {
-		if( nameKey != null ) {
+		if( nameKey != null && nameFileString != null ) {
 			String name = getFullName(location);
 			if( name == null || !name.startsWith(requiredNamePrefix)) {
 				return false;
 			}
 		}
-		String vers = getFullVersion(location);
-		if( vers == null || !vers.startsWith(requiredVersionPrefix)) {
-			return false;
+		if( versionKey != null && versionFileString != null ) {
+			String vers = getFullVersion(location);
+			if( vers == null || !vers.startsWith(requiredVersionPrefix)) {
+				return false;
+			}
 		}
 		return true;
 	}
 
 	@Override
 	public String getFullVersion(File root) {
-		if( versionFileStringIsPattern ) 
-			return ManifestUtility.getPropertyFromManifestFile(new File(root, versionFileString), versionKey);
+		if( !versionFileStringIsPattern ) 
+			return getProperty(new File(root, versionFileString), versionKey);
 		
 		List<String> includes = Arrays.asList(new String[]{versionFileString});
 		GlobScanner gs = new GlobScanner(root,includes, Collections.EMPTY_LIST, true);
 		List<String> results = gs.matches();
 		if( results != null && results.size() > 0 ) {
-			return ManifestUtility.getPropertyFromManifestFile(new File(root, results.get(0)), versionKey);
+			for( String s : results ) {
+				String ret = getProperty(new File(root, s), versionKey);
+				if( ret != null )
+					return ret;
+			}
 		}
 		return null;
 	}
 	
+	protected String getProperty(File f, String key) {
+		return ManifestUtility.getPropertyFromManifestFile(f, key);
+	}
+	
 	public String getFullName(File root) {
-		if( nameFileStringIsPattern ) 
-			return ManifestUtility.getPropertyFromManifestFile(new File(root, nameFileString), nameKey);
+		if( !nameFileStringIsPattern ) 
+			return getProperty(new File(root, nameFileString), nameKey);
 
 		List<String> includes = Arrays.asList(new String[]{nameFileString});
 		GlobScanner gs = new GlobScanner(root,includes, Collections.EMPTY_LIST, true);
 		List<String> results = gs.matches();
 		if( results != null && results.size() > 0 ) {
-			return ManifestUtility.getPropertyFromManifestFile(new File(root, results.get(0)), nameKey);
+			if( results != null && results.size() > 0 ) {
+				for( String s : results ) {
+					String ret = getProperty(new File(root, s), nameKey);
+					if( ret != null )
+						return ret;
+				}
+			}
 		}
 		return null;
 	}

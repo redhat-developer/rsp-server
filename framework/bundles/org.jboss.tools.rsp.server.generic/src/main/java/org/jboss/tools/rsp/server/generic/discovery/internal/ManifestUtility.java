@@ -29,7 +29,14 @@ public class ManifestUtility {
 
 	public static String getPropertyFromManifestFile(File manifestFile, String propertyName) {
 		try {
-			String contents = FileUtil.getContents(manifestFile);
+			return getPropertyFromManifestContents(FileUtil.getContents(manifestFile), propertyName);
+		} catch (IOException e) {
+			return null;
+		}
+	}
+
+	public static String getPropertyFromManifestContents(String contents, String propertyName) {
+		try {
 			if( contents != null ) {
 				Manifest mf = new Manifest(new ByteArrayInputStream(contents.getBytes()));
 				Attributes a = mf.getMainAttributes();
@@ -42,16 +49,12 @@ public class ManifestUtility {
 		return null;
 	}
 
-	public static String getPropertyFromPropertiesFile(File file, String propertyName) {
-		try {
-			return searchPropertiesInputStream(new FileInputStream(file), new String[] {propertyName});
-		} catch(IOException ioe) {
-			// 
-		}
-		return null;
+
+	public static String getManifestPropertiesFromZip(File systemJarFile, String manifestAttributes) {
+		return manifestAttributes == null ? null : 
+			getManifestPropertiesFromZip(systemJarFile, new String[] {manifestAttributes});
 	}
-
-
+	
 	public static String getManifestPropertiesFromZip(File systemJarFile, String[] manifestAttributes) {
 		if (systemJarFile.isDirectory()) {
 			return null;
@@ -75,6 +78,16 @@ public class ManifestUtility {
 		return getManifestPropertiesFromZip(toSearch, new String[] {versionKey});
 	}
 	
+
+	public static String getPropertyFromPropertiesFile(File file, String propertyName) {
+		try {
+			return searchPropertiesInputStream(new FileInputStream(file), new String[] {propertyName});
+		} catch(IOException ioe) {
+			// 
+		}
+		return null;
+	}
+
 	public static String searchPropertiesInputStream(InputStream stream, String[] keysToSearch) throws IOException {
 		Properties props = new Properties();
 		props.load(stream);

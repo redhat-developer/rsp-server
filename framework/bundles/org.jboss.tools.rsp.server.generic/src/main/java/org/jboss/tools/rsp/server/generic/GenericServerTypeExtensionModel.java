@@ -15,6 +15,7 @@ import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.rsp.server.generic.discovery.ExplodedManifestDiscovery;
 import org.jboss.tools.rsp.server.generic.discovery.GenericServerBeanTypeProvider;
 import org.jboss.tools.rsp.server.generic.discovery.JarManifestDiscovery;
+import org.jboss.tools.rsp.server.generic.discovery.PropertiesFileDiscovery;
 import org.jboss.tools.rsp.server.generic.runtimes.download.GenericDownloadRuntimesProvider;
 import org.jboss.tools.rsp.server.generic.servertype.GenericServerType;
 import org.jboss.tools.rsp.server.spi.discovery.ServerBeanType;
@@ -45,9 +46,11 @@ public class GenericServerTypeExtensionModel implements IServerBehaviorFromJSONP
 		loadDownloads(serverTypeId, downloads);
 		
 		JSONMemento type = serverType.getChild("type");
-		JSONMemento behavior = type.getChild("behavior");
-		IServerBehaviorProvider delegateProviderFromJson = this.delegateProvider.loadBehaviorFromJSON(serverTypeId, behavior);
-		loadServerType(serverTypeId, delegateProviderFromJson, type);
+		if( type != null ) {
+			JSONMemento behavior = type.getChild("behavior");
+			IServerBehaviorProvider delegateProviderFromJson = this.delegateProvider.loadBehaviorFromJSON(serverTypeId, behavior);
+			loadServerType(serverTypeId, delegateProviderFromJson, type);
+		}
 	}
 
 	public IServerBehaviorProvider loadBehaviorFromJSON(String serverTypeId, JSONMemento behaviorMemento) {
@@ -115,7 +118,7 @@ public class GenericServerTypeExtensionModel implements IServerBehaviorFromJSONP
 						nameString, nameIsPattern, nameKey, requiredNamePrefix, 
 						versionString, versionIsPattern, versionKey, requiredVersionPrefix));
 			} else if( "properties".equals(discoveryType)) {
-				collector.add(new JarManifestDiscovery(id, name, serverTypeId, 
+				collector.add(new PropertiesFileDiscovery(id, name, serverTypeId, 
 						nameString, nameIsPattern, nameKey, requiredNamePrefix, 
 						versionString, versionIsPattern, versionKey, requiredVersionPrefix));
 			}
