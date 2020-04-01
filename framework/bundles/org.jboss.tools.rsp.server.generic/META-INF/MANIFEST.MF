@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: org.jboss.tools.rsp.server.generic
 Bundle-SymbolicName: org.jboss.tools.rsp.server.generic
 Automatic-Module-Name: org.jboss.tools.rsp.server.generic
-Bundle-Version: 0.22.7.Final
+Bundle-Version: 0.22.8.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: org.eclipse.lsp4j.jsonrpc,
  org.eclipse.lsp4j.jsonrpc.json,
@@ -46,4 +46,7 @@ Import-Package: org.eclipse.lsp4j.jsonrpc,
  org.slf4j
 Bundle-Activator: org.jboss.tools.rsp.server.generic.impl.Activator
 Export-Package: org.jboss.tools.rsp.server.generic,
- org.jboss.tools.rsp.server.generic.servertype
+ org.jboss.tools.rsp.server.generic.discovery,
+ org.jboss.tools.rsp.server.generic.discovery.internal,
+ org.jboss.tools.rsp.server.generic.servertype,
+ org.jboss.tools.rsp.server.generic.servertype.variables

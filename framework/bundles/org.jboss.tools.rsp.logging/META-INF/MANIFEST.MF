@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: org.jboss.tools.rsp.logging 
 Bundle-SymbolicName: org.jboss.tools.rsp.logging
-Bundle-Version: 0.22.7.Final
+Bundle-Version: 0.22.8.qualifier
 Bundle-Activator: org.jboss.tools.rsp.logging.LoggingActivator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: ch.qos.logback.classic,

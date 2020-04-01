@@ -20,17 +20,15 @@ import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.launching.memento.JSONMemento;
 import org.jboss.tools.rsp.server.generic.servertype.GenericServerBehavior;
 import org.jboss.tools.rsp.server.generic.servertype.GenericServerType;
-import org.jboss.tools.rsp.server.generic.servertype.variables.IDynamicVariable;
-import org.jboss.tools.rsp.server.generic.servertype.variables.IStringVariableManager;
-import org.jboss.tools.rsp.server.generic.servertype.variables.IValueVariable;
+import org.jboss.tools.rsp.server.generic.servertype.variables.ServerStringVariableManager;
 import org.jboss.tools.rsp.server.generic.servertype.variables.StringSubstitutionEngine;
+import org.jboss.tools.rsp.server.generic.servertype.variables.ServerStringVariableManager.IExternalVariableResolver;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
-import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
 public class GenericJavaLauncher extends AbstractGenericJavaLauncher
-		implements IServerStartLauncher, IServerShutdownLauncher {
+		implements IServerStartLauncher, IServerShutdownLauncher, IExternalVariableResolver {
 
 
 	private JSONMemento startupMemento;
@@ -198,46 +196,17 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 
 	private String applySubstitutions(String input) throws CoreException {
 		return new StringSubstitutionEngine().performStringSubstitution(input, 
-				true, true, new ServerStringVariableManager(getServer()));
+				true, true, new ServerStringVariableManager(getServer(), this));
 	}
 
-	private class ServerStringVariableManager implements IStringVariableManager {
-		private IServer server;
-
-		public ServerStringVariableManager(IServer server) {
-			this.server = server;
-
-		}
-
-		@Override
-		public IValueVariable getValueVariable(String name) {
-			return new IValueVariable() {
-				@Override
-				public String getValue() {
-					String nonServerVal = getNonServerKeyValues(name);
-					if( nonServerVal != null ) {
-						return nonServerVal;
-					}
-					return server.getAttribute(name, (String) null);
-				}
-			};
-		}
-
-		public String getNonServerKeyValues(String name) {
-			if( "java.home".equals(name)) {
-				IVMInstall vmi = getVMInstall(getDelegate());
-				if( vmi != null ) {
-					return vmi.getInstallLocation().getAbsolutePath();
-				}
+	@Override
+	public String getNonServerKeyValue(String key) {
+		if( "java.home".equals(key)) {
+			IVMInstall vmi = getVMInstall(getServer().getDelegate());
+			if( vmi != null ) {
+				return vmi.getInstallLocation().getAbsolutePath();
 			}
-			return null;
 		}
-		
-		@Override
-		public IDynamicVariable getDynamicVariable(String name) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
+		return null;
 	}
 }
