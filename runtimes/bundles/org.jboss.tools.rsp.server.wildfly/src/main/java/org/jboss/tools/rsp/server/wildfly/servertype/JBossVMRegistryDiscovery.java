@@ -15,7 +15,7 @@ import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMRunner;
 import org.jboss.tools.rsp.eclipse.jdt.launching.StandardVMType;
 import org.jboss.tools.rsp.server.LauncherSingleton;
-import org.jboss.tools.rsp.server.spi.servertype.IServer;
+import org.jboss.tools.rsp.server.spi.servertype.IServerAttributes;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
 public class JBossVMRegistryDiscovery {
@@ -76,7 +76,7 @@ public class JBossVMRegistryDiscovery {
 		return registry;
 	}
 	
-	public boolean ensureVMInstallAdded(IServer server) {
+	public boolean ensureVMInstallAdded(IServerAttributes server) {
 		String vmi = server.getAttribute(IJBossServerAttributes.VM_INSTALL_PATH, (String)null);
 		IVMInstallRegistry reg = LauncherSingleton.getDefault().getLauncher().getModel().getVMInstallModel();
 		return ensureVMInstallAdded(vmi, reg);

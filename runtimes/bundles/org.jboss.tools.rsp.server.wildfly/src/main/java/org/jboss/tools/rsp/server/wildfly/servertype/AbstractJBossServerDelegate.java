@@ -44,6 +44,7 @@ import org.jboss.tools.rsp.server.spi.model.polling.WebPortPoller;
 import org.jboss.tools.rsp.server.spi.publishing.IPublishController;
 import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
+import org.jboss.tools.rsp.server.spi.servertype.IServerAttributes;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerWorkingCopy;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
@@ -494,6 +495,12 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		server.setAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_BOOLEAN, false);
 		server.setAttribute(IJBossServerAttributes.WILDFLY_PUBLISH_RESTART_PATTERN_KEY, 
 				IJBossServerAttributes.WILDFLY_PUBLISH_RESTART_PATTERN_DEFAULT);
+	}
+
+	
+	@Override
+	public void setDependentDefaults(IServerWorkingCopy server) {
+		new JBossVMRegistryDiscovery().ensureVMInstallAdded(server);
 	}
 
 }

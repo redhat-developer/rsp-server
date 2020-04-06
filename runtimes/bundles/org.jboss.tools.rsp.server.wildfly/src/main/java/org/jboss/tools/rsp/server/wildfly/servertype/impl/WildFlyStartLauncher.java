@@ -124,7 +124,7 @@ public class WildFlyStartLauncher extends AbstractLauncher {
 		}
 	}
 	
-	private String getCalculatedProgramArgs() {
+	protected String getCalculatedProgramArgs() {
 		IDefaultLaunchArguments largs = getLaunchArgs();
 		String r1 = null;
 		if( largs != null ) {
