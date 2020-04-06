@@ -114,7 +114,7 @@ public class WildFlyStartLauncher extends AbstractLauncher {
 		return one == null ? two == null : one.equals(two);
 	}
 	
-	private void saveProperty(String key, String val) {
+	protected void saveProperty(String key, String val) {
 		IServerWorkingCopy wc = getServer().createWorkingCopy();
 		wc.setAttribute(key, val);
 		try {
