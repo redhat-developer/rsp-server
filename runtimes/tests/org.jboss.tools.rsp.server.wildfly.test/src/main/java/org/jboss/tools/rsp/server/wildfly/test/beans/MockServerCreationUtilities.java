@@ -376,14 +376,17 @@ public class MockServerCreationUtilities extends Assert {
 	}
 
 	private static File createWildfly190MockServerDirectory(String name, String serverTypeId, String serverJar) {
-		return createWildflyServerDirectory(name, serverTypeId, serverJar,
+		return createWildflyServerDirectory(name, serverTypeId, serverJar, "main", 
 				"JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 19.0.0.Final\n");
 	}
 
 	private static File createWildflyServerDirectory(String name, String serverTypeId, String serverJar, String manString) {
+		return createWildflyServerDirectory(name, serverTypeId, serverJar, "wildfly-full", manString);
+	}
+	private static File createWildflyServerDirectory(String name, String serverTypeId, String serverJar, String productFolder, String manString) {
 		File loc = new File(getMocksBaseDir(), name);
 		createAS7xProductStructure(loc, true, serverJar, null, null);
-		File productDir = new File(loc, "modules/system/layers/base/org/jboss/as/product/wildfly-full/dir/META-INF/");
+		File productDir = new File(loc, "modules/system/layers/base/org/jboss/as/product/" + productFolder + "/dir/META-INF/");
 		productDir.mkdirs();
 		try {
 			IOUtil.setContents(new File(productDir, "manifest.mf"), manString);
