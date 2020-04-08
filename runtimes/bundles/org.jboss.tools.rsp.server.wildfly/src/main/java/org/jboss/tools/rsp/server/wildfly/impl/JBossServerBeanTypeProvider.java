@@ -35,6 +35,7 @@ import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeSOAP;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeSOAPStandalone;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeUnknownAS71Product;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeUnknownAS72Product;
+import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly19;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly80;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildflyX;
 
@@ -120,12 +121,11 @@ public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider, IJB
 	public static final ServerBeanTypeWildflyX WILDFLY180_WEB = new ServerBeanTypeWildflyX(
 			ID_WILDFLY_WEB, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
 			true, "18.", IServerConstants.SERVER_WILDFLY_180);
-
 	
-	public static final ServerBeanTypeWildflyX WILDFLY190 = new ServerBeanTypeWildflyX(
+	public static final ServerBeanTypeWildfly19 WILDFLY190 = new ServerBeanTypeWildfly19(
 			ID_WILDFLY, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
 			false, "19.", IServerConstants.SERVER_WILDFLY_190);
-	public static final ServerBeanTypeWildflyX WILDFLY190_WEB = new ServerBeanTypeWildflyX(
+	public static final ServerBeanTypeWildfly19 WILDFLY190_WEB = new ServerBeanTypeWildfly19(
 			ID_WILDFLY_WEB, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
 			true, "19.", IServerConstants.SERVER_WILDFLY_190);
 
