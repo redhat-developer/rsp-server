@@ -32,6 +32,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.debug.core.DebugException;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
+import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.launching.memento.JSONMemento;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.rsp.server.generic.GenericServerActivator;
@@ -39,6 +40,9 @@ import org.jboss.tools.rsp.server.generic.IPublishControllerWithOptions;
 import org.jboss.tools.rsp.server.generic.servertype.launch.GenericJavaLauncher;
 import org.jboss.tools.rsp.server.generic.servertype.launch.NoOpLauncher;
 import org.jboss.tools.rsp.server.generic.servertype.launch.TerminateShutdownLauncher;
+import org.jboss.tools.rsp.server.generic.servertype.variables.ServerStringVariableManager;
+import org.jboss.tools.rsp.server.generic.servertype.variables.ServerStringVariableManager.IExternalVariableResolver;
+import org.jboss.tools.rsp.server.generic.servertype.variables.StringSubstitutionEngine;
 import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
@@ -294,13 +298,20 @@ public class GenericServerBehavior extends AbstractServerDelegate {
 		if("webPoller".equals(pollerId)) {
 			JSONMemento props = startupMemento.getChild("pollerProperties");
 			if( props != null ) {
-				String url = props.getString("url");
+				String urlFromProps = props.getString("url");
+				String fromPropsWithSubs = urlFromProps;
+				try {
+					fromPropsWithSubs = applySubstitutions(urlFromProps);
+				} catch(CoreException ce) {
+					// TODO log
+				}
+				final String finalUrl = fromPropsWithSubs;
 				IPollResultListener listener = upOrDown == IServerStatePoller.SERVER_STATE.DOWN ? 
 						shutdownServerResultListener() : launchServerResultListener();
 				WebPortPoller toRun = new WebPortPoller("Web Poller: " + this.getServer().getName()) {
 					@Override
 					protected String getURL(IServer server) {
-						return url;
+						return finalUrl;
 					}
 				};
 				PollThreadUtils.pollServer(getServer(), upOrDown, toRun, listener);
@@ -423,7 +434,12 @@ public class GenericServerBehavior extends AbstractServerDelegate {
 			JSONMemento props = startupMemento.getChild("pollerProperties");
 			if( props != null ) {
 				String url = props.getString("url");
-				return url;
+				try {
+					return applySubstitutions(url);
+				} catch(CoreException ce) {
+					// TODO
+					return url;
+				}
 			}
 		}		
 		return null;
@@ -459,5 +475,13 @@ public class GenericServerBehavior extends AbstractServerDelegate {
 			}
 		}
 	}
+	
+	public String applySubstitutions(String input) throws CoreException {
+		return new StringSubstitutionEngine().performStringSubstitution(input, 
+				true, true, new ServerStringVariableManager(getServer(), getExternalVariableResolver()));
+	}
 
+	protected IExternalVariableResolver getExternalVariableResolver() {
+		return new DefaultExternalVariableResolver(this);
+	}
 }

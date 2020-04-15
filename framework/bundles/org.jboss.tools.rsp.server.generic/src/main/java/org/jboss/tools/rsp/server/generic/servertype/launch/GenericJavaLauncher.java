@@ -16,24 +16,20 @@ import org.jboss.tools.rsp.api.DefaultServerAttributes;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
-import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.launching.memento.JSONMemento;
 import org.jboss.tools.rsp.server.generic.servertype.GenericServerBehavior;
 import org.jboss.tools.rsp.server.generic.servertype.GenericServerType;
-import org.jboss.tools.rsp.server.generic.servertype.variables.ServerStringVariableManager;
-import org.jboss.tools.rsp.server.generic.servertype.variables.StringSubstitutionEngine;
-import org.jboss.tools.rsp.server.generic.servertype.variables.ServerStringVariableManager.IExternalVariableResolver;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
 public class GenericJavaLauncher extends AbstractGenericJavaLauncher
-		implements IServerStartLauncher, IServerShutdownLauncher, IExternalVariableResolver {
+		implements IServerStartLauncher, IServerShutdownLauncher {
 
 
 	private JSONMemento startupMemento;
 
-	public GenericJavaLauncher(IServerDelegate serverDelegate, JSONMemento startupMemento) {
+	public GenericJavaLauncher(GenericServerBehavior serverDelegate, JSONMemento startupMemento) {
 		super(serverDelegate);
 		this.startupMemento = startupMemento;
 	}
@@ -195,18 +191,7 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 	}
 
 	private String applySubstitutions(String input) throws CoreException {
-		return new StringSubstitutionEngine().performStringSubstitution(input, 
-				true, true, new ServerStringVariableManager(getServer(), this));
+		return ((GenericServerBehavior)getDelegate()).applySubstitutions(input);
 	}
 
-	@Override
-	public String getNonServerKeyValue(String key) {
-		if( "java.home".equals(key)) {
-			IVMInstall vmi = getVMInstall(getServer().getDelegate());
-			if( vmi != null ) {
-				return vmi.getInstallLocation().getAbsolutePath();
-			}
-		}
-		return null;
-	}
 }
