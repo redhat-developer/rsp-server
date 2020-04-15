@@ -48,18 +48,18 @@ public class GenericServerTypeExtensionModel implements IServerBehaviorFromJSONP
 		JSONMemento type = serverType.getChild("type");
 		if( type != null ) {
 			JSONMemento behavior = type.getChild("behavior");
-			IServerBehaviorProvider delegateProviderFromJson = this.delegateProvider.loadBehaviorFromJSON(serverTypeId, behavior);
+			IGenericServerBehaviorProvider delegateProviderFromJson = this.delegateProvider.loadBehaviorFromJSON(serverTypeId, behavior);
 			loadServerType(serverTypeId, delegateProviderFromJson, type);
 		}
 	}
 
-	public IServerBehaviorProvider loadBehaviorFromJSON(String serverTypeId, JSONMemento behaviorMemento) {
+	public IGenericServerBehaviorProvider loadBehaviorFromJSON(String serverTypeId, JSONMemento behaviorMemento) {
 		return new GenericServerBehaviorProvider(behaviorMemento);
 	}
 	
 
 	private void loadServerType(String serverTypeId, 
-			IServerBehaviorProvider delegateProvider, JSONMemento type) {
+			IGenericServerBehaviorProvider delegateProvider, JSONMemento type) {
 		String name = type.getString("name");
 		String desc = type.getString("description");
 		String launchModes = type.getString("launchModes");

@@ -11,9 +11,8 @@ package org.jboss.tools.rsp.server.generic;
 import org.jboss.tools.rsp.launching.memento.JSONMemento;
 import org.jboss.tools.rsp.server.generic.servertype.GenericServerBehavior;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
-import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
-public class GenericServerBehaviorProvider implements IServerBehaviorProvider {
+public class GenericServerBehaviorProvider implements IGenericServerBehaviorProvider {
 	private JSONMemento behaviorMemento;
 
 	public GenericServerBehaviorProvider(JSONMemento behaviorMemento) {
@@ -21,7 +20,7 @@ public class GenericServerBehaviorProvider implements IServerBehaviorProvider {
 	}
 
 	@Override
-	public IServerDelegate createServerDelegate(String typeId, IServer server) {
+	public GenericServerBehavior createServerDelegate(String typeId, IServer server) {
 		return new GenericServerBehavior(server, behaviorMemento);
 	}
 
