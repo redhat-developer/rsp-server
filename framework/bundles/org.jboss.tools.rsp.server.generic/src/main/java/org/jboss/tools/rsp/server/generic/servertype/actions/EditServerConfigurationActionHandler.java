@@ -56,6 +56,13 @@ public class EditServerConfigurationActionHandler {
 				IPath tmpPath = new Path(home).append(possiblePaths[i]);
 				if( tmpPath.toFile().isFile()) {
 					asList.add(possiblePaths[i]);
+				} else if( tmpPath.toFile().isDirectory()) {
+					File[] children = tmpPath.toFile().listFiles();
+					for( int j = 0; j < children.length; j++ ) {
+						if( children[j].isFile()) {
+							asList.add(possiblePaths[i]);							
+						}
+					}
 				}
 			}
 		}
