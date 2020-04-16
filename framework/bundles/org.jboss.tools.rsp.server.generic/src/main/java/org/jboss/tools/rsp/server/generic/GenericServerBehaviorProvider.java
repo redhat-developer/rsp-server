@@ -12,7 +12,7 @@ import org.jboss.tools.rsp.launching.memento.JSONMemento;
 import org.jboss.tools.rsp.server.generic.servertype.GenericServerBehavior;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
-public class GenericServerBehaviorProvider implements IGenericServerBehaviorProvider {
+public class GenericServerBehaviorProvider implements IServerBehaviorProvider {
 	private JSONMemento behaviorMemento;
 
 	public GenericServerBehaviorProvider(JSONMemento behaviorMemento) {

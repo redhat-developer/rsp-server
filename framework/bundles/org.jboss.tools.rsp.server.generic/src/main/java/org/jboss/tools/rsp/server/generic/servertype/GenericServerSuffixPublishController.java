@@ -17,6 +17,7 @@ import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.server.generic.IPublishControllerWithOptions;
+import org.jboss.tools.rsp.server.generic.IStringSubstitutionProvider;
 import org.jboss.tools.rsp.server.spi.publishing.AbstractFilesystemPublishController;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
@@ -59,7 +60,9 @@ public class GenericServerSuffixPublishController extends AbstractFilesystemPubl
 		String home = getServer().getAttribute(DefaultServerAttributes.SERVER_HOME_DIR, (String)null);
 		String safeDeploymentPath = null;
 		try {
-			safeDeploymentPath = ((GenericServerBehavior)getDelegate()).applySubstitutions(deploymentPath);
+			IServerDelegate del = getDelegate();
+			safeDeploymentPath = (del instanceof IStringSubstitutionProvider) ? 
+					((IStringSubstitutionProvider)del).applySubstitutions(deploymentPath) : deploymentPath;
 		} catch(CoreException ce) {
 			// TODO
 		}

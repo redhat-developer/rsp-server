@@ -8,13 +8,9 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.generic;
 
-import org.jboss.tools.rsp.server.generic.servertype.GenericServerBehavior;
-import org.jboss.tools.rsp.server.spi.servertype.IServer;
+import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 
-/**
- * Maybe can be deleted?
- *
- */
-public interface IGenericServerBehaviorProvider {
-	public GenericServerBehavior createServerDelegate(String typeId, IServer server);
+public interface IStringSubstitutionProvider {
+	
+	public String applySubstitutions(String input) throws CoreException;
 }

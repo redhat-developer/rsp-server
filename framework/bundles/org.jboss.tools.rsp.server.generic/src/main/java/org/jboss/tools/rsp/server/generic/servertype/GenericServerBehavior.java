@@ -32,11 +32,11 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.debug.core.DebugException;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
-import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.launching.memento.JSONMemento;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.rsp.server.generic.GenericServerActivator;
 import org.jboss.tools.rsp.server.generic.IPublishControllerWithOptions;
+import org.jboss.tools.rsp.server.generic.IStringSubstitutionProvider;
 import org.jboss.tools.rsp.server.generic.servertype.launch.GenericJavaLauncher;
 import org.jboss.tools.rsp.server.generic.servertype.launch.NoOpLauncher;
 import org.jboss.tools.rsp.server.generic.servertype.launch.TerminateShutdownLauncher;
@@ -60,7 +60,8 @@ import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GenericServerBehavior extends AbstractServerDelegate {
+public class GenericServerBehavior extends AbstractServerDelegate
+								implements IStringSubstitutionProvider {
 	private static final Logger LOG = LoggerFactory.getLogger(GenericServerBehavior.class);
 	public static final String START_LAUNCH_SHARED_DATA = "GenericServerBehavior.startLaunch";
 

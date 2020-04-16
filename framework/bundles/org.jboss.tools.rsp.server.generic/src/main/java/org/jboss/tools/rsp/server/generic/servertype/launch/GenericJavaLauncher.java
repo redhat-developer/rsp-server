@@ -17,6 +17,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.launching.memento.JSONMemento;
+import org.jboss.tools.rsp.server.generic.IStringSubstitutionProvider;
 import org.jboss.tools.rsp.server.generic.servertype.GenericServerBehavior;
 import org.jboss.tools.rsp.server.generic.servertype.GenericServerType;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
@@ -191,7 +192,9 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 	}
 
 	private String applySubstitutions(String input) throws CoreException {
-		return ((GenericServerBehavior)getDelegate()).applySubstitutions(input);
+		IServerDelegate del = getDelegate();
+		return (del instanceof IStringSubstitutionProvider) ? 
+				((IStringSubstitutionProvider)del).applySubstitutions(input) : input;
 	}
 
 }

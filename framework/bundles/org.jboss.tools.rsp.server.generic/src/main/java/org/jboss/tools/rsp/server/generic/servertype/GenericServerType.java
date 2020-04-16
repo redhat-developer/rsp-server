@@ -17,7 +17,7 @@ import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.launching.java.ILaunchModes;
 import org.jboss.tools.rsp.launching.memento.JSONMemento;
-import org.jboss.tools.rsp.server.generic.IGenericServerBehaviorProvider;
+import org.jboss.tools.rsp.server.generic.IServerBehaviorProvider;
 import org.jboss.tools.rsp.server.spi.servertype.AbstractServerType;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
@@ -33,12 +33,12 @@ public class GenericServerType extends AbstractServerType {
 	private JSONMemento requiredAttributes;
 	private JSONMemento optionalAttributes;
 	private JSONMemento staticAttributes;
-	private IGenericServerBehaviorProvider delegateProvider;
+	private IServerBehaviorProvider delegateProvider;
 	
 	public GenericServerType(String id, String name, String desc,
 			String runModes, JSONMemento requiredAttributes, 
 			JSONMemento optionalAttributes, JSONMemento staticAttributes,
-			IGenericServerBehaviorProvider delegateProvider) {
+			IServerBehaviorProvider delegateProvider) {
 		super(id, name, desc);
 		this.runModes = runModes;
 		this.requiredAttributes = requiredAttributes;
