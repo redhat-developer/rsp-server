@@ -23,6 +23,7 @@ import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
 import org.jboss.tools.rsp.api.dao.WorkflowPromptDetails;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
+import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
@@ -154,7 +155,7 @@ public class ShowInBrowserActionHandler {
 	
 	private String findUrlFromChoice(String choice) {
 		String baseUrl = getBaseUrl();
-		if( choice.equals(ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT)) {
+		if( choice.trim().equals(ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT)) {
 			return baseUrl;
 		} else {
 			List<DeployableState> states = getDeployableStates();
@@ -172,7 +173,13 @@ public class ShowInBrowserActionHandler {
 	
 	protected String getBaseUrl() {
 		JSONMemento mem = genericServerBehavior.getActionsJSON().getChild(ACTION_SHOW_IN_BROWSER_JSON_ID);
-		return mem.getString("baseUrl");
+		String ret = mem.getString("baseUrl");
+		try {
+			ret = genericServerBehavior.applySubstitutions(ret);
+		} catch(CoreException ce) {
+			// TODO log
+		}
+		return ret;
 	}
 
 	protected String getDeploymentStrategy() {
