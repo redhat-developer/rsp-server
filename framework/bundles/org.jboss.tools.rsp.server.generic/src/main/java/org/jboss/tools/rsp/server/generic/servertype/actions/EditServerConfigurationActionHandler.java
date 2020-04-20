@@ -11,8 +11,8 @@ package org.jboss.tools.rsp.server.generic.servertype.actions;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 import org.jboss.tools.rsp.api.DefaultServerAttributes;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
@@ -21,6 +21,7 @@ import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
 import org.jboss.tools.rsp.api.dao.WorkflowPromptDetails;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
+import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
@@ -53,14 +54,20 @@ public class EditServerConfigurationActionHandler {
 
 		if( possiblePaths != null ) {
 			for( int i = 0; i < possiblePaths.length; i++ ) {
-				IPath tmpPath = new Path(home).append(possiblePaths[i]);
+				String possiblePathResolved = possiblePaths[i];
+				try {
+					possiblePathResolved = genericServerDelegate.applySubstitutions(possiblePaths[i]);
+				} catch(CoreException ce) {
+					// TODO log 
+				}
+				IPath tmpPath = new Path(home).append(possiblePathResolved);
 				if( tmpPath.toFile().isFile()) {
-					asList.add(possiblePaths[i]);
+					asList.add(possiblePathResolved);
 				} else if( tmpPath.toFile().isDirectory()) {
 					File[] children = tmpPath.toFile().listFiles();
 					for( int j = 0; j < children.length; j++ ) {
 						if( children[j].isFile()) {
-							asList.add(possiblePaths[i]);							
+							asList.add(possiblePathResolved + children[j].getName());							
 						}
 					}
 				}
