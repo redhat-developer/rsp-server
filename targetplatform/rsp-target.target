@@ -20,6 +20,11 @@
 			<unit id="org.mockito" version="1.9.5.v201605172210" />
 		</location>
 
+		<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+			<repository location="https://download.jboss.org/jbosstools/updates/requirements/jandex/2.1.3/" />
+
+			<unit id="org.jboss.jandex" version="2.1.3.v20200429-1511" />
+		</location>
 
 		<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 			<repository location="https://download.jboss.org/jbosstools/updates/requirements/logback/1.2.3/" />

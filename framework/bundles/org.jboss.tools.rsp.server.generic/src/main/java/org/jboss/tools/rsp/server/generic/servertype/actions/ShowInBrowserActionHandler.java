@@ -11,6 +11,8 @@ package org.jboss.tools.rsp.server.generic.servertype.actions;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,6 +31,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.launching.memento.JSONMemento;
 import org.jboss.tools.rsp.server.generic.impl.Activator;
+import org.jboss.tools.rsp.server.generic.jee.WarDeploymentResourceLocator;
 import org.jboss.tools.rsp.server.generic.servertype.GenericServerBehavior;
 import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
@@ -69,13 +72,18 @@ public class ShowInBrowserActionHandler {
 		prompt.setResponseSecret(false);
 		prompt.setResponseType(ServerManagementAPIConstants.ATTR_TYPE_STRING);
 		
-		List<String> deployments = getDeployableStatesHavingContextRoots()
-			.stream().map(DeployableState::getReference).map(DeployableReference::getPath)
-			.collect(Collectors.toList());
-		
 		List<String> deployments2 = new ArrayList<>();
 		deployments2.add(ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT);
-		deployments2.addAll(deployments);
+		
+		List<DeployableState> dss = getDeployableStatesHavingContextRoots();
+		String basedir = getBaseUrl();
+		for( DeployableState ds : dss ) {
+			String path = basedir + "/" + getContextRoot(ds);
+			deployments2.add(path);
+		}
+		deployments2.addAll(fromResourceLocators());
+		
+		
 		
 		prompt.setValidResponses(deployments2);
 		item1.setPrompt(prompt);
@@ -85,6 +93,32 @@ public class ShowInBrowserActionHandler {
 		return action;
 	}
 	
+	private List<String> fromResourceLocators() {
+		String locator = getResourceLocator();
+		if( locator == null || locator.isEmpty())
+			return Collections.EMPTY_LIST;
+		
+		if( "jee".equals(locator)) {
+			return findJeeResourcesFromDeployments();
+		}
+		return Collections.EMPTY_LIST;
+	}
+
+	private List<String> findJeeResourcesFromDeployments() {
+		ArrayList<String> ret = new ArrayList<>();
+		List<DeployableState> states = getDeployableStatesHavingContextRoots();
+		for( DeployableState ds : states ) {
+			String p = ds.getReference().getPath();
+			String[] oneDep = WarDeploymentResourceLocator.findResources(p);
+			String baseUrl = getBaseUrl();
+			String contextRoot = getContextRoot(ds);
+			for( String onedepString : oneDep ) {
+				ret.add(baseUrl + "/" + contextRoot + "/" + onedepString);
+			}
+		}
+		return ret;
+	}
+
 	private List<DeployableState> getDeployableStatesHavingContextRoots() {
 		List<DeployableState> dss = getDeployableStates();
 		ArrayList<DeployableState> collector = new ArrayList<>();
@@ -157,6 +191,8 @@ public class ShowInBrowserActionHandler {
 		String baseUrl = getBaseUrl();
 		if( choice.trim().equals(ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT)) {
 			return baseUrl;
+		} if( choice.trim().startsWith("http")) {
+			return choice.trim();
 		} else {
 			List<DeployableState> states = getDeployableStates();
 			for( DeployableState ds : states ) {
@@ -185,6 +221,12 @@ public class ShowInBrowserActionHandler {
 	protected String getDeploymentStrategy() {
 		JSONMemento mem = genericServerBehavior.getActionsJSON().getChild(ACTION_SHOW_IN_BROWSER_JSON_ID);
 		return mem.getString("deploymentStrategy");
+	}
+	
+
+	protected String getResourceLocator() {
+		JSONMemento mem = genericServerBehavior.getActionsJSON().getChild(ACTION_SHOW_IN_BROWSER_JSON_ID);
+		return mem.getString("resourceLocator");
 	}
 
 }
