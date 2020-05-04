@@ -132,29 +132,38 @@ pipeline {
             script {
                 unstash 'site'
                 unstash 'zips'
+
+                // choose remote upload directory
+                def upload_dir = params.publish ? 'stable' : 'snapshots'
+
+                // get distribution version
                 def distroVersion = sh script: "ls distribution/distribution/target/*.zip | cut --complement -f 1 -d '-' | rev | cut -c5- | rev | tr -d '\n'", returnStdout: true
 
                 // First empty the remote dirs
                 def emptyDir = sh script: "mktemp -d | tr -d '\n'", returnStdout: true
                 sh "chmod 775 ${emptyDir}"
-                sh "rsync -Pzrlt --rsh=ssh --protocol=28 --delete ${emptyDir}/ ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/snapshots/rsp-server/p2/${distroVersion}/"
-                sh "rsync -Pzrlt --rsh=ssh --protocol=28 --delete ${emptyDir}/ ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/snapshots/rsp-server/p2/${distroVersion}/plugins/"
+                sh "rsync -Pzrlt --rsh=ssh --protocol=28 --delete ${emptyDir}/ ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/${upload_dir}/rsp-server/p2/${distroVersion}/"
+                sh "rsync -Pzrlt --rsh=ssh --protocol=28 --delete ${emptyDir}/ ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/${upload_dir}/rsp-server/p2/${distroVersion}/plugins/"
 
                 // Upload the p2 update site.  This logic only works because all plugins are jars. 
                 // If we ever have exploded bundles here, this will need to be redone
                 def siteRepositoryFilesToPush = findFiles(glob: 'site/target/repository/*')
                 def sitePluginFilesToPush = findFiles(glob: 'site/target/repository/plugins/*')
                 for (i = 0; i < siteRepositoryFilesToPush.length; i++) {
-                    sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${siteRepositoryFilesToPush[i].path} ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/snapshots/rsp-server/p2/${distroVersion}/"
+                    sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${siteRepositoryFilesToPush[i].path} ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/${upload_dir}/rsp-server/p2/${distroVersion}/"
                 }
                 for (i = 0; i < sitePluginFilesToPush.length; i++) {
-                    sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${sitePluginFilesToPush[i].path} ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/snapshots/rsp-server/p2/${distroVersion}/plugins/"
+                    sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${sitePluginFilesToPush[i].path} ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/${upload_dir}/rsp-server/p2/${distroVersion}/plugins/"
                 }
 
+                // find rsp distribution zip and create symlink with word latest in the file name
+                dir('distribution/distribution/target') {
+                    sh "ln -s org.jboss.tools.rsp.distribution-${distroVersion}.zip org.jboss.tools.rsp.distribution-latest.zip"
+                }
                 // Upload distributions / zips
                 def filesToPush = findFiles(glob: '**/*.zip')
                 for (i = 0; i < filesToPush.length; i++) {
-                    sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${filesToPush[i].path} ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/snapshots/rsp-server/"
+                    sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${filesToPush[i].path} ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/${upload_dir}/rsp-server/"
                 }
             }
         }
