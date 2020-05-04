@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,6 +33,7 @@ import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
+import org.jboss.tools.rsp.server.generic.servertype.actions.AbstractShowInBrowserActionHandler;
 import org.jboss.tools.rsp.server.wildfly.servertype.actions.ShowInBrowserActionHandler;
 import org.junit.Test;
 
@@ -41,9 +43,7 @@ public class ShowInBrowserActionTest {
 	public void testActionInitialWorkflowNoDeployments() {
 		TestableShowInBrowserActionHandler testable = new TestableShowInBrowserActionHandler(
 				"http://127.0.0.1:8080", Collections.emptyList());
-		assertActionDetails(testable, 1, new String[] { 
-				ShowInBrowserActionHandler.ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT
-		});
+		assertActionDetails(testable, 1, new String[] { "http://127.0.0.1:8080"});
 	}
 
 	@Test
@@ -58,8 +58,8 @@ public class ShowInBrowserActionTest {
 		TestableShowInBrowserActionHandler testable = new TestableShowInBrowserActionHandler(
 				"http://127.0.0.1:8080", states);
 		assertActionDetails(testable, 2, new String[] { 
-				ShowInBrowserActionHandler.ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT,
-				tmpFile.getAbsolutePath()
+				"http://127.0.0.1:8080",
+				"http://127.0.0.1:8080/sample"
 		});
 	}
 
@@ -71,10 +71,11 @@ public class ShowInBrowserActionTest {
 		assertEquals(workflowResponse.getStatus().getSeverity(), IStatus.CANCEL);
 	}
 
+	
 	@Test
 	public void testActionHandlingSelectRoot() throws IOException {
 		WorkflowResponse workflowResponse = runTestActionHandlingSelect(
-				ShowInBrowserActionHandler.ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT);
+				"http://127.0.0.1:8080");
 		assertNotNull(workflowResponse);
 		assertNotNull(workflowResponse.getStatus());
 		assertEquals(workflowResponse.getStatus().getSeverity(), IStatus.OK);
@@ -95,6 +96,19 @@ public class ShowInBrowserActionTest {
 		assertTrue(workflowResponse.getItems().size() == 0);
 	}
 
+
+	@Test
+	public void testActionHandlingSelectNonNullNotOptionUrl() throws IOException {
+		// We'll allow this to work. If the user types in a random url 
+		// and it's not junk, we'll just open that page
+		WorkflowResponse workflowResponse = runTestActionHandlingSelect("http://www.google.com");
+		assertNotNull(workflowResponse);
+		assertNotNull(workflowResponse.getStatus());
+		assertEquals(workflowResponse.getStatus().getSeverity(), IStatus.OK);
+		assertNotNull(workflowResponse.getItems());
+		assertEquals(workflowResponse.getItems().size(), 1);
+	}
+
 	@Test
 	public void testActionHandlingSelectDeployment() throws IOException {
 		File tmpFolder = Files.createTempDirectory(getClass().getName()).toFile();
@@ -102,7 +116,7 @@ public class ShowInBrowserActionTest {
 
 		
 		WorkflowResponse workflowResponse = runTestActionHandlingSelect(
-				tmpFile, tmpFile.getAbsolutePath());
+				tmpFile, "http://127.0.0.1:8080/sample");
 		assertNotNull(workflowResponse);
 		assertNotNull(workflowResponse.getStatus());
 		assertEquals(workflowResponse.getStatus().getSeverity(), IStatus.OK);
@@ -113,6 +127,112 @@ public class ShowInBrowserActionTest {
 		assertEquals(item.getContent(), "http://127.0.0.1:8080/sample");
 	}
 
+	
+	@Test
+	public void testActionHandlingSelectDeploymentWithJBossWeb() throws IOException {
+		File tmpFolder = Files.createTempDirectory(getClass().getName()).toFile();
+		File deploymentSourceRoot = new File(tmpFolder, "test45.war");
+		deploymentSourceRoot.mkdirs();
+		File webinf = new File(deploymentSourceRoot, "WEB-INF");
+		webinf.mkdirs();
+		File jbossWebFile = new File(webinf, "jboss-web.xml");
+		String jbosswebXml = 
+				"<jboss-web>\n" + 
+				"    <context-root>bank</context-root>\n" + 
+				"</jboss-web>";
+		Files.copy(new ByteArrayInputStream(jbosswebXml.getBytes()), jbossWebFile.toPath() );
+
+		List<DeployableState> states = new ArrayList<>();
+		DeployableState ds = createState("server1", "wonka", 
+				"dumbLabel", deploymentSourceRoot.getAbsolutePath(), null);
+		states.add(ds);
+		
+		TestableShowInBrowserActionHandler testable = new TestableShowInBrowserActionHandler(
+				"http://127.0.0.1:8080", states);
+		assertActionDetails(testable, 2, new String[] { 
+				"http://127.0.0.1:8080",
+				"http://127.0.0.1:8080/bank"
+		});
+		
+
+		ServerActionRequest req = new ServerActionRequest();
+		req.setActionId(ShowInBrowserActionHandler.ACTION_SHOW_IN_BROWSER_ID);
+		req.setServerId("server1");
+		Map<String, Object> data = new HashMap<>();
+		data.put(ShowInBrowserActionHandler.ACTION_SHOW_IN_BROWSER_SELECTED_PROMPT_ID, 
+				"http://127.0.0.1:8080/bank");
+		req.setData(data);
+		
+		WorkflowResponse workflowResponse = testable.handle(req);
+		assertNotNull(workflowResponse);
+		assertNotNull(workflowResponse.getStatus());
+		assertEquals(workflowResponse.getStatus().getSeverity(), IStatus.OK);
+		assertNotNull(workflowResponse.getItems());
+		assertNotNull(workflowResponse.getItems().get(0));
+		WorkflowResponseItem item = workflowResponse.getItems().get(0);
+		assertEquals(item.getItemType(), ServerManagementAPIConstants.WORKFLOW_TYPE_OPEN_BROWSER);
+		assertEquals(item.getContent(), "http://127.0.0.1:8080/bank");
+	}
+
+	
+	@Test
+	public void testActionHandlingSelectDeploymentWithEar() throws IOException {
+		File tmpFolder = Files.createTempDirectory(getClass().getName()).toFile();
+		File deploymentSourceRoot = new File(tmpFolder, "test45.ear");
+		deploymentSourceRoot.mkdirs();
+		File metainf = new File(deploymentSourceRoot, "META-INF");
+		metainf.mkdirs();
+		File appXmlFile = new File(metainf, "application.xml");
+		String appXml = 
+				"<application>\n" + 
+				"    <display-name>JBossDukesBank</display-name>\n" + 
+				"\n" + 
+				"    <module>\n" + 
+				"        <ejb>bank-ejb.jar</ejb>\n" + 
+				"    </module>\n" + 
+				"    <module>\n" + 
+				"        <web>\n" + 
+				"            <web-uri>web-client.war</web-uri>\n" + 
+				"            <context-root>testbank</context-root>\n" + 
+				"        </web>\n" + 
+				"    </module>\n" + 
+				"\n" + 
+				"</application>";
+		Files.copy(new ByteArrayInputStream(appXml.getBytes()), appXmlFile.toPath() );
+
+		List<DeployableState> states = new ArrayList<>();
+		DeployableState ds = createState("server1", "wonka", 
+				"dumbLabel", deploymentSourceRoot.getAbsolutePath(), null);
+		states.add(ds);
+		
+		TestableShowInBrowserActionHandler testable = new TestableShowInBrowserActionHandler(
+				"http://127.0.0.1:8080", states);
+		assertActionDetails(testable, 2, new String[] { 
+				"http://127.0.0.1:8080",
+				"http://127.0.0.1:8080/testbank"
+		});
+		
+
+		ServerActionRequest req = new ServerActionRequest();
+		req.setActionId(ShowInBrowserActionHandler.ACTION_SHOW_IN_BROWSER_ID);
+		req.setServerId("server1");
+		Map<String, Object> data = new HashMap<>();
+		data.put(ShowInBrowserActionHandler.ACTION_SHOW_IN_BROWSER_SELECTED_PROMPT_ID, 
+				"http://127.0.0.1:8080/testbank");
+		req.setData(data);
+		
+		WorkflowResponse workflowResponse = testable.handle(req);
+		assertNotNull(workflowResponse);
+		assertNotNull(workflowResponse.getStatus());
+		assertEquals(workflowResponse.getStatus().getSeverity(), IStatus.OK);
+		assertNotNull(workflowResponse.getItems());
+		assertNotNull(workflowResponse.getItems().get(0));
+		WorkflowResponseItem item = workflowResponse.getItems().get(0);
+		assertEquals(item.getItemType(), ServerManagementAPIConstants.WORKFLOW_TYPE_OPEN_BROWSER);
+		assertEquals(item.getContent(), "http://127.0.0.1:8080/testbank");
+	}
+
+	
 	public WorkflowResponse runTestActionHandlingSelect(String responseData) throws IOException {
 		File tmpFolder = Files.createTempDirectory(getClass().getName()).toFile();
 		File tmpFile = new File(tmpFolder, "sample.war");
@@ -127,8 +247,8 @@ public class ShowInBrowserActionTest {
 		TestableShowInBrowserActionHandler testable = new TestableShowInBrowserActionHandler(
 				"http://127.0.0.1:8080", states);
 		assertActionDetails(testable, 2, new String[] { 
-				ShowInBrowserActionHandler.ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT,
-				tmpFile.getAbsolutePath()
+				"http://127.0.0.1:8080",
+				"http://127.0.0.1:8080/sample"
 		});
 		
 		ServerActionRequest req = new ServerActionRequest();
