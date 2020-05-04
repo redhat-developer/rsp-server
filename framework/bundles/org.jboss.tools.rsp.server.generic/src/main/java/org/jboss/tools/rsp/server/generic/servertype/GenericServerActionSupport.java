@@ -18,7 +18,7 @@ import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.launching.memento.JSONMemento;
 import org.jboss.tools.rsp.server.generic.servertype.actions.EditServerConfigurationActionHandler;
-import org.jboss.tools.rsp.server.generic.servertype.actions.ShowInBrowserActionHandler;
+import org.jboss.tools.rsp.server.generic.servertype.actions.GenericServerShowInBrowserActionHandler;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 
 public class GenericServerActionSupport {
@@ -40,7 +40,7 @@ public class GenericServerActionSupport {
 			for (JSONMemento actionToAdd : actionsToAdd) {
 				ServerActionWorkflow wf1 = null;
 				if (actionToAdd.getNodeName().equals("showInBrowser")) {
-					wf1 = ShowInBrowserActionHandler.getInitialWorkflow(behavior);
+					wf1 = new GenericServerShowInBrowserActionHandler(behavior).getInitialWorkflow();
 				}
 				if (actionToAdd.getNodeName().equals("editServerConfiguration")) {
 					wf1 = EditServerConfigurationActionHandler.getInitialWorkflow(behavior);
@@ -55,8 +55,8 @@ public class GenericServerActionSupport {
 	}
 	
 	public WorkflowResponse executeServerAction(ServerActionRequest req) {
-		if( ShowInBrowserActionHandler.ACTION_SHOW_IN_BROWSER_ID.equals(req.getActionId() )) {
-			return new ShowInBrowserActionHandler(behavior).handle(req);
+		if( GenericServerShowInBrowserActionHandler.ACTION_SHOW_IN_BROWSER_ID.equals(req.getActionId() )) {
+			return new GenericServerShowInBrowserActionHandler(behavior).handle(req);
 		}
 		if( EditServerConfigurationActionHandler.ACTION_ID.equals(req.getActionId() )) {
 			return new EditServerConfigurationActionHandler(behavior).handle(req);

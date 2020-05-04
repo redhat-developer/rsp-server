@@ -19,6 +19,7 @@ import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
 import org.jboss.tools.rsp.api.dao.ServerActionRequest;
@@ -484,5 +485,17 @@ public class GenericServerBehavior extends AbstractServerDelegate
 
 	protected IExternalVariableResolver getExternalVariableResolver() {
 		return new DefaultExternalVariableResolver(this);
+	}
+
+	/**
+	 * Use any server-type custom logic to discover the context root for a deployment
+	 * @param strat strategy provided via json
+	 * @param deployableOutputName suggested name calculated from deployment or its override flags
+	 * @param deployableOutputName2 
+	 * @param ds
+	 * @return null if the default logic should be used; an empty array if no urls found, an array of urls otherwise
+	 */
+	public String[] getDeploymentUrls(String strat, String deployableOutputName, String deployableOutputName2, DeployableState ds) {
+		return null;
 	}
 }

@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
@@ -23,32 +22,32 @@ import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
 import org.jboss.tools.rsp.api.dao.WorkflowPromptDetails;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
-import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
-import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
-import org.jboss.tools.rsp.launching.memento.JSONMemento;
 import org.jboss.tools.rsp.server.generic.impl.Activator;
-import org.jboss.tools.rsp.server.generic.servertype.GenericServerBehavior;
 import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
+import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 
-public class ShowInBrowserActionHandler {
+public abstract class AbstractShowInBrowserActionHandler {
 	public static final String ACTION_SHOW_IN_BROWSER_JSON_ID = "showInBrowser";
 	public static final String ACTION_SHOW_IN_BROWSER_ID = "ShowInBrowserActionHandler.actionId";
 	public static final String ACTION_SHOW_IN_BROWSER_LABEL = "Show in browser...";
 	public static final String ACTION_SHOW_IN_BROWSER_SELECTED_PROMPT_ID = "ShowInBrowserActionHandler.selection.id";
 	public static final String ACTION_SHOW_IN_BROWSER_SELECTED_PROMPT_LABEL = 
 			"Which deployment do you want to show in the web browser?";
-	public static final String ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT = "Welcome Page (Index)";
 	
-	public static final ServerActionWorkflow getInitialWorkflow(GenericServerBehavior genericServerBehavior2) {
-		return new ShowInBrowserActionHandler(genericServerBehavior2).getInitialWorkflowInternal();
+	private IServerDelegate serverDelegate;
+	public AbstractShowInBrowserActionHandler(IServerDelegate genericServerBehavior) {
+		this.serverDelegate = genericServerBehavior;
 	}
 	
-	private GenericServerBehavior genericServerBehavior;
-	public ShowInBrowserActionHandler(GenericServerBehavior genericServerBehavior) {
-		this.genericServerBehavior = genericServerBehavior;
+	protected abstract String[] getDeploymentUrls(DeployableState ds);
+	
+	protected abstract String getBaseUrl();
+
+	public ServerActionWorkflow getInitialWorkflow() {
+		return getInitialWorkflowInternal();
 	}
 	
 	protected ServerActionWorkflow getInitialWorkflowInternal() {
@@ -69,13 +68,12 @@ public class ShowInBrowserActionHandler {
 		prompt.setResponseSecret(false);
 		prompt.setResponseType(ServerManagementAPIConstants.ATTR_TYPE_STRING);
 		
-		List<String> deployments = getDeployableStatesHavingContextRoots()
-			.stream().map(DeployableState::getReference).map(DeployableReference::getPath)
-			.collect(Collectors.toList());
+		List<String> urls = getDeploymentUrls();
 		
 		List<String> deployments2 = new ArrayList<>();
-		deployments2.add(ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT);
-		deployments2.addAll(deployments);
+		if( !urls.contains(getBaseUrl()))
+			deployments2.add(getBaseUrl());
+		deployments2.addAll(urls);
 		
 		prompt.setValidResponses(deployments2);
 		item1.setPrompt(prompt);
@@ -85,39 +83,21 @@ public class ShowInBrowserActionHandler {
 		return action;
 	}
 	
-	private List<DeployableState> getDeployableStatesHavingContextRoots() {
+	private List<String> getDeploymentUrls() {
 		List<DeployableState> dss = getDeployableStates();
-		ArrayList<DeployableState> collector = new ArrayList<>();
+		ArrayList<String> collector = new ArrayList<>();
 		for( DeployableState ds : dss ) {
-			if( getContextRoot(ds) != null ) 
-				collector.add(ds);
+			String[] urls = getDeploymentUrls(ds);
+			if( urls != null ) 
+				collector.addAll(Arrays.asList(urls));
 		}
 		return collector;
 	}
 	
 	protected List<DeployableState> getDeployableStates() {
-		return genericServerBehavior.getServerPublishModel().getDeployableStatesWithOptions();
+		return serverDelegate.getServerPublishModel().getDeployableStatesWithOptions();
 	}
 
-	private String getContextRoot(DeployableState ds) {
-		String strat = getDeploymentStrategy();
-		String deployableOutputName = new Path(ds.getReference().getPath()).lastSegment();
-		if( ds.getReference().getOptions() != null ) {
-			String outputName = (String)ds.getReference().getOptions().get(ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME);
-			if( outputName != null ) 
-				deployableOutputName = outputName;
-		}
-		if( "appendDeploymentNameRemoveSuffix".equals(strat)) {
-			String depName = deployableOutputName;
-			if (depName.indexOf(".") > 0)
-				depName = depName.substring(0, depName.lastIndexOf("."));
-			return depName;
-		} else if( "appendDeploymentName".equals(strat)) {
-			return deployableOutputName;
-		}
-		return null;
-	}
-	
 	protected String getOutputName(DeployableReference ref) {
 		Map<String, Object> options = ref.getOptions();
 		String def = null;
@@ -154,37 +134,11 @@ public class ShowInBrowserActionHandler {
 	}
 	
 	private String findUrlFromChoice(String choice) {
-		String baseUrl = getBaseUrl();
-		if( choice.trim().equals(ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT)) {
-			return baseUrl;
-		} else {
-			List<DeployableState> states = getDeployableStates();
-			for( DeployableState ds : states ) {
-				if( ds.getReference().getPath().equals(choice)) {
-					String contextRoot = getContextRoot(ds);
-					if( contextRoot != null ) {
-						return baseUrl + "/" + contextRoot;
-					}
-				}
-			}
+		// We can accept any url they type here I guess
+		if( choice.toLowerCase().startsWith("http://") || choice.toLowerCase().startsWith("https://")) { 
+			return choice;
 		}
 		return null;
 	}
 	
-	protected String getBaseUrl() {
-		JSONMemento mem = genericServerBehavior.getActionsJSON().getChild(ACTION_SHOW_IN_BROWSER_JSON_ID);
-		String ret = mem.getString("baseUrl");
-		try {
-			ret = genericServerBehavior.applySubstitutions(ret);
-		} catch(CoreException ce) {
-			// TODO log
-		}
-		return ret;
-	}
-
-	protected String getDeploymentStrategy() {
-		JSONMemento mem = genericServerBehavior.getActionsJSON().getChild(ACTION_SHOW_IN_BROWSER_JSON_ID);
-		return mem.getString("deploymentStrategy");
-	}
-
 }

@@ -90,7 +90,7 @@ public class WildFlyServerDelegate extends AbstractJBossServerDelegate {
 		ListServerActionResponse ret = new ListServerActionResponse();
 		ret.setStatus(StatusConverter.convert(Status.OK_STATUS));
 		List<ServerActionWorkflow> allActions = new ArrayList<>();
-		allActions.add(ShowInBrowserActionHandler.getInitialWorkflow(this));
+		allActions.add(new ShowInBrowserActionHandler(this).getInitialWorkflow());
 		allActions.add(EditServerConfigurationActionHandler.getInitialWorkflow(this));
 		ret.setWorkflows(allActions);
 		return ret;
