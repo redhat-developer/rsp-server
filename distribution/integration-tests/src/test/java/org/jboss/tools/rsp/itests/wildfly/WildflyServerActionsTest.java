@@ -48,7 +48,7 @@ public class WildflyServerActionsTest extends RSPCase {
 	public static final String ACTION_SHOW_IN_BROWSER_SELECTED_PROMPT_ID = "ShowInBrowserActionHandler.selection.id";
 	public static final String ACTION_SHOW_IN_BROWSER_SELECTED_PROMPT_LABEL = 
 			"Which deployment do you want to show in the web browser?";
-	public static final String ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT = "Welcome Page (Index)";
+	public static final String ACTION_SHOW_IN_BROWSER_SELECT_SERVER_ROOT = "http://localhost:8080";
 	
 	private ServerHandle handle;
 
