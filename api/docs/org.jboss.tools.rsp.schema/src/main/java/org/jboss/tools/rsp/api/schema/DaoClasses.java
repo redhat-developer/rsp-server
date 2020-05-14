@@ -32,7 +32,9 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import java.util.zip.ZipFile;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * Scans for (dao) classes that match the package "org.jboss.tools.rsp.api.dao".
@@ -42,7 +44,7 @@ import org.apache.log4j.Logger;
  */
 public class DaoClasses {
 
-	private static final Logger LOG = Logger.getLogger(DaoClasses.class);
+	private static final Logger LOG = LogManager.getLogger(DaoClasses.class);
 
 	private static final String PROTOCOL_JAR = "jar";
 	private static final String PROTOCOL_FILE = "file";
