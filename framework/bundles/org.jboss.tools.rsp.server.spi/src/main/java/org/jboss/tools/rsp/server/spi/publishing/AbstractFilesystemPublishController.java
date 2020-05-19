@@ -399,9 +399,11 @@ public abstract class AbstractFilesystemPublishController implements IPublishCon
 	protected int removeModule(DeployableReference reference, 
 			int publishRequestType, int modulePublishState) throws CoreException {
 		File dest = getDestinationPath(reference).toFile();
-		if( dest == null || !dest.exists()) {
+		if( dest == null ) {
 			return getServerPublishModel().getDeployableState(reference).getPublishState();
 		}
+		if( !dest.exists())
+			return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 		
 		if( dest.isFile()) {
 			return removeFileModule(reference, publishRequestType, modulePublishState, dest);
