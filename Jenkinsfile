@@ -96,7 +96,14 @@ pipeline {
                                 }
                             }
                             steps {
-                                sh 'mvn -B -P sonar sonar:sonar -Dsonar.login=${SONAR_TOKEN}'
+                                script {
+                                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')] {
+                                        sh '''
+                                            set +x
+                                            mvn -B -P sonar sonar:sonar -Dsonar.login="${SONAR_TOKEN}"
+                                        '''
+                                    }
+                                }
                             }
                         }
                     }

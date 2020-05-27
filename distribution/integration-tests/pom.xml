@@ -15,18 +15,18 @@
 
 	<properties>
 		<skipITests>true</skipITests>
-		<server.id>install-wildfly-18.0.0.Final</server.id>
-		<server.url>http://download.jboss.org/wildfly/18.0.0.Final/wildfly-18.0.0.Final.zip</server.url>
-		<server.sha1>28a1769ebf48faa44cbc77476fa98ceceb382d18</server.sha1>
-		<server.type.id>org.jboss.ide.eclipse.as.wildfly.180</server.type.id>
-		<server.version>18.0.0.Final</server.version>
+        <server.id>install-wildfly-19.1.0.Final</server.id>
+        <server.url>https://download.jboss.org/wildfly/19.1.0.Final/wildfly-19.1.0.Final.zip</server.url>
+        <server.sha1>d9e922f3924dc7585a3fa50915270fd2053be2aa</server.sha1>
+        <server.type.id>org.jboss.ide.eclipse.as.wildfly.190</server.type.id>
+        <server.version>19.1.0.Final</server.version>
 		<server.path>${project.build.directory}/wildfly-${server.version}</server.path>
 		<!-- Sonar report property for code coverage -->
 		<sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 		<!-- Quickstarts properties -->
 		<quickstarts.server>wildfly</quickstarts.server>
-		<quickstarts.url>https://github.com/wildfly/quickstart/archive/18.0.0.Final.zip</quickstarts.url>
-		<quickstarts.dir>quickstart-18.0.0.Final</quickstarts.dir>
+		<quickstarts.url>https://github.com/wildfly/quickstart/archive/19.1.0.Final.zip</quickstarts.url>
+		<quickstarts.dir>quickstart-19.1.0.Final</quickstarts.dir>
 	</properties>
 
 	<name>Runtime Server Protocol : Integration Tests</name>
@@ -258,11 +258,27 @@
 				</property>
 			</activation>
 			<properties>
-				<server.id>install-wildfly-18.0.0.Final</server.id>
-				<server.url>https://download.jboss.org/wildfly/18.0.0.Final/wildfly-18.0.0.Final.zip</server.url>
-				<server.sha1>28a1769ebf48faa44cbc77476fa98ceceb382d18</server.sha1>
+				<server.id>install-wildfly-18.0.1.Final</server.id>
+				<server.url>https://download.jboss.org/wildfly/18.0.1.Final/wildfly-18.0.1.Final.zip</server.url>
+				<server.sha1>4e2e8335800516923792befaffb3657c0a295c93</server.sha1>
 				<server.type.id>org.jboss.ide.eclipse.as.wildfly.180</server.type.id>
-				<server.version>18.0.0.Final</server.version>
+				<server.version>18.0.1.Final</server.version>
+			</properties>
+		</profile>
+		<profile>
+			<id>wildfly-19</id>
+			<activation>
+				<property>
+					<name>wildfly</name>
+					<value>19</value>
+				</property>
+			</activation>
+			<properties>
+				<server.id>install-wildfly-19.1.0.Final</server.id>
+				<server.url>https://download.jboss.org/wildfly/19.1.0.Final/wildfly-19.1.0.Final.zip</server.url>
+				<server.sha1>d9e922f3924dc7585a3fa50915270fd2053be2aa</server.sha1>
+				<server.type.id>org.jboss.ide.eclipse.as.wildfly.190</server.type.id>
+				<server.version>19.1.0.Final</server.version>
 			</properties>
 		</profile>
 		<profile>
@@ -274,9 +290,9 @@
 			</activation>
 			<properties>
 				<quickstarts.server>wildfly</quickstarts.server>
-				<quickstarts.dir>quickstart-18.0.0.Final</quickstarts.dir>
-				<quickstarts.url>https://github.com/wildfly/quickstart/archive/18.0.0.Final.zip</quickstarts.url>
-			</properties>
+				<quickstarts.dir>quickstart-19.0.0.Final</quickstarts.dir>
+				<quickstarts.url>https://github.com/wildfly/quickstart/archive/19.1.0.Final.zip</quickstarts.url>
+			</properties> 
 		</profile>
 		<profile>
 			<id>eap-quickstarts</id>
