@@ -39,7 +39,9 @@ public interface IServerConstants {
 	public static final String SERVER_WILDFLY_170 = "org.jboss.ide.eclipse.as.wildfly.170"; //$NON-NLS-1$
 	public static final String SERVER_WILDFLY_180 = "org.jboss.ide.eclipse.as.wildfly.180"; //$NON-NLS-1$
 	public static final String SERVER_WILDFLY_190 = "org.jboss.ide.eclipse.as.wildfly.190"; //$NON-NLS-1$
-
+	public static final String SERVER_WILDFLY_200 = "org.jboss.ide.eclipse.as.wildfly.200"; //$NON-NLS-1$
+	// NEW_SERVER_ADAPTER
+	
 	public static final String SERVER_EAP_43 = "org.jboss.ide.eclipse.as.eap.43"; //$NON-NLS-1$
 	public static final String SERVER_EAP_50 = "org.jboss.ide.eclipse.as.eap.50"; //$NON-NLS-1$
 	public static final String SERVER_EAP_60 = "org.jboss.ide.eclipse.as.eap.60"; //$NON-NLS-1$
@@ -48,14 +50,15 @@ public interface IServerConstants {
 	public static final String SERVER_EAP_71 = "org.jboss.ide.eclipse.as.eap.71"; //$NON-NLS-1$
 	public static final String SERVER_EAP_72 = "org.jboss.ide.eclipse.as.eap.72"; //$NON-NLS-1$
 	public static final String SERVER_EAP_73 = "org.jboss.ide.eclipse.as.eap.73"; //$NON-NLS-1$
-
+	// NEW_SERVER_ADAPTER
+	
 	public static final String[] ALL_JBOSS_SERVERS = new String[] {
 			SERVER_AS_32,SERVER_AS_40,SERVER_AS_42,SERVER_AS_50,SERVER_AS_51,
 			SERVER_AS_60,SERVER_AS_70,SERVER_AS_71,
 			SERVER_WILDFLY_80,SERVER_WILDFLY_90,SERVER_WILDFLY_100,
 			SERVER_WILDFLY_110,SERVER_WILDFLY_120,SERVER_WILDFLY_130,
 			SERVER_WILDFLY_140, SERVER_WILDFLY_150, SERVER_WILDFLY_160, 
-			SERVER_WILDFLY_170, SERVER_WILDFLY_180,SERVER_WILDFLY_190,
+			SERVER_WILDFLY_170, SERVER_WILDFLY_180,SERVER_WILDFLY_190,SERVER_WILDFLY_200,
 			SERVER_EAP_43,SERVER_EAP_50,SERVER_EAP_60, SERVER_EAP_61, 
 			SERVER_EAP_70, SERVER_EAP_71, SERVER_EAP_72, SERVER_EAP_73
 		};
@@ -90,7 +93,8 @@ public interface IServerConstants {
 	public static final String RUNTIME_WILDFLY_170 = "org.jboss.ide.eclipse.as.runtime.wildfly.170"; //$NON-NLS-1$
 	public static final String RUNTIME_WILDFLY_180 = "org.jboss.ide.eclipse.as.runtime.wildfly.180"; //$NON-NLS-1$
 	public static final String RUNTIME_WILDFLY_190 = "org.jboss.ide.eclipse.as.runtime.wildfly.190"; //$NON-NLS-1$
-
+	public static final String RUNTIME_WILDFLY_200 = "org.jboss.ide.eclipse.as.runtime.wildfly.200"; //$NON-NLS-1$
+	// NEW_SERVER_ADAPTER
 	public static final String RUNTIME_EAP_43 = "org.jboss.ide.eclipse.as.runtime.eap.43"; //$NON-NLS-1$
 	public static final String RUNTIME_EAP_50 = "org.jboss.ide.eclipse.as.runtime.eap.50"; //$NON-NLS-1$
 	public static final String RUNTIME_EAP_60 = "org.jboss.ide.eclipse.as.runtime.eap.60"; //$NON-NLS-1$
@@ -99,7 +103,8 @@ public interface IServerConstants {
 	public static final String RUNTIME_EAP_71 = "org.jboss.ide.eclipse.as.runtime.eap.71"; //$NON-NLS-1$
 	public static final String RUNTIME_EAP_72 = "org.jboss.ide.eclipse.as.runtime.eap.72"; //$NON-NLS-1$
 	public static final String RUNTIME_EAP_73 = "org.jboss.ide.eclipse.as.runtime.eap.73"; //$NON-NLS-1$
-
+	// NEW_SERVER_ADAPTER
+	
 	public static final Map<String, String> RUNTIME_TO_SERVER = new HashMap<String, String>() {{
 		put(RUNTIME_AS_32, SERVER_AS_32);
 		put(RUNTIME_AS_40, SERVER_AS_40);
@@ -121,6 +126,7 @@ public interface IServerConstants {
 		put(RUNTIME_WILDFLY_170, SERVER_WILDFLY_170);
 		put(RUNTIME_WILDFLY_180, SERVER_WILDFLY_180);
 		put(RUNTIME_WILDFLY_190, SERVER_WILDFLY_190);
+		put(RUNTIME_WILDFLY_200, SERVER_WILDFLY_200);
 
 		put(RUNTIME_EAP_43, SERVER_EAP_43);
 		put(RUNTIME_EAP_50, SERVER_EAP_50);
@@ -131,7 +137,7 @@ public interface IServerConstants {
 		put(RUNTIME_EAP_72, SERVER_EAP_72);
 		put(RUNTIME_EAP_73, SERVER_EAP_73);
     }};
-	
+	// NEW_SERVER_ADAPTER
 	
 	// TODO move elsewhere
 	public static final String EXT_JAR = ".jar";

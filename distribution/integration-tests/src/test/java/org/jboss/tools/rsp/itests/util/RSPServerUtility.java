@@ -35,6 +35,8 @@ public class RSPServerUtility {
 				return createServerType(serverID, ServerTypeStringConstants.WF18_NAME, ServerTypeStringConstants.WF18_DESC);
 			case IServerConstants.SERVER_WILDFLY_190:
 				return createServerType(serverID, ServerTypeStringConstants.WF19_NAME, ServerTypeStringConstants.WF19_DESC);
+			case IServerConstants.SERVER_WILDFLY_200:
+				return createServerType(serverID, ServerTypeStringConstants.WF20_NAME, ServerTypeStringConstants.WF20_DESC);
 			default:
 				return createServerType(IServerConstants.SERVER_WILDFLY_120, ServerTypeStringConstants.WF12_NAME, ServerTypeStringConstants.WF12_DESC);
 		}
