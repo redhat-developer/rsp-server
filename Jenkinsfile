@@ -149,6 +149,12 @@ pipeline {
                 // First empty the remote dirs
                 def emptyDir = sh script: "mktemp -d | tr -d '\n'", returnStdout: true
                 sh "chmod 775 ${emptyDir}"
+		
+		// TODO delete me
+                sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${emptyDir}/ ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/${upload_dir}/rsp-server/"
+                sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${emptyDir}/ ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/${upload_dir}/rsp-server/p2/"
+		// TODO end delete-me
+
                 sh "rsync -Pzrlt --rsh=ssh --protocol=28 --delete ${emptyDir}/ ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/${upload_dir}/rsp-server/p2/${distroVersion}/"
                 sh "rsync -Pzrlt --rsh=ssh --protocol=28 --delete ${emptyDir}/ ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/${upload_dir}/rsp-server/p2/${distroVersion}/plugins/"
 
