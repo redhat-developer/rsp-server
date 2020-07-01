@@ -67,6 +67,15 @@ public interface RSPServer {
 	void shutdown();
 
 
+	/**
+	 * The `server/shutdownIfLastClient` notification is sent by the client to shut down the
+	 * RSP itself only if it is the last client connected. 
+	 */
+	@JsonNotification
+	void shutdownIfLastClient();
+
+
+
 	/*
 	 * Discovery
 	 */
@@ -436,6 +445,5 @@ public interface RSPServer {
 	 */
 	@JsonRequest
 	public CompletableFuture<Status> cancelJob(JobHandle job);
-
 
 }

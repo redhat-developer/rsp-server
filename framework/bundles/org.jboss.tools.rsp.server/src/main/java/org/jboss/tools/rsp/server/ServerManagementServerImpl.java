@@ -221,6 +221,13 @@ public class ServerManagementServerImpl implements RSPServer {
 		}.start();
 	}
 
+	@Override
+	public void shutdownIfLastClient() {
+		if( clients.size() == 1 ) {
+			shutdown();
+		}
+	}
+
 	private void shutdownSync() {
 		managementModel.dispose();
 		launcher.shutdown();

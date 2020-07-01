@@ -278,6 +278,14 @@ This endpoint takes no parameters.
 
 This endpoint returns no value
 
+#### server/shutdownIfLastClient
+
+ The `server/shutdownIfLastClient` notification is sent by the client to shut down the RSP itself only if it is the last client connected. 
+
+This endpoint takes no parameters. 
+
+This endpoint returns no value
+
 #### server/getDiscoveryPaths
 
  The `server/getDiscoveryPaths` request is sent by the client to fetch a list of discovery paths that can be searched. Discovery paths exist in the RSP model as paths suitable to be searched for server runtime installations. Additional paths may be added via the `server/addDiscoveryPath` entry point, or removed via the `server/removeDiscoveryPath` entry point. 
