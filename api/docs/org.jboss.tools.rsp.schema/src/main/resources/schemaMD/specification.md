@@ -278,9 +278,9 @@ This endpoint takes no parameters.
 
 This endpoint returns no value
 
-#### server/shutdownIfLastClient
+#### server/disconnectClient
 
- The `server/shutdownIfLastClient` notification is sent by the client to shut down the RSP itself only if it is the last client connected. 
+ The `server/disconnectClient` notification is sent by the client to alert the server that the client should be disconnected 
 
 This endpoint takes no parameters. 
 

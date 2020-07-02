@@ -24,8 +24,8 @@ export class Outgoing {
     shutdown(timeout: number = Common.DEFAULT_TIMEOUT): void {
         return Common.sendSimpleNotification(this.connection, Messages.Server.ShutdownNotification.type, null);
     }
-    shutdownIfLastClient(timeout: number = Common.DEFAULT_TIMEOUT): void {
-        return Common.sendSimpleNotification(this.connection, Messages.Server.ShutdownIfLastClientNotification.type, null);
+    disconnectClient(timeout: number = Common.DEFAULT_TIMEOUT): void {
+        return Common.sendSimpleNotification(this.connection, Messages.Server.DisconnectClientNotification.type, null);
     }
     getDiscoveryPaths(timeout: number = Common.DEFAULT_TIMEOUT): Promise<Array<Protocol.DiscoveryPath>> {
         return Common.sendSimpleRequest(this.connection, Messages.Server.GetDiscoveryPathsRequest.type,
@@ -166,7 +166,7 @@ export class Outgoing {
 export namespace ErrorMessages {
     export const REGISTERCLIENTCAPABILITIES_TIMEOUT = 'Failed to register client capabilities in time';
     export const SHUTDOWN_TIMEOUT = 'Failed to shutdown in time';
-    export const SHUTDOWNIFLASTCLIENT_TIMEOUT = 'Failed to shutdown if last client in time';
+    export const DISCONNECTCLIENT_TIMEOUT = 'Failed to disconnect client in time';
     export const GETDISCOVERYPATHS_TIMEOUT = 'Failed to get discovery paths in time';
     export const FINDSERVERBEANS_TIMEOUT = 'Failed to find server beans in time';
     export const ADDDISCOVERYPATH_TIMEOUT = 'Failed to add discovery path in time';

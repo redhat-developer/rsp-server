@@ -222,10 +222,20 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	@Override
-	public void shutdownIfLastClient() {
-		if( clients.size() == 1 ) {
-			shutdown();
-		}
+	public void disconnectClient() {
+		final RSPClient rspc = ClientThreadLocal.getActiveClient();
+		new Thread("Shutdown") {
+			@Override
+			public void run() {
+				ClientThreadLocal.setActiveClient(rspc);
+				try {
+					Thread.sleep(200);
+				} catch(InterruptedException ie) {
+				}
+				launcher.closeConnection(rspc);
+				ClientThreadLocal.setActiveClient(null);
+			}
+		}.start();
 	}
 
 	private void shutdownSync() {

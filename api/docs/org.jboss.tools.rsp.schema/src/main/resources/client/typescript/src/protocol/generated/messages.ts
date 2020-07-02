@@ -25,11 +25,11 @@ export namespace Messages {
             export const type = new NotificationType<void, void>('server/shutdown');
         }
         /**
-         * The `server/shutdownIfLastClient` notification is sent by the client to shut down the
-         * RSP itself only if it is the last client connected.
+         * The `server/disconnectClient` notification is sent by the client to
+         * alert the server that the client should be disconnected
          */
-        export namespace ShutdownIfLastClientNotification {
-            export const type = new NotificationType<void, void>('server/shutdownIfLastClient');
+        export namespace DisconnectClientNotification {
+            export const type = new NotificationType<void, void>('server/disconnectClient');
         }
         /**
          * The `server/getDiscoveryPaths` request is sent by the client to fetch a list

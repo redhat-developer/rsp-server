@@ -236,5 +236,15 @@ public class ServerManagementServerLauncher {
 			i.close();
 		}
 	}
+	
+	public void closeConnection(RSPClient client) {
+		List<SocketLauncher<RSPClient>> all = 
+				serverImpl.getActiveLaunchers();
+		for( SocketLauncher<RSPClient> i : all ) {
+			if( i.getRemoteProxy() == client ) {
+				i.close();
+			}
+		}
+	}
 
 }
