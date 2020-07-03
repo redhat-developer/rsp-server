@@ -66,6 +66,14 @@ public class StandardCommandHandler implements InputHandler {
 				System.exit(0);
 			}
 		},
+		DISCONNECT("disconnect") {
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
+				launcher.getServerProxy().disconnectClient();
+				System.out.println("Disconnected from server.");
+				System.exit(0);
+			}
+		},
 		ADD_PATH("add path") {
 			@Override
 			public boolean isMatching(String command) {
