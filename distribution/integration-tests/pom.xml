@@ -15,18 +15,18 @@
 
 	<properties>
 		<skipITests>true</skipITests>
-        <server.id>install-wildfly-19.1.0.Final</server.id>
-        <server.url>https://download.jboss.org/wildfly/19.1.0.Final/wildfly-19.1.0.Final.zip</server.url>
-        <server.sha1>d9e922f3924dc7585a3fa50915270fd2053be2aa</server.sha1>
-        <server.type.id>org.jboss.ide.eclipse.as.wildfly.190</server.type.id>
-        <server.version>19.1.0.Final</server.version>
+        <server.id>install-wildfly-20.0.1.Final</server.id>
+        <server.url>https://download.jboss.org/wildfly/20.0.1.Final/wildfly-20.0.1.Final.zip</server.url>
+        <server.sha1>bcaba55cb2dac92264baff94b111b7ad31363bd4</server.sha1>
+        <server.type.id>org.jboss.ide.eclipse.as.wildfly.200</server.type.id>
+        <server.version>20.0.1.Final</server.version>
 		<server.path>${project.build.directory}/wildfly-${server.version}</server.path>
 		<!-- Sonar report property for code coverage -->
 		<sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 		<!-- Quickstarts properties -->
 		<quickstarts.server>wildfly</quickstarts.server>
-		<quickstarts.url>https://github.com/wildfly/quickstart/archive/19.1.0.Final.zip</quickstarts.url>
-		<quickstarts.dir>quickstart-19.1.0.Final</quickstarts.dir>
+		<quickstarts.url>https://github.com/wildfly/quickstart/archive/20.0.0.Final.zip</quickstarts.url>
+		<quickstarts.dir>quickstart-20.0.0.Final</quickstarts.dir>
 	</properties>
 
 	<name>Runtime Server Protocol : Integration Tests</name>
@@ -290,11 +290,11 @@
 				</property>
 			</activation>
 			<properties>
-				<server.id>install-wildfly-20.0.0.Final</server.id>
-				<server.url>https://download.jboss.org/wildfly/20.0.0.Final/wildfly-20.0.0.Final.zip</server.url>
+				<server.id>install-wildfly-20.0.1.Final</server.id>
+				<server.url>https://download.jboss.org/wildfly/20.0.1.Final/wildfly-20.0.1.Final.zip</server.url>
 				<server.sha1>3146dbeb1e9d42e66a08eb653d61a76626e70015</server.sha1>
 				<server.type.id>org.jboss.ide.eclipse.as.wildfly.200</server.type.id>
-				<server.version>20.0.0.Final</server.version>
+				<server.version>20.0.1.Final</server.version>
 			</properties>
 		</profile>
 		<profile>
