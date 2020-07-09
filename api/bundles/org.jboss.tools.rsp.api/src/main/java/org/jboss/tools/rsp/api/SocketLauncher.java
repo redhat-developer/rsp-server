@@ -14,6 +14,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
@@ -63,6 +64,7 @@ public class SocketLauncher<T> implements Launcher<T> {
 	}
 	
 	public CompletableFuture<Void> startListening() {
+		final ExecutorService service = Executors.newSingleThreadExecutor();
 		return CompletableFuture.runAsync(() -> {
 			try {
 				this.startListeningResult = this.launcher.startListening();
@@ -70,7 +72,8 @@ public class SocketLauncher<T> implements Launcher<T> {
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-		}, Executors.newSingleThreadExecutor());
+			service.shutdown();
+		}, service);
 	}
 
 	public T getRemoteProxy() {
