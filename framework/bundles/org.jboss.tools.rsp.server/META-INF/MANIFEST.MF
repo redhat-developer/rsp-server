@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: org.jboss.tools.rsp.server
 Bundle-SymbolicName: org.jboss.tools.rsp.server
 Automatic-Module-Name: org.jboss.tools.rsp.server
-Bundle-Version: 0.23.2.Final
+Bundle-Version: 0.23.3.Final
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Activator: org.jboss.tools.rsp.server.ServerCoreActivator
 Import-Package: com.google.gson,
