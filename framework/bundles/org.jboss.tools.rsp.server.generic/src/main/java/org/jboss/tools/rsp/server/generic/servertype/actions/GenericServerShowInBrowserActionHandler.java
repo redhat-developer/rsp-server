@@ -17,6 +17,7 @@ public class GenericServerShowInBrowserActionHandler extends AbstractShowInBrows
 	private GenericServerBehavior genericServerBehavior;
 	public GenericServerShowInBrowserActionHandler(GenericServerBehavior genericServerBehavior) {
 		super(genericServerBehavior);
+		this.genericServerBehavior = genericServerBehavior;
 	}
 	
 	@Override
