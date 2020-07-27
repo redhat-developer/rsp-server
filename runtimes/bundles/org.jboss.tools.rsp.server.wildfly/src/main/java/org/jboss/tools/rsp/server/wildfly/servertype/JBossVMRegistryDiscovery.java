@@ -45,7 +45,9 @@ public class JBossVMRegistryDiscovery {
 		if( vmPath == null ) {
 			vmi = reg.getDefaultVMInstall();
 		} else {
-			vmi = reg.findVMInstall(new File(vmPath));
+			if (ensureVMInstallAdded(vmPath, reg)) {
+				vmi = reg.findVMInstall(new File(vmPath));
+			}			
 		}
 		return vmi;
 	}
