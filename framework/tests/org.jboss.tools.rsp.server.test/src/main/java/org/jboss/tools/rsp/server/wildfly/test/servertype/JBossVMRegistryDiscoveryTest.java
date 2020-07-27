@@ -74,7 +74,9 @@ public class JBossVMRegistryDiscoveryTest {
 		String home = System.getProperty("java.home");
 		assertNotNull(discovery.findVMInstall(home));
 		registry.removeVMInstall(registry.getDefaultVMInstall());
-		assertNull(discovery.findVMInstall(home));
+		assertThat(registry.getVMs()).hasSize(0);
+		assertNotNull(discovery.findVMInstall(home));
+		assertThat(registry.getVMs()).hasSize(1);
 	}
 	
 	@Test
