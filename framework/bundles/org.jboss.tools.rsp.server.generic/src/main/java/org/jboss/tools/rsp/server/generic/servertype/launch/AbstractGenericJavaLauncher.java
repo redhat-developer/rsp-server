@@ -11,8 +11,10 @@ package org.jboss.tools.rsp.server.generic.servertype.launch;
 import org.jboss.tools.rsp.eclipse.debug.core.DebugException;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
+import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.server.LauncherSingleton;
+import org.jboss.tools.rsp.server.generic.discovery.GenericVMRegistryDiscovery;
 import org.jboss.tools.rsp.server.spi.launchers.AbstractJavaLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
@@ -57,5 +59,10 @@ public abstract class AbstractGenericJavaLauncher extends AbstractJavaLauncher i
 					registry = LauncherSingleton.getDefault().getLauncher().getModel().getVMInstallModel();
 		}
 		return registry;
+	}
+	
+	@Override
+	protected IVMInstall getVMInstall(IServerDelegate delegate) {
+		return new GenericVMRegistryDiscovery().findVMInstall(delegate);
 	}
 }

@@ -31,6 +31,7 @@ public interface DefaultServerAttributes {
 	 * Deployment options 
 	 */
 	public static final String DEPLOYMENT_OPTION_OUTPUT_NAME = "deployment.output.name";
+	public static final String VM_INSTALL_PATH = "vm.install.path";
 	
 
 }
