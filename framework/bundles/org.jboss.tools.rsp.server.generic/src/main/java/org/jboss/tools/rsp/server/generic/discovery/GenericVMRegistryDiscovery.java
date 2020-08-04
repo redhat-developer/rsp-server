@@ -7,6 +7,7 @@ import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.eclipse.jdt.launching.StandardVMType;
 import org.jboss.tools.rsp.server.LauncherSingleton;
+import org.jboss.tools.rsp.server.generic.servertype.GenericServerAttributes;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
 public class GenericVMRegistryDiscovery {
@@ -21,7 +22,7 @@ public class GenericVMRegistryDiscovery {
 				|| delegate.getServer() == null) {
 			return null;
 		}
-		return delegate.getServer().getAttribute(DefaultServerAttributes.VM_INSTALL_PATH, (String)null);
+		return delegate.getServer().getAttribute(GenericServerAttributes.VM_INSTALL_PATH, (String)null);
 	}
 	public IVMInstall findVMInstall(String vmPath) {
 		return findVMInstall(vmPath, null);
@@ -90,21 +91,6 @@ public class GenericVMRegistryDiscovery {
 			}
 		}
 		return true;
-	}
-	
-	protected String getNewVmName(String base, IVMInstallRegistry reg) {
-		IVMInstall vmi = reg.findVMInstall(base);
-		if( vmi == null )
-			return base;
-		String tmpName = null;
-		int i = 1;
-		while(true) {
-			tmpName = base + " (" + i + ")";
-			vmi = reg.findVMInstall(tmpName);
-			if( vmi == null )
-				return tmpName;
-			i++;
-		}
 	}
 
 }
