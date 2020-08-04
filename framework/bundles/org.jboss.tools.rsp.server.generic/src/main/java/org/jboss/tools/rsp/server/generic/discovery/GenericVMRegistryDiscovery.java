@@ -93,4 +93,19 @@ public class GenericVMRegistryDiscovery {
 		return true;
 	}
 
+	protected String getNewVmName(String base, IVMInstallRegistry reg) {
+		IVMInstall vmi = reg.findVMInstall(base);
+		if( vmi == null )
+			return base;
+		String tmpName = null;
+		int i = 1;
+		while(true) {
+			tmpName = base + " (" + i + ")";
+			vmi = reg.findVMInstall(tmpName);
+			if( vmi == null )
+				return tmpName;
+			i++;
+		}
+	}
+	
 }
