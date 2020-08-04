@@ -16,7 +16,6 @@ import org.jboss.tools.rsp.api.DefaultServerAttributes;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
-import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.launching.memento.JSONMemento;
 import org.jboss.tools.rsp.server.generic.IStringSubstitutionProvider;
 import org.jboss.tools.rsp.server.generic.servertype.GenericServerBehavior;

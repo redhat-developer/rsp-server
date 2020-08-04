@@ -2,7 +2,6 @@ package org.jboss.tools.rsp.server.generic.discovery;
 
 import java.io.File;
 
-import org.jboss.tools.rsp.api.DefaultServerAttributes;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.eclipse.jdt.launching.StandardVMType;
@@ -39,8 +38,7 @@ public class GenericVMRegistryDiscovery {
 		} else {
 			if (ensureVMInstallAdded(vmPath, reg)) {
 				vmi = reg.findVMInstall(new File(vmPath));
-			}			
-			vmi = reg.findVMInstall(new File(vmPath));
+			}
 		}
 		return vmi;
 	}
