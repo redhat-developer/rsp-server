@@ -196,5 +196,4 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 		return (del instanceof IStringSubstitutionProvider) ? 
 				((IStringSubstitutionProvider)del).applySubstitutions(input) : input;
 	}
-
 }
