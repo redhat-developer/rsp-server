@@ -1,3 +1,11 @@
+/*******************************************************************************	
+ * Copyright (c) 2020 Red Hat, Inc. Distributed under license by Red Hat, Inc.	
+ * All rights reserved. This program is made available under the terms of the	
+ * Eclipse Public License v2.0 which accompanies this distribution, and is	
+ * available at http://www.eclipse.org/legal/epl-v20.html	
+ * 	
+ * Contributors: Red Hat, Inc.	
+ ******************************************************************************/
 package org.jboss.tools.rsp.server.generic.test.servertype;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,8 +24,8 @@ import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.eclipse.jdt.launching.StandardVMType;
 import org.jboss.tools.rsp.eclipse.jdt.launching.VMInstallRegistry;
-import org.jboss.tools.rsp.server.persistence.DataLocationCore;
 import org.jboss.tools.rsp.server.generic.discovery.GenericVMRegistryDiscovery;
+import org.jboss.tools.rsp.server.persistence.DataLocationCore;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -66,7 +74,9 @@ public class GenericVMRegistryDiscoveryTest {
 		String home = System.getProperty("java.home");
 		assertNotNull(discovery.findVMInstall(home));
 		registry.removeVMInstall(registry.getDefaultVMInstall());
-		assertNull(discovery.findVMInstall(home));
+		assertThat(registry.getVMs()).hasSize(0);
+		assertNotNull(discovery.findVMInstall(home));
+		assertThat(registry.getVMs()).hasSize(1);
 	}
 	
 	@Test
