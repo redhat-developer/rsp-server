@@ -30,7 +30,8 @@ Require-Bundle: org.jboss.tools.rsp.api,
  org.junit,
  org.jboss.tools.locus.mockito,
  org.assertj.core;bundle-version="2.1.0",
- javax.annotation;bundle-version="1.2.0"
+ javax.annotation;bundle-version="1.2.0",
+ org.jboss.tools.rsp.server.generic
 Export-Package: org.jboss.tools.rsp.server.model.publishing,
  org.jboss.tools.rsp.server.util.generation
 Bundle-Activator: org.jboss.tools.rsp.server.ServerTestActivator
