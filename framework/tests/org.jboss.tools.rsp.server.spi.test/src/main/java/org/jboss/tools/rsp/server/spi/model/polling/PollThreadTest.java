@@ -24,6 +24,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.jboss.tools.rsp.api.DefaultServerAttributes;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller.CANCELATION_CAUSE;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller.SERVER_STATE;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller.TIMEOUT_BEHAVIOR;
@@ -247,6 +248,38 @@ public class PollThreadTest {
 		
 		// cleanup
 		pollThread.cancel();
+	}
+
+
+	@Test
+	public void notifiesFailureUponCustomTimeout() throws Exception {
+		notifiesFailureUponCustomTimeoutImpl(200);
+		notifiesFailureUponCustomTimeoutImpl(600);
+		notifiesFailureUponCustomTimeoutImpl(1000);
+	}
+	
+	
+	public void notifiesFailureUponCustomTimeoutImpl(int serverTimeoutVal) throws Exception {
+		doReturn(serverTimeoutVal).when(server).getAttribute(DefaultServerAttributes.SERVER_TIMEOUT_STARTUP, 1);
+		// given
+		IServerStatePoller poller = spy(new DelayableFixedResponsePoller(SERVER_STATE.UNKNOWN, POLLER_SLEEP));
+		doReturn(TIMEOUT_BEHAVIOR.FAIL).when(poller).getTimeoutBehavior();
+		
+		long start = System.currentTimeMillis();
+		// when
+		PollThread pollThread = PollThreadUtils.pollServer(1, server, SERVER_STATE.UP, poller, resultListener);
+		pollThread.join();
+
+		// then
+		AssertedState state = resultListener.getNextNotifiedState();
+		assertThat(state.isAsserted()).isFalse();
+		assertThat(state.getServerState()).isEqualTo(SERVER_STATE.DOWN);
+		// cleanup
+		pollThread.cancel();
+		
+		long end = System.currentTimeMillis();
+		long diff = end - start;
+		assertThat(diff > serverTimeoutVal);
 	}
 
 	@Test

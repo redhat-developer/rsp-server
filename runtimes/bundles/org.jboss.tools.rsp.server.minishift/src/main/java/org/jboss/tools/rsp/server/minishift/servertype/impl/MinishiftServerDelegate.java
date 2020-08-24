@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.jboss.tools.rsp.api.DefaultServerAttributes;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
@@ -200,7 +201,7 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 				shutdownServerResultListener() : launchServerResultListener();
 		IServerStatePoller poller = getPoller(expectedState);
 		// 5 minute timeout
-		PollThreadUtils.pollServer(getServer(), expectedState, poller, listener,5*60*1000);
+		PollThreadUtils.pollServer(5*60*1000, getServer(), expectedState, poller, listener);
 	}
 	
 	/*
@@ -290,8 +291,11 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 	}
 	@Override
 	public void setDefaults(IServerWorkingCopy server) {
+		super.setDefaults(server);
 		server.setAttribute(STARTUP_PROGRAM_ARGS_STRING, "start");
 		server.setAttribute(STARTUP_ENV_VARS_MAP, new HashMap<>());
+		server.setAttribute(DefaultServerAttributes.SERVER_TIMEOUT_STARTUP, 5*60*1000);
+		server.setAttribute(DefaultServerAttributes.SERVER_TIMEOUT_SHUTDOWN, 5*60*1000);
 	}
 	
 	@Override

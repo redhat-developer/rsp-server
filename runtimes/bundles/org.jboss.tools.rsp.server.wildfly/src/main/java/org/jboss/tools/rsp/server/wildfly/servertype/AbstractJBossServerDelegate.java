@@ -492,6 +492,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	
 	@Override
 	public void setDefaults(IServerWorkingCopy server) {
+		super.setDefaults(server);
 		server.setAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_BOOLEAN, false);
 		server.setAttribute(IJBossServerAttributes.WILDFLY_PUBLISH_RESTART_PATTERN_KEY, 
 				IJBossServerAttributes.WILDFLY_PUBLISH_RESTART_PATTERN_DEFAULT);
