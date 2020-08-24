@@ -11,6 +11,7 @@ package org.jboss.tools.rsp.server.minishift.servertype.impl;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import org.jboss.tools.rsp.api.DefaultServerAttributes;
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.ServerActionRequest;
@@ -103,6 +104,8 @@ public class CRCServerDelegate extends MinishiftServerDelegate {
 	
 	@Override
 	public void setDefaults(IServerWorkingCopy server) {
+		server.setAttribute(DefaultServerAttributes.SERVER_TIMEOUT_STARTUP, 5*60*1000);
+		server.setAttribute(DefaultServerAttributes.SERVER_TIMEOUT_SHUTDOWN, 5*60*1000);
 		server.setAttribute(IMinishiftServerAttributes.LAUNCH_OVERRIDE_BOOLEAN, false);
 		server.setAttribute(IMinishiftServerAttributes.MINISHIFT_CPUS, 4);
 		server.setAttribute(IMinishiftServerAttributes.MINISHIFT_MEMORY, 8192);

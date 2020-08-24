@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import org.jboss.tools.rsp.api.DefaultServerAttributes;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
@@ -607,7 +608,8 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	}
 	@Override
 	public void setDefaults(IServerWorkingCopy server) {
-		// DO nothing
+		server.setAttribute(DefaultServerAttributes.SERVER_TIMEOUT_STARTUP, 2*60*1000);
+		server.setAttribute(DefaultServerAttributes.SERVER_TIMEOUT_SHUTDOWN, 2*60*1000);
 	}
 	
 	@Override

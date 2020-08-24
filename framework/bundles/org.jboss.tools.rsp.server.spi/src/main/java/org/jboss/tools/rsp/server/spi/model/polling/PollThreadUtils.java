@@ -8,6 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.spi.model.polling;
 
+import org.jboss.tools.rsp.api.DefaultServerAttributes;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller.SERVER_STATE;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
@@ -63,17 +64,23 @@ public class PollThreadUtils {
 	
 
 	public static PollThread pollServer(IServer server, SERVER_STATE expectedState, IServerStatePoller poller, IPollResultListener listener) {
-		return pollServer(server, expectedState, poller, listener, DEFAULT_TIMEOUT); 
+		return pollServer(DEFAULT_TIMEOUT, server, expectedState, poller, listener);
+	}
+
+	public static PollThread pollServer(int defaultTimeout, IServer server, SERVER_STATE expectedState, IServerStatePoller poller, IPollResultListener listener) {
+		String key = (expectedState == SERVER_STATE.UP ? DefaultServerAttributes.SERVER_TIMEOUT_STARTUP : DefaultServerAttributes.SERVER_TIMEOUT_SHUTDOWN);
+		int timeoutVal = server.getAttribute(key, defaultTimeout);
+		return pollServer(server, expectedState, poller, listener, timeoutVal); 
 	}
 
 	public static PollThread pollServer(IServer server, SERVER_STATE expectedState, IServerStatePoller poller,
-			IPollResultListener listener, int timeout) {
+			IPollResultListener listener, int actualTimeout) {
 		IServerDelegate del = server.getDelegate();
 		PollThread pollThread = getPollThread(del);
-		pollThread = pollServer(server, expectedState, poller, pollThread, listener, timeout);
+		pollThread = pollServer(server, expectedState, poller, pollThread, listener, actualTimeout);
 		return pollThread;
 	}
-
+	
 	/**
 	 * Stops the given PollThread and creates a new PollThread, that polls the given
 	 * IServer for the given SERVER_STATE using the given IServerStatePoller and
@@ -107,79 +114,4 @@ public class PollThreadUtils {
 		delegate.putSharedData(PROP_POLL_THREAD_KEY, poller);
 	}
 
-//
-//	/**
-//	 * The credential provider is alerted that credentials are needed. 
-//	 * The response may come at any time. 
-//	 * 
-//	 * @param requester
-//	 * @param requiredProps
-//	 */
-//	public static void requestCredentialsAsynch(final INeedCredentials requester, final List<String> requiredProps) {
-//		new Thread() {
-//			public void run() {
-//				requestCredentialsSynchronous(requester, requiredProps);
-//			}
-//		}.start();
-//	}
-//	
-//	/**
-//	 * The credential provider is alerted that credentials are needed. 
-//	 * The calling thread will block until this method is finished. 
-//	 * The requester will be told of its credentials by the provider.
-//	 * 
-//	 * @param requester
-//	 * @param requiredProps
-//	 * @return
-//	 */
-//
-//	public static void requestCredentialsSynchronous(final INeedCredentials requester, List<String> requiredProps) {
-//		IProvideCredentials provider = ExtensionManager.getDefault()
-//				.getFirstCredentialProvider(requester, requiredProps);
-//		provider.handle(requester, requiredProps);
-//	}
-//
-//
-//	/**
-//	 * The credential provider is alerted that credentials are needed. 
-//	 * The calling thread will block until this method is finished. 
-//	 * A dummy requester is created, which will receive the properties. 
-//	 * It will then return them to the caller directly. 
-//	 * 
-//	 * @param requester
-//	 * @param requiredProps
-//	 * @return Properties 
-//	 */
-//
-//	public static Properties requestCredentialsSynchronous(final IServerProvider server, List<String> requiredProps) {
-//		NeedCredentials requester = new NeedCredentials(server.getServer(), requiredProps);
-//		IProvideCredentials provider = ExtensionManager.getDefault()
-//				.getFirstCredentialProvider(requester, requiredProps);
-//		provider.handle(requester, requiredProps);
-//		return requester.getReturnedCredentials();
-//	}
-//	
-//	public static class NeedCredentials implements INeedCredentials {
-//		private IServer server;
-//		private List<String> requiredProps;
-//		private Properties returnedCredentials;
-//		public NeedCredentials(IServer server, List<String> requiredProps) {
-//			this.server = server;
-//			this.requiredProps = requiredProps;
-//		}
-//		public IServer getServer() {
-//			return server;
-//		}
-//		public List<String> getRequiredProperties() {
-//			return requiredProps;
-//		}
-//		public void provideCredentials(Properties credentials) {
-//			returnedCredentials = credentials;
-//		}
-//		public Properties getReturnedCredentials() {
-//			return returnedCredentials;
-//		}
-//	}
-
-	
 }
