@@ -11,6 +11,7 @@ package org.jboss.tools.rsp.server.generic.servertype;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
 import org.jboss.tools.rsp.api.dao.ServerActionRequest;
 import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
@@ -39,7 +40,8 @@ public class GenericServerActionSupport {
 			JSONMemento[] actionsToAdd = props.getChildren();
 			for (JSONMemento actionToAdd : actionsToAdd) {
 				ServerActionWorkflow wf1 = null;
-				if (actionToAdd.getNodeName().equals("showInBrowser")) {
+				if (actionToAdd.getNodeName().equals("showInBrowser") && 
+						behavior.getServerState().getState() == ServerManagementAPIConstants.STATE_STARTED) {
 					wf1 = new GenericServerShowInBrowserActionHandler(behavior).getInitialWorkflow();
 				}
 				if (actionToAdd.getNodeName().equals("editServerConfiguration")) {
