@@ -65,6 +65,9 @@ public class GenericServerBehavior extends AbstractServerDelegate
 								implements IStringSubstitutionProvider {
 	private static final Logger LOG = LoggerFactory.getLogger(GenericServerBehavior.class);
 	public static final String START_LAUNCH_SHARED_DATA = "GenericServerBehavior.startLaunch";
+	public static final boolean FLAG_MODE_START = true;
+	public static final boolean FLAG_MODE_STOP = false;
+	
 
 	private JSONMemento behaviorMemento;
 	private IPublishControllerWithOptions publishController;
@@ -163,11 +166,11 @@ public class GenericServerBehavior extends AbstractServerDelegate
 	protected IServerStartLauncher getStartLauncher() {
 		JSONMemento startupMemento = behaviorMemento.getChild("startup");
 		// TODO casting is dumb. Should be smarter than this
-		return (IServerStartLauncher)getLauncher(startupMemento);
+		return (IServerStartLauncher)getLauncher(startupMemento, FLAG_MODE_START);
 	}
 	protected IServerShutdownLauncher getStopLauncher() {
 		JSONMemento shutdownMemento = behaviorMemento.getChild("shutdown");
-		return getLauncher(shutdownMemento);
+		return getLauncher(shutdownMemento, FLAG_MODE_STOP);
 	}
 	public JSONMemento getActionsJSON() {
 		return behaviorMemento.getChild("actions");
@@ -245,18 +248,20 @@ public class GenericServerBehavior extends AbstractServerDelegate
 		return null;
 	}
 
-	protected IServerShutdownLauncher getLauncher(JSONMemento memento) {
+	protected IServerShutdownLauncher getLauncher(JSONMemento memento, boolean startup) {
 		String launchType = memento.getString("launchType");
 		if( "java-launch".equals(launchType)) {
-			return new GenericJavaLauncher(this, memento);
-		}
-		if( "terminateProcess".equals(launchType)) {
-			ILaunch startLaunch = getStartLaunch();
-			return new TerminateShutdownLauncher(this, startLaunch);
+			return new GenericJavaLauncher(this, memento, startup);
 		}
 		if( "noOp".equals(launchType)) {
 			return new NoOpLauncher(this);
 		}
+		
+		if( "terminateProcess".equals(launchType)) {
+			ILaunch startLaunch = getStartLaunch();
+			return new TerminateShutdownLauncher(this, startLaunch);
+		}
+
 		return null;
 	}
 

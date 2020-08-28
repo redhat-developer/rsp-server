@@ -22,17 +22,23 @@ import org.jboss.tools.rsp.server.generic.servertype.GenericServerBehavior;
 import org.jboss.tools.rsp.server.generic.servertype.GenericServerType;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
+import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
 public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 		implements IServerStartLauncher, IServerShutdownLauncher {
 
-
-	private JSONMemento startupMemento;
-
-	public GenericJavaLauncher(GenericServerBehavior serverDelegate, JSONMemento startupMemento) {
+	private JSONMemento memento;
+	private boolean flagMode;
+	public GenericJavaLauncher(GenericServerBehavior serverDelegate, JSONMemento memento) {
 		super(serverDelegate);
-		this.startupMemento = startupMemento;
+		this.memento = memento;
+	}
+
+	public GenericJavaLauncher(GenericServerBehavior serverDelegate, JSONMemento memento, boolean startup) {
+		super(serverDelegate);
+		this.memento = memento;
+		this.flagMode = startup;
 	}
 
 	/*
@@ -62,7 +68,7 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 	
 	@Override
 	protected String getWorkingDirectory() {
-		JSONMemento launchProperties = startupMemento.getChild("launchProperties");
+		JSONMemento launchProperties = memento.getChild("launchProperties");
 		if (launchProperties != null) {
 			String wd = launchProperties.getString("workingDirectory");
 			if( wd == null ) {
@@ -90,7 +96,7 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 
 	@Override
 	protected String getMainTypeName() {
-		JSONMemento launchProperties = startupMemento.getChild("launchProperties");
+		JSONMemento launchProperties = memento.getChild("launchProperties");
 		if (launchProperties != null) {
 			String main = launchProperties.getString("mainType");
 			if( main != null ) {
@@ -107,13 +113,13 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 	@Override
 	protected String getVMArguments() {
 		String def = getDefaultVMArguments();
-		if(getServer().getAttribute(GenericServerType.LAUNCH_OVERRIDE_BOOLEAN, false)) {
-			return getServer().getAttribute(GenericServerType.JAVA_LAUNCH_OVERRIDE_VM_ARGS, def);
+		if(shouldOverrideArgs(getServer())) {
+			return getOverrideVMArgs(getServer(), def);
 		}
 		return def;
 	}
 	protected String getDefaultVMArguments() {
-		JSONMemento launchProperties = startupMemento.getChild("launchProperties");
+		JSONMemento launchProperties = memento.getChild("launchProperties");
 		if (launchProperties != null) {
 			String vmArgs = launchProperties.getString("vmArgs");
 			if( vmArgs != null ) {
@@ -130,14 +136,34 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 	@Override
 	protected String getProgramArguments() {
 		String def = getDefaultProgramArguments();
-		if(getServer().getAttribute(GenericServerType.LAUNCH_OVERRIDE_BOOLEAN, false)) {
-			return getServer().getAttribute(GenericServerType.LAUNCH_OVERRIDE_PROGRAM_ARGS, def);
+		if(shouldOverrideArgs(getServer())) {
+			return getOverrideArgs(getServer(), def);
 		}
 		return def;
 	}
 	
+	protected String getOverrideArgs(IServer server, String def) {
+		if( flagMode == GenericServerBehavior.FLAG_MODE_START ) {
+			return getServer().getAttribute(GenericServerType.LAUNCH_OVERRIDE_PROGRAM_ARGS, def);
+		}
+		// TODO allow users to override shutdown args 
+		return def;
+	}
+
+	protected String getOverrideVMArgs(IServer server, String def) {
+		if( flagMode == GenericServerBehavior.FLAG_MODE_START ) {
+			return getServer().getAttribute(GenericServerType.JAVA_LAUNCH_OVERRIDE_VM_ARGS, def);
+		}
+		// TODO allow users to override shutdown vm args 
+		return def;
+	}
+
+	protected boolean shouldOverrideArgs(IServer server) {
+		return getServer().getAttribute(GenericServerType.LAUNCH_OVERRIDE_BOOLEAN, false);
+	}
+	
 	protected String getDefaultProgramArguments() {
-		JSONMemento launchProperties = startupMemento.getChild("launchProperties");
+		JSONMemento launchProperties = memento.getChild("launchProperties");
 		if (launchProperties != null) {
 			String programArgs = launchProperties.getString("programArgs");
 			if( programArgs != null ) {
@@ -155,7 +181,7 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 	protected String[] getClasspath() {
 		String serverHome = getDelegate().getServer().getAttribute(DefaultServerAttributes.SERVER_HOME_DIR,
 				(String) null);
-		JSONMemento launchProperties = startupMemento.getChild("launchProperties");
+		JSONMemento launchProperties = memento.getChild("launchProperties");
 		if (launchProperties != null) {
 			String cpFromJson = launchProperties.getString("classpath");
 			if (cpFromJson != null && !cpFromJson.isEmpty()) {
