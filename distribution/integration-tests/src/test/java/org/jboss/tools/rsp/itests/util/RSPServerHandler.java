@@ -120,15 +120,19 @@ public class RSPServerHandler {
             if (backup) {
                 dataFolder.renameTo(new File(DATA_BACKUP));
             } else {
-                Files.walk(dataFolder.toPath())
-                    .sorted(Comparator.reverseOrder())
-                    .map(Path::toFile)
-                    .forEach(f -> safeDelete(f));
-                dataFolder.delete();
+            	deleteDirectory(dataFolder);
             }
         }
     }
-    
+    private static boolean deleteDirectory(File directoryToBeDeleted) {
+	    File[] allContents = directoryToBeDeleted.listFiles();
+	    if (allContents != null) {
+	        for (File file : allContents) {
+	            deleteDirectory(file);
+	        }
+	    }
+	    return directoryToBeDeleted.delete();
+	}
     private static void safeDelete(File f) {
     	if( f.exists())
     		f.delete();
