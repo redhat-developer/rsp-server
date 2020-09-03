@@ -15,11 +15,11 @@
 
 	<properties>
 		<skipITests>true</skipITests>
-        <server.id>install-wildfly-20.0.1.Final</server.id>
-        <server.url>https://download.jboss.org/wildfly/20.0.1.Final/wildfly-20.0.1.Final.zip</server.url>
-        <server.sha1>bcaba55cb2dac92264baff94b111b7ad31363bd4</server.sha1>
-        <server.type.id>org.jboss.ide.eclipse.as.wildfly.200</server.type.id>
-        <server.version>20.0.1.Final</server.version>
+	        <server.id>install-wildfly-20.0.1.Final</server.id>
+	        <server.url>https://download.jboss.org/wildfly/20.0.1.Final/wildfly-20.0.1.Final.zip</server.url>
+	        <server.sha1>bcaba55cb2dac92264baff94b111b7ad31363bd4</server.sha1>
+	        <server.type.id>org.jboss.ide.eclipse.as.wildfly.200</server.type.id>
+	        <server.version>20.0.1.Final</server.version>
 		<server.path>${project.build.directory}/wildfly-${server.version}</server.path>
 		<!-- Sonar report property for code coverage -->
 		<sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>

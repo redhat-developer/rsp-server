@@ -8,6 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.itests.wildfly;
 
+import static org.jboss.tools.rsp.itests.util.ServerStateUtil.waitForServerState;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -18,12 +19,17 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
 import org.jboss.tools.rsp.api.dao.ServerActionRequest;
 import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
+import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
+import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.rsp.api.dao.ServerType;
+import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.Status;
+import org.jboss.tools.rsp.api.dao.StopServerAttributes;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
 import org.jboss.tools.rsp.itests.RSPCase;
@@ -68,13 +74,35 @@ public class WildflyServerActionsTest extends RSPCase {
 	public void testListServerActions() throws Exception {
 		ListServerActionResponse response = serverProxy.listServerActions(handle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.OK, response.getStatus().getSeverity());
-		assertEquals(2, response.getWorkflows().size());
+		assertEquals(1, response.getWorkflows().size());
 		ServerActionWorkflow workflow = response.getWorkflows().get(0);
+		assertEquals(EDITCONFIG_ACTION_ID, workflow.getActionId());
+		assertEquals(EDITCONFIG_ACTION_LABEL, workflow.getActionLabel());
+	}
+
+	@Test
+	public void testListServerActionsStarted() throws Exception {
+        LaunchParameters params = new LaunchParameters(
+                new ServerAttributes(wildflyType.getId(), SERVER_ID, new HashMap<>()), MODE_RUN);
+        StartServerResponse response = serverProxy.startServerAsync(params).get(SERVER_OPERATION_TIMEOUT, TimeUnit.MILLISECONDS);
+        assertEquals(0, response.getStatus().getSeverity());
+        assertEquals(STATUS_MESSAGE_OK, response.getStatus().getMessage());
+        waitForServerState(ServerManagementAPIConstants.STATE_STARTED, 10, client);
+        
+		ListServerActionResponse actionResponse = serverProxy.listServerActions(handle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
+		assertEquals(Status.OK, actionResponse.getStatus().getSeverity());
+		
+		assertEquals(2, actionResponse.getWorkflows().size());
+		ServerActionWorkflow workflow = actionResponse.getWorkflows().get(0);
+		
 		assertEquals(SHOWIN_ACTION_ID, workflow.getActionId());
 		assertEquals(SHOWIN_ACTION_LABEL, workflow.getActionLabel());
-		ServerActionWorkflow workflow2 = response.getWorkflows().get(1);
+		ServerActionWorkflow workflow2 = actionResponse.getWorkflows().get(1);
 		assertEquals(EDITCONFIG_ACTION_ID, workflow2.getActionId());
 		assertEquals(EDITCONFIG_ACTION_LABEL, workflow2.getActionLabel());
+
+        serverProxy.stopServerAsync(new StopServerAttributes(SERVER_ID, true)).get();
+        waitForServerState(ServerManagementAPIConstants.STATE_STOPPED, 10, client);
 	}
 
 	@Test
