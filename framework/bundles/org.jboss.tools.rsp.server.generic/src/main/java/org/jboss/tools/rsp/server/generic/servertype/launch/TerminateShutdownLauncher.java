@@ -8,12 +8,16 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.generic.servertype.launch;
 
+import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.ServerHandle;
+import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.debug.core.DebugException;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.rsp.server.generic.servertype.GenericServerBehavior;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
+import org.jboss.tools.rsp.server.spi.model.ServerModelListenerAdapter;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
@@ -29,8 +33,22 @@ public class TerminateShutdownLauncher implements IServerShutdownLauncher {
 
 	@Override
 	public ILaunch launch(boolean force) throws CoreException {
+		final Boolean[] stopped = new Boolean[1];
+		stopped[0] = false;
+		ServerModelListenerAdapter listener = new ServerModelListenerAdapter() {
+			@Override
+			public void serverStateChanged(ServerHandle server, ServerState state) {
+				if(genericServerBehavior.getServerHandle().equals(server) && state.getState() == ServerManagementAPIConstants.STATE_STOPPED) {
+					stopped[0] = true;
+				}
+			}
+		};
+		genericServerBehavior.getServer().getServerModel().addServerModelListener(listener);
 		terminateAllProcesses(startLaunch);
-		if( allProcessesTerminated(startLaunch)) {
+		genericServerBehavior.getServer().getServerModel().removeServerModelListener(listener);
+		if( stopped[0]) {
+			// do nothing 
+		} else if( allProcessesTerminated(startLaunch)) {
 			genericServerBehavior.setServerState(IServerDelegate.STATE_STOPPED);
 		} else {
 			genericServerBehavior.setServerState(IServerDelegate.STATE_STARTED);
