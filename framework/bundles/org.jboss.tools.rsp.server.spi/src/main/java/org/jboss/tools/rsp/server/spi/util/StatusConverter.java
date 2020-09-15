@@ -35,19 +35,23 @@ public class StatusConverter {
 		String msg = status.getMessage();
 		Throwable t = status.getException();
 		String trace = getTrace(t);
-		fullMessage.append(trace);
+		if( trace != null )
+			fullMessage.append(trace);
 		
 		if( status instanceof MultiStatus ) {
 			IStatus[] kids = ((MultiStatus)status).getChildren();
 			if( kids != null ) {
 				for( int i = 0; i < kids.length; i++ ) {
-					String msg2 = status.getMessage();
-					Throwable t2 = status.getException();
+					String msg2 = kids[i].getMessage();
+					Throwable t2 = kids[i].getException();
 					String trace2 = getTrace(t2);
 					fullMessage.append("\n\n");
-					fullMessage.append(msg2);
-					fullMessage.append("\n");
-					fullMessage.append(trace2);
+					if( msg2 != null ) {
+						fullMessage.append(msg2);
+						fullMessage.append("\n");
+					}
+					if( trace2 != null )
+						fullMessage.append(trace2);
 				}
 			}
 		}
