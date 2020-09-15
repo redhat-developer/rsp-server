@@ -11,6 +11,7 @@ package org.jboss.tools.rsp.server.generic.servertype;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.server.LauncherSingleton;
+import org.jboss.tools.rsp.server.generic.discovery.GenericVMRegistryDiscovery;
 import org.jboss.tools.rsp.server.generic.servertype.variables.ServerStringVariableManager.IExternalVariableResolver;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 
@@ -31,19 +32,14 @@ public class DefaultExternalVariableResolver implements IExternalVariableResolve
 	@Override
 	public String getNonServerKeyValue(String key) {
 		if( "java.home".equals(key)) {
-			IVMInstall vmi = getVMInstall(getGenericServerBehavior());
-			if( vmi != null ) {
-				return vmi.getInstallLocation().getAbsolutePath();
-			}
+			IVMInstall vm1 = new GenericVMRegistryDiscovery().findVMInstall(getGenericServerBehavior());
+			return vm1 == null ? null : vm1.getInstallLocation().getAbsolutePath();
 		}
 		return null;
 	}
 
 	protected IVMInstall getVMInstall(IServerDelegate delegate) {
-		IVMInstallRegistry reg = getDefaultRegistry();
-		if( reg != null )
-			return reg.getDefaultVMInstall();
-		return null;
+		return new GenericVMRegistryDiscovery().findVMInstall(delegate);
 	}
 
 	protected IVMInstallRegistry getDefaultRegistry() {
