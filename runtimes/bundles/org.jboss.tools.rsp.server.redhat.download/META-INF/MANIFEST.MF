@@ -4,7 +4,7 @@ Bundle-Name: org.jboss.tools.rsp.server.redhat.download
 Bundle-SymbolicName: org.jboss.tools.rsp.server.redhat.download
 Bundle-Activator: org.jboss.tools.rsp.server.redhat.download.impl.Activator
 Automatic-Module-Name: org.jboss.tools.rsp.server.redhat.download
-Bundle-Version: 0.23.7.Final
+Bundle-Version: 0.23.8.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: org.eclipse.lsp4j.jsonrpc,
  org.eclipse.lsp4j.jsonrpc.json,
