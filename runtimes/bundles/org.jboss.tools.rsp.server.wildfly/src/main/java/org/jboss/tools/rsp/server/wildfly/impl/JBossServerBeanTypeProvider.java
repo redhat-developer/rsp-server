@@ -137,6 +137,13 @@ public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider, IJB
 			ID_WILDFLY_WEB, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
 			true, "20.", IServerConstants.SERVER_WILDFLY_200);
 
+	public static final ServerBeanTypeWildfly19 WILDFLY210 = new ServerBeanTypeWildfly19(
+			ID_WILDFLY, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			false, "21.", IServerConstants.SERVER_WILDFLY_210);
+	public static final ServerBeanTypeWildfly19 WILDFLY210_WEB = new ServerBeanTypeWildfly19(
+			ID_WILDFLY_WEB, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			true, "21.", IServerConstants.SERVER_WILDFLY_210);
+
 
 	public static final ServerBeanType EAP70 = new ServerBeanTypeEAP70();
 	public static final ServerBeanType EAP71 = new ServerBeanTypeEAP71();
@@ -182,6 +189,7 @@ public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider, IJB
 		WILDFLY180, WILDFLY180_WEB,
 		WILDFLY190, WILDFLY190_WEB,
 		WILDFLY200, WILDFLY200_WEB,
+		WILDFLY210, WILDFLY210_WEB,
 		WILDFLY80, 
 		FSW6, EAP61, SOA6, JPP61,  DV6, 
 		UNKNOWN_AS72_PRODUCT,
