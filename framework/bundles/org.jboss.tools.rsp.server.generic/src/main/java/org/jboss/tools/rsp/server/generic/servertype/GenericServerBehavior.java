@@ -430,9 +430,14 @@ public class GenericServerBehavior extends AbstractServerDelegate
 			setServerState(IServerDelegate.STATE_STARTED);
 		}
 	}
-	
+
 	@Override
-	protected void setServerState(int state, boolean fire) {
+	public void setServerState(int state) {
+		super.setServerState(state);
+	}
+
+	@Override
+	public void setServerState(int state, boolean fire) {
 		if( state == ServerManagementAPIConstants.STATE_STARTED) {
 			pollDeploymentsForState(ServerManagementAPIConstants.STATE_STARTED);
 		} else if( state == ServerManagementAPIConstants.STATE_STOPPED) {
