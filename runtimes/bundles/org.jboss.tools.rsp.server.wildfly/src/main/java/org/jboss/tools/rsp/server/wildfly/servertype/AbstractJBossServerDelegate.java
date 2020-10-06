@@ -348,7 +348,9 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		setDeployablePublishState(reference, syncState);
 		
 		// TODO launch a module poller?!
-		setDeployableState(reference, ServerManagementAPIConstants.STATE_STARTED);
+		boolean serverStarted = getServerState().getState() == ServerManagementAPIConstants.STATE_STARTED;
+		int deployState = (serverStarted ? ServerManagementAPIConstants.STATE_STARTED : ServerManagementAPIConstants.STATE_STOPPED);
+		setDeployableState(reference, deployState);
 	}
 
 	@Override
@@ -484,6 +486,24 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 
 	private IStatus verifyDeploymentChanges(IServer dummyServer, IServer server) {
 		return Status.OK_STATUS;
+	}
+
+	protected void setServerState(int state) {
+		if( state == ServerManagementAPIConstants.STATE_STARTED) {
+			pollDeploymentsForState(ServerManagementAPIConstants.STATE_STARTED);
+		} else if( state == ServerManagementAPIConstants.STATE_STOPPED) {
+			pollDeploymentsForState(ServerManagementAPIConstants.STATE_STOPPED);
+		}
+		super.setServerState(state, true);
+	}
+
+	
+	protected void pollDeploymentsForState(int state) {
+		// For now, don't poll. Just set all to started. 
+		List<DeployableState> dss = getServerState().getDeployableStates();
+		for( DeployableState ds : dss ) {
+			setDeployableState(ds.getReference(), state);
+		}
 	}
 
 	private boolean isEqual(String one, String two) {
