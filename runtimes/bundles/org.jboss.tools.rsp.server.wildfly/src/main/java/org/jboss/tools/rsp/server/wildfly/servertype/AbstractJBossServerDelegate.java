@@ -261,17 +261,21 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	
 	@Override
 	protected void setServerState(int state, boolean fire) {
-		if( state == IServerDelegate.STATE_STOPPED ) {
-			markAllDeploymentsStopped();
+		if( state == ServerManagementAPIConstants.STATE_STARTED) {
+			pollDeploymentsForState(ServerManagementAPIConstants.STATE_STARTED);
+		} else if( state == ServerManagementAPIConstants.STATE_STOPPED) {
+			pollDeploymentsForState(ServerManagementAPIConstants.STATE_STOPPED);
 		}
 		super.setServerState(state, fire);
 	}
-
-	protected void markAllDeploymentsStopped() {
-		for( DeployableState ds : getServerPublishModel().getDeployableStates()) {
-			getServerPublishModel().setDeployableState(ds.getReference(), IServerDelegate.STATE_STOPPED);
+	
+	protected void pollDeploymentsForState(int state) {
+		// For now, don't poll. Just set all to started. 
+		for( DeployableState ds : getServerPublishModel().getDeployableStates() ) {
+			getServerPublishModel().setDeployableState(ds.getReference(), state);
 		}
 	}
+	
 	protected ILaunch getStartLaunch() {
 		return (ILaunch)getSharedData(START_LAUNCH_SHARED_DATA);
 	}
@@ -486,24 +490,6 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 
 	private IStatus verifyDeploymentChanges(IServer dummyServer, IServer server) {
 		return Status.OK_STATUS;
-	}
-
-	protected void setServerState(int state) {
-		if( state == ServerManagementAPIConstants.STATE_STARTED) {
-			pollDeploymentsForState(ServerManagementAPIConstants.STATE_STARTED);
-		} else if( state == ServerManagementAPIConstants.STATE_STOPPED) {
-			pollDeploymentsForState(ServerManagementAPIConstants.STATE_STOPPED);
-		}
-		super.setServerState(state, true);
-	}
-
-	
-	protected void pollDeploymentsForState(int state) {
-		// For now, don't poll. Just set all to started. 
-		List<DeployableState> dss = getServerState().getDeployableStates();
-		for( DeployableState ds : dss ) {
-			setDeployableState(ds.getReference(), state);
-		}
 	}
 
 	private boolean isEqual(String one, String two) {
