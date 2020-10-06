@@ -11,6 +11,7 @@ package org.jboss.tools.rsp.server.generic.servertype;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -396,7 +397,10 @@ public class GenericServerBehavior extends AbstractServerDelegate
 		setDeployablePublishState(reference, syncState);
 		
 		// TODO launch a module poller?!
-		setDeployableState(reference, ServerManagementAPIConstants.STATE_STARTED);
+		boolean serverStarted = getServerState().getState() == ServerManagementAPIConstants.STATE_STARTED;
+		int deployState = (serverStarted ? ServerManagementAPIConstants.
+				STATE_STARTED : ServerManagementAPIConstants.STATE_STOPPED);
+		setDeployableState(reference, deployState);
 	}
 
 	@Override
@@ -426,13 +430,22 @@ public class GenericServerBehavior extends AbstractServerDelegate
 			setServerState(IServerDelegate.STATE_STARTED);
 		}
 	}
-
-	public void setServerState(int state) {
-		super.setServerState(state);
-	}
-
-	public void setServerState(int state, boolean fire) {
+	
+	@Override
+	protected void setServerState(int state, boolean fire) {
+		if( state == ServerManagementAPIConstants.STATE_STARTED) {
+			pollDeploymentsForState(ServerManagementAPIConstants.STATE_STARTED);
+		} else if( state == ServerManagementAPIConstants.STATE_STOPPED) {
+			pollDeploymentsForState(ServerManagementAPIConstants.STATE_STOPPED);
+		}
 		super.setServerState(state, fire);
+	}
+	
+	protected void pollDeploymentsForState(int state) {
+		// For now, don't poll. Just set all to started. 
+		for( DeployableState ds : getServerPublishModel().getDeployableStates() ) {
+			getServerPublishModel().setDeployableState(ds.getReference(), state);
+		}
 	}
 	
 	public String getPollURL(IServer server) {
