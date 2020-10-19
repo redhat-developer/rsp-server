@@ -172,6 +172,10 @@ pipeline {
                 for (i = 0; i < filesToPush.length; i++) {
                     sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${filesToPush[i].path} ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/${upload_dir}/rsp-server/"
                 }
+
+		sh "echo org.jboss.tools.rsp.distribution.latest.version=${distroVersion} > LATEST"
+		sh "echo org.jboss.tools.rsp.distribution.latest.url=https://download.jboss.org/jbosstools/adapters/${upload_dir}/rsp-server/org.jboss.tools.rsp.distribution-${distroVersion}.zip >> LATEST"
+		sh "rsync -Pzrlt --rsh=ssh --protocol=28 LATEST ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/${upload_dir}/rsp-server/"
             }
         }
     }
