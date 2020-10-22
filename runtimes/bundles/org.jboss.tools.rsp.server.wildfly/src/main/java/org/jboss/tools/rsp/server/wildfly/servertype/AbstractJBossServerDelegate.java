@@ -12,6 +12,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
@@ -44,7 +45,6 @@ import org.jboss.tools.rsp.server.spi.model.polling.WebPortPoller;
 import org.jboss.tools.rsp.server.spi.publishing.IPublishController;
 import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
-import org.jboss.tools.rsp.server.spi.servertype.IServerAttributes;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerWorkingCopy;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
@@ -409,24 +409,27 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		List<DeployableState> existing = getServerPublishModel().getDeployableStates();
 		List<DeployableState> updated = dummyServer.getDelegate().getServerPublishModel().getDeployableStates();
 		
-		for( DeployableState ds : existing ) {
-			getServerPublishModel().fillOptionsFromCache(ds.getReference());
+		List<DeployableReference> existingRefs = existing.stream().map(s -> s.getReference()).collect(Collectors.toList());
+		List<DeployableReference> updatedRefs = updated.stream().map(s -> s.getReference()).collect(Collectors.toList());
+		
+		for( DeployableReference ds : existingRefs ) {
+			getServerPublishModel().fillOptionsFromCache(ds);
 		}
 
-		for( DeployableState ds : updated ) {
-			dummyServer.getDelegate().getServerPublishModel().fillOptionsFromCache(ds.getReference());
+		for( DeployableReference ds : updatedRefs ) {
+			dummyServer.getDelegate().getServerPublishModel().fillOptionsFromCache(ds);
 		}
 
 		// Calculate the delta on modules?
 		List<DeployableReference> unchanged = new ArrayList<>();
 		List<DeployableReference> removed = new ArrayList<>();
-		for( DeployableState ds : existing ) {
-			DeployableState matching = findExactMatch(ds.getReference(), updated);
+		for( DeployableReference ds : existingRefs ) {
+			DeployableState matching = findExactMatch(ds, updated);
 			if( matching == null ) {
-				removed.add(ds.getReference());
+				removed.add(ds);
 			} else {
-				unchanged.add(ds.getReference());
-				updated.remove(ds);
+				unchanged.add(ds);
+				updatedRefs.remove(ds);
 			}
 		}
 
@@ -435,8 +438,8 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 			ret.add(getServerPublishModel().removeDeployable(removed1));
 		}
 		// Whatever is left is 'added'
-		for( DeployableState ds : updated ) {
-			ret.add(getServerPublishModel().addDeployable(ds.getReference()));
+		for( DeployableReference ds : updatedRefs ) {
+			ret.add(getServerPublishModel().addDeployable(ds));
 		}
 	}
 
