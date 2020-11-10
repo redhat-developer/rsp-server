@@ -25,4 +25,4 @@ jobs:
         java-package: jdk # (jre, jdk, or jdk+fx) - defaults to jdk
         architecture: x64
     - name: Build & Verify using Maven
-    - run: mvn clean verify -Pintegration-tests -U -fae -e -B
+      run: mvn clean verify -Pintegration-tests -U -fae -e -B
