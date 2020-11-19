@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.RSPServer;
+import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.SocketLauncher;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
@@ -265,6 +266,14 @@ public class ServerManagementServerImpl implements RSPServer {
 		
 		IServer server = managementModel.getServerModel().getServer(handle.getId());
 		boolean b = managementModel.getServerModel().removeServer(server);
+		if( server.getDelegate().getServerRunState() != ServerManagementAPIConstants.STATE_STOPPED) {
+			new Thread("Stopping server: " + server.getName()) {
+				public void run() {
+					IServerDelegate del = server.getDelegate();
+					del.stop(false);
+				}
+			}.start();
+		}
 		return booleanToStatus(b, "Server not removed: " + handle.getId());
 	}
 
