@@ -34,6 +34,7 @@ import org.jboss.tools.rsp.foundation.core.launchers.GenericProcessRunner;
 import org.jboss.tools.rsp.foundation.core.tasks.TaskModel;
 import org.jboss.tools.rsp.launching.utils.NativeEnvironmentUtils;
 import org.jboss.tools.rsp.launching.utils.OSUtils;
+import org.jboss.tools.rsp.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.rsp.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimeWorkflowConstants;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesModel;
@@ -73,9 +74,10 @@ public class JavaJarRuntimeInstaller implements IRuntimeInstaller {
 					getDownloadUrl(downloadRuntime, taskModel), deleteOnExit, user, pass, new SubProgressMonitor(monitor, 80));
 						
 			ILaunch launch = createExternalToolsLaunchConfiguration(f, unzipDirectory);
-//			if (launch == null) {
-//				return new Status(IStatus.ERROR, RuntimeCoreActivator.PLUGIN_ID, "Unable to launch external command java -jar " + f.getAbsolutePath());
-//			}
+			if (launch == null) {
+				return new Status(IStatus.ERROR, RuntimeCoreActivator.PLUGIN_ID, "Unable to launch external command java -jar " + f.getAbsolutePath());
+			}
+			
 			IProcess[] processes = launch.getProcesses();
 			boolean finished = false;
 			while(!monitor.isCanceled() && !finished) {
@@ -116,15 +118,14 @@ public class JavaJarRuntimeInstaller implements IRuntimeInstaller {
 	
 	static final String JAVA_HOME_PROPERTY_KEY = "java.home";
 	private ILaunch createExternalToolsLaunchConfiguration(File downloadedFile, 
-			String unzipDirectory) {
+			String unzipDirectory) throws CoreException {
 		
 		IVMInstall install = createVMRegistry().getDefaultVMInstall();
 		IPath javaBin = getJavaBin(install);
-		IPath workingDir = new Path(downloadedFile.getAbsolutePath());
+		IPath workingDir = new Path(downloadedFile.getParentFile().getAbsolutePath());
 		JavaJarInstallationLauncher launcher = new JavaJarInstallationLauncher(javaBin, workingDir, 
 				new Path(downloadedFile.getAbsolutePath()), new Path(unzipDirectory));
-		ILaunch l2 = launcher.createLaunch("run");
-		return l2;
+		return launcher.launch("run");
 	}
 	
 	private IVMInstallRegistry createVMRegistry() {
