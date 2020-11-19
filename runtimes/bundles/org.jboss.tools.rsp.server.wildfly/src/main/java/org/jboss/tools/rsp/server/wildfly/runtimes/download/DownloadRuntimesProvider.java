@@ -91,11 +91,6 @@ public class DownloadRuntimesProvider extends AbstractStacksDownloadRuntimesProv
 		if( dlrt == null || !dlrt.equals(dr))
 			return null;
 		
-		String installer = (dr.getInstallationMethod() == null ? 
-				IRuntimeInstaller.EXTRACT_INSTALLER : dr.getInstallationMethod());
-		if( !IRuntimeInstaller.EXTRACT_INSTALLER.equals(installer))
-				return null;  // we can't handle binary or installer-jar at this time
-		
 		String prop = dr.getProperty(DownloadRuntime.PROPERTY_REQUIRES_CREDENTIALS);
 		if( prop != null && "true".equalsIgnoreCase(prop))
 			// // Requires credentials is handled by another executor
