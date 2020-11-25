@@ -7,6 +7,7 @@
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
 package org.jboss.tools.rsp.internal.launching.java.util;
+import javax.xml.XMLConstants;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -82,7 +83,7 @@ public class LaunchingSupportUtils {
 	private static DocumentBuilder getParser() throws CoreException {
 		if (fgXMLParser == null) {
 			try {
-				fgXMLParser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+				fgXMLParser = createDocumentBuilderFactory().newDocumentBuilder();
 				fgXMLParser.setErrorHandler(new DefaultHandler());
 			} catch (ParserConfigurationException e) {
 				abort(LaunchingPlugin_34, e);
@@ -347,5 +348,12 @@ public class LaunchingSupportUtils {
 	protected static void abort(String message, Throwable exception, int code) throws CoreException {
 		throw new CoreException(new Status(IStatus.ERROR, IVMInstallChangedListener.LAUNCHING_ID_PLUGIN,
 				code, message, exception));
+	}
+
+	private static DocumentBuilderFactory createDocumentBuilderFactory() {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+		return factory;
 	}
 }
