@@ -89,7 +89,7 @@ public final class XMLMemento implements IMemento {
 		
 		Document document = null;
 		try {	
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilderFactory factory = createDocumentBuilderFactory();
 			DocumentBuilder parser = factory.newDocumentBuilder();
 			document = parser.parse(new InputSource(in));
 			Node node = document.getFirstChild();
@@ -126,7 +126,7 @@ public final class XMLMemento implements IMemento {
 	public static XMLMemento createWriteRoot(String type) {
 		Document document;
 		try {
-			document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+			document = createDocumentBuilderFactory().newDocumentBuilder().newDocument();
 			Element element = document.createElement(type);
 			document.appendChild(element);
 			return new XMLMemento(document, element);
@@ -348,7 +348,7 @@ public final class XMLMemento implements IMemento {
 		Result result = new StreamResult(os);
 		Source source = new DOMSource(factory);
 		try {
-			TransformerFactory factory = TransformerFactory.newInstance();
+			TransformerFactory factory = createTransformerFactory();
 			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 			Transformer transformer = factory.newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
@@ -435,5 +435,19 @@ public final class XMLMemento implements IMemento {
 			return textNode.getData();
 		}
 		return ""; //$NON-NLS-1$
+	}
+
+	private static DocumentBuilderFactory createDocumentBuilderFactory() {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+		return factory;
+	}
+
+	private static TransformerFactory createTransformerFactory() {
+		TransformerFactory factory = TransformerFactory.newInstance();
+		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+		return factory;
 	}
 }
