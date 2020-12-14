@@ -41,9 +41,12 @@ public class MinishiftStatusPoller extends AbstractPoller implements IServerStat
 	private String[] callMinishiftStatus(IServer server) throws CommandTimeoutException, IOException {
 		List<String> args1 = new ArrayList<>();
 		args1.add("status");
-		String profile = MinishiftPropertyUtility.getMinishiftProfile(server);
-		args1.add("--profile");
-		args1.add(profile);
+
+		if( MinishiftStartLauncher.supportsProfiles(server) ) {
+			String profile = MinishiftPropertyUtility.getMinishiftProfile(server);
+			args1.add("--profile");
+			args1.add(profile);
+		}
 		
 		String[] args = (String[]) args1.toArray(new String[args1.size()]);
 		String cmd = getMinishiftCommand(server);

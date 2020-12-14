@@ -26,8 +26,11 @@ public class MinishiftStopLauncher extends AbstractLauncher implements IServerSh
 	}
 
 	public String getProgramArguments() {
-		String profile = MinishiftPropertyUtility.getMinishiftProfile(getServer());
-		String profileFlags = " --profile " + profile;
-		return "stop " + profileFlags;
+		if( MinishiftStartLauncher.supportsProfiles(getServer()) ) {
+			String profile = MinishiftPropertyUtility.getMinishiftProfile(getServer());
+			String profileFlags = " --profile " + profile;
+			return "stop " + profileFlags;
+		}
+		return "stop";
 	}
 }

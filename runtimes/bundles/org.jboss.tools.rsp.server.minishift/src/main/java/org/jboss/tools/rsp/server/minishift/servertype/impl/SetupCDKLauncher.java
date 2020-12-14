@@ -35,7 +35,7 @@ public class SetupCDKLauncher extends AbstractLauncher {
 	}
 	
 	protected boolean supportsProfiles(IServer server) {
-		return true;
+		return MinishiftStartLauncher.supportsProfiles(server);
 	}
 	
 	protected String getCDKCredentialArguments() {
