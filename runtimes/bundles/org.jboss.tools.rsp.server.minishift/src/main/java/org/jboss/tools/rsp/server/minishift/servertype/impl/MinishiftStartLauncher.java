@@ -43,8 +43,11 @@ public class MinishiftStartLauncher extends AbstractLauncher {
 		return append == null ? "" : append;
 	}
 	
-	protected boolean supportsProfiles(IServer server) {
+	public static boolean supportsProfiles(IServer server) {
 		// TODO some earlier versions don't support profiles
+		String typeId = server.getServerType().getId();
+		if( MinishiftServerTypes.CRC_1X_ID.equals(typeId)) 
+			return false;
 		return true; 
 	}
 	
