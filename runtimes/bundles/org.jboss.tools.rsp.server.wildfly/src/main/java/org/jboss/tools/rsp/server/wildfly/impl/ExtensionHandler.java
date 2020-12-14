@@ -27,6 +27,7 @@ public class ExtensionHandler {
 
 	private static final IServerType[] TYPES = {
 			// NEW_SERVER_ADAPTER
+			WildFlyServerTypes.WF22_SERVER_TYPE,
 			WildFlyServerTypes.WF21_SERVER_TYPE,
 			WildFlyServerTypes.WF20_SERVER_TYPE,
 			WildFlyServerTypes.WF19_SERVER_TYPE,

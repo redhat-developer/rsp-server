@@ -24,6 +24,7 @@ import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.WildFlyExtende
 import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.WildFlyExtendedProperties.Wildfly190ExtendedProperties;
 import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.WildFlyExtendedProperties.Wildfly200ExtendedProperties;
 import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.WildFlyExtendedProperties.Wildfly210ExtendedProperties;
+import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.WildFlyExtendedProperties.Wildfly220ExtendedProperties;
 import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.WildFlyExtendedProperties.Wildfly80ExtendedProperties;
 import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.WildFlyExtendedProperties.Wildfly90ExtendedProperties;
 
@@ -89,6 +90,8 @@ public class ExtendedServerPropertiesAdapterFactory implements IServerConstants 
 			return new Wildfly200ExtendedProperties(s);
 		case SERVER_WILDFLY_210:
 			return new Wildfly210ExtendedProperties(s);
+		case SERVER_WILDFLY_220:
+			return new Wildfly220ExtendedProperties(s);
 		// NEW_SERVER_ADAPTER
 		default:
 			return null;
