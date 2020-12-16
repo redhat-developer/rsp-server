@@ -253,7 +253,8 @@ public class WildflyEditServerTest extends RSPCase {
 		request.setHandle(handle);
 		response = serverProxy.updateServer(request).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.ERROR, response.getValidation().getStatus().getSeverity());
-		assertEquals("Update Failed: null", response.getValidation().getStatus().getMessage());
+		String msg = response.getValidation().getStatus().getMessage();
+		assertTrue(msg.startsWith("Update Failed: Server type not found:"));
 
 		// send invalid json, values, etc. mainly for server.home.dir
 		request.setServerJson(parseJsonAndAddObject(formerString, SERVER_CONFIG_HOME, System.getProperty("user.dir") + File.pathSeparator + "randomDir123"));
