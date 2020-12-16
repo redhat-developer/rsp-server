@@ -13,6 +13,7 @@ package org.jboss.tools.rsp.server.spi.runtimes;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -240,6 +241,7 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 		item1a.setId(ServerManagementAPIConstants.WORKFLOW_LICENSE_URL_ID);
 		item1a.setLabel("License URL: ");
 		item1a.setContent(dlrt.getLicenseURL());
+		item1a.setProperties(new HashMap<String,String>() {{ put(ServerManagementAPIConstants.WORKFLOW_ITEM_STRING_PROPERTY_LINK_URL, dlrt.getLicenseURL()); }});
 		det = new WorkflowPromptDetails();
 		item1a.setPrompt(det);
 		det.setResponseType(ServerManagementAPIConstants.ATTR_TYPE_NONE);
