@@ -196,6 +196,29 @@ public class MinishiftServerDelegate extends AbstractServerDelegate {
 
 	}
 	
+	/**
+	 * Discover the server state by actually checking 
+	 * whatever mechanism should be used, and not just 
+	 * returning cached values. 
+	 */
+	/**
+	 * Discover the server state by actually checking 
+	 * whatever mechanism should be used, and not just 
+	 * returning cached values. 
+	 */
+	public void discoverServerState() {
+		SERVER_STATE ss = PollThreadUtils.isServerStarted(getServer(), 
+				getPoller(IServerStatePoller.SERVER_STATE.UP));
+		if( ss == SERVER_STATE.UP ) {
+			setServerState(ServerManagementAPIConstants.STATE_STARTED);
+		} else if( ss == SERVER_STATE.DOWN) {
+			setServerState(ServerManagementAPIConstants.STATE_STOPPED);
+		} else {
+			setServerState(ServerManagementAPIConstants.STATE_UNKNOWN);
+		}
+	}
+
+	
 	protected void launchPoller(IServerStatePoller.SERVER_STATE expectedState) {
 		IPollResultListener listener = expectedState == IServerStatePoller.SERVER_STATE.DOWN ? 
 				shutdownServerResultListener() : launchServerResultListener();

@@ -91,7 +91,6 @@ public class ServerManagementServerLauncher {
 
 	public void launch(int port) throws Exception {
 		persistenceEventManager.loadState();
-		// create the chat server
 		startListening(port, serverImpl);
 	}
 	

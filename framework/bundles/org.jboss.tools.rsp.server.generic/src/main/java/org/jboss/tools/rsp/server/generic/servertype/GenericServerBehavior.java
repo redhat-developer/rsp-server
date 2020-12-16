@@ -11,7 +11,6 @@ package org.jboss.tools.rsp.server.generic.servertype;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -293,16 +292,28 @@ public class GenericServerBehavior extends AbstractServerDelegate
 		
 	}
 
-	private void launchPoller(SERVER_STATE upOrDown, String pollerId, JSONMemento startupMemento) {
-		// TODO eventually break this out
-		if("automaticSuccess".equals(pollerId)) {
-			if( upOrDown == IServerStatePoller.SERVER_STATE.UP)
-				setServerState(STATE_STARTED, true);
-			if( upOrDown == IServerStatePoller.SERVER_STATE.DOWN)
-				setServerState(STATE_STOPPED, true);
-			return;
+	/**
+	 * Discover the server state by actually checking 
+	 * whatever mechanism should be used, and not just 
+	 * returning cached values. 
+	 */
+	public void discoverServerState() {
+		JSONMemento startupMemento = behaviorMemento.getChild("startup");
+		String poller = startupMemento.getString("poller");
+
+		SERVER_STATE ss = PollThreadUtils.isServerStarted(getServer(), 
+				getPoller(IServerStatePoller.SERVER_STATE.UP, poller, startupMemento));
+		if( ss == SERVER_STATE.UP ) {
+			setServerState(ServerManagementAPIConstants.STATE_STARTED);
+		} else if( ss == SERVER_STATE.DOWN) {
+			setServerState(ServerManagementAPIConstants.STATE_STOPPED);
+		} else {
+			setServerState(ServerManagementAPIConstants.STATE_UNKNOWN);
 		}
-		
+	}
+
+	
+	private IServerStatePoller getPoller(SERVER_STATE up, String pollerId, JSONMemento startupMemento) {
 		if("webPoller".equals(pollerId)) {
 			JSONMemento props = startupMemento.getChild("pollerProperties");
 			if( props != null ) {
@@ -314,20 +325,38 @@ public class GenericServerBehavior extends AbstractServerDelegate
 					// TODO log
 				}
 				final String finalUrl = fromPropsWithSubs;
-				IPollResultListener listener = upOrDown == IServerStatePoller.SERVER_STATE.DOWN ? 
-						shutdownServerResultListener() : launchServerResultListener();
 				WebPortPoller toRun = new WebPortPoller("Web Poller: " + this.getServer().getName()) {
 					@Override
 					protected String getURL(IServer server) {
 						return finalUrl;
 					}
 				};
-				PollThreadUtils.pollServer(getServer(), upOrDown, toRun, listener);
+				return toRun;
 			}
+		}	
+		return null;
+	}
+
+
+	private void launchPoller(SERVER_STATE upOrDown, String pollerId, JSONMemento startupMemento) {
+		// TODO eventually break this out
+		if("automaticSuccess".equals(pollerId)) {
+			if( upOrDown == IServerStatePoller.SERVER_STATE.UP)
+				setServerState(STATE_STARTED, true);
+			if( upOrDown == IServerStatePoller.SERVER_STATE.DOWN)
+				setServerState(STATE_STOPPED, true);
 			return;
 		}
 		if("noOpPoller".equals(pollerId)) {
 			return;
+		}
+
+		IServerStatePoller poller = getPoller(upOrDown, pollerId, startupMemento);
+		IPollResultListener listener = upOrDown == IServerStatePoller.SERVER_STATE.DOWN ? 
+				shutdownServerResultListener() : launchServerResultListener();
+		if( poller != null ) {
+			PollThreadUtils.pollServer(getServer(), upOrDown, 
+					poller, listener);
 		}
 	}
 

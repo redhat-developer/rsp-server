@@ -171,6 +171,14 @@ public class ServerModel implements IServerModel {
 		File data = this.managementModel.getDataStoreModel().getDataLocation();
 		File servers = new File(data, SERVERS_DIRECTORY);
 		loadServers(servers);
+		new Thread("Initialize Server State") {
+			public void run() {
+				ArrayList<IServerDelegate> servers = new ArrayList<>(serverDelegates.values());
+				for( IServerDelegate sd : servers ) {
+					sd.discoverServerState();
+				}
+			}
+		}.start();
 	}
 
 	protected void loadFailedServers(String id) {
