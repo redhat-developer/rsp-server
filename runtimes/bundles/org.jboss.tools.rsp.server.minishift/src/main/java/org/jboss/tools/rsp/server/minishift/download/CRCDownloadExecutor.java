@@ -92,7 +92,9 @@ public class CRCDownloadExecutor extends AbstractDownloadManagerExecutor {
 				IMinishiftServerAttributes.CRC_IMAGE_PULL_SECRET,
 				prefix + "Pull Secret file: ",
 				ServerManagementAPIConstants.ATTR_TYPE_STRING);
-
+		Map<String,String> props = item1.getProperties() == null ? new HashMap<String,String>() : item1.getProperties();
+		props.put(ServerManagementAPIConstants.WORKFLOW_ITEM_BOOLEAN_PROPERTY_LOCAL_FILE, "true");
+		item1.setProperties(props);
 		List<WorkflowResponseItem> items = Arrays.asList(item1);
 		resp.setItems(items);
 		resp.setRequestId(requestId);

@@ -31,6 +31,10 @@ public interface ServerManagementAPIConstants extends DefaultServerAttributes {
 	public static final String WORKFLOW_TYPE_OPEN_BROWSER = "workflow.browser.open";
 	public static final String WORKFLOW_TYPE_OPEN_TERMINAL = "workflow.terminal.open";	
 
+	
+	public static final String WORKFLOW_ITEM_STRING_PROPERTY_LINK_URL = "workflow.item.string.property.link.url";	
+	public static final String WORKFLOW_ITEM_BOOLEAN_PROPERTY_LOCAL_FILE = "workflow.item.boolean.property.local.file";	
+
 
 	public static final String WORKFLOW_EDITOR_PROPERTY_PATH = "workflow.editor.file.path";
 	public static final String WORKFLOW_EDITOR_PROPERTY_CONTENT = "workflow.editor.file.content";
