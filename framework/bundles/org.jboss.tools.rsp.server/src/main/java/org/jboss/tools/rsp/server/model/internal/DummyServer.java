@@ -31,8 +31,11 @@ public class DummyServer extends Server {
 		DummyServer ds = new DummyServer();
 		ds.loadFromJson(json);
 		String serverType = ds.getAttribute(Server.TYPE_ID, (String)null);
-		
 		IServerType type = smodel.getIServerType(serverType);
+		if( type == null ) {
+			throw new CoreException(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 0, 
+					NLS.bind("Server type not found: {0}", serverType), null));
+		}
 		ds.setServerType(type);
 		ds.setDelegate(type.createServerDelegate(ds));
 		ds.loadFromJson(json);
