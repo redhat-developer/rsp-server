@@ -280,6 +280,13 @@ public interface IServerDelegate {
 	public IStatus publish(int kind);
 
 	/**
+	 * Discover the server state by actually checking 
+	 * whatever mechanism should be used, and not just 
+	 * returning cached values. 
+	 */
+	public void discoverServerState();
+	
+	/**
 	 * Get the server state, including run state, publish state, 
 	 * as well as the run state and publish state for the deployables.
 	 * @return

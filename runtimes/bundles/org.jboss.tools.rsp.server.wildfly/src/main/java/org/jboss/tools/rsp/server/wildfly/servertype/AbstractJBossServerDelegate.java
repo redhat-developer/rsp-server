@@ -40,6 +40,7 @@ import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
 import org.jboss.tools.rsp.server.spi.model.polling.IPollResultListener;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller;
+import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller.SERVER_STATE;
 import org.jboss.tools.rsp.server.spi.model.polling.PollThreadUtils;
 import org.jboss.tools.rsp.server.spi.model.polling.WebPortPoller;
 import org.jboss.tools.rsp.server.spi.publishing.IPublishController;
@@ -73,6 +74,23 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	protected abstract IServerStartLauncher getStartLauncher(IServer delegate);
 	
 	protected abstract IServerShutdownLauncher getStopLauncher();
+
+	/**
+	 * Discover the server state by actually checking 
+	 * whatever mechanism should be used, and not just 
+	 * returning cached values. 
+	 */
+	public void discoverServerState() {
+		SERVER_STATE ss = PollThreadUtils.isServerStarted(getServer(), 
+				getPoller(IServerStatePoller.SERVER_STATE.UP));
+		if( ss == SERVER_STATE.UP ) {
+			setServerState(ServerManagementAPIConstants.STATE_STARTED);
+		} else if( ss == SERVER_STATE.DOWN) {
+			setServerState(ServerManagementAPIConstants.STATE_STOPPED);
+		} else {
+			setServerState(ServerManagementAPIConstants.STATE_UNKNOWN);
+		}
+	}
 
 
 	public String getPollURL(IServer server) {

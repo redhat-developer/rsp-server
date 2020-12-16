@@ -145,6 +145,15 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		}
 		return AbstractServerDelegate.PUBLISH_STATE_UNKNOWN;
 	}
+	
+	/**
+	 * Discover the server state by actually checking 
+	 * whatever mechanism should be used, and not just 
+	 * returning cached values. 
+	 */
+	public void discoverServerState() {
+		// Do nothing, subclasses override
+	}
 
 	public ServerHandle getServerHandle() {
 		IServerType ist = getServer().getServerType();
