@@ -58,7 +58,10 @@ pipeline {
         timeout(time: 2, unit: 'HOURS')
     }
 
-
+    tools {
+        jdk 'openjdk-11'
+    }
+    
     stages {
         stage('Checkout SCM') {
             steps {
@@ -89,23 +92,23 @@ pipeline {
                                 archiveArtifacts 'distribution/integration-tests/target/quickstarts/*/build.log'
                             }
                         }
-//                         stage('SonarCloud Report') {
-//                             when {
-//                                 expression {
-//                                     params.SONAR
-//                                 }
-//                             }
-//                             steps {
-//                                 script {
-//                                     withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-//                                         sh '''
-//                                             set +x
-//                                             mvn -B -P sonar sonar:sonar -Dsonar.login="${SONAR_TOKEN}"
-//                                         '''
-//                                     }
-//                                 }
-//                             }
-//                         }
+                        stage('SonarCloud Report') {
+                            when {
+                                expression {
+                                    params.SONAR
+                                }
+                            }
+                            steps {
+                                script {
+                                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                                        sh '''
+                                            set +x
+                                            mvn -B -P sonar sonar:sonar -Dsonar.login="${SONAR_TOKEN}"
+                                        '''
+                                    }
+                                }
+                            }
+                        }
                     }
                     post {
                         always {
