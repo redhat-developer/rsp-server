@@ -89,23 +89,23 @@ pipeline {
                                 archiveArtifacts 'distribution/integration-tests/target/quickstarts/*/build.log'
                             }
                         }
-                        stage('SonarCloud Report') {
-                            when {
-                                expression {
-                                    params.SONAR
-                                }
-                            }
-                            steps {
-                                script {
-                                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                                        sh '''
-                                            set +x
-                                            mvn -B -P sonar sonar:sonar -Dsonar.login="${SONAR_TOKEN}"
-                                        '''
-                                    }
-                                }
-                            }
-                        }
+//                         stage('SonarCloud Report') {
+//                             when {
+//                                 expression {
+//                                     params.SONAR
+//                                 }
+//                             }
+//                             steps {
+//                                 script {
+//                                     withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+//                                         sh '''
+//                                             set +x
+//                                             mvn -B -P sonar sonar:sonar -Dsonar.login="${SONAR_TOKEN}"
+//                                         '''
+//                                     }
+//                                 }
+//                             }
+//                         }
                     }
                     post {
                         always {
