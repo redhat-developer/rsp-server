@@ -72,7 +72,7 @@ pipeline {
         }
         stage('Build and tests') {
             parallel {
-                stage('Java 8 runtime') {
+                stage('Java 11 runtime') {
                     agent {
                         label 'rhel7'
                     }
