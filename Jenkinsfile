@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def default_java = "openjdk-1.8"
+def default_java = "openjdk-11"
 def default_os = "rhel7"
 def java_axes = ["openjdk-1.8", "openjdk-11"]
 def os_axes = ["rhel7", "win10"]
