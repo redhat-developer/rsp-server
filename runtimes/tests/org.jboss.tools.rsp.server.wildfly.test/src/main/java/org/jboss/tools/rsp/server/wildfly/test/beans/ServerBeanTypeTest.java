@@ -86,6 +86,7 @@ public class ServerBeanTypeTest {
 		map.put(IServerConstants.SERVER_WILDFLY_200, new ServerBeanTypeMock(ID_WILDFLY, NAME_WILDFLY, IServerConstants.SERVER_WILDFLY_200, "20.0"));
 		map.put(IServerConstants.SERVER_WILDFLY_210, new ServerBeanTypeMock(ID_WILDFLY, NAME_WILDFLY, IServerConstants.SERVER_WILDFLY_210, "21.0"));
 		map.put(IServerConstants.SERVER_WILDFLY_220, new ServerBeanTypeMock(ID_WILDFLY, NAME_WILDFLY, IServerConstants.SERVER_WILDFLY_220, "22.0"));
+		map.put(IServerConstants.SERVER_WILDFLY_230, new ServerBeanTypeMock(ID_WILDFLY, NAME_WILDFLY, IServerConstants.SERVER_WILDFLY_230, "23.0"));
 		// NEW_SERVER_ADAPTER
 		return map;
 	}
