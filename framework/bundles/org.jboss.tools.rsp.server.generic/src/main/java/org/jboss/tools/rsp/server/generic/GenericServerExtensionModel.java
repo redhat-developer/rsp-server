@@ -11,7 +11,9 @@ package org.jboss.tools.rsp.server.generic;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.launching.memento.JSONMemento;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 
@@ -24,7 +26,7 @@ public class GenericServerExtensionModel {
 		this.rspModel = rspModel;
 		this.map = new HashMap<>();
 		
-		JSONMemento memento = JSONMemento.createReadRoot(is);
+		JSONMemento memento = createModelMemento(is);
 		JSONMemento[] serverTypes = memento.getChild("serverTypes").getChildren();
 		for( int i = 0; i < serverTypes.length; i++ ) {
 			String id = serverTypes[i].getNodeName();
@@ -33,6 +35,13 @@ public class GenericServerExtensionModel {
 			this.map.put(id, oneType);
 		}
 	}
+
+
+	private JSONMemento createModelMemento(InputStream is) {
+		JSONMemento read = JSONMemento.createReadRoot(is);
+		return TemplateExtensionModelUtility.generateEffectiveMemento(read);
+	}
+
 
 	private GenericServerTypeExtensionModel loadOneServer(JSONMemento serverMemento, 
 			IServerBehaviorFromJSONProvider delegateProvider) {
