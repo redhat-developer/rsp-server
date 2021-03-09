@@ -10,12 +10,14 @@ package org.jboss.tools.rsp.server.generic.servertype.launch;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.jboss.tools.rsp.api.DefaultServerAttributes;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
+import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.launching.memento.JSONMemento;
 import org.jboss.tools.rsp.server.generic.IStringSubstitutionProvider;
 import org.jboss.tools.rsp.server.generic.servertype.GenericServerBehavior;
@@ -24,6 +26,7 @@ import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
+import org.jboss.tools.rsp.server.spi.util.VersionComparisonUtility;
 
 public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 		implements IServerStartLauncher, IServerShutdownLauncher {
@@ -121,18 +124,29 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 	protected String getDefaultVMArguments() {
 		JSONMemento launchProperties = memento.getChild("launchProperties");
 		if (launchProperties != null) {
-			String vmArgs = launchProperties.getString("vmArgs");
-			if( vmArgs != null ) {
+			return getJavaRelativeProperty(launchProperties, "vmArgs");
+		}
+		return null;
+	}
+
+	protected String getJavaRelativeProperty(JSONMemento launchProperties, String key) {
+		IVMInstall vmi = getVMInstall(getDelegate());
+		String javaVersion = vmi.getJavaVersion();
+		if( javaVersion != null ) {
+			String versionKey = getJavaVersionProperty(javaVersion, launchProperties.getNames(), key);
+			String args = launchProperties.getString(versionKey);
+			if( args != null ) {
 				try {
-					return applySubstitutions(vmArgs);
+					return applySubstitutions(args);
 				} catch(CoreException ce) {
-					return vmArgs;
+					return args;
 				}
 			}
 		}
 		return null;
 	}
-
+	
+	
 	@Override
 	protected String getProgramArguments() {
 		String def = getDefaultProgramArguments();
@@ -165,14 +179,7 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 	protected String getDefaultProgramArguments() {
 		JSONMemento launchProperties = memento.getChild("launchProperties");
 		if (launchProperties != null) {
-			String programArgs = launchProperties.getString("programArgs");
-			if( programArgs != null ) {
-				try {
-					return applySubstitutions(programArgs);
-				} catch(CoreException ce) {
-					return programArgs;
-				}
-			}
+			return getJavaRelativeProperty(launchProperties, "vmArgs");
 		}
 		return null;
 	}
@@ -183,18 +190,51 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 				(String) null);
 		JSONMemento launchProperties = memento.getChild("launchProperties");
 		if (launchProperties != null) {
-			String cpFromJson = launchProperties.getString("classpath");
-			if (cpFromJson != null && !cpFromJson.isEmpty()) {
-				// First apply substitutions
-				String postSub = cpFromJson;
-				try {
-					postSub = applySubstitutions(postSub);
-				} catch(CoreException ce) {
+			IVMInstall vmi = getVMInstall(getDelegate());
+			String javaVersion = vmi.getJavaVersion();
+			if( javaVersion != null ) {
+				String key = getJavaVersionProperty(javaVersion, launchProperties.getNames(), "classpath");
+				String cpFromJson = launchProperties.getString(key);
+				if (cpFromJson != null && !cpFromJson.isEmpty()) {
+					return getClasspathFromString(serverHome,cpFromJson);
 				}
-				return convertStringToClasspathEntries(serverHome, postSub);
 			}
 		}
 		return null;
+	}
+	
+	
+	
+	public static String getJavaVersionProperty(String javaVersion, 
+			List<String> attributes, String prefix) {
+		if( attributes.contains(prefix))
+			return prefix;
+		
+		String prefixVersion = prefix + ".version.";
+		List<String> jsonVersions = new ArrayList<>();
+		for( String s : attributes ) {
+			if(s.startsWith(prefixVersion)) {
+				jsonVersions.add((s.substring(prefixVersion.length())));
+			}
+		}
+		VersionComparisonUtility.sort(jsonVersions);
+		String last = null;
+		for( String s : jsonVersions ) {
+			if( !VersionComparisonUtility.isGreaterThanOrEqualTo(javaVersion, s))
+				return last == null ? null : prefixVersion + last;
+			last = s;
+		}
+		return prefixVersion + last;
+	}
+
+	protected String[] getClasspathFromString(String serverHome, String cpFromJson) {
+		// First apply substitutions
+		String postSub = cpFromJson;
+		try {
+			postSub = applySubstitutions(postSub);
+		} catch(CoreException ce) {
+		}
+		return convertStringToClasspathEntries(serverHome, postSub);
 	}
 	
 	private String[] convertStringToClasspathEntries(String serverHome, String postSub) {

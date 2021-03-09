@@ -11,9 +11,7 @@ package org.jboss.tools.rsp.server.generic;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-import org.jboss.tools.rsp.api.dao.CreateServerResponse;
 import org.jboss.tools.rsp.launching.memento.JSONMemento;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 

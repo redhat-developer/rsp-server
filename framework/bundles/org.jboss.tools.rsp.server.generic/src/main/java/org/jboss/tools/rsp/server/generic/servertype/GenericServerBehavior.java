@@ -47,6 +47,7 @@ import org.jboss.tools.rsp.server.generic.servertype.variables.StringSubstitutio
 import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
+import org.jboss.tools.rsp.server.spi.model.polling.AbstractPoller;
 import org.jboss.tools.rsp.server.spi.model.polling.IPollResultListener;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller.SERVER_STATE;
@@ -301,14 +302,18 @@ public class GenericServerBehavior extends AbstractServerDelegate
 		JSONMemento startupMemento = behaviorMemento.getChild("startup");
 		String poller = startupMemento.getString("poller");
 
-		SERVER_STATE ss = PollThreadUtils.isServerStarted(getServer(), 
-				getPoller(IServerStatePoller.SERVER_STATE.UP, poller, startupMemento));
-		if( ss == SERVER_STATE.UP ) {
-			setServerState(ServerManagementAPIConstants.STATE_STARTED);
-		} else if( ss == SERVER_STATE.DOWN) {
-			setServerState(ServerManagementAPIConstants.STATE_STOPPED);
-		} else {
+		IServerStatePoller pollerImpl = getPoller(IServerStatePoller.SERVER_STATE.UP, poller, startupMemento);
+		if( pollerImpl == null )
 			setServerState(ServerManagementAPIConstants.STATE_UNKNOWN);
+		else {
+			SERVER_STATE ss = PollThreadUtils.isServerStarted(getServer(), pollerImpl);
+			if( ss == SERVER_STATE.UP ) {
+				setServerState(ServerManagementAPIConstants.STATE_STARTED);
+			} else if( ss == SERVER_STATE.DOWN) {
+				setServerState(ServerManagementAPIConstants.STATE_STOPPED);
+			} else {
+				setServerState(ServerManagementAPIConstants.STATE_UNKNOWN);
+			}
 		}
 	}
 
@@ -333,7 +338,7 @@ public class GenericServerBehavior extends AbstractServerDelegate
 				};
 				return toRun;
 			}
-		}	
+		}
 		return null;
 	}
 
