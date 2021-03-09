@@ -9,6 +9,10 @@
 
 package org.jboss.tools.rsp.server.spi.util;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 public class VersionComparisonUtility {
 	private VersionComparisonUtility() {
 		
@@ -57,5 +61,34 @@ public class VersionComparisonUtility {
 		int testMinor = Integer.parseInt(splitTest[1]);
 		if( vmiMinor > testMinor ) return false;
 		return true;
+	}
+
+	public static void sort(List<String> versions) {
+		Collections.sort(versions, new Comparator<String>() {
+
+			@Override
+			public int compare(String arg0, String arg1) {
+				String[] arg0Split = arg0.split("\\.");
+				String[] arg1Split = arg1.split("\\.");
+				int max = arg0Split.length < arg1Split.length ? arg0Split.length : arg1Split.length;
+				for( int i = 0; i < max; i++ ) {
+					Integer arg0Segment = Integer.parseInt(arg0Split[i]);
+					Integer arg1Segment = Integer.parseInt(arg1Split[i]);
+					if( arg0Segment.intValue() > arg1Segment.intValue() ) {
+						return 1;
+					}
+					if( arg0Segment.intValue() < arg1Segment.intValue() ) {
+						return -1;
+					}
+				}
+				// We've reached an end. 
+				if( arg0Split.length > arg1Split.length )
+					return 1; // Tie
+				else if( arg0Split.length < arg1Split.length )
+					return -1; // Tie
+				else
+					return 0;
+			}
+		});
 	}
 }
