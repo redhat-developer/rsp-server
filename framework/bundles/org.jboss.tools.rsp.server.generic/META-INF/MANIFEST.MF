@@ -51,4 +51,5 @@ Export-Package: org.jboss.tools.rsp.server.generic,
  org.jboss.tools.rsp.server.generic.jee,
  org.jboss.tools.rsp.server.generic.servertype,
  org.jboss.tools.rsp.server.generic.servertype.actions,
+ org.jboss.tools.rsp.server.generic.servertype.launch,
  org.jboss.tools.rsp.server.generic.servertype.variables
