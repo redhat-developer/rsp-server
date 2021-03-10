@@ -10,7 +10,6 @@ package org.jboss.tools.rsp.server.generic.servertype.launch;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.jboss.tools.rsp.api.DefaultServerAttributes;
@@ -130,8 +129,7 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 	}
 
 	protected String getJavaRelativeProperty(JSONMemento launchProperties, String key) {
-		IVMInstall vmi = getVMInstall(getDelegate());
-		String javaVersion = vmi.getJavaVersion();
+		String javaVersion = getJavaVersion();
 		if( javaVersion != null ) {
 			String versionKey = getJavaVersionProperty(javaVersion, launchProperties.getNames(), key);
 			String args = launchProperties.getString(versionKey);
@@ -179,7 +177,7 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 	protected String getDefaultProgramArguments() {
 		JSONMemento launchProperties = memento.getChild("launchProperties");
 		if (launchProperties != null) {
-			return getJavaRelativeProperty(launchProperties, "vmArgs");
+			return getJavaRelativeProperty(launchProperties, "programArgs");
 		}
 		return null;
 	}
@@ -190,8 +188,7 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 				(String) null);
 		JSONMemento launchProperties = memento.getChild("launchProperties");
 		if (launchProperties != null) {
-			IVMInstall vmi = getVMInstall(getDelegate());
-			String javaVersion = vmi.getJavaVersion();
+			String javaVersion = getJavaVersion();
 			if( javaVersion != null ) {
 				String key = getJavaVersionProperty(javaVersion, launchProperties.getNames(), "classpath");
 				String cpFromJson = launchProperties.getString(key);
@@ -203,7 +200,11 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 		return null;
 	}
 	
-	
+	protected String getJavaVersion() {
+		IVMInstall vmi = getVMInstall(getDelegate());
+		String javaVersion = vmi.getJavaVersion();
+		return javaVersion;
+	}
 	
 	public static String getJavaVersionProperty(String javaVersion, 
 			List<String> attributes, String prefix) {
