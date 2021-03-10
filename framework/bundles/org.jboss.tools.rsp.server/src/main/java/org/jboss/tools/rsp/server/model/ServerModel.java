@@ -290,6 +290,13 @@ public class ServerModel implements IServerModel {
 		}
 		Server server = createServer2(type, id, attributes);
 		IServerDelegate del = server.getDelegate();
+		if( del == null ) {
+			return new CreateServerResponse(
+					StatusConverter.convert(
+							new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+									"Error creating server delegate")), 
+									Collections.EMPTY_LIST);
+		}
 		CreateServerValidation valid = del.validate();
 		if( !valid.getStatus().isOK()) {
 			return valid.toDao();
@@ -297,7 +304,12 @@ public class ServerModel implements IServerModel {
 		try {
 			server.save(new NullProgressMonitor());
 		} catch(CoreException ce) {
-			
+			return new CreateServerResponse(
+					StatusConverter.convert(
+							new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+									"Error saving server in model", ce)), 
+									Collections.EMPTY_LIST);
+
 		}
 		addServer(server, del);
 		return valid.toDao();
