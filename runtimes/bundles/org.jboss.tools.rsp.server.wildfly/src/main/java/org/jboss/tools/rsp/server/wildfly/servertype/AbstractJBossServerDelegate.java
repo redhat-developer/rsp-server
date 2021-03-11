@@ -212,25 +212,20 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	public IStatus stop(boolean force) {
 		setServerState(IServerDelegate.STATE_STOPPING);
 		ILaunch stopLaunch = null;
-		launchPoller(IServerStatePoller.SERVER_STATE.DOWN);
+		if( !force )
+			launchPoller(IServerStatePoller.SERVER_STATE.DOWN);
 		try {
 			stopLaunch = getStopLauncher().launch(force);
 			if( stopLaunch != null)
 				registerLaunch(stopLaunch);
 		} catch(CoreException ce) {
-			// Dead code... but I feel it's not dead?  idk :( 
-//			if( stopLaunch != null ) {
-//				IProcess[] processes = startLaunch.getProcesses();
-//				for( int i = 0; i < processes.length; i++ ) {
-//					try {
-//						processes[i].terminate();
-//					} catch(DebugException de) {
-//						LaunchingCore.log(de);
-//					}
-//				}
-//			}
-			setServerState(IServerDelegate.STATE_STARTED);
+			if( !force )
+				setServerState(IServerDelegate.STATE_STARTED);
 			return ce.getStatus();
+		} finally {
+			if( force ) {
+				setServerState(IServerDelegate.STATE_STOPPED);
+			}
 		}
 		return Status.OK_STATUS;
 
