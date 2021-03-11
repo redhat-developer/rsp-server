@@ -44,6 +44,7 @@ import org.jboss.tools.rsp.api.dao.ServerBean;
 import org.jboss.tools.rsp.api.dao.ServerDeployableReference;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
+import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.Status;
@@ -52,6 +53,7 @@ import org.jboss.tools.rsp.api.dao.UpdateServerRequest;
 import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
+import org.jboss.tools.rsp.client.bindings.ServerManagementClientImpl;
 import org.jboss.tools.rsp.client.bindings.ServerManagementClientLauncher;
 
 public class StandardCommandHandler implements InputHandler {
@@ -292,7 +294,10 @@ public class StandardCommandHandler implements InputHandler {
 				List<ServerHandle> handles = launcher.getServerProxy().getServerHandles().get();
 				System.out.println(handles.size() + " servers found:");
 				for( ServerHandle sh : handles ) {
-					System.out.println("   " + sh.getType().getId() + ":" + sh.getId());
+					ServerState ss = launcher.getServerProxy().getServerState(sh).get();
+					System.out.println("   " + sh.getType().getId() + ":" + sh.getId() + " [" + 
+							ServerManagementClientImpl.getRunStateString(ss.getState()) + ", " + 
+									ServerManagementClientImpl.getPublishStateString(ss.getPublishState()) + "]");
 				}
 			}
 		},
