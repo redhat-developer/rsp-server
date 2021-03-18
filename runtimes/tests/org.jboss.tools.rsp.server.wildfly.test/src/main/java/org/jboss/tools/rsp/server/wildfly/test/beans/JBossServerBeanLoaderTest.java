@@ -99,6 +99,7 @@ public class JBossServerBeanLoaderTest extends TestCase {
 		expected.put(IServerConstants.SERVER_EAP_71, new Data(JBossServerBeanTypeProvider.EAP71, "7.1."));
 		expected.put(IServerConstants.SERVER_EAP_72, new Data(JBossServerBeanTypeProvider.EAP72, "7.2."));
 		expected.put(IServerConstants.SERVER_EAP_73, new Data(JBossServerBeanTypeProvider.EAP73, "7.3."));
+		expected.put(IServerConstants.SERVER_EAP_74, new Data(JBossServerBeanTypeProvider.EAP74, "7.4."));
 		expected.put(MockServerCreationUtilities.TEST_SERVER_TYPE_EAP_65, new Data(JBossServerBeanTypeProvider.EAP61, "6.5."));
 		expected.put(MockServerCreationUtilities.TEST_SERVER_TYPE_GATEIN_34, new Data(JBossServerBeanTypeProvider.AS7GateIn, "3.4."));
 		expected.put(MockServerCreationUtilities.TEST_SERVER_TYPE_GATEIN_35, new Data(JBossServerBeanTypeProvider.AS7GateIn, "3.5."));

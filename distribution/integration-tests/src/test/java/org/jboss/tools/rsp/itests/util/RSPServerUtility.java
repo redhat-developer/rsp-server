@@ -13,14 +13,17 @@ import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
 import org.jboss.tools.rsp.server.wildfly.servertype.impl.ServerTypeStringConstants;
 
 /**
- * 
+ *
+ *   Is this class even used? I can't find references to these methods
+ *   Also EAP isn't listed here at all.
+ *   
  * @author odockal
  *
  */
 public class RSPServerUtility {
 	// NEW_SERVER_ADAPTER
 	public static ServerType getServerType(String serverID) {
-		switch (serverID) {
+		switch (serverID) {	
 			case IServerConstants.SERVER_WILDFLY_130:
 				return createServerType(serverID, ServerTypeStringConstants.WF13_NAME, ServerTypeStringConstants.WF13_DESC);
 			case IServerConstants.SERVER_WILDFLY_140:
