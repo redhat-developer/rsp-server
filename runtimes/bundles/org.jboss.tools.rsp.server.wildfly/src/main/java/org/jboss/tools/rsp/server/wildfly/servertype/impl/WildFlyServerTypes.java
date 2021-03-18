@@ -80,4 +80,6 @@ public class WildFlyServerTypes implements ServerTypeStringConstants{
 			new WildFlyServerType(EAP72_ID, EAP72_NAME, EAP72_DESC);
 	public static final BaseJBossServerType EAP73_SERVER_TYPE = 
 			new WildFlyServerType(EAP73_ID, EAP73_NAME, EAP73_DESC);
+	public static final BaseJBossServerType EAP74_SERVER_TYPE = 
+			new WildFlyServerType(EAP74_ID, EAP74_NAME, EAP74_DESC);
 }

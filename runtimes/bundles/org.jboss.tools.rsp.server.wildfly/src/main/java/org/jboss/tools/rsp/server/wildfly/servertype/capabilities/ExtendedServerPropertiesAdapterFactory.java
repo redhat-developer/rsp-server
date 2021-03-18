@@ -62,6 +62,8 @@ public class ExtendedServerPropertiesAdapterFactory implements IServerConstants 
 			return new JBossEAP72ExtendedProperties(s);
 		case SERVER_EAP_73:
 			return new JBossEAP73ExtendedProperties(s);
+		case SERVER_EAP_74:
+			return new JBossEAP74ExtendedProperties(s);
 
 		case SERVER_WILDFLY_80:
 			return new Wildfly80ExtendedProperties(s);
