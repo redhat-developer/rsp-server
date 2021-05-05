@@ -10,10 +10,13 @@ package org.jboss.tools.rsp.server.minishift.servertype;
 
 import java.util.Map;
 
+import org.jboss.tools.rsp.server.minishift.discovery.MinishiftVersionLoader.MinishiftVersions;
+import org.jboss.tools.rsp.server.minishift.discovery.MinishiftVersionUtil;
 import org.jboss.tools.rsp.server.minishift.servertype.impl.CRCServerDelegate;
 import org.jboss.tools.rsp.server.minishift.servertype.impl.MinishiftServerDelegate;
 import org.jboss.tools.rsp.server.redhat.credentials.RedHatAccessCredentials;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
+import org.jboss.tools.rsp.server.spi.servertype.IServerAttributes;
 
 public class MinishiftPropertyUtility {
 
@@ -21,44 +24,46 @@ public class MinishiftPropertyUtility {
 		// inhibit instantiation
 	}
 	
-	public static String getMinishiftAppendedProgArgs(IServer server) {
+	public static String getMinishiftAppendedProgArgs(IServerAttributes server) {
 		return server.getAttribute(MinishiftServerDelegate.STARTUP_PROGRAM_ARGS_STRING, (String)null);
 	}
 
-	public static Map<String,String> getMinishiftStartupEnvironment(IServer server) {
+	public static Map<String,String> getMinishiftStartupEnvironment(IServerAttributes server) {
 		return (Map<String,String>)server.getAttribute(MinishiftServerDelegate.STARTUP_ENV_VARS_MAP, (Map<String,String>)null);
 	}
 
-	public static String getMinishiftCommand(IServer server) {
+	public static String getMinishiftCommand(IServerAttributes server) {
 		return server.getAttribute(IMinishiftServerAttributes.MINISHIFT_BINARY, (String) null);
 	}
 
-	public static String getMinishiftVMDriver(IServer server) {
+	public static String getMinishiftVMDriver(IServerAttributes server) {
 		return server.getAttribute(IMinishiftServerAttributes.MINISHIFT_VM_DRIVER, (String) null);
 	}
 
-	public static String getMinishiftProfile(IServer server) {
+	public static String getMinishiftProfile(IServerAttributes server) {
 		return server.getAttribute(IMinishiftServerAttributes.MINISHIFT_PROFILE,
 				IMinishiftServerAttributes.MINISHIFT_PROFILE_DEFAULT);
 	}
 
-	public static String getMinishiftHome(IServer server) {
+	public static String getMinishiftHome(IServerAttributes server) {
 		return server.getAttribute(IMinishiftServerAttributes.MINISHIFT_HOME, (String)null);
 	}
 	
-	public static String getMinishiftCPU(IServer server, int defaultCPU) {
+	public static String getMinishiftCPU(IServerAttributes server, int defaultCPU) {
 		return server.getAttribute(IMinishiftServerAttributes.MINISHIFT_CPUS, Integer.toString(defaultCPU));
 	}
 	
-	public static String getMinishiftMemory(IServer server, int defaultMemory) {
-		return server.getAttribute(IMinishiftServerAttributes.MINISHIFT_MEMORY, Integer.toString(defaultMemory));
+	public static String getMinishiftMemory(IServerAttributes server, MinishiftVersions vers) {
+		boolean matches_1_24 = MinishiftVersionUtil.matchesCRC1_24_OrGreater(vers);
+		return server.getAttribute(IMinishiftServerAttributes.MINISHIFT_MEMORY, 
+				Integer.toString(matches_1_24 ? 9216 : 8192));
 	}
 	
-	public static String getCRCBundle(IServer server) {
+	public static String getCRCBundle(IServerAttributes server) {
 		return server.getAttribute(IMinishiftServerAttributes.CRC_BUNDLE, (String) null);
 	}
 	
-	public static boolean getShouldOverride(IServer server) {
+	public static boolean getShouldOverride(IServerAttributes server) {
 		return server.getAttribute(IMinishiftServerAttributes.LAUNCH_OVERRIDE_BOOLEAN, false);
 	}
 
