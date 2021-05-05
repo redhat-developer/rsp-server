@@ -8,6 +8,9 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.minishift.servertype.impl;
 
+import org.jboss.tools.rsp.server.minishift.discovery.MinishiftVersionLoader;
+import org.jboss.tools.rsp.server.minishift.discovery.MinishiftVersionLoader.MinishiftVersions;
+import org.jboss.tools.rsp.server.minishift.discovery.MinishiftVersionUtil;
 import org.jboss.tools.rsp.server.minishift.servertype.AbstractLauncher;
 import org.jboss.tools.rsp.server.minishift.servertype.MinishiftPropertyUtility;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
@@ -22,11 +25,13 @@ public class StartCRCLauncher extends AbstractLauncher {
 	@Override
 	public String getProgramArguments() {
 		IServer server = getServer();
-				
 		String cpu = MinishiftPropertyUtility.getMinishiftCPU(server, 4);
 		String cpuArg = isEmpty(cpu) ? "" : " --cpus=" + cpu;
 		
-		String memory = MinishiftPropertyUtility.getMinishiftMemory(server, 8192);
+		String cmd = MinishiftPropertyUtility.getMinishiftCommand(server);
+		MinishiftVersions vers = MinishiftVersionLoader.getVersionProperties(cmd);
+
+		String memory = MinishiftPropertyUtility.getMinishiftMemory(server, vers);
 		String memoryArg = isEmpty(memory) ? "" : " --memory=" + memory;
 		
 		String pullSecret = MinishiftPropertyUtility.getMinishiftImagePullSecret(server);

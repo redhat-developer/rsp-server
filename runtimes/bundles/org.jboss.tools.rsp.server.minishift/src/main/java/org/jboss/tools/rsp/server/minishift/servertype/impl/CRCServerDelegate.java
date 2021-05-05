@@ -25,7 +25,11 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.debug.core.DebugException;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
+import org.jboss.tools.rsp.server.minishift.discovery.MinishiftVersionLoader;
+import org.jboss.tools.rsp.server.minishift.discovery.MinishiftVersionUtil;
+import org.jboss.tools.rsp.server.minishift.discovery.MinishiftVersionLoader.MinishiftVersions;
 import org.jboss.tools.rsp.server.minishift.servertype.IMinishiftServerAttributes;
+import org.jboss.tools.rsp.server.minishift.servertype.MinishiftPropertyUtility;
 import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller;
@@ -108,7 +112,14 @@ public class CRCServerDelegate extends MinishiftServerDelegate {
 		server.setAttribute(DefaultServerAttributes.SERVER_TIMEOUT_SHUTDOWN, 5*60*1000);
 		server.setAttribute(IMinishiftServerAttributes.LAUNCH_OVERRIDE_BOOLEAN, false);
 		server.setAttribute(IMinishiftServerAttributes.MINISHIFT_CPUS, 4);
-		server.setAttribute(IMinishiftServerAttributes.MINISHIFT_MEMORY, 8192);
+	}
+
+	@Override
+	public void setDependentDefaults(IServerWorkingCopy server) {
+		String cmd = MinishiftPropertyUtility.getMinishiftCommand(getServer());
+		MinishiftVersions vers = MinishiftVersionLoader.getVersionProperties(cmd);
+		server.setAttribute(IMinishiftServerAttributes.MINISHIFT_MEMORY, 
+				MinishiftPropertyUtility.getMinishiftMemory(server, vers));
 	}
 	
 	protected IServerStatePoller getPoller(IServerStatePoller.SERVER_STATE expectedState) {

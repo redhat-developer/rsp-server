@@ -92,6 +92,21 @@ public class MinishiftVersionUtil {
 	}
 	
 
+	public static boolean matchesCRC1_24_OrGreater(MinishiftVersions versions) {
+		String crcVers = versions.getCRCVersion();
+		if( crcVers == null )
+			return false;
+		
+		if (crcVers.contains("+")) {
+			crcVers = crcVers.substring(0, crcVers.indexOf('+'));
+		}
+		String[] segments = crcVers.split("\\.");
+		if ("1".equals(segments[0]) && Integer.parseInt(segments[1]) >= 24) {
+			return true;
+		}
+		return false;
+	}
+
 	public static boolean matchesMinishift17OrGreater(String version) {
 		if (version.contains("+")) {
 			String prefix = version.substring(0, version.indexOf('+'));
