@@ -69,14 +69,14 @@ public class AlphanumComparator implements Comparator<String> {
 				long thatLong = Long.parseLong(thatChunk);
 				if( thisLong != thatLong ) {
 					// If they're different numbers, fine
-					return thisLong - thatLong > 0 ? 1 : -1;
+					return thisLong - thatLong > 0 ? -1 : 1;
 				} else {
 					// They're basically the same number, but could have 
 					// rogue zeroes there. 
 					if( thisChunk.length() == thatChunk.length() )
 						result = 0; // same number, same size, equal
 					else 
-						return thatChunk.length() - thisChunk.length();
+						return thisChunk.length() - thatChunk.length();
 				}
 			} else {
 				result = thisChunk.compareTo(thatChunk);
