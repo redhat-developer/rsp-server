@@ -363,8 +363,8 @@ public class ServerModel implements IServerModel {
 						attributeValues.put(attrKey, converted);
 					}
 				}
-			} 
-			if (String.class.equals(expectedType) 
+			}
+			if (required && String.class.equals(expectedType) 
 					&& ((String) value).trim().isEmpty()) {
 					multiStatus.add(new Status(IStatus.ERROR, attrKey,
 							NLS.bind("Attribute {0} must not be empty", attrKey)));
