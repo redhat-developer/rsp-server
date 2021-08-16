@@ -49,6 +49,8 @@ public abstract class Base {
 	
 	private static final String MAP_PROPERTIES_KEY = "mapProperties";
 	private static final String LIST_PROPERTIES_KEY = "listProperties";
+	private static final String MAP_PROPERTY_KEY_PREFIX = "mapProperty";
+	private static final String LIST_PROPERTY_KEY_PREFIX = "listProperty";
 	private static final String PROPERTY_KEY_VALUE_PREFIX = "value";
 	
 	protected Map<String, Object> map = new HashMap<>();
@@ -277,11 +279,16 @@ public abstract class Base {
 	}
 
 	protected void saveMap(IMemento memento, String key, Map<String,String> map2) {
-		IMemento child = memento.getChild(MAP_PROPERTIES_KEY);
-		if( child == null )
-			child = memento.createChild(MAP_PROPERTIES_KEY);
-		
-		IMemento keyChild = child.createChild(key);
+		IMemento toUse = null;
+		if( key.startsWith(MAP_PROPERTY_KEY_PREFIX)) {
+			toUse = memento;
+		} else {
+			toUse = memento.getChild(MAP_PROPERTIES_KEY);
+			if( toUse == null )
+				toUse = memento.createChild(MAP_PROPERTIES_KEY);
+		}
+
+		IMemento keyChild = toUse.createChild(key);
 		Iterator<String> iterator = map2.keySet().iterator();
 		while (iterator.hasNext()) {
 			String s = iterator.next();
@@ -290,11 +297,16 @@ public abstract class Base {
 	}
 	
 	protected void saveList(IMemento memento, String key, List<String> list) {
-		IMemento child = memento.getChild(LIST_PROPERTIES_KEY);
-		if( child == null )
-			child = memento.createChild(LIST_PROPERTIES_KEY);
+		IMemento toUse = null;
+		if( key.startsWith(LIST_PROPERTY_KEY_PREFIX)) {
+			toUse = memento;
+		} else {
+			toUse = memento.getChild(LIST_PROPERTIES_KEY);
+			if( toUse == null )
+				toUse = memento.createChild(LIST_PROPERTIES_KEY);
+		}
 		
-		IMemento keyChild = child.createChild(key);
+		IMemento keyChild = toUse.createChild(key);
 		int i = 0;
 		Iterator<String> iterator = list.iterator();
 		while (iterator.hasNext()) {
@@ -344,6 +356,20 @@ public abstract class Base {
 			String key = iterator.next();
 			map.put(key, memento.getString(key));
 		}
+		
+		// property keys that start with specific constants can be loaded as their type
+		IMemento[] allChildren = memento.getChildren();
+		for( int i = 0; i < allChildren.length; i++ ) {
+			if( allChildren[i].getNodeName().startsWith(LIST_PROPERTY_KEY_PREFIX)) {
+				map.put(allChildren[i].getNodeName(), getListFromMemento(allChildren[i]));
+			}
+			if( allChildren[i].getNodeName().startsWith(MAP_PROPERTY_KEY_PREFIX)) {
+				map.put(allChildren[i].getNodeName(), getMapFromMemento(allChildren[i]));
+			}
+		}
+		
+		
+		// or they can be isolated in a specific parent 
 		IMemento[] children = memento.getChildren(LIST_PROPERTIES_KEY);
 		if (children != null) {
 			for (IMemento child : children)
