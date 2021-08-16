@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.server.wildfly.servertype;
 
 import org.jboss.tools.rsp.api.DefaultServerAttributes;
+import org.jboss.tools.rsp.server.spi.launchers.AbstractJavaLauncher;
 
 public interface IJBossServerAttributes extends DefaultServerAttributes {
 	/*
@@ -42,6 +43,9 @@ public interface IJBossServerAttributes extends DefaultServerAttributes {
 	public static final String LAUNCH_OVERRIDE_BOOLEAN = "args.override.boolean";
 	public static final String LAUNCH_OVERRIDE_PROGRAM_ARGS = "args.program.override.string";
 	public static final String LAUNCH_OVERRIDE_VM_ARGS = "args.vm.override.string";
+	public static final String LAUNCH_APPEND_ENV = AbstractJavaLauncher.PROPERTY_LAUNCH_ENV;
+	
+
 	// Old
 	public static final String LAUNCH_OVERRIDE_PROGRAM_ARGS_V1 = "program.args.override.string";
 	public static final String LAUNCH_OVERRIDE_VM_ARGS_V1 = "vm.args.override.string";

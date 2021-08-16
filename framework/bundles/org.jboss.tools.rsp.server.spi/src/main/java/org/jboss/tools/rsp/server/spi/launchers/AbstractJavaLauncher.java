@@ -37,6 +37,8 @@ public abstract class AbstractJavaLauncher implements IServerStartLauncher {
 	
 	public static final String PROPERTY_PROGRAM_ARGS = "property.program.args";
 	public static final String PROPERTY_VM_ARGS = "property.vm.args";
+	public static final String PROPERTY_LAUNCH_ENV = "mapProperty.launch.env";
+	
 	
 
 	private IServerDelegate delegate;
@@ -81,6 +83,7 @@ public abstract class AbstractJavaLauncher implements IServerStartLauncher {
 		}
 		props.put(PROPERTY_PROGRAM_ARGS, getProgramArguments());
 		props.put(PROPERTY_VM_ARGS, getVMArguments());
+		props.put(PROPERTY_LAUNCH_ENV, String.join("\n", getEnvironment()));
 		return launchedDetails;
 	}
 
@@ -208,7 +211,11 @@ public abstract class AbstractJavaLauncher implements IServerStartLauncher {
 	}
 
 	protected Map<String, String> getEnvironmentFromServer() {
-		return new HashMap<>(System.getenv());
+		HashMap<String,String> ret = new HashMap<>(System.getenv());
+		Map<String,String> toAdd = getServer().getAttribute(PROPERTY_LAUNCH_ENV, new HashMap<String,String>()); 
+		if( toAdd != null )
+			ret.putAll(toAdd);
+		return ret;
 	}
 	
 }
