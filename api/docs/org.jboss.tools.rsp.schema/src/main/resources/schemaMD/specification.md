@@ -815,6 +815,152 @@ export interface Status {
     ok: boolean;
 }</pre></td></tr></table>
 
+#### server/createServerWorkflow
+
+ Initiate a request to create a server via workflow @return 
+
+This endpoint takes the following json schemas as parameters: 
+
+<table><tr><th>Param #</th><th>json</th><th>typescript</th></tr>
+<tr><td>0</td><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "requestId" : {
+      "type" : "integer"
+    },
+    "serverTypeId" : {
+      "type" : "string"
+    },
+    "data" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "any"
+      }
+    }
+  }
+}</pre></td><td><pre>export interface CreateServerWorkflowRequest {
+    requestId: number;
+    serverTypeId: string;
+    data: { [index: string]: any };
+}</pre></td></tr></table>
+
+This endpoint returns the following schema as a return value: 
+
+<table><tr><th>json</th><th>typescript</th></tr>
+<tr><td><pre>{
+  "type" : "object",
+  "properties" : {
+    "status" : {
+      "type" : "object",
+      "properties" : {
+        "severity" : {
+          "type" : "integer"
+        },
+        "plugin" : {
+          "type" : "string"
+        },
+        "code" : {
+          "type" : "integer"
+        },
+        "message" : {
+          "type" : "string"
+        },
+        "trace" : {
+          "type" : "string"
+        },
+        "ok" : {
+          "type" : "boolean"
+        }
+      }
+    },
+    "requestId" : {
+      "type" : "integer"
+    },
+    "jobId" : {
+      "type" : "string"
+    },
+    "items" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "itemType" : {
+            "type" : "string"
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "content" : {
+            "type" : "string"
+          },
+          "prompt" : {
+            "type" : "object",
+            "properties" : {
+              "responseType" : {
+                "type" : "string"
+              },
+              "responseSecret" : {
+                "type" : "boolean"
+              },
+              "validResponses" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "properties" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    },
+    "invalidFields" : {
+      "type" : "array",
+      "items" : {
+        "type" : "string"
+      }
+    }
+  }
+}</pre></td><td><pre>export interface WorkflowResponse {
+    status: Status;
+    requestId: number;
+    jobId: string;
+    items: WorkflowResponseItem[];
+    invalidFields: string[];
+}
+
+export interface Status {
+    severity: number;
+    plugin: string;
+    code: number;
+    message: string;
+    trace: string;
+    ok: boolean;
+}
+
+export interface WorkflowResponseItem {
+    id: string;
+    itemType: string;
+    label: string;
+    content: string;
+    prompt: WorkflowPromptDetails;
+    properties: { [index: string]: string };
+}
+
+export interface WorkflowPromptDetails {
+    responseType: string;
+    responseSecret: boolean;
+    validResponses: string[];
+}</pre></td></tr></table>
+
 #### server/getServerAsJson
 
  The `server/getServerAsJson` request is sent by the client to fetch a string representation of a server adapter. A server handle and a status object are included along with the json representation of the server. In the event of failure, the returned `Status` object will detail the cause of error. 
@@ -2723,6 +2869,12 @@ This endpoint returns the following schema as a return value:
           }
         }
       }
+    },
+    "invalidFields" : {
+      "type" : "array",
+      "items" : {
+        "type" : "string"
+      }
     }
   }
 }</pre></td><td><pre>export interface WorkflowResponse {
@@ -2730,6 +2882,7 @@ This endpoint returns the following schema as a return value:
     requestId: number;
     jobId: string;
     items: WorkflowResponseItem[];
+    invalidFields: string[];
 }
 
 export interface Status {
@@ -2886,6 +3039,12 @@ This endpoint returns the following schema as a return value:
                     }
                   }
                 }
+              },
+              "invalidFields" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "string"
+                }
               }
             }
           }
@@ -2941,6 +3100,7 @@ export interface WorkflowResponse {
     requestId: number;
     jobId: string;
     items: WorkflowResponseItem[];
+    invalidFields: string[];
 }
 
 export interface WorkflowResponseItem {
@@ -3068,6 +3228,12 @@ This endpoint returns the following schema as a return value:
           }
         }
       }
+    },
+    "invalidFields" : {
+      "type" : "array",
+      "items" : {
+        "type" : "string"
+      }
     }
   }
 }</pre></td><td><pre>export interface WorkflowResponse {
@@ -3075,6 +3241,7 @@ This endpoint returns the following schema as a return value:
     requestId: number;
     jobId: string;
     items: WorkflowResponseItem[];
+    invalidFields: string[];
 }
 
 export interface Status {

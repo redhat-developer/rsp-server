@@ -36,6 +36,9 @@ import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TypeScriptGenerator;
 import cz.habarta.typescript.generator.TypeScriptOutputKind;
 
+/*
+ * This project requires java8 to run properly
+ */
 public class TypescriptUtility {
 
 	private static final String JAVA_END = " */\n";

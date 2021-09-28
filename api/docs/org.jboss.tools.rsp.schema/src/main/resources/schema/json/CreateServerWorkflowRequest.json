@@ -1,0 +1,17 @@
+{
+  "type" : "object",
+  "properties" : {
+    "requestId" : {
+      "type" : "integer"
+    },
+    "serverTypeId" : {
+      "type" : "string"
+    },
+    "data" : {
+      "type" : "object",
+      "additionalProperties" : {
+        "type" : "any"
+      }
+    }
+  }
+}

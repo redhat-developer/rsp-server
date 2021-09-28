@@ -72,6 +72,12 @@
           }
         }
       }
+    },
+    "invalidFields" : {
+      "type" : "array",
+      "items" : {
+        "type" : "string"
+      }
     }
   }
 }

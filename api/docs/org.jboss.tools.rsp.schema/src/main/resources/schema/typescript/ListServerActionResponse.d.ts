@@ -23,6 +23,7 @@ export interface WorkflowResponse {
     requestId: number;
     jobId: string;
     items: WorkflowResponseItem[];
+    invalidFields: string[];
 }
 
 export interface WorkflowResponseItem {

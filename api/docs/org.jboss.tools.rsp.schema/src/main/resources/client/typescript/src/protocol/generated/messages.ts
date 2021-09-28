@@ -139,6 +139,13 @@ export namespace Messages {
             export const type = new RequestType<Protocol.ServerAttributes, Protocol.CreateServerResponse, void, void>('server/createServer');
         }
         /**
+         * Initiate a request to create a server via workflow
+         * @return
+         */
+        export namespace CreateServerWorkflowRequest {
+            export const type = new RequestType<Protocol.CreateServerWorkflowRequest, Protocol.WorkflowResponse, void, void>('server/createServerWorkflow');
+        }
+        /**
          * The `server/getServerAsJson` request is sent by the client to
          * fetch a string representation of a server adapter.
          * A server handle and a status object are included along with the
