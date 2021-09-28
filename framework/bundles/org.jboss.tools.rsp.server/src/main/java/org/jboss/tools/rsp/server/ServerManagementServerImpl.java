@@ -27,6 +27,7 @@ import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
+import org.jboss.tools.rsp.api.dao.CreateServerWorkflowRequest;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
 import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
@@ -773,6 +774,33 @@ public class ServerManagementServerImpl implements RSPServer {
 		error.setStatus(s);
 		error.setItems(new ArrayList<>());
 		return error;
+	}
+	
+
+	@Override
+	public CompletableFuture<WorkflowResponse> createServerWorkflow(CreateServerWorkflowRequest req) {
+		return createCompletableFuture(() -> createServerWorkflowInternal(req));
+	}
+
+	private WorkflowResponse createServerWorkflowInternal(CreateServerWorkflowRequest req) {
+		if (req == null) {
+			WorkflowResponse resp = errorWorkflowResponse(errorStatus("Invalid Request: Request cannot be null."));
+			resp.setItems(new ArrayList<>());
+			return resp;
+		}
+		String serverTypeId = req.getServerTypeId();
+		if (serverTypeId == null) {
+			WorkflowResponse resp = errorWorkflowResponse(errorStatus("Invalid Request: serverTypeId cannot be null."));
+			resp.setItems(new ArrayList<>());
+			return resp;
+		}
+		IServerType type = managementModel.getServerModel().getIServerType(serverTypeId);
+		try {
+			return type.createServerWorkflow(this, req);
+		} catch(RuntimeException re) {
+			Status status = errorStatus("Error executing actions: " + re.getMessage(), re);
+			return errorWorkflowResponse(status, req.getRequestId());
+		}
 	}
 
 	@Override

@@ -21,7 +21,8 @@ public interface ServerManagementAPIConstants extends DefaultServerAttributes {
 	
 	public static final String ATTR_TYPE_BOOL = "bool";
 	public static final String ATTR_TYPE_INT = "int";
-	public static final String ATTR_TYPE_STRING= "string";
+	public static final String ATTR_TYPE_STRING = "string";
+	public static final String ATTR_TYPE_LOCAL_FILE = "local_file";
 	public static final String ATTR_TYPE_LIST = "list";
 	public static final String ATTR_TYPE_MAP = "map";
 	

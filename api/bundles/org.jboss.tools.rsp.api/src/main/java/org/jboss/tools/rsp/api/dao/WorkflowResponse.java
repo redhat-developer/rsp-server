@@ -24,6 +24,7 @@ public class WorkflowResponse {
 	// A possible list of workflow items to be completed or null 
 	private List<WorkflowResponseItem> items;
 	
+	private List<String> invalidFields;
 	
 	public WorkflowResponse() {
 		super();
@@ -59,5 +60,13 @@ public class WorkflowResponse {
 
 	public void setJobId(String jobId) {
 		this.jobId = jobId;
+	}
+
+	public List<String> getInvalidFields() {
+		return invalidFields;
+	}
+
+	public void setInvalidFields(List<String> invalidFields) {
+		this.invalidFields = invalidFields;
 	}
 }

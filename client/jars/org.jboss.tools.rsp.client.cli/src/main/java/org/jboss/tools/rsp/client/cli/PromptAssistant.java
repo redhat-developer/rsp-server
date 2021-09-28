@@ -332,10 +332,9 @@ public class PromptAssistant {
 	 * Conversion
 	 */
 	public Object workaroundDoubles(Object defaultVal, String attrType) {
-
 		// Workaround for the problems with json transfer
 		Class<?> intended = getAttributeTypeAsClass(attrType);
-		if (Integer.class.equals(intended) && Double.class.equals(defaultVal.getClass())) {
+		if (Integer.class.equals(intended) && defaultVal != null && Double.class.equals(defaultVal.getClass())) {
 			return Integer.valueOf(((Double)defaultVal).intValue());
 		}
 		return defaultVal;
@@ -358,8 +357,12 @@ public class PromptAssistant {
 	
 	public Object convertType(String input, String type) {
 		if (ServerManagementAPIConstants.ATTR_TYPE_INT.equals(type)) {
+			if( input == null || input.length() == 0 )
+				return null;
 			return Integer.parseInt(input);
 		} else if (ServerManagementAPIConstants.ATTR_TYPE_STRING.equals(type)) {
+			if( input == null || input.length() == 0 )
+				return null;
 			return input;
 		} else if (ServerManagementAPIConstants.ATTR_TYPE_BOOL.equals(type)) {
 			return Boolean.parseBoolean(input);

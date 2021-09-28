@@ -30,7 +30,6 @@ import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
-import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.core.runtime.SubMonitor;
 import org.jboss.tools.rsp.foundation.core.tasks.TaskModel;
 import org.jboss.tools.rsp.launching.utils.IStatusRunnableWithProgress;
@@ -44,7 +43,7 @@ import org.jboss.tools.rsp.server.spi.client.MessageContextStore.MessageContext;
 import org.jboss.tools.rsp.server.spi.jobs.IJob;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.model.IServerModel;
-import org.jboss.tools.rsp.server.spi.util.StatusConverter;
+import org.jboss.tools.rsp.server.spi.util.WorkflowUtility;
 
 /*
  * A class for simple download-runtimes that require only a license agreement
@@ -62,18 +61,12 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 		return dlrt;
 	}
 	
-	protected WorkflowResponse quickResponse(int sev, String msg, DownloadSingleRuntimeRequest req) {
+	public static WorkflowResponse quickResponse(int sev, String msg, DownloadSingleRuntimeRequest req) {
 		return quickResponse(sev, msg, req, null);
 	}
-	protected WorkflowResponse quickResponse(int sev, String msg, 
+	public static WorkflowResponse quickResponse(int sev, String msg, 
 			DownloadSingleRuntimeRequest req, Throwable t) {
-		WorkflowResponse resp = new WorkflowResponse();
-		IStatus istat = new Status(sev, SPIActivator.BUNDLE_ID, msg, t);
-		resp.setStatus(StatusConverter.convert(istat));
-		if( req != null )
-			resp.setRequestId(req.getRequestId());
-		return resp;
-		
+		return WorkflowUtility.quickResponse(sev, msg, req.getRequestId(), t);
 	}
 	
 	@Override

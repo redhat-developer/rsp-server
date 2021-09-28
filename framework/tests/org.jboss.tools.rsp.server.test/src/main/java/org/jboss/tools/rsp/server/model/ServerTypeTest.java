@@ -20,10 +20,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.jboss.tools.rsp.api.RSPServer;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
+import org.jboss.tools.rsp.api.dao.CreateServerWorkflowRequest;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
+import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
@@ -303,6 +306,11 @@ public class ServerTypeTest {
 			CreateServerValidation ret = new CreateServerValidation(error2, new ArrayList<String>());
 			doReturn(ret).when(del).validate();
 			return del;
+		}
+
+		@Override
+		public WorkflowResponse createServerWorkflow(RSPServer server, CreateServerWorkflowRequest req) {
+			return null;
 		}
 
 	}

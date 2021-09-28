@@ -23,6 +23,7 @@ import org.jboss.tools.rsp.api.dao.Attribute;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
+import org.jboss.tools.rsp.api.dao.CreateServerWorkflowRequest;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
@@ -341,6 +342,39 @@ public class StandardCommandHandler implements InputHandler {
 								return;
 							}
 						}
+					}
+				} catch(InterruptedException ie ) {
+					ie.printStackTrace();
+					Thread.currentThread().interrupt();
+				} catch( ExecutionException ioe) {
+					ioe.printStackTrace();
+				}			}
+		},
+
+		WORKFLOW_ADD_SERVER("workflow add server") {
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
+				try {
+					ServerType selected = assistant.chooseServerType();
+					if (selected == null) {
+						System.out.println("Canceling request.");
+						return;
+					}
+					
+					CreateServerWorkflowRequest req = new CreateServerWorkflowRequest();
+					req.setServerTypeId(selected.getId());
+					WorkflowResponse resp = launcher.getServerProxy().createServerWorkflow(req).get();
+					boolean done = false;
+					while( !done ) {
+						boolean continueWorklow = validateWorkflowResponse(resp, assistant, "The server has been added.");
+						if( !continueWorklow )
+							return;
+						Map<String, Object> toSend = displayPromptsSeekWorkflowInput(resp, assistant);
+						CreateServerWorkflowRequest req2 = new CreateServerWorkflowRequest();
+						req2.setRequestId(resp.getRequestId());
+						req2.setServerTypeId(selected.getId());
+						req2.setData(toSend);
+						resp = launcher.getServerProxy().createServerWorkflow(req2).get();
 					}
 				} catch(InterruptedException ie ) {
 					ie.printStackTrace();

@@ -18,6 +18,7 @@ import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
+import org.jboss.tools.rsp.api.dao.CreateServerWorkflowRequest;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.DownloadSingleRuntimeRequest;
 import org.jboss.tools.rsp.api.dao.GetServerJsonResponse;
@@ -192,6 +193,16 @@ public interface RSPServer {
 	@JsonRequest
 	CompletableFuture<CreateServerResponse> createServer(ServerAttributes csa);
 
+	
+	/**
+	 * Initiate a request to create a server via workflow
+	 * @return
+	 */
+	@JsonRequest
+	public CompletableFuture<WorkflowResponse> createServerWorkflow(CreateServerWorkflowRequest req);
+
+	
+	
 	/**
 	 * The `server/getServerAsJson` request is sent by the client to
 	 * fetch a string representation of a server adapter.

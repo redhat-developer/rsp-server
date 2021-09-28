@@ -8,8 +8,11 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.spi.servertype;
 
+import org.jboss.tools.rsp.api.RSPServer;
 import org.jboss.tools.rsp.api.dao.Attributes;
+import org.jboss.tools.rsp.api.dao.CreateServerWorkflowRequest;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
+import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 
 public interface IServerType {
 	public String getId();
@@ -21,4 +24,6 @@ public interface IServerType {
 	public Attributes getRequiredLaunchAttributes();
 	public Attributes getOptionalLaunchAttributes();
 	public ServerLaunchMode[] getLaunchModes();
+	public WorkflowResponse createServerWorkflow(RSPServer server, CreateServerWorkflowRequest req);
+
 }
