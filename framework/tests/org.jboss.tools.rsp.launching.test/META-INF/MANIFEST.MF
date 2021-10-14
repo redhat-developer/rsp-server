@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.jboss.tools.rsp.launching.test
 Automatic-Module-Name: org.jboss.tools.rsp.launching.java.test
-Bundle-Version: 0.24.0.qualifier
+Bundle-Version: 0.25.0.Final
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .
 Require-Bundle: org.jboss.tools.rsp.launching;bundle-version="0.0.9",
