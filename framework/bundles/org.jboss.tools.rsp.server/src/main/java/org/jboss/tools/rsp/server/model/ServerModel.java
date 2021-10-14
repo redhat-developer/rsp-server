@@ -90,6 +90,8 @@ public class ServerModel implements IServerModel {
 		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_INT);
 		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_BOOL);
 		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_STRING);
+		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE);
+		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FOLDER);
 		// List must be List<String>
 		approvedAttributeTypes.add(ServerManagementAPIConstants.ATTR_TYPE_LIST);
 		// Map must be Map<String, String>

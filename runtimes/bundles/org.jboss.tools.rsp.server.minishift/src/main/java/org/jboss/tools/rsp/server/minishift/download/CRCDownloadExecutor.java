@@ -91,7 +91,7 @@ public class CRCDownloadExecutor extends AbstractDownloadManagerExecutor {
 		WorkflowResponseItem item1 = createWorkflowItem(
 				IMinishiftServerAttributes.CRC_IMAGE_PULL_SECRET,
 				prefix + "Pull Secret file: ",
-				ServerManagementAPIConstants.ATTR_TYPE_STRING);
+				ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE);
 		Map<String,String> props = item1.getProperties() == null ? new HashMap<String,String>() : item1.getProperties();
 		props.put(ServerManagementAPIConstants.WORKFLOW_ITEM_BOOLEAN_PROPERTY_LOCAL_FILE, "true");
 		item1.setProperties(props);

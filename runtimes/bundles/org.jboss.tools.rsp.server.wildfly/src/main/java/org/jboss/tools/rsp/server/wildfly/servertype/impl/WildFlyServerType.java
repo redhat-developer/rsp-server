@@ -28,12 +28,12 @@ public class WildFlyServerType extends BaseJBossServerType {
 	protected void fillOptionalAttributes(CreateServerAttributesUtility attrs) {
 		super.fillOptionalAttributes(attrs);
 		attrs.addAttribute(IJBossServerAttributes.WILDFLY_CONFIG_FILE, 
-				ServerManagementAPIConstants.ATTR_TYPE_STRING, 
+				ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE, 
 				"Set the configuration file you want your WildFly instance to use.", 
 				IJBossServerAttributes.WILDFLY_CONFIG_FILE_DEFAULT);
 
 		attrs.addAttribute(IJBossServerAttributes.WILDFLY_DEPLOY_DIR, 
-				ServerManagementAPIConstants.ATTR_TYPE_STRING, 
+				ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FOLDER, 
 				"Override the directory tools should deploy to. Path may be relative to the server home, or absolute.", 
 				"");
 	}

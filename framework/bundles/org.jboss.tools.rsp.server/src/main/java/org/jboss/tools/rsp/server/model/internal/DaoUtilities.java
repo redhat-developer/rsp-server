@@ -25,6 +25,10 @@ public class DaoUtilities {
 			return Boolean.class;
 		} else if( ServerManagementAPIConstants.ATTR_TYPE_STRING.equals(type)) {
 			return String.class;
+		} else if( ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE.equals(type)) {
+			return String.class;
+		} else if( ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FOLDER.equals(type)) {
+			return String.class;
 		} else if( ServerManagementAPIConstants.ATTR_TYPE_LIST.equals(type)) {
 			return List.class;
 		} else if( ServerManagementAPIConstants.ATTR_TYPE_MAP.equals(type)) {

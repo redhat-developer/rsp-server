@@ -59,7 +59,7 @@ public class CDKServerType extends BaseMinishiftServerType {
 	@Override 
 	protected void fillRequiredAttributes(CreateServerAttributesUtility attrs) {
 		attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_BINARY, 
-				ServerManagementAPIConstants.ATTR_TYPE_STRING,
+				ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE,
 				"A filesystem path pointing to a minishift binary file.", null);
 
 		// If there's a global setting for rht username, then this is optional, not required
@@ -88,7 +88,7 @@ public class CDKServerType extends BaseMinishiftServerType {
 				"A minishift profile. Default value is 'minishift'", "minishift");
 
 		attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_HOME, 
-				ServerManagementAPIConstants.ATTR_TYPE_STRING,
+				ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FOLDER,
 				"A attribute to set the MINISHIFT_HOME environment variable when interacting with the server. The MINISHIFT_HOME environment variable allows you to choose a different home directory for Minishift", null);
 		
 		// If there's a global setting for rht username, then this is optional, not required

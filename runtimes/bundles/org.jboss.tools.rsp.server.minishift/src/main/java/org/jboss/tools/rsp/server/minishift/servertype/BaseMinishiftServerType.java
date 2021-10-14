@@ -39,7 +39,7 @@ public abstract class BaseMinishiftServerType extends AbstractServerType {
 	
 	protected void fillRequiredAttributes(CreateServerAttributesUtility attrs) {
 		attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_BINARY, 
-				ServerManagementAPIConstants.ATTR_TYPE_STRING,
+				ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE,
 				"A filesystem path pointing to a minishift binary file.", null);
 	}
 
@@ -63,7 +63,7 @@ public abstract class BaseMinishiftServerType extends AbstractServerType {
 				"A minishift profile. Default value is 'minishift'", "minishift");
 
 		attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_HOME, 
-				ServerManagementAPIConstants.ATTR_TYPE_STRING,
+				ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FOLDER,
 				"A attribute to set the MINISHIFT_HOME environment variable when interacting with the server. The MINISHIFT_HOME environment variable allows you to choose a different home directory for Minishift", null);
 	}
 

@@ -29,10 +29,10 @@ public class CRCServerType extends BaseMinishiftServerType{
 	@Override
 	protected void fillRequiredAttributes(CreateServerAttributesUtility attrs) {
 		attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_BINARY, 
-				ServerManagementAPIConstants.ATTR_TYPE_STRING,
+				ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE,
 				"A filesystem path pointing to a crc binary file.", null);
 		attrs.addAttribute(IMinishiftServerAttributes.CRC_IMAGE_PULL_SECRET, 
-				ServerManagementAPIConstants.ATTR_TYPE_STRING,
+				ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE,
 				"A filesystem path pointing to your CRC Pull Secret file.", null);
 	}
 	

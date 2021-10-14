@@ -132,6 +132,10 @@ public class GenericServerType extends AbstractServerType {
 	private Object convertDefaultValue(String val, String type) {
 		if( ServerManagementAPIConstants.ATTR_TYPE_STRING.equals(type)) 
 			return val;
+		if( ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE.equals(type)) 
+			return val;
+		if( ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FOLDER.equals(type)) 
+			return val;
 		if( ServerManagementAPIConstants.ATTR_TYPE_INT.equals(type))
 			return Integer.parseInt(val);
 		if( ServerManagementAPIConstants.ATTR_TYPE_BOOL.equals(type))

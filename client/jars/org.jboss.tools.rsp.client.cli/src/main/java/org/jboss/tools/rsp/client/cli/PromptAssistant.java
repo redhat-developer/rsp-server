@@ -347,6 +347,10 @@ public class PromptAssistant {
 			return Boolean.class;
 		} else if (ServerManagementAPIConstants.ATTR_TYPE_STRING.equals(type)) {
 			return String.class;
+		} else if (ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE.equals(type)) {
+			return String.class;
+		} else if (ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FOLDER.equals(type)) {
+			return String.class;
 		} else if (ServerManagementAPIConstants.ATTR_TYPE_LIST.equals(type)) {
 			return List.class;
 		} else if (ServerManagementAPIConstants.ATTR_TYPE_MAP.equals(type)) {
@@ -356,11 +360,16 @@ public class PromptAssistant {
 	}
 	
 	public Object convertType(String input, String type) {
+		List<String> stringTypes = Arrays.asList(new String[] {
+				ServerManagementAPIConstants.ATTR_TYPE_STRING,
+				ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE,
+				ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FOLDER,
+		});
 		if (ServerManagementAPIConstants.ATTR_TYPE_INT.equals(type)) {
 			if( input == null || input.length() == 0 )
 				return null;
 			return Integer.parseInt(input);
-		} else if (ServerManagementAPIConstants.ATTR_TYPE_STRING.equals(type)) {
+		} else if (stringTypes.contains(type)) {
 			if( input == null || input.length() == 0 )
 				return null;
 			return input;

@@ -36,7 +36,7 @@ public abstract class BaseJBossServerType extends AbstractServerType {
 		if( required == null ) {
 			CreateServerAttributesUtility attrs = new CreateServerAttributesUtility();
 			attrs.addAttribute(IJBossServerAttributes.SERVER_HOME, 
-					ServerManagementAPIConstants.ATTR_TYPE_STRING, 
+					ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FOLDER, 
 					"A filesystem path pointing to a server installation's root directory", null);
 			required = attrs.toPojo();
 		}
@@ -55,7 +55,7 @@ public abstract class BaseJBossServerType extends AbstractServerType {
 
 	protected void fillOptionalAttributes(CreateServerAttributesUtility attrs) {
 		attrs.addAttribute(IJBossServerAttributes.VM_INSTALL_PATH, 
-				ServerManagementAPIConstants.ATTR_TYPE_STRING, 
+				ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FOLDER, 
 				"A string representation pointing to a java home. If not set, java.home will be used instead.", null);
 
 		attrs.addAttribute(IJBossServerAttributes.AUTOPUBLISH_ENABLEMENT, 

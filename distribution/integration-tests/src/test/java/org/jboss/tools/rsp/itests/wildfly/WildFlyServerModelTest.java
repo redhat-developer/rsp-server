@@ -163,7 +163,7 @@ public class WildFlyServerModelTest extends RSPCase {
         		);
         expected.put(IJBossServerAttributes.WILDFLY_CONFIG_FILE, 
         		new Attribute(
-					ServerManagementAPIConstants.ATTR_TYPE_STRING, 
+					ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE, 
 					"Set the configuration file you want your WildFly instance to use.", 
 					IJBossServerAttributes.WILDFLY_CONFIG_FILE_DEFAULT)
         		);
