@@ -26,6 +26,7 @@ public interface ServerManagementAPIConstants extends DefaultServerAttributes {
 	 * Added 0.25.0
 	 */
 	public static final String ATTR_TYPE_LOCAL_FILE = "local_file";
+	public static final String ATTR_TYPE_LOCAL_FOLDER = "local_folder";
 	public static final String ATTR_TYPE_LIST = "list";
 	public static final String ATTR_TYPE_MAP = "map";
 	
