@@ -119,13 +119,14 @@ pipeline {
                         }
                     }
                 }
-                stage('Parallel integration tests') {
-                    steps {
-                        script {
-                            parallel axes
-                        }
-                    }
-                }
+
+//                stage('Parallel integration tests') {
+//                    steps {
+//                        script {
+//                            parallel axes
+//                        }
+//                    }
+//                }
             }
         }
     }
