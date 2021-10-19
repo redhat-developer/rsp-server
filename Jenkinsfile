@@ -86,12 +86,14 @@ pipeline {
                                 stash includes: 'site/target/repository/**', name: 'site'
                             }
                         }
-                        stage('Integration tests') {
-                            steps {
-                                sh 'mvn verify -B -Pintegration-tests -DskipTests=true -Dmaven.test.failure.ignore=true'
-                                archiveArtifacts 'distribution/integration-tests/target/quickstarts/*/build.log'
-                            }
-                        }
+
+//                        stage('Integration tests') {
+//                            steps {
+//                                sh 'mvn verify -B -Pintegration-tests -DskipTests=true -Dmaven.test.failure.ignore=true'
+//                                archiveArtifacts 'distribution/integration-tests/target/quickstarts/*/build.log'
+//                            }
+//                        }
+
                         stage('SonarCloud Report') {
                             when {
                                 expression {
