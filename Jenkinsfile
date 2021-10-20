@@ -87,12 +87,12 @@ pipeline {
                             }
                         }
 
-//                        stage('Integration tests') {
-//                            steps {
-//                                sh 'mvn verify -B -Pintegration-tests -DskipTests=true -Dmaven.test.failure.ignore=true'
-//                                archiveArtifacts 'distribution/integration-tests/target/quickstarts/*/build.log'
-//                            }
-//                        }
+                       stage('Integration tests') {
+                           steps {
+                               sh 'mvn verify -B -Pintegration-tests -DskipTests=true -Dmaven.test.failure.ignore=true'
+                               archiveArtifacts 'distribution/integration-tests/target/quickstarts/*/build.log'
+                           }
+                       }
 
                         stage('SonarCloud Report') {
                             when {
@@ -120,13 +120,13 @@ pipeline {
                     }
                 }
 
-//                stage('Parallel integration tests') {
-//                    steps {
-//                        script {
-//                            parallel axes
-//                        }
-//                    }
-//                }
+               stage('Parallel integration tests') {
+                   steps {
+                       script {
+                           parallel axes
+                       }
+                   }
+               }
             }
         }
     }
