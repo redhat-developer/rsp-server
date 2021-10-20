@@ -8,7 +8,10 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.itests.util;
 
+import java.io.IOException;
 import java.net.Socket;
+import java.net.UnknownHostException;
+
 import org.jboss.tools.rsp.api.RSPServer;
 import org.jboss.tools.rsp.api.SocketLauncher;
 import org.jboss.tools.rsp.client.cli.ServerManagementCLI;
@@ -31,7 +34,7 @@ public class DummyClientLauncher {
         this.port = port;
     }
 
-    public void launch() throws Exception {
+    public void launch() throws UnknownHostException, IOException {
         DummyClient client = new DummyClient();
         this.socket = new Socket(host, port);
         this.launcher = new SocketLauncher<>(client, RSPServer.class, socket);

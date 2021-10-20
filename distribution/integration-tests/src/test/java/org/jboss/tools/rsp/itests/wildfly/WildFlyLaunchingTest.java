@@ -267,7 +267,8 @@ public class WildFlyLaunchingTest extends RSPCase {
 
     @Test
     public void testStopServer() throws Exception {
-        createServer(WILDFLY_ROOT, "wildfly5");
+        Status status = createServer(WILDFLY_ROOT, "wildfly5");
+        assertEquals(Status.OK, status.getSeverity());
         Map<String, Object> attr = new HashMap<>();
         attr.put("server.home.dir", WILDFLY_ROOT);
         LaunchParameters params = new LaunchParameters(
@@ -276,7 +277,7 @@ public class WildFlyLaunchingTest extends RSPCase {
         serverProxy.startServerAsync(params).get(SERVER_OPERATION_TIMEOUT, TimeUnit.MILLISECONDS);
         waitForServerState(ServerManagementAPIConstants.STATE_STARTED, 10, client);
         
-        Status status = serverProxy.stopServerAsync(new StopServerAttributes("wildfly5", false)).get(SERVER_OPERATION_TIMEOUT, TimeUnit.MILLISECONDS);
+        status = serverProxy.stopServerAsync(new StopServerAttributes("wildfly5", false)).get(SERVER_OPERATION_TIMEOUT, TimeUnit.MILLISECONDS);
         waitForServerState(ServerManagementAPIConstants.STATE_STOPPED, 10, client);
         
         assertEquals(Status.OK, status.getSeverity());

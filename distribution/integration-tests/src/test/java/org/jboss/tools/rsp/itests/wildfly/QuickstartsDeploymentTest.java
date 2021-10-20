@@ -177,7 +177,7 @@ public class QuickstartsDeploymentTest extends RSPCase {
 		assertTrue(serverProxy.getDeployables(handle).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS).getStates().isEmpty());
 		state = getDeployableStateByReference(handle, reference);
 		assertNull("Deployable reference was still found", state);
-		HttpUtility.waitForUrlEndpoint(url, 404, 30);
+		HttpUtility.waitForUrlEndpoint(url, 404, 60);
 	}
 
 	private DeployableState getDeployableStateByReference(ServerHandle handle, DeployableReference reference) throws TimeoutException {
