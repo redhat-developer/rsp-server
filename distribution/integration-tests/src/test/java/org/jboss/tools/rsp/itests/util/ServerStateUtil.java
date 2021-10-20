@@ -18,7 +18,8 @@ import org.jboss.tools.rsp.api.dao.ServerState;
  */
 public class ServerStateUtil {
 
-	private static final long WAIT_FOR_SERVERSTATE = 3000;
+	public static final String OS = System.getProperty("os.name");
+	private static final long WAIT_FOR_SERVERSTATE = OS.indexOf("win") >= 0 ? 5000 : 3000;
     private static final int NO_STATE = -1;
 
 	public static String toStateString(ServerState state) {
@@ -51,9 +52,10 @@ public class ServerStateUtil {
     public static ServerState waitForServerState(int expected, int attempts, DummyClient client) throws Exception {
         int tries = attempts;
         
+        ServerState s = null;
         while(tries > 0) {
             tries--;
-            ServerState s = client.getStateObject();
+            s = client.getStateObject();
 			if (s != null) {
 				if (expected == NO_STATE
 						|| expected == s.getState()) {
@@ -62,7 +64,7 @@ public class ServerStateUtil {
 			}
             Thread.sleep(WAIT_FOR_SERVERSTATE);
         }
-        throw new AssertionError("Waiting for server state to change to " + expected + " timed out");
+        throw new AssertionError("Waiting for server state to change to " + expected + " timed out. Last state was " + s.getState());
     }
     
     public static ServerState waitForDeployables(int attempts, DummyClient client) throws Exception {

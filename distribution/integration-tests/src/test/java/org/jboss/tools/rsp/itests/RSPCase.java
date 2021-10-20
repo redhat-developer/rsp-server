@@ -68,7 +68,7 @@ public abstract class RSPCase {
 	protected static final String MODE_RUN = "run";
 	protected static final String STATUS_MESSAGE_OK = "ok";
 	protected static final int SERVER_OPERATION_TIMEOUT = 10000;
-	protected static final int REQUEST_TIMEOUT = 4000;
+	protected static final int REQUEST_TIMEOUT = 5000;
 
 	protected static DummyClientLauncher launcher;
 	protected static RSPServer serverProxy;
@@ -137,7 +137,13 @@ public abstract class RSPCase {
 		RSPServerHandler.prepareServer();
 		RSPServerHandler.startServer();
 		launcher = new DummyClientLauncher("localhost", 27511);
-		launcher.launch();
+		try {
+			launcher.launch();
+		} catch (Exception exc) {
+			exc.printStackTrace();
+			System.out.print(" Rerun: launcher.launch()");
+			launcher.launch();
+		}
 		serverProxy = launcher.getServerProxy();
 	}
 
