@@ -2,8 +2,15 @@
 
 def default_java = "openjdk-11"
 def default_os = "rhel7"
-def java_axes = ["openjdk-1.8", "openjdk-11"]
-def os_axes = ["rhel7", "win10"]
+def java_axes = []
+def os_axes = []
+if (params.SIMPLE_MATRIX) {
+    java_axes = ["openjdk-11"]
+    os_axes = ["rhel7"]
+} else {
+    java_axes = ["openjdk-1.8", "openjdk-11"]
+    os_axes = ["rhel7", "win10"]
+}
 
 def axes = [:]
 os_axes.each {
@@ -81,7 +88,7 @@ pipeline {
                             steps {
                                 unstash 'source'
                                 sh 'mvn clean install -fae -B'
-                                archiveArtifacts 'distribution/distribution*/target/org.jboss.tools.rsp.distribution*.zip,api/docs/org.jboss.tools.rsp.schema/target/*.jar,site/target/repository/**'
+                                archiveArtifacts artifacts: 'distribution/distribution*/target/org.jboss.tools.rsp.distribution*.zip,api/docs/org.jboss.tools.rsp.schema/target/*.jar,site/target/repository/**', allowEmptyArchive: true
                                 stash includes: 'distribution/distribution*/target/org.jboss.tools.rsp.distribution*.zip,api/docs/org.jboss.tools.rsp.schema/target/*.jar', name: 'zips'
                                 stash includes: 'site/target/repository/**', name: 'site'
                             }
@@ -90,7 +97,7 @@ pipeline {
                        stage('Integration tests') {
                            steps {
                                sh 'mvn verify -B -Pintegration-tests -DskipTests=true -Dmaven.test.failure.ignore=true'
-                               archiveArtifacts 'distribution/integration-tests/target/quickstarts/*/build.log'
+                               archiveArtifacts artifacts: 'distribution/integration-tests/target/quickstarts/*/build.log', allowEmptyArchive: true
                            }
                        }
 
@@ -115,7 +122,7 @@ pipeline {
                     post {
                         always {
                             junit '**/surefire-reports/*.xml'
-                            archiveArtifacts '**/integration-tests/target/surefire-reports/*,**/tests/**/target/surefire-reports/*'
+                            archiveArtifacts artifacts: '**/integration-tests/target/surefire-reports/*,**/tests/**/target/surefire-reports/*', allowEmptyArchive: true
                         }
                     }
                 }
@@ -137,7 +144,7 @@ pipeline {
                     dir("${it.key}") {
                         unstash "${it.key}"
                     }
-                    archiveArtifacts "${it.key}/**/integration-tests/target/surefire-reports/*,**/tests/**/target/surefire-reports/*"
+                    archiveArtifacts artifacts: "${it.key}/**/integration-tests/target/surefire-reports/*,**/tests/**/target/surefire-reports/*", allowEmptyArchive: true
                 }
             }
         }
@@ -179,9 +186,9 @@ pipeline {
                     sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${filesToPush[i].path} ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/${upload_dir}/rsp-server/"
                 }
 
-		sh "echo org.jboss.tools.rsp.distribution.latest.version=${distroVersion} > LATEST"
-		sh "echo org.jboss.tools.rsp.distribution.latest.url=https://download.jboss.org/jbosstools/adapters/${upload_dir}/rsp-server/org.jboss.tools.rsp.distribution-${distroVersion}.zip >> LATEST"
-		sh "rsync -Pzrlt --rsh=ssh --protocol=28 LATEST ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/${upload_dir}/rsp-server/"
+        		sh "echo org.jboss.tools.rsp.distribution.latest.version=${distroVersion} > LATEST"
+        		sh "echo org.jboss.tools.rsp.distribution.latest.url=https://download.jboss.org/jbosstools/adapters/${upload_dir}/rsp-server/org.jboss.tools.rsp.distribution-${distroVersion}.zip >> LATEST"
+        		sh "rsync -Pzrlt --rsh=ssh --protocol=28 LATEST ${UPLOAD_USER_AT_HOST}:${UPLOAD_PATH}/${upload_dir}/rsp-server/"
             }
         }
     }
