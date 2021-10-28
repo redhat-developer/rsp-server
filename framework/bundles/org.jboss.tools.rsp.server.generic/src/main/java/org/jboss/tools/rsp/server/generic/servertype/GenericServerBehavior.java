@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.jboss.tools.rsp.api.DefaultServerAttributes;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
@@ -352,6 +354,28 @@ public class GenericServerBehavior extends AbstractServerDelegate
 				setServerState(STATE_STOPPED, true);
 			return;
 		}
+		if("delayedSuccess".equals(pollerId)) {
+			if( upOrDown == IServerStatePoller.SERVER_STATE.UP) {
+				Executors.newSingleThreadExecutor().submit(() -> {
+					try {
+						Thread.sleep(3000);
+					} catch(Throwable t) {
+					}
+					setServerState(STATE_STARTED, true);
+				});
+			}
+			if( upOrDown == IServerStatePoller.SERVER_STATE.DOWN) {
+				Executors.newSingleThreadExecutor().submit(() -> {
+					try {
+						Thread.sleep(3000);
+					} catch(Throwable t) {
+					}
+					setServerState(STATE_STOPPED, true);
+				});
+			}
+			return;
+		}
+		
 		if("noOpPoller".equals(pollerId)) {
 			return;
 		}

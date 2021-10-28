@@ -53,6 +53,9 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 		if (force && terminateProcesses(launch)) {
 			return null;
 		}
+		if( launch == null )
+			return null;
+		
 		return launch("run");
 	}
 
