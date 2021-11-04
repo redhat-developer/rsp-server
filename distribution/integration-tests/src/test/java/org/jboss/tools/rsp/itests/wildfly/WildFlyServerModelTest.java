@@ -109,7 +109,7 @@ public class WildFlyServerModelTest extends RSPCase {
         Attributes attr = serverProxy.getRequiredAttributes(wildflyType).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
         
         Map<String, Attribute> expected = new HashMap<>();
-        expected.put("server.home.dir", new Attribute("string", "A filesystem path pointing to a server installation's root directory", null));
+        expected.put("server.home.dir", new Attribute(ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FOLDER, "A filesystem path pointing to a server installation's root directory", null));
         assertEquals(new Attributes(expected), attr);
     }
     
