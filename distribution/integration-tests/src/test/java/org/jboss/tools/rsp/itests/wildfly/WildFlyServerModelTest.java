@@ -134,7 +134,7 @@ public class WildFlyServerModelTest extends RSPCase {
         Attributes attr = serverProxy.getOptionalAttributes(wildflyType).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
         
         Map<String, Attribute> expected = new HashMap<>();
-        expected.put("vm.install.path", new Attribute("string",
+        expected.put("vm.install.path", new Attribute(ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FOLDER,
                 "A string representation pointing to a java home. If not set, java.home will be used instead.", null));
         
         expected.put(IJBossServerAttributes.AUTOPUBLISH_ENABLEMENT,
@@ -163,7 +163,7 @@ public class WildFlyServerModelTest extends RSPCase {
         		);
         expected.put(IJBossServerAttributes.WILDFLY_CONFIG_FILE, 
         		new Attribute(
-					ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FOLDER, 
+					ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE, 
 					"Set the configuration file you want your WildFly instance to use.", 
 					IJBossServerAttributes.WILDFLY_CONFIG_FILE_DEFAULT)
         		);
