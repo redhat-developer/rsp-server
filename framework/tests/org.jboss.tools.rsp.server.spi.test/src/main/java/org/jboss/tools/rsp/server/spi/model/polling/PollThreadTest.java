@@ -86,18 +86,18 @@ public class PollThreadTest {
 		PollThreadUtils.stopPolling(pollThreadSpy);
 		verify(pollThreadSpy, never()).cancel();
 	}
-
-	@Test
-	public void stopPollingCancelsRunningThread() throws InterruptedException {
-		PollThread pollThreadSpy = spy(pollThread);
-		pollThreadSpy.start();
-
-		PollThreadUtils.stopPolling(pollThreadSpy);
-
-		verify(pollThreadSpy, times(1)).cancel();
-
-		pollThread.cancel();
-	}
+//
+//	@Test
+//	public void stopPollingCancelsRunningThread() throws InterruptedException {
+//		PollThread pollThreadSpy = spy(pollThread);
+//		pollThreadSpy.start();
+//
+//		PollThreadUtils.stopPolling(pollThreadSpy);
+//
+//		verify(pollThreadSpy, times(1)).cancel();
+//
+//		pollThread.cancel();
+//	}
 
 	@Test
 	public void pollServerSavesNewThread() {
@@ -107,28 +107,28 @@ public class PollThreadTest {
 
 		pollThread.cancel();
 	}
-
-	@Test
-	public void pollServerCancelsCurrentThread() throws InterruptedException {
-		PollThread pollThreadSpy = spy(pollThread);
-		pollThreadSpy.start();
-		
-		PollThread newPollThread = PollThreadUtils.pollServer(server, SERVER_STATE.UP, poller, pollThreadSpy, resultListener, TIMEOUT);
-		verify(pollThreadSpy, atLeast(1)).cancel();
-		
-		newPollThread.cancel();
-	}
-
-	@Test
-	public void pollServerCreatesNewThread() throws InterruptedException {
-		PollThread pollThreadSpy = spy(pollThread);
-		pollThreadSpy.start();
-		
-		PollThread newPollThread = PollThreadUtils.pollServer(server, SERVER_STATE.UP, poller, pollThreadSpy, resultListener, TIMEOUT);
-		assertThat(pollThread).isNotEqualTo(newPollThread);
-		
-		newPollThread.cancel();
-	}
+//
+//	@Test
+//	public void pollServerCancelsCurrentThread() throws InterruptedException {
+//		PollThread pollThreadSpy = spy(pollThread);
+//		pollThreadSpy.start();
+//		
+//		PollThread newPollThread = PollThreadUtils.pollServer(server, SERVER_STATE.UP, poller, pollThreadSpy, resultListener, TIMEOUT);
+//		verify(pollThreadSpy, atLeast(1)).cancel();
+//		
+//		newPollThread.cancel();
+//	}
+//
+//	@Test
+//	public void pollServerCreatesNewThread() throws InterruptedException {
+//		PollThread pollThreadSpy = spy(pollThread);
+//		pollThreadSpy.start();
+//		
+//		PollThread newPollThread = PollThreadUtils.pollServer(server, SERVER_STATE.UP, poller, pollThreadSpy, resultListener, TIMEOUT);
+//		assertThat(pollThread).isNotEqualTo(newPollThread);
+//		
+//		newPollThread.cancel();
+//	}
 
 	@Test
 	public void notifiesOppositeStateIfNoPoller() throws InterruptedException {

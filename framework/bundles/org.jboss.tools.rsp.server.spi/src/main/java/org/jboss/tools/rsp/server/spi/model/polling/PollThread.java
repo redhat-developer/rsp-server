@@ -11,6 +11,7 @@ package org.jboss.tools.rsp.server.spi.model.polling;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller.CANCELATION_CAUSE;
 import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller.SERVER_STATE;
+import org.jboss.tools.rsp.server.spi.model.polling.IServerStatePoller.TIMEOUT_BEHAVIOR;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.slf4j.Logger;
@@ -128,8 +129,18 @@ public class PollThread extends Thread {
 
 	private void handleTimeoutTermination() {
 		cancelPoller(CANCELATION_CAUSE.TIMEOUT_REACHED);
-		SERVER_STATE state = poller.getTimeoutBehavior().getServerState(expectedState);
-		alertListener(state);
+		TIMEOUT_BEHAVIOR beh = poller.getTimeoutBehavior();
+		if( beh != null ) {
+			SERVER_STATE state = beh.getServerState(expectedState);
+			alertListener(state);
+		} else {
+			// We have to treat it as a fail if the poller doesn't implement this
+			if( expectedState == SERVER_STATE.DOWN) {
+				alertListener(SERVER_STATE.UP);
+			} else {
+				alertListener(SERVER_STATE.DOWN);
+			}
+		}
 	}
 	
 	private void handleUncertainTermination() {
