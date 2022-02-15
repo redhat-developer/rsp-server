@@ -48,8 +48,8 @@ Require-Bundle: org.jboss.tools.rsp.api,
  org.jboss.tools.rsp.server.generic,
  org.jboss.tools.rsp.runtime.core,
  org.junit,
- org.jboss.tools.locus.mockito,
- org.assertj.core;bundle-version="2.1.0",
+ org.mockito,
+ org.assertj,
  javax.annotation;bundle-version="1.2.0",
  org.jboss.tools.rsp.server.spi
 Bundle-Activator: org.jboss.tools.rsp.server.generic.test.GenericServerTestActivator
