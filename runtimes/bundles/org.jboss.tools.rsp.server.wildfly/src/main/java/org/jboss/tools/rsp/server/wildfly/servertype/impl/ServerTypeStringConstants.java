@@ -150,5 +150,9 @@ public interface ServerTypeStringConstants {
 	public static final String EAP73_NAME = "JBoss EAP 7.3";
 	public static final String EAP73_DESC = "A server adapter capable of discovering and controlling a JBoss EAP 7.3 runtime instance.";
 
+	public static final String EAP_XP_ID = IServerConstants.SERVER_EAP_XP;
+	public static final String EAP_XP_NAME = "Standalone Web Application";
+	public static final String EAP_XP_DESC = "A server adapter capable of launching a standalone microprofile project.";
+
 	
 }
