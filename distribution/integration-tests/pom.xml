@@ -15,18 +15,18 @@
 
 	<properties>
 		<skipITests>true</skipITests>
-            <server.id>install-wildfly-24.0.0.Final</server.id>
-            <server.url>https://download.jboss.org/wildfly/24.0.0.Final/wildfly-24.0.0.Final.zip</server.url>
-            <server.sha1>708451bb57d679f64a84010af9cbb5d19cf89c8a</server.sha1>
+            <server.id>install-wildfly-26.1.1.Final</server.id>
+            <server.url>https://github.com/wildfly/wildfly/releases/download/26.1.1.Final/wildfly-26.1.1.Final.zip</server.url>
+            <server.sha1>8c76263c93ee4fa96cde1d7acca68b57a99b1df0</server.sha1>
             <server.type.id>org.jboss.ide.eclipse.as.wildfly.240</server.type.id>
-            <server.version>24.0.0.Final</server.version>
+            <server.version>26.1.1.Final</server.version>
 		<server.path>${project.build.directory}/wildfly-${server.version}</server.path>
 		<!-- Sonar report property for code coverage -->
 		<sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 		<!-- Quickstarts properties -->
 		<quickstarts.server>wildfly</quickstarts.server>
-		<quickstarts.url>https://github.com/wildfly/quickstart/archive/24.0.0.Final.zip</quickstarts.url>
-		<quickstarts.dir>quickstart-24.0.0.Final</quickstarts.dir>
+		<quickstarts.url>https://github.com/wildfly/quickstart/archive/26.1.1.Final.zip</quickstarts.url>
+		<quickstarts.dir>quickstart-26.1.1.Final</quickstarts.dir>
 	</properties>
 
 	<name>Runtime Server Protocol : Integration Tests</name>
@@ -330,6 +330,38 @@
 			</properties>
 		</profile>
 		<profile>
+			<id>wildfly-25</id>
+			<activation>
+				<property>
+					<name>wildfly</name>
+					<value>25</value>
+				</property>
+			</activation>
+			<properties>
+				<server.id>install-wildfly-25.0.1.Final</server.id>
+				<server.url>hthttps://github.com/wildfly/wildfly/releases/download/25.0.1.Final/wildfly-25.0.1.Final.zip</server.url>
+				<server.sha1>bec1609897894eeab5b243766c9fc66ac960de49</server.sha1>
+				<server.type.id>org.jboss.ide.eclipse.as.wildfly.240</server.type.id>
+				<server.version>25.0.1.Final</server.version>
+			</properties>
+		</profile>
+		<profile>
+			<id>wildfly-26</id>
+			<activation>
+				<property>
+					<name>wildfly</name>
+					<value>26</value>
+				</property>
+			</activation>
+			<properties>
+				<server.id>install-wildfly-26.1.1.Final</server.id>
+				<server.url>https://github.com/wildfly/wildfly/releases/download/26.1.1.Final/wildfly-26.1.1.Final.zip</server.url>
+				<server.sha1>8c76263c93ee4fa96cde1d7acca68b57a99b1df0</server.sha1>
+				<server.type.id>org.jboss.ide.eclipse.as.wildfly.240</server.type.id>
+				<server.version>26.1.1.Final</server.version>
+			</properties>
+		</profile>
+		<profile>
 			<id>wildfly-quickstarts</id>
 			<activation>
 				<property>
@@ -338,21 +370,8 @@
 			</activation>
 			<properties>
 				<quickstarts.server>wildfly</quickstarts.server>
-				<quickstarts.dir>quickstart-24.0.0.Final</quickstarts.dir>
-				<quickstarts.url>https://github.com/wildfly/quickstart/archive/24.0.0.Final.zip</quickstarts.url>
-			</properties>
-		</profile>
-		<profile>
-			<id>eap-quickstarts</id>
-			<activation>
-				<property>
-					<name>eap</name>
-				</property>
-			</activation>
-			<properties>
-				<quickstarts.server>eap</quickstarts.server>
-				<quickstarts.dir>jboss-eap-7.2.1.GA-quickstarts</quickstarts.dir>
-				<quickstarts.url>https://download.eng.brq.redhat.com/released/JBoss-middleware/eap7/7.2.1/jboss-eap-7.2.1-quickstarts.zip</quickstarts.url>
+				<quickstarts.dir>quickstart-26.1.1.Final</quickstarts.dir>
+				<quickstarts.url>https://github.com/wildfly/quickstart/archive/26.1.1.Final.zip</quickstarts.url>
 			</properties>
 		</profile>
 	</profiles>
