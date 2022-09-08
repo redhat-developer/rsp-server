@@ -116,10 +116,13 @@ public class IOUtil {
 	            	 f.mkdirs();
 	             } else {
 	            	 File f = new File(toLoc, eName);
+															if(!f.toPath().normalize().startsWith(toLoc.toPath().normalize())) {
+																throw new IOException("Bad zip entry");
+															}
 		             f.getParentFile().mkdirs();
 		             if( !f.exists()) {
 		            	 String out = f.getAbsolutePath();
-						try (BufferedOutputStream dest = new BufferedOutputStream(new FileOutputStream(out), BUFFER)) {
+						try (BufferedOutputStream dest = new BufferedOutputStream(new FileOutputStream(new File(out)), BUFFER)) {
 							while ((count = zis.read(data, 0, BUFFER)) != -1) {
 								dest.write(data, 0, count);
 							}
