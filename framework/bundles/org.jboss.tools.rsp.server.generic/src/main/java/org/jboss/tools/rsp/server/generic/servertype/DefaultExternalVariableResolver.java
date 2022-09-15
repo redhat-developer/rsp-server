@@ -8,12 +8,15 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.generic.servertype;
 
+import java.util.Map;
+
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.server.LauncherSingleton;
 import org.jboss.tools.rsp.server.generic.discovery.GenericVMRegistryDiscovery;
 import org.jboss.tools.rsp.server.generic.servertype.variables.ServerStringVariableManager.IExternalVariableResolver;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
+import org.jboss.tools.rsp.server.spi.servertype.IServerType;
 
 /**
  * This class currently only exposes java.home as a resolvable / dynamic attribute.
@@ -34,6 +37,15 @@ public class DefaultExternalVariableResolver implements IExternalVariableResolve
 		if( "java.home".equals(key)) {
 			IVMInstall vm1 = new GenericVMRegistryDiscovery().findVMInstall(getGenericServerBehavior());
 			return vm1 == null ? null : vm1.getInstallLocation().getAbsolutePath();
+		}
+		IServerType st = this.genericServerBehavior.getServer().getServerType();
+		if( st != null && st instanceof GenericServerType) {
+			GenericServerType st1 = (GenericServerType)st;
+			Map<String, Object> map = st1.getDefaults();
+			if( map.containsKey(key)) {
+				Object v = map.get(key);
+				return v == null ? null : v.toString();
+			}
 		}
 		return null;
 	}
