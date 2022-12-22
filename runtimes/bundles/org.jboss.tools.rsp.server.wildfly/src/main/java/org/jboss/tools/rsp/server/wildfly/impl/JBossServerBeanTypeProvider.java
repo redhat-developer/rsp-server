@@ -25,6 +25,7 @@ import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeEAP71;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeEAP72;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeEAP73;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeEAP74;
+import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeEAP80;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeEAPStandalone;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeEPP;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeEWP;
@@ -37,8 +38,8 @@ import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeSOAPStandalon
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeUnknownAS71Product;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeUnknownAS72Product;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly19;
-import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly24Plus;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildfly80;
+import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildflyPlus;
 import org.jboss.tools.rsp.server.wildfly.beans.impl.ServerBeanTypeWildflyX;
 
 public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider, IJBossServerResourceConstants {
@@ -161,12 +162,18 @@ public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider, IJB
 			ID_WILDFLY_WEB, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
 			true, "23.", IServerConstants.SERVER_WILDFLY_230);
 
-	public static final ServerBeanTypeWildfly24Plus WILDFLY240 = new ServerBeanTypeWildfly24Plus(
+	public static final ServerBeanTypeWildflyPlus WILDFLY240 = new ServerBeanTypeWildflyPlus(
 			ID_WILDFLY, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
-			false, "24.", IServerConstants.SERVER_WILDFLY_240);
-	public static final ServerBeanTypeWildfly24Plus WILDFLY240_WEB = new ServerBeanTypeWildfly24Plus(
+			false, 24, IServerConstants.SERVER_WILDFLY_240);
+	public static final ServerBeanTypeWildflyPlus WILDFLY240_WEB = new ServerBeanTypeWildflyPlus(
 			ID_WILDFLY_WEB, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
-			true, "24.", IServerConstants.SERVER_WILDFLY_240);
+			true, 24, IServerConstants.SERVER_WILDFLY_240);
+	public static final ServerBeanTypeWildflyPlus WILDFLY270 = new ServerBeanTypeWildflyPlus(
+			ID_WILDFLY, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			false, 27, IServerConstants.SERVER_WILDFLY_270);
+	public static final ServerBeanTypeWildflyPlus WILDFLY270_WEB = new ServerBeanTypeWildflyPlus(
+			ID_WILDFLY_WEB, NAME_WILDFLY, AS7_MODULE_LAYERED_SERVER_MAIN,
+			true, 27, IServerConstants.SERVER_WILDFLY_270);
 
 	// NEW_SERVER_ADAPTER
 
@@ -175,6 +182,7 @@ public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider, IJB
 	public static final ServerBeanType EAP72 = new ServerBeanTypeEAP72();
 	public static final ServerBeanType EAP73 = new ServerBeanTypeEAP73();
 	public static final ServerBeanType EAP74 = new ServerBeanTypeEAP74();
+	public static final ServerBeanType EAP80 = new ServerBeanTypeEAP80();
 		
 	public static final ServerBeanType JPP6 = new ServerBeanTypeJPP6();
 	
@@ -202,7 +210,7 @@ public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider, IJB
 	 */
 	public static final ServerBeanType[] KNOWN_TYPES =
 		{
-		AS,  EAP70, EAP71, EAP72, EAP73, EAP74,
+		AS,  EAP70, EAP71, EAP72, EAP73, EAP74, EAP80,
 		WILDFLY90,  WILDFLY90_WEB, 
 		WILDFLY100, WILDFLY100_WEB,
 		WILDFLY110, WILDFLY110_WEB,
@@ -219,6 +227,7 @@ public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider, IJB
 		WILDFLY220, WILDFLY220_WEB,
 		WILDFLY230, WILDFLY230_WEB,
 		WILDFLY240, WILDFLY240_WEB,
+		WILDFLY270, WILDFLY270_WEB,
 		WILDFLY80, 
 		FSW6, EAP61, SOA6, JPP61,  DV6, 
 		UNKNOWN_AS72_PRODUCT,

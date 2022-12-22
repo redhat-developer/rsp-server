@@ -72,6 +72,7 @@ public class ServerBeanTypeTest {
 		map.put(IServerConstants.SERVER_EAP_72, new ServerBeanTypeMock(ID_EAP, NAME_EAP, IServerConstants.SERVER_EAP_72, "7.2"));
 		map.put(IServerConstants.SERVER_EAP_73, new ServerBeanTypeMock(ID_EAP, NAME_EAP, IServerConstants.SERVER_EAP_73, "7.3"));
 		map.put(IServerConstants.SERVER_EAP_74, new ServerBeanTypeMock(ID_EAP, NAME_EAP, IServerConstants.SERVER_EAP_74, "7.4"));
+		map.put(IServerConstants.SERVER_EAP_80, new ServerBeanTypeMock(ID_EAP, NAME_EAP, IServerConstants.SERVER_EAP_80, "8.0"));
 		map.put(IServerConstants.SERVER_WILDFLY_80, new ServerBeanTypeMock(ID_WILDFLY, NAME_WILDFLY, IServerConstants.SERVER_WILDFLY_80, "8.0"));
 		map.put(IServerConstants.SERVER_WILDFLY_90, new ServerBeanTypeMock(ID_WILDFLY, NAME_WILDFLY, IServerConstants.SERVER_WILDFLY_90, "9.0"));
 		map.put(IServerConstants.SERVER_WILDFLY_100, new ServerBeanTypeMock(ID_WILDFLY, NAME_WILDFLY, IServerConstants.SERVER_WILDFLY_100, "10.0"));
@@ -89,6 +90,7 @@ public class ServerBeanTypeTest {
 		map.put(IServerConstants.SERVER_WILDFLY_220, new ServerBeanTypeMock(ID_WILDFLY, NAME_WILDFLY, IServerConstants.SERVER_WILDFLY_220, "22.0"));
 		map.put(IServerConstants.SERVER_WILDFLY_230, new ServerBeanTypeMock(ID_WILDFLY, NAME_WILDFLY, IServerConstants.SERVER_WILDFLY_230, "23.0"));
 		map.put(IServerConstants.SERVER_WILDFLY_240, new ServerBeanTypeMock(ID_WILDFLY, NAME_WILDFLY, IServerConstants.SERVER_WILDFLY_240, "24.0"));
+		map.put(IServerConstants.SERVER_WILDFLY_270, new ServerBeanTypeMock(ID_WILDFLY, NAME_WILDFLY, IServerConstants.SERVER_WILDFLY_270, "27.0"));
 		// NEW_SERVER_ADAPTER
 		return map;
 	}
