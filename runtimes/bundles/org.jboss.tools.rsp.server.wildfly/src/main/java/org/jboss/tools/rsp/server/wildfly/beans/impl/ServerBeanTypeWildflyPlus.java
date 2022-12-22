@@ -16,16 +16,18 @@ import java.util.Collections;
 
 import org.jboss.tools.rsp.server.wildfly.impl.util.JBossManifestUtility;
 
-public class ServerBeanTypeWildfly24Plus extends JBossServerBeanType {
+public class ServerBeanTypeWildflyPlus extends JBossServerBeanType {
 	private boolean web;
 	private String versionPrefix;
 	private String serverAdapterId;
+	private int majorVersion;
 
-	public ServerBeanTypeWildfly24Plus( String id, String name, String systemJarPath,
-			boolean web, String versionPrefix, String serverAdapterId) {
+	public ServerBeanTypeWildflyPlus( String id, String name, String systemJarPath,
+			boolean web, int majorVersion, String serverAdapterId) {
 		super(id, name, systemJarPath);
 		this.web = web;
-		this.versionPrefix = versionPrefix;
+		this.majorVersion = majorVersion;
+		this.versionPrefix = Integer.toString(majorVersion) + ".";
 		this.serverAdapterId = serverAdapterId;
 	}
 	
@@ -36,9 +38,9 @@ public class ServerBeanTypeWildfly24Plus extends JBossServerBeanType {
 	@Override
 	public String getFullVersion(File location, File systemFile) {
 		if( !this.web ) 
-			return getFullVersion(location, systemFile, this.versionPrefix);
+			return getFullVersion(location, systemFile, this.majorVersion, this.versionPrefix);
 		else
-			return getFullVersionWeb(location, systemFile, this.versionPrefix);
+			return getFullVersionWeb(location, systemFile, this.majorVersion, this.versionPrefix);
 	}
 
 	public boolean isServerRoot(File location) {
@@ -49,35 +51,38 @@ public class ServerBeanTypeWildfly24Plus extends JBossServerBeanType {
 		return this.serverAdapterId;
 	}
 	
-	private static boolean canHandleVersion(int myVersion, int foundVersion) {
+	private static boolean canHandleVersion(int beanTypeVersion, int foundVersion) {
 		ArrayList<Integer> adaptersDeclared = new ArrayList<>();
-		String[] all = IServerConstants.ALL_JBOSS_SERVERS;
-		for(int i = 0; i < all.length; i++ ) {
-			if( all[i].startsWith(IServerConstants.WF_SERVER_PREFIX)) {
-				String suffix = all[i].substring(IServerConstants.WF_SERVER_PREFIX.length());
-				int major = -1;
+		String[] allServerTypes = IServerConstants.ALL_JBOSS_SERVERS;
+		for(int i = 0; i < allServerTypes.length; i++ ) {
+			String st = allServerTypes[i];
+			if( st.startsWith(IServerConstants.WF_SERVER_PREFIX)) {
+				String suffix = st.substring(IServerConstants.WF_SERVER_PREFIX.length());
+				int serverTypeMajor = -1;
 				if( suffix.length() == 2 ) {
-					major = Integer.parseInt(suffix);
+					serverTypeMajor = Integer.parseInt(suffix.substring(0,1));
 				} else if( suffix.length() == 3 ) {
-					major = Integer.parseInt(suffix.substring(0, 2));
+					serverTypeMajor = Integer.parseInt(suffix.substring(0, 2));
 				}
-				if( major >= myVersion && major <= foundVersion)
-					adaptersDeclared.add(major);
+				if( serverTypeMajor >= beanTypeVersion && serverTypeMajor <= foundVersion)
+					adaptersDeclared.add(serverTypeMajor);
 			}
 		}
 		Collections.sort(adaptersDeclared);
-		return adaptersDeclared.get(adaptersDeclared.size()-1) == myVersion;
+		boolean ret = adaptersDeclared.get(adaptersDeclared.size()-1) == beanTypeVersion;
+		return ret;
 	}
 	
-	public static String getFullVersion(File location, File systemFile, String myPrefix) {
+	public static String getFullVersion(File location, 
+			File systemFile, int majorVersion, String myPrefix) {
 		String found = JBossManifestUtility.getManifestPropFromJBossModulesFolder(
 				new File[]{new File(location, MODULES)}, 
 				"org.jboss.as.product", "main/dir/META-INF", 
 				MANIFEST_PROD_RELEASE_VERS);
-		return fullVersionIfResponsible(myPrefix, found);
+		return fullVersionIfResponsible(myPrefix, majorVersion, found);
 	}
 
-	private static String fullVersionIfResponsible(String myPrefix, String found) {
+	private static String fullVersionIfResponsible(String myPrefix, int majorVersion, String found) {
 		if( found != null && found.length() > 2) {
 			// We found a version. 
 			if( found.startsWith(myPrefix)) {
@@ -85,7 +90,7 @@ public class ServerBeanTypeWildfly24Plus extends JBossServerBeanType {
 			}
 			String majorFound = found.substring(0,2); 
 			int majorFoundInt = Integer.parseInt(majorFound);
-			if( majorFoundInt < 24 ) {
+			if( majorFoundInt < majorVersion ) {
 				return null;
 			}
 			String myMajor = myPrefix.substring(0,2);
@@ -97,12 +102,13 @@ public class ServerBeanTypeWildfly24Plus extends JBossServerBeanType {
 		return null;
 	}
 
-	public static String getFullVersionWeb(File location, File systemFile, String prefix) {
+	public static String getFullVersionWeb(File location, 
+			File systemFile, int majorVersion, String prefix) {
 		String vers = JBossManifestUtility.getManifestPropFromJBossModulesFolder(
 				new File[]{new File(location, MODULES)}, 
 				"org.jboss.as.product", 
 				"wildfly-web/dir/META-INF", MANIFEST_PROD_RELEASE_VERS);
-		return fullVersionIfResponsible(prefix, vers);
+		return fullVersionIfResponsible(prefix, majorVersion, vers);
 	}
 
 }

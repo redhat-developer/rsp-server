@@ -12,6 +12,10 @@ import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
 
 public interface ServerTypeStringConstants {
 	// NEW_SERVER_ADAPTER 
+	public static final String WF27_ID = IServerConstants.SERVER_WILDFLY_270;
+	public static final String WF27_NAME = "WildFly 27+";
+	public static final String WF27_DESC = "A server adapter capable of discovering and controlling a WildFly 27.x runtime instance.";
+
 	public static final String WF24_ID = IServerConstants.SERVER_WILDFLY_240;
 	public static final String WF24_NAME = "WildFly 24+";
 	public static final String WF24_DESC = "A server adapter capable of discovering and controlling a WildFly 24.x runtime instance.";
@@ -142,13 +146,17 @@ public interface ServerTypeStringConstants {
 	public static final String EAP72_NAME = "JBoss EAP 7.2";
 	public static final String EAP72_DESC = "A server adapter capable of discovering and controlling a JBoss EAP 7.2 runtime instance.";
 
+	public static final String EAP73_ID = IServerConstants.SERVER_EAP_73;
+	public static final String EAP73_NAME = "JBoss EAP 7.3";
+	public static final String EAP73_DESC = "A server adapter capable of discovering and controlling a JBoss EAP 7.3 runtime instance.";
+
 	public static final String EAP74_ID = IServerConstants.SERVER_EAP_74;
 	public static final String EAP74_NAME = "JBoss EAP 7.4";
 	public static final String EAP74_DESC = "A server adapter capable of discovering and controlling a JBoss EAP 7.4 runtime instance.";
 
-	public static final String EAP73_ID = IServerConstants.SERVER_EAP_73;
-	public static final String EAP73_NAME = "JBoss EAP 7.3";
-	public static final String EAP73_DESC = "A server adapter capable of discovering and controlling a JBoss EAP 7.3 runtime instance.";
+	public static final String EAP80_ID = IServerConstants.SERVER_EAP_80;
+	public static final String EAP80_NAME = "JBoss EAP 8.0";
+	public static final String EAP80_DESC = "A server adapter capable of discovering and controlling a JBoss EAP 8.0 runtime instance.";
 
 	public static final String EAP_XP_ID = IServerConstants.SERVER_EAP_XP;
 	public static final String EAP_XP_NAME = "Standalone Web Application";

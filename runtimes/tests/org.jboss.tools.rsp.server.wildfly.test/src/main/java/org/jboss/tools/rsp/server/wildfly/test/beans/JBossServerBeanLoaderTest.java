@@ -92,6 +92,7 @@ public class JBossServerBeanLoaderTest extends TestCase {
 		expected.put(IServerConstants.SERVER_WILDFLY_220, new Data(JBossServerBeanTypeProvider.WILDFLY220, "22.0."));
 		expected.put(IServerConstants.SERVER_WILDFLY_230, new Data(JBossServerBeanTypeProvider.WILDFLY230, "23.0."));
 		expected.put(IServerConstants.SERVER_WILDFLY_240, new Data(JBossServerBeanTypeProvider.WILDFLY240, "24.0."));
+		expected.put(IServerConstants.SERVER_WILDFLY_270, new Data(JBossServerBeanTypeProvider.WILDFLY240, "27.0."));
 		expected.put(IServerConstants.SERVER_EAP_43, new Data(JBossServerBeanTypeProvider.EAP_STD, "4.3."));
 		expected.put(IServerConstants.SERVER_EAP_50, new Data(JBossServerBeanTypeProvider.EAP_STD, "5.1."));
 		expected.put(IServerConstants.SERVER_EAP_60, new Data(JBossServerBeanTypeProvider.EAP6, "6.0."));
@@ -101,6 +102,7 @@ public class JBossServerBeanLoaderTest extends TestCase {
 		expected.put(IServerConstants.SERVER_EAP_72, new Data(JBossServerBeanTypeProvider.EAP72, "7.2."));
 		expected.put(IServerConstants.SERVER_EAP_73, new Data(JBossServerBeanTypeProvider.EAP73, "7.3."));
 		expected.put(IServerConstants.SERVER_EAP_74, new Data(JBossServerBeanTypeProvider.EAP74, "7.4."));
+		expected.put(IServerConstants.SERVER_EAP_80, new Data(JBossServerBeanTypeProvider.EAP80, "8.0."));
 		expected.put(MockServerCreationUtilities.TEST_SERVER_TYPE_EAP_65, new Data(JBossServerBeanTypeProvider.EAP61, "6.5."));
 		expected.put(MockServerCreationUtilities.TEST_SERVER_TYPE_GATEIN_34, new Data(JBossServerBeanTypeProvider.AS7GateIn, "3.4."));
 		expected.put(MockServerCreationUtilities.TEST_SERVER_TYPE_GATEIN_35, new Data(JBossServerBeanTypeProvider.AS7GateIn, "3.5."));
