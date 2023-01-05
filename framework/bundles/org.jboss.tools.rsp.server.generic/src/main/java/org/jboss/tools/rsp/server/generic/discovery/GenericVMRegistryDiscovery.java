@@ -21,6 +21,9 @@ public class GenericVMRegistryDiscovery {
 	
 	public IVMInstall findVMInstall(IServerDelegate delegate) {
 		String vmPath = getVMPath(delegate);
+		if( vmPath != null && vmPath.isEmpty()) {
+			vmPath = null;
+		}
 		return findVMInstall(vmPath, delegate);
 	}
 
