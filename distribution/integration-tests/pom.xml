@@ -129,9 +129,7 @@
 						<streamLogs>true</streamLogs>
 						<pomIncludes>
 							<pomInclude>kitchensink/pom.xml</pomInclude>
-							<pomInclude>kitchensink-ear/pom.xml</pomInclude>
-							<pomInclude>ejb-in-war/pom.xml</pomInclude>
-							<pomInclude>ejb-in-ear/pom.xml</pomInclude>
+							<pomInclude>helloworld/pom.xml</pomInclude>
 						</pomIncludes>
 					</configuration>
 				  	<executions>

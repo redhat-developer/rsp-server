@@ -28,7 +28,7 @@ public abstract class ServerBeanType {
 		return id;
 	}
 	public String toString() {
-		return id;
+		return id + ":" + name;
 	}
 	
 	public String getName() {

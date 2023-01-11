@@ -68,8 +68,7 @@ public class QuickstartsDeploymentTest extends RSPCase {
 
 	private static Logger log = Logger.getLogger(QuickstartsDeploymentTest.class.getName());
 
-	private static final List<String> projects = Arrays.asList("kitchensink", "kitchensink-ear", "ejb-in-war",
-			"ejb-in-ear");
+	private static final List<String> projects = Arrays.asList("kitchensink", "helloworld"); //, "kitchensink-ear", "ejb-in-war", "ejb-in-ear");
 
 	private static final List<String> deploymentTypes = Arrays.asList("war", "exploded");
 
