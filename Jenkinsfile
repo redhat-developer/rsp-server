@@ -8,7 +8,7 @@ if (params.SIMPLE_MATRIX) {
     java_axes = ["openjdk-11"]
     os_axes = ["rhel7"]
 } else {
-    java_axes = ["openjdk-1.8", "openjdk-11"]
+    java_axes = ["openjdk-11"]
     os_axes = ["rhel7", "win10"]
 }
 
