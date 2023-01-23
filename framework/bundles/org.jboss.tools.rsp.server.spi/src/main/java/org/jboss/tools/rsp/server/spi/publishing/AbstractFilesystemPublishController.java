@@ -365,7 +365,7 @@ public abstract class AbstractFilesystemPublishController implements IPublishCon
 		return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 	}
 	
-	private void completeDelete(Path pathToBeDeleted) throws IOException {
+	protected void completeDelete(Path pathToBeDeleted) throws IOException {
 		if( pathToBeDeleted.toFile().exists()) {
 			try (Stream<Path> paths = Files.walk(pathToBeDeleted)) {
 				paths.sorted(Comparator.reverseOrder())
