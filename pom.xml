@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jboss.tools.rsp</groupId>
 	<artifactId>parent</artifactId>
-	<version>0.25.6.Final</version>
+	<version>0.25.7-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Runtime Server Protocol</name>
 	<description>A runtime-server protocol based on LSP</description>
