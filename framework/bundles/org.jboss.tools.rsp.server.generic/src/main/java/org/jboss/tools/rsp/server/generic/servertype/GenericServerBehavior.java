@@ -80,6 +80,10 @@ public class GenericServerBehavior extends AbstractServerDelegate
 		this.behaviorMemento = behaviorMemento;
 		setServerState(IServerDelegate.STATE_STOPPED);
 	}
+	
+	protected JSONMemento getBehaviorMemento() {
+		return this.behaviorMemento;
+	}
 
 	protected ILaunch getStartLaunch() {
 		return (ILaunch)getSharedData(START_LAUNCH_SHARED_DATA);
@@ -402,19 +406,23 @@ public class GenericServerBehavior extends AbstractServerDelegate
 	 */
 	protected IPublishControllerWithOptions getPublishController() {
 		if( publishController == null ) {
-			JSONMemento publishMemento = behaviorMemento.getChild("publish");
-			String deployPath = publishMemento.getString("deployPath");
-			String approvedSuffixes = publishMemento.getString("approvedSuffixes");
-			String[] suffixes = approvedSuffixes == null ? null : approvedSuffixes.split(",", -1);
-			String supportsExploded = publishMemento.getString("supportsExploded");
-			boolean exploded = (supportsExploded == null ? false : Boolean.parseBoolean(supportsExploded));
-			this.publishController = new GenericServerSuffixPublishController(
-					getServer(), this, 
-					suffixes, deployPath, exploded);
+			publishController = createPublishController();
 		}
 		return publishController;
 	}
-		
+	
+	protected IPublishControllerWithOptions createPublishController() {
+		JSONMemento publishMemento = behaviorMemento.getChild("publish");
+		String deployPath = publishMemento.getString("deployPath");
+		String approvedSuffixes = publishMemento.getString("approvedSuffixes");
+		String[] suffixes = approvedSuffixes == null ? null : approvedSuffixes.split(",", -1);
+		String supportsExploded = publishMemento.getString("supportsExploded");
+		boolean exploded = (supportsExploded == null ? false : Boolean.parseBoolean(supportsExploded));
+		return new GenericServerSuffixPublishController(
+				getServer(), this, 
+				suffixes, deployPath, exploded);
+	}
+
 	@Override
 	public IStatus canAddDeployable(DeployableReference ref) {
 		return getPublishController().canAddDeployable(ref);
