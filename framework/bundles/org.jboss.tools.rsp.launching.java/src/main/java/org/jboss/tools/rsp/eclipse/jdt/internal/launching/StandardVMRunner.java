@@ -409,9 +409,9 @@ public class StandardVMRunner extends AbstractVMRunner {
 
 		String[] envp = prependJREPath(config.getEnvironment());
 
-		String[] newenvp = checkClasspath(arguments, cp, envp);
-		if(newenvp != null) {
-			envp = newenvp;
+		String[] tmpEnvironment = checkClasspath(arguments, cp, envp);
+		if(tmpEnvironment != null) {
+			envp = tmpEnvironment;
 			arguments.remove(cpidx);
 			arguments.remove(cpidx);
 		}
@@ -433,7 +433,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 		if(newCmdLine != null) {
 			cmdLine = newCmdLine;
 		}
-		return new LaunchingCommandLineDetails(cmdLine, wd, newenvp, new HashMap<String,String>());
+		return new LaunchingCommandLineDetails(cmdLine, wd, envp, new HashMap<String,String>());
 	}	
 	
 	/* (non-Javadoc)
