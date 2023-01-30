@@ -1,5 +1,5 @@
 #!/usr/bin/env groovy
-
+ 
 def default_java = "openjdk-11"
 def default_os = "rhel7"
 def java_axes = []
