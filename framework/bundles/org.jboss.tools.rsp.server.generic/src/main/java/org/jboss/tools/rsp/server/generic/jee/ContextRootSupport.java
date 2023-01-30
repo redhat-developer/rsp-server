@@ -122,8 +122,9 @@ public abstract class ContextRootSupport {
 
 	protected String[] findFromDescriptorInArchive(DeployableState ds) {
 		ArrayList<String> ret = new ArrayList<>();
+		ZipFile zipFile = null;
 		try {
-			ZipFile zipFile = new ZipFile(ds.getReference().getPath());
+			zipFile = new ZipFile(ds.getReference().getPath());
 		    Enumeration<? extends ZipEntry> entries = zipFile.entries();
 		    List<String> customWebDescriptorList = Arrays.asList(getCustomWebDescriptorsRelativePath());
 		    List<String> earDescriptorList = Arrays.asList(getApplicationDescriptorRelativePath());
@@ -144,7 +145,15 @@ public abstract class ContextRootSupport {
 		        }
 		    }
 		} catch(IOException ioe) {
-			
+			// ignore
+		} finally {
+			if( zipFile != null ) {
+				try {
+					zipFile.close();
+				} catch(IOException ioe) {
+					// ignore
+				}
+			}
 		}
 		return (String[]) ret.toArray(new String[ret.size()]);
 	}

@@ -185,12 +185,13 @@ public class ServerModel implements IServerModel {
 
 	protected void loadFailedServers(String id) {
 		List<File> failed = failedServerLoads.get(id);
-		failed = (failed == null ? Collections.emptyList() : failed);
-		List<File> failedClone = new ArrayList<>(failed);
+		List<File> failedSafe = (failed == null ? Collections.emptyList() : failed);
+		List<File> failedClone = new ArrayList<>(failedSafe);
 		for( File serverFile : failedClone) {
 			Server loaded = loadServer(serverFile);
 			if( loaded != null ) {
-				failed.remove(serverFile);
+				if( failed != null )
+					failed.remove(serverFile);
 				addServer(loaded, loaded.getDelegate());
 			}
 		}
