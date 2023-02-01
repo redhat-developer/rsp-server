@@ -73,7 +73,7 @@ public class PromptAssistant {
 		return null;
 	}
 
-	public ServerType chooseServerType() {
+	public ServerType chooseServerType() throws InterruptedException {
 		try {
 			List<ServerType> types = launcher.getServerProxy().getServerTypes().get();
 			List<String> typeList = types.stream().map(ServerType::getVisibleName).collect(Collectors.toList());
@@ -82,9 +82,11 @@ public class PromptAssistant {
 				int ind = typeList.indexOf(ret);
 				return types.get(ind);
 			}
+		} catch (InterruptedException ie) {
+			throw ie;
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		} 
 		return null;
 	}
 

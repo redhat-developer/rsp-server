@@ -363,7 +363,9 @@ public class GenericServerBehavior extends AbstractServerDelegate
 				Executors.newSingleThreadExecutor().submit(() -> {
 					try {
 						Thread.sleep(3000);
-					} catch(Throwable t) {
+					} catch(InterruptedException t) {
+						// Sonar makes me reset the flag
+						Thread.currentThread().interrupt();
 					}
 					setServerState(STATE_STARTED, true);
 				});
@@ -372,7 +374,9 @@ public class GenericServerBehavior extends AbstractServerDelegate
 				Executors.newSingleThreadExecutor().submit(() -> {
 					try {
 						Thread.sleep(3000);
-					} catch(Throwable t) {
+					} catch(InterruptedException t) {
+						// Sonar makes me reset the flag
+						Thread.currentThread().interrupt();
 					}
 					setServerState(STATE_STOPPED, true);
 				});

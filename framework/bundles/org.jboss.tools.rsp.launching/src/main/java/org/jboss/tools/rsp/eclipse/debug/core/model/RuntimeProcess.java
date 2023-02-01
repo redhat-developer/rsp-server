@@ -206,7 +206,8 @@ public class RuntimeProcess implements IProcess {
 			    process.destroy();
 			}
 			int attempts = 0;
-			while (attempts < MAX_WAIT_FOR_DEATH_ATTEMPTS) {
+			boolean interrupted = false;
+			while (attempts < MAX_WAIT_FOR_DEATH_ATTEMPTS && !interrupted) {
 				try {
 				    process = getSystemProcess();
 					if (process != null) {
@@ -218,6 +219,8 @@ public class RuntimeProcess implements IProcess {
 				try {
 					Thread.sleep(TIME_TO_WAIT_FOR_THREAD_DEATH);
 				} catch (InterruptedException e) {
+					interrupted = true;
+					Thread.currentThread().interrupt();
 				}
 				attempts++;
 			}
@@ -429,6 +432,7 @@ public class RuntimeProcess implements IProcess {
 					fOSProcess.waitFor();
 				} catch (InterruptedException ie) {
 					// clear interrupted state
+					// This is intentional
 					Thread.interrupted();
 				} finally {
 					fOSProcess = null;

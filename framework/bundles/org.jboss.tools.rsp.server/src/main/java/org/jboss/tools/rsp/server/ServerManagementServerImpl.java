@@ -233,6 +233,7 @@ public class ServerManagementServerImpl implements RSPServer {
 				try {
 					Thread.sleep(200);
 				} catch(InterruptedException ie) {
+					Thread.currentThread().interrupt();
 				}
 				launcher.closeConnection(rspc);
 				ClientThreadLocal.setActiveClient(null);
@@ -606,7 +607,10 @@ public class ServerManagementServerImpl implements RSPServer {
 
 	// This API has no way to return an error. Should be changed
 	public ListDeployablesResponse getDeployablesSync(ServerHandle handle) {
-		if( handle == null || handle.getId() == null ) {
+		String handleIdOrNull = handle == null ? null : handle.getId();
+		String handleIdOrNullString = handleIdOrNull == null ? "null" : handleIdOrNull;
+		
+		if( handleIdOrNull == null ) {
 			ListDeployablesResponse resp = new ListDeployablesResponse(
 					null, errorStatus("Unable to locate server with null id."));
 			return resp;
@@ -615,7 +619,7 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( server == null ) {
 			ListDeployablesResponse resp = new ListDeployablesResponse(
 					null, errorStatus(NLS.bind("Unable to locate server {0}", 
-							handle == null ? "null" : handle.getId())));
+							handleIdOrNullString)));
 			return resp;
 		}
 		ListDeployablesResponse resp = new ListDeployablesResponse();

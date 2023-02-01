@@ -98,7 +98,7 @@ public class CoreException extends Exception {
 	 * @param output the stream to write to
 	 */
 	@Override
-	public void printStackTrace(PrintStream output) {
+	public void printStackTrace(final PrintStream output) {
 		synchronized (output) {
 			super.printStackTrace(output);
 			printChildren(status, output);
@@ -113,7 +113,7 @@ public class CoreException extends Exception {
 	 * @param output the stream to write to
 	 */
 	@Override
-	public void printStackTrace(PrintWriter output) {
+	public void printStackTrace(final PrintWriter output) {
 		synchronized (output) {
 			super.printStackTrace(output);
 			printChildren(status, output);

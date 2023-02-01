@@ -73,7 +73,12 @@ public class PollThread extends Thread {
 					done = poller.isComplete();
 				} catch (PollingException | InterruptedException e) {
 					// abort and put the message in event log
-					cancel(e.getMessage(), CANCELATION_CAUSE.FAILED);
+					if( e instanceof InterruptedException) {
+						Thread.currentThread().interrupt();
+						cancel(e.getMessage(), CANCELATION_CAUSE.CANCEL);
+					} else {
+						cancel(e.getMessage(), CANCELATION_CAUSE.FAILED);
+					}
 					return;
 				} catch (RequiresInfoException rie) {
 					// This way each request for new info is checked only once.

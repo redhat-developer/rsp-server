@@ -158,6 +158,7 @@ public class InputStreamMonitor {
 				fLock.wait();
 			}
 		} catch (InterruptedException e) {
+			// Intentionally not rethrown or set to interrupted
 		}
 	}
 

@@ -128,6 +128,9 @@ public class LayeredModulePathFactory {
         }
 
         private LayersConfig(Properties properties) {
+            this(properties, false);
+        }
+        private LayersConfig(Properties properties, boolean excludeBase) {
             configured = true;
             // Possible future enhancement; probably better to use an xml file
 //            layersPath = properties.getProperty("layers.path", DEFAULT_LAYERS_PATH);
@@ -135,7 +138,6 @@ public class LayeredModulePathFactory {
 //            boolean excludeBase = Boolean.valueOf(properties.getProperty("exclude.base.layer", "false"));
             layersPath = DEFAULT_LAYERS_PATH;
             addOnsPath = DEFAULT_ADD_ONS_PATH;
-            boolean excludeBase = false;
             String layersProp = (String) properties.get("layers");
             if (layersProp == null || (layersProp = layersProp.trim()).length() == 0) {
                 if (excludeBase) {
@@ -215,7 +217,7 @@ public class LayeredModulePathFactory {
             if (is != null) try {
                 is.close();
             } catch (Exception e) {
-                throw new RuntimeException(e);
+            	// Ignore
             }
         }
     }

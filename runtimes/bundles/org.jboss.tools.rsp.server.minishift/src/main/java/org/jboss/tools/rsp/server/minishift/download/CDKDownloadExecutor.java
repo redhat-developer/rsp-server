@@ -111,7 +111,7 @@ public class CDKDownloadExecutor extends AbstractDownloadManagerExecutor {
 		if (req.getRequestId() != 0) {
 			state = SESSION_STATE.getState(req.getRequestId());
 		}
-		if (state.getWorkflowStep() == STEP_ATTRIBUTES) {
+		if (state != null && state.getWorkflowStep() == STEP_ATTRIBUTES) {
 			String wtpRuntimeId = getRuntime().getProperty(AbstractStacksDownloadRuntimesProvider.PROP_WTP_RUNTIME);
 			String serverType = MinishiftServerTypes.RUNTIME_TO_SERVER.get(wtpRuntimeId);
 			List<String> list = Arrays.asList(

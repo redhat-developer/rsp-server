@@ -99,11 +99,11 @@ public class JBossExtendedProperties extends ServerExtendedProperties {
 		// almost-empty extended properties class
 		// If we're AS 5, return the 5x args
 		if (isAS5(server)) {
-			if (isSoa5x()) {
-				return new JBossSoa5xDefaultLaunchArguments(server);
-			} else {
+//			if (isSoa5x()) {
+//				return new JBossSoa5xDefaultLaunchArguments(server);
+//			} else {
 				return new JBoss5xDefaultLaunchArguments(server);
-			}
+//			}
 		} else {
 			// else return the < 5 launch args
 			return new JBossDefaultLaunchArguments(server);

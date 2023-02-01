@@ -69,6 +69,9 @@ public class SocketLauncher<T> implements Launcher<T> {
 			try {
 				this.startListeningResult = this.launcher.startListening();
 				startListeningResult.get();
+			} catch(InterruptedException ie) {
+				Thread.currentThread().interrupt();
+				throw new RuntimeException(ie);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
