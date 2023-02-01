@@ -215,7 +215,7 @@ public class ServerManagementModel implements IServerManagementModel {
 				LOG.error("Waiting too long for shutdown of servers during RSP shutdown");
 			}
 		} catch(InterruptedException ie) {
-			// Ignore, do not set interrupt state again
+			Thread.currentThread().interrupt();
 		}
 		threadExecutor.shutdown();
 	}

@@ -50,6 +50,7 @@ public abstract class AbstractPoller implements IServerStatePoller {
 			try {
 				Thread.sleep(POLLING_DELAY);
 			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
 				cancel(CANCELATION_CAUSE.CANCEL);
 			}
 		}

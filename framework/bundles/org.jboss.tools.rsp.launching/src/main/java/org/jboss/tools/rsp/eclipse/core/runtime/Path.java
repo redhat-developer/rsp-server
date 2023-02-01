@@ -1084,9 +1084,14 @@ public class Path implements IPath, Cloneable {
 			Assert.isTrue(value.indexOf(IPath.DEVICE_SEPARATOR) == (value.length() - 1), "Last character should be the device separator"); //$NON-NLS-1$
 		}
 		//return the receiver if the device is the same
-		if (value == device || (value != null && value.equals(device)))
-			return this;
-
+		if( value == null ) {
+			if( device == null )
+				return this;
+		} else {
+			if( value.equals(device)) {
+				return this;
+			}
+		}
 		return new Path(value, segments, flags);
 	}
 

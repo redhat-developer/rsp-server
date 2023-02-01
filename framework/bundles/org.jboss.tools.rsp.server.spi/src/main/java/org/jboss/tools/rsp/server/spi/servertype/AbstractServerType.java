@@ -102,6 +102,9 @@ public abstract class AbstractServerType implements IServerType {
 		try {
 			result = create.get();
 		} catch(ExecutionException | InterruptedException ee) {
+			if( ee instanceof InterruptedException) {
+				Thread.currentThread().interrupt();
+			}
 			return errorWorkflowResponse(ee.getMessage());
 		}
 		if( result.getStatus().isOK()) {

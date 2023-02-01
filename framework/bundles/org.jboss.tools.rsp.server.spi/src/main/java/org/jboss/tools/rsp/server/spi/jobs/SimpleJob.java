@@ -87,6 +87,10 @@ public class SimpleJob implements IJob {
 			try {
 				runnable.run(getProgressMonitor());
 				return Status.OK_STATUS;
+			} catch(InterruptedException ie) {
+				Thread.currentThread().interrupt();
+				LOG.error(ie.getMessage(), ie);
+				return new Status(IStatus.ERROR, SPIActivator.BUNDLE_ID, ie.getMessage());
 			} catch(Exception e) {
 				LOG.error(e.getMessage(), e);
 				return new Status(IStatus.ERROR, SPIActivator.BUNDLE_ID, e.getMessage());
@@ -94,6 +98,10 @@ public class SimpleJob implements IJob {
 		} else if( statusRunnable != null ) {
 			try {
 				return statusRunnable.run(getProgressMonitor());
+			} catch(InterruptedException ie) {
+				Thread.currentThread().interrupt();
+				LOG.error(ie.getMessage(), ie);
+				return new Status(IStatus.ERROR, SPIActivator.BUNDLE_ID, ie.getMessage());
 			} catch(Exception e) {
 				LOG.error(e.getMessage(), e);
 				return new Status(IStatus.ERROR, SPIActivator.BUNDLE_ID, e.getMessage());

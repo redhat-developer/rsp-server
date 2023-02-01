@@ -87,6 +87,9 @@ public class JavaJarRuntimeInstaller implements IRuntimeInstaller {
 				}
 				finished = checkFinished;
 				safeSleep(500);
+				if( Thread.interrupted()) {
+					monitor.setCanceled(true);
+				}
 			}
 		} catch(CoreException ce) {
 			return ce.getStatus();
@@ -100,7 +103,7 @@ public class JavaJarRuntimeInstaller implements IRuntimeInstaller {
 		try { 
 			Thread.sleep(duration);
 		} catch(InterruptedException ie) {
-			// Ignore
+			Thread.currentThread().interrupt();
 		}
 	}
 

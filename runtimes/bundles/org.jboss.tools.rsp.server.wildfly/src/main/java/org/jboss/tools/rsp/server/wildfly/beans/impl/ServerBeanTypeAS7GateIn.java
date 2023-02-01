@@ -49,9 +49,9 @@ public class ServerBeanTypeAS7GateIn extends JBossServerBeanType {
 		
 		File f2 = new File(location, GATEIN_35_PROPERTY_FILE);
 		if( f2.exists()) {
-			try {
+			try (FileInputStream fis = new FileInputStream(f2)) {
 				Properties p = new Properties();
-				p.load(new FileInputStream(f2));
+				p.load(fis);
 				return p.getProperty(VERSION_PROP);
 			} catch(IOException ioe) {
 				// ignore

@@ -218,7 +218,10 @@ public class Status implements IStatus {
 	 * @param pluginId the unique identifier of the relevant plug-in
 	 */
 	public void setPlugin(String pluginId) {
-		Assert.isLegal(pluginId != null && pluginId.length() > 0);
+		boolean legal = pluginId != null && pluginId.length() > 0;
+		if( !legal ) {
+			throw new IllegalArgumentException();
+		}
 		this.pluginId = pluginId;
 	}
 

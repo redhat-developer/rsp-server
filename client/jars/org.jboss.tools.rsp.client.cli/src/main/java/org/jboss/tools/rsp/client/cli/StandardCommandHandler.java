@@ -272,20 +272,34 @@ public class StandardCommandHandler implements InputHandler {
 		LIST_SERVERTYPE_ATTRIBUTES_REQUIRED("list attributes required") {
 			@Override
 			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
-				ServerType st = assistant.chooseServerType();
-				if (st != null) {
-					Attributes attr = launcher.getServerProxy().getRequiredAttributes(st).get();
-					printAttr(attr);
-				}
+				try {
+					ServerType st = assistant.chooseServerType();
+					if (st != null) {
+						Attributes attr = launcher.getServerProxy().getRequiredAttributes(st).get();
+						printAttr(attr);
+					}
+				} catch(InterruptedException ie ) {
+					ie.printStackTrace();
+					Thread.currentThread().interrupt();
+				} catch( ExecutionException ioe) {
+					ioe.printStackTrace();
+				}			
 			}
 		},
 		LIST_SERVERTYPE_ATTRIBUTES_OPTIONAL("list attributes optional") {
 			@Override
 			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
-				ServerType st = assistant.chooseServerType();
-				if( st != null ) {
-					Attributes attr = launcher.getServerProxy().getOptionalAttributes(st).get();
-					printAttr(attr);
+				try {
+					ServerType st = assistant.chooseServerType();
+					if( st != null ) {
+						Attributes attr = launcher.getServerProxy().getOptionalAttributes(st).get();
+						printAttr(attr);
+					}
+				} catch(InterruptedException ie ) {
+					ie.printStackTrace();
+					Thread.currentThread().interrupt();
+				} catch( ExecutionException ioe) {
+					ioe.printStackTrace();
 				}
 			}
 		},
@@ -348,7 +362,8 @@ public class StandardCommandHandler implements InputHandler {
 					Thread.currentThread().interrupt();
 				} catch( ExecutionException ioe) {
 					ioe.printStackTrace();
-				}			}
+				}			
+			}
 		},
 
 		WORKFLOW_ADD_SERVER("workflow add server") {

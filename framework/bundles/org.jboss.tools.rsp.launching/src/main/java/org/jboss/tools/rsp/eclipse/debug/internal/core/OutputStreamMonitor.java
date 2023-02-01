@@ -108,6 +108,8 @@ public class OutputStreamMonitor implements IFlushableStreamMonitor {
 			try {
 				thread.join();
 			} catch (InterruptedException ie) {
+				// Intentionally not rethrown or interrupt flag set. 
+				// Copied from org.eclipse
 			}
 			fListeners = new ListenerList<>();
 		}
@@ -183,6 +185,8 @@ public class OutputStreamMonitor implements IFlushableStreamMonitor {
                 try {
                     Thread.sleep(1); // just give up CPU to maintain UI responsiveness.
                 } catch (InterruptedException e) {
+    				// Intentionally not rethrown or interrupt flag set. 
+    				// Copied from org.eclipse
                 }
             }
 		}

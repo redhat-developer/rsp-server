@@ -341,6 +341,9 @@ public class FileWatcherService implements IFileWatcherService {
 				handleEvents(key);
 			}
 		} catch (InterruptedException | ClosedWatchServiceException e) {
+			if( e instanceof InterruptedException ) {
+				Thread.currentThread().interrupt();
+			}
 			if( !isClosing()) {
 				log(e);
 			}

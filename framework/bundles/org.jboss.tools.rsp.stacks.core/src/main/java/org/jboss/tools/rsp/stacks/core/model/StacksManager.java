@@ -203,6 +203,9 @@ public class StacksManager {
 		try {
 			return future.get(millisTimeout, TimeUnit.MILLISECONDS);
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			if( e instanceof InterruptedException ) {
+				Thread.currentThread().interrupt();
+			}
 		} finally {
 			singleThreadExecutor.shutdown();
 		}

@@ -174,6 +174,7 @@ public class CRCServerDelegate extends MinishiftServerDelegate {
 				tries += 1;
 			}			
 		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {

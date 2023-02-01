@@ -34,7 +34,7 @@ public class EnvironmentUtility {
 		// check if server is CRC
 		String typeId = this.server.getServerType().getId();
 		
-		if( appendCredentials && typeId != MinishiftServerTypes.CRC_1X_ID ) 
+		if( appendCredentials && !MinishiftServerTypes.CRC_1X_ID.equals(typeId)) 
 			configEnv = getEnvironmentFromServer();
 		else 
 			configEnv = new HashMap<>();

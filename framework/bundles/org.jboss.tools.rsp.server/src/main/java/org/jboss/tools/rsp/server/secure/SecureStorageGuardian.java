@@ -138,6 +138,9 @@ public class SecureStorageGuardian implements ISecureStorageProvider {
 					return getSecureStorage();
 				}
 			} catch(InterruptedException | ExecutionException ie) {
+				if( ie instanceof InterruptedException) {
+					Thread.currentThread().interrupt();
+				}
 				LOG.error(ie.getMessage(), ie);
 			}
 			if( storage == null ) {
