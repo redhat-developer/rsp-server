@@ -41,7 +41,7 @@ public class MinishiftServerTypes {
 	public static final BaseMinishiftServerType CRC_1X_SERVER_TYPE = 
 			new CRCServerType(CRC_1X_ID, CRC_1X_NAME, CRC_1X_DESC);
 	
-	public static final Map<String, String> RUNTIME_TO_SERVER = new HashMap<>();
+	private static final Map<String, String> RUNTIME_TO_SERVER = new HashMap<>();
 	static {
 		RUNTIME_TO_SERVER.put(RUNTIME_MINISHIFT_17_ID, MINISHIFT_1_12_ID);
 		RUNTIME_TO_SERVER.put(RUNTIME_CDK_30_ID, CDK_3X_ID);
@@ -49,6 +49,9 @@ public class MinishiftServerTypes {
 		RUNTIME_TO_SERVER.put(RUNTIME_CRC_10_ID, CRC_1X_ID);
 	};
 
+	public static String getServerForRuntime(String rt) {
+		return RUNTIME_TO_SERVER.get(rt);
+	}
 	private MinishiftServerTypes() {
 		// inhibit instantiation
 	}

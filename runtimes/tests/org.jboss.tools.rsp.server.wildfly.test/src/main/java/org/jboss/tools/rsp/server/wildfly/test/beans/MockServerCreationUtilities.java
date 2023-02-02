@@ -180,7 +180,7 @@ public class MockServerCreationUtilities extends Assert {
 				return new ServerBeanTypeManager() {
 					@Override
 					public ServerBeanType[] getAllRegisteredTypes() {
-						return JBossServerBeanTypeProvider.KNOWN_TYPES;
+						return JBossServerBeanTypeProvider.getKnownServerBeanTypes();
 					}
 				};
 			}

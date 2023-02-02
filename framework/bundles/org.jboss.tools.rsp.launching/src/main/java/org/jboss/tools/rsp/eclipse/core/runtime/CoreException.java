@@ -99,7 +99,7 @@ public class CoreException extends Exception {
 	 */
 	@Override
 	public void printStackTrace(final PrintStream output) {
-		synchronized (output) {
+		synchronized (output) { // NOSONAR
 			super.printStackTrace(output);
 			printChildren(status, output);
 		}
@@ -114,7 +114,7 @@ public class CoreException extends Exception {
 	 */
 	@Override
 	public void printStackTrace(final PrintWriter output) {
-		synchronized (output) {
+		synchronized (output) { // NOSONAR
 			super.printStackTrace(output);
 			printChildren(status, output);
 		}

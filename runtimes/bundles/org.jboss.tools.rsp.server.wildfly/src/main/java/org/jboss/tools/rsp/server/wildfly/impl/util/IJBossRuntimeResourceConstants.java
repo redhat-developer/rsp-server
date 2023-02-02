@@ -38,7 +38,7 @@ public interface IJBossRuntimeResourceConstants {
 	public static final String AS7_BOOT_LOG = "boot.log"; //$NON-NLS-1$
 	public static final String JAVAX = "javax";//$NON-NLS-1$
 	
-	public static final String[] JBOSS_TEMPORARY_FOLDERS = new String[] { WORK, DATA, FOLDER_TMP, FOLDER_LOG};
+	//public static final String[] JBOSS_TEMPORARY_FOLDERS = new String[] { WORK, DATA, FOLDER_TMP, FOLDER_LOG};
 
 	public static final String TWIDDLE_JAR = "twiddle.jar"; //$NON-NLS-1$
 	public static final String TWIDDLE_SH = "twiddle.sh"; //$NON-NLS-1$

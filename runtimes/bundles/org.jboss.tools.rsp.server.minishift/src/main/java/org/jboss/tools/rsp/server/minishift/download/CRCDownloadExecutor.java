@@ -56,7 +56,7 @@ public class CRCDownloadExecutor extends AbstractDownloadManagerExecutor {
 		
 		// but rsp-server doesn't really have a server / runtime split. 
 		// So now we need to get the rsp-server server type id
-		String serverType = MinishiftServerTypes.RUNTIME_TO_SERVER.get(wtpRuntimeId);
+		String serverType = MinishiftServerTypes.getServerForRuntime(wtpRuntimeId);
 		
 		// Now we have to somehow create this thing... ... ... 
 		Set<String> serverIds = getServerModel().getServers().keySet();

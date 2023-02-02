@@ -208,7 +208,7 @@ public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider, IJB
 	 * 
 	 * 	// NEW_SERVER_ADAPTER
 	 */
-	public static final ServerBeanType[] KNOWN_TYPES =
+	private static final ServerBeanType[] KNOWN_TYPES =
 		{
 		AS,  EAP70, EAP71, EAP72, EAP73, EAP74, EAP80,
 		WILDFLY90,  WILDFLY90_WEB, 
@@ -238,9 +238,13 @@ public class JBossServerBeanTypeProvider implements IServerBeanTypeProvider, IJB
 		EPP, EAP,  EWP
 	};
 	
+	public static final ServerBeanType[] getKnownServerBeanTypes() {
+		return KNOWN_TYPES;		
+	}
+	
 	@Override
 	public ServerBeanType[] getServerBeanTypes() {
-		return KNOWN_TYPES;
+		return getKnownServerBeanTypes();
 	}
 
 }

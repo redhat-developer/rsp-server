@@ -52,6 +52,7 @@ public class UnzipUtility implements IExtractUtility {
 		int overwrite = IOverwrite.NO;
 		destination.mkdirs();
 		try(ZipFile zipFile = new ZipFile(file)) {
+			String destinationCanon = destination.getCanonicalPath();;
 			Enumeration<? extends ZipEntry> entries = zipFile.entries();
 			monitor.beginTask(EXTRACTING, zipFile.size());
 			while (entries.hasMoreElements()) {
@@ -63,33 +64,36 @@ public class UnzipUtility implements IExtractUtility {
 				String entryName = entry.getName();
 				File entryFile = new File(destination, entryName);
 				monitor.subTask(entry.getName());
-				if (overwrite != IOverwrite.ALL 
-						&& overwrite != IOverwrite.NO_ALL
-						&& entryFile.exists()) {
-					overwrite = overwriteQuery.overwrite(entryFile);
-					if (overwrite == IOverwrite.CANCEL) {
-						return Status.CANCEL_STATUS;
-					}
-				}
-				if (!entryFile.exists() 
-						|| overwrite == IOverwrite.YES 
-						|| overwrite == IOverwrite.ALL) {
-					createEntry(monitor, zipFile, entry, entryFile);
-				}
 				
-				// Lets check for a possible root, to avoid scanning the archive again later
-				if (!rootEntryImpossible && discoveredRoot == null) {
-					// Check for a root
-					if (entryName == null || entryName.isEmpty() || entryName.startsWith(SEPARATOR) || entryName.indexOf(SEPARATOR) == -1) {
-						rootEntryImpossible = true;
-						possibleRoot = null;
-					} else {
-						String directory = entryName.substring(0, entryName.indexOf(SEPARATOR));
-						if (possibleRoot == null) {
-							possibleRoot = directory;
-						} else if (!directory.equals(possibleRoot)) {
+				if( entryFile.getCanonicalPath().startsWith(destinationCanon)) {
+					if (overwrite != IOverwrite.ALL 
+							&& overwrite != IOverwrite.NO_ALL
+							&& entryFile.exists()) {
+						overwrite = overwriteQuery.overwrite(entryFile);
+						if (overwrite == IOverwrite.CANCEL) {
+							return Status.CANCEL_STATUS;
+						}
+					}
+					if (!entryFile.exists() 
+							|| overwrite == IOverwrite.YES 
+							|| overwrite == IOverwrite.ALL) {
+						createEntry(monitor, zipFile, entry, entryFile);
+					}
+					
+					// Lets check for a possible root, to avoid scanning the archive again later
+					if (!rootEntryImpossible && discoveredRoot == null) {
+						// Check for a root
+						if (entryName == null || entryName.isEmpty() || entryName.startsWith(SEPARATOR) || entryName.indexOf(SEPARATOR) == -1) {
 							rootEntryImpossible = true;
 							possibleRoot = null;
+						} else {
+							String directory = entryName.substring(0, entryName.indexOf(SEPARATOR));
+							if (possibleRoot == null) {
+								possibleRoot = directory;
+							} else if (!directory.equals(possibleRoot)) {
+								rootEntryImpossible = true;
+								possibleRoot = null;
+							}
 						}
 					}
 				}

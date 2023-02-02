@@ -62,7 +62,7 @@ public class MinishiftCdkDownloadRuntimesProvider extends AbstractStacksDownload
 
 	@Override
 	protected boolean runtimeTypeIsRegistered(String runtimeId) {
-		return MinishiftServerTypes.RUNTIME_TO_SERVER.get(runtimeId) != null;
+		return MinishiftServerTypes.getServerForRuntime(runtimeId) != null;
 	}
 
 	@Override
