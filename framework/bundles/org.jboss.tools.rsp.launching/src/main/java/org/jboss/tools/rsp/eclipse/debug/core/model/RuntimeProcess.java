@@ -431,9 +431,7 @@ public class RuntimeProcess implements IProcess {
 				try {
 					fOSProcess.waitFor();
 				} catch (InterruptedException ie) {
-					// clear interrupted state
-					// This is intentional
-					Thread.interrupted();
+					Thread.currentThread().interrupt();
 				} finally {
 					fOSProcess = null;
 					fRuntimeProcess.terminated();

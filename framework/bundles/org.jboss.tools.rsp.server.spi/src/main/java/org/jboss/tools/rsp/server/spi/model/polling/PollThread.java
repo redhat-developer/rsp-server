@@ -55,14 +55,19 @@ public class PollThread extends Thread {
 			return;
 		}
 
-		int maxWait = getTimeout();
-
-		long startTime = System.currentTimeMillis();
-		boolean done = false;
-		boolean serverStartedOrStopped = false;
 		try {
 			poller.beginPolling(getServer(), expectedState);
-	
+		} catch(Exception e) {
+			LOG.error("Error occurred while polling, aborting.", e);
+			cancel(e.getMessage(), CANCELATION_CAUSE.FAILED);
+		}
+		
+		try {
+			int maxWait = getTimeout();
+			long startTime = System.currentTimeMillis();
+			boolean done = false;
+			boolean serverStartedOrStopped = false;
+			
 			// begin the loop; ask the poller every so often
 			while (!serverStartedOrStopped
 					&& !isAborted()
@@ -99,9 +104,9 @@ public class PollThread extends Thread {
 				// we timed out. get response from preferences
 				handleTimeoutTermination();
 			}
-		} catch(Exception e) {
-			LOG.error("Error occurred while polling, aborting.", e);
-			cancel(e.getMessage(), CANCELATION_CAUSE.FAILED);
+		} catch( RuntimeException re) {
+			LOG.error("Error occurred while polling, aborting.", re);
+			cancel(re.getMessage(), CANCELATION_CAUSE.FAILED);
 		}
 	}
 
