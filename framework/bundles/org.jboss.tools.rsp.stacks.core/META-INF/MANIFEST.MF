@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %BundleName
 Bundle-Vendor: %BundleVendor
 Bundle-SymbolicName: org.jboss.tools.rsp.stacks.core
-Bundle-Version: 0.25.7.Final
+Bundle-Version: 0.26.0.Final
 Bundle-Activator: org.jboss.tools.rsp.stacks.core.StacksCoreActivator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
