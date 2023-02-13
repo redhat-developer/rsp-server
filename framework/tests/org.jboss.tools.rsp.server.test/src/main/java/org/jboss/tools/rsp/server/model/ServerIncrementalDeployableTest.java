@@ -35,17 +35,16 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
-import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
-import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.server.filewatcher.FileWatcherService;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
-import org.jboss.tools.rsp.server.spi.servertype.IDeployableResourceDelta;
+import org.jboss.tools.rsp.server.spi.servertype.IDeployableDelta;
+import org.jboss.tools.rsp.server.spi.servertype.IDeployableResourceDelta.DELTA_TYPE;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.util.DataLocationSysProp;
 import org.jboss.tools.rsp.server.util.TestServerUtils;
@@ -149,10 +148,10 @@ public class ServerIncrementalDeployableTest {
 		waitDeployableState(PUBLISH_STATE_INCREMENTAL,server, 10000);
 		
 		// Ensure delta marks changed resource as modified
-		IDeployableResourceDelta delta1 = server.getDelegate().getServerPublishModel().getDeployableResourceDelta(reference);
+		IDeployableDelta delta1 = server.getDelegate().getServerPublishModel().getDeployableResourceDelta(reference);
 		assertTrue(delta1.getResourceDeltaMap().containsKey(indexJspRelativePath));
 		assertNotNull(delta1.getResourceDeltaMap().get(indexJspRelativePath));
-		assertEquals(Integer.valueOf(IDeployableResourceDelta.MODIFIED), (Integer)delta1.getResourceDeltaMap().get(indexJspRelativePath));
+		assertEquals(DELTA_TYPE.MODIFIED, delta1.getResourceDeltaMap().get(indexJspRelativePath).getDeltaType());
 		
 		// Delete that resource
 		resetAllLatches();
@@ -168,7 +167,7 @@ public class ServerIncrementalDeployableTest {
 		delta1 = server.getDelegate().getServerPublishModel().getDeployableResourceDelta(reference);
 		assertTrue(delta1.getResourceDeltaMap().containsKey(indexJspRelativePath));
 		assertNotNull(delta1.getResourceDeltaMap().get(indexJspRelativePath));
-		assertEquals(Integer.valueOf(IDeployableResourceDelta.DELETED), (Integer)delta1.getResourceDeltaMap().get(indexJspRelativePath));
+		assertEquals(DELTA_TYPE.DELETED, delta1.getResourceDeltaMap().get(indexJspRelativePath).getDeltaType());
 
 		// re-instate that resource and verify the delta goes back to just 'modified' instead of deleted
 		resetAllLatches();
@@ -186,8 +185,8 @@ public class ServerIncrementalDeployableTest {
 		delta1 = server.getDelegate().getServerPublishModel().getDeployableResourceDelta(reference);
 		assertTrue(delta1.getResourceDeltaMap().containsKey(indexJspRelativePath));
 		assertNotNull(delta1.getResourceDeltaMap().get(indexJspRelativePath));
-		assertEquals(Integer.valueOf(IDeployableResourceDelta.MODIFIED), 
-				(Integer)delta1.getResourceDeltaMap().get(indexJspRelativePath));
+		assertEquals(DELTA_TYPE.MODIFIED, 
+				delta1.getResourceDeltaMap().get(indexJspRelativePath).getDeltaType());
 
 		
 		// Publish and verify the states are accurately matching expectations
@@ -212,8 +211,8 @@ public class ServerIncrementalDeployableTest {
 		delta1 = server.getDelegate().getServerPublishModel().getDeployableResourceDelta(reference);
 		assertTrue(delta1.getResourceDeltaMap().containsKey(indexJspRelativePath));
 		assertNotNull(delta1.getResourceDeltaMap().get(indexJspRelativePath));
-		assertEquals(Integer.valueOf(IDeployableResourceDelta.DELETED), 
-				(Integer)delta1.getResourceDeltaMap().get(indexJspRelativePath));
+		assertEquals(DELTA_TYPE.DELETED, 
+				delta1.getResourceDeltaMap().get(indexJspRelativePath).getDeltaType());
 
 
 
@@ -235,10 +234,10 @@ public class ServerIncrementalDeployableTest {
 		assertTrue(delta1.getResourceDeltaMap().containsKey(otherJspRelativePath));
 		assertNotNull(delta1.getResourceDeltaMap().get(indexJspRelativePath));
 		assertNotNull(delta1.getResourceDeltaMap().get(otherJspRelativePath));
-		assertEquals(Integer.valueOf(IDeployableResourceDelta.DELETED), 
-				(Integer)delta1.getResourceDeltaMap().get(indexJspRelativePath));
-		assertEquals(Integer.valueOf(IDeployableResourceDelta.CREATED), 
-				(Integer)delta1.getResourceDeltaMap().get(otherJspRelativePath));
+		assertEquals(DELTA_TYPE.DELETED, 
+				delta1.getResourceDeltaMap().get(indexJspRelativePath).getDeltaType());
+		assertEquals(DELTA_TYPE.CREATED, 
+				delta1.getResourceDeltaMap().get(otherJspRelativePath).getDeltaType());
 
 
 		// Publish and verify the states are accurately matching expectations

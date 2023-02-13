@@ -20,8 +20,16 @@ public interface IServerPublishModel {
 	 * @param reference
 	 * @return
 	 */
-	public IDeployableResourceDelta getDeployableResourceDelta(DeployableReference reference);
+	public IDeployableDelta getDeployableResourceDelta(DeployableReference reference);
 	
+	/**
+	 * Get any assembly resource mappings for a given deployable
+	 * @param reference
+	 * @return
+	 */
+	public IDeploymentAssemblyMapping[] getDeployableResourceMappings(DeployableReference reference);
+	
+
 	/**
 	 * Adds a deployable to the list of objects we want published to the server. 
 	 * On the next publish request, a publish of this deployable will be attempted. 

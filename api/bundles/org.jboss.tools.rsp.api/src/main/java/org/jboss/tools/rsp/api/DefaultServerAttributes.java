@@ -34,6 +34,8 @@ public interface DefaultServerAttributes {
 	 * Deployment options 
 	 */
 	public static final String DEPLOYMENT_OPTION_OUTPUT_NAME = "deployment.output.name";
+	public static final String DEPLOYMENT_OPTION_ASSEMBLY_FILE = "deployment.assembly.file";
+	public static final String DEPLOYMENT_OPTION_ASSEMBLY_FILE_DEFAULT = "rsp.assembly.json";
 	
 
 }

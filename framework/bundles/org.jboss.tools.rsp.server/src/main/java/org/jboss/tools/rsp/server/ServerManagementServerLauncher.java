@@ -74,7 +74,7 @@ public class ServerManagementServerLauncher {
 				LOG.error("Error locking workspace", ioe.getMessage(), ioe);
 			}
 		}
-		throw new RuntimeException("Workspace is locked. Please verify workspace is not in use, or, remove the .lock file in the folder " + dlc.getDataLocation().getAbsolutePath());
+		throw new RuntimeException("Workspace is locked. Please verify workspace is not in use, or, remove the .lock file at " + dlc.getDataLocation().getAbsolutePath() + "/.lock");
 	}
 	
 	public IServerManagementModel getModel() {

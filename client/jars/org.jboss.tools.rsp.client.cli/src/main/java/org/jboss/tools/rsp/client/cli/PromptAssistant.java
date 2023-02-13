@@ -27,6 +27,7 @@ import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
 import org.jboss.tools.rsp.api.dao.JobHandle;
 import org.jboss.tools.rsp.api.dao.JobProgress;
 import org.jboss.tools.rsp.api.dao.ListDeployablesResponse;
+import org.jboss.tools.rsp.api.dao.ListDeploymentOptionsResponse;
 import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
 import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
 import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
@@ -102,6 +103,11 @@ public class PromptAssistant {
 			return deployables.getStates().get(ind).getReference();
 		}
 		return null;
+	}
+	
+	public ListDeploymentOptionsResponse listDeploymentOptions(ServerHandle handle) throws InterruptedException, ExecutionException {
+		ListDeploymentOptionsResponse opts = launcher.getServerProxy().listDeploymentOptions(handle).get();
+		return opts;
 	}
 
 	public ServerHandle selectServer() throws InterruptedException, ExecutionException {

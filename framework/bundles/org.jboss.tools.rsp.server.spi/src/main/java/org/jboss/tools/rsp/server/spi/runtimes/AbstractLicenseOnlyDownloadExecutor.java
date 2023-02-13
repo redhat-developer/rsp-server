@@ -234,7 +234,9 @@ public abstract class AbstractLicenseOnlyDownloadExecutor implements IDownloadRu
 		item1a.setId(ServerManagementAPIConstants.WORKFLOW_LICENSE_URL_ID);
 		item1a.setLabel("License URL: ");
 		item1a.setContent(dlrt.getLicenseURL());
-		item1a.setProperties(new HashMap<String,String>() {{ put(ServerManagementAPIConstants.WORKFLOW_ITEM_STRING_PROPERTY_LINK_URL, dlrt.getLicenseURL()); }});
+		HashMap<String,String> props = new HashMap<String,String>();
+		props.put(ServerManagementAPIConstants.WORKFLOW_ITEM_STRING_PROPERTY_LINK_URL, dlrt.getLicenseURL());
+		item1a.setProperties(props);
 		det = new WorkflowPromptDetails();
 		item1a.setPrompt(det);
 		det.setResponseType(ServerManagementAPIConstants.ATTR_TYPE_NONE);
