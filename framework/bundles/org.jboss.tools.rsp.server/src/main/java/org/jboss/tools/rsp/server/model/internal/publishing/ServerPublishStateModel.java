@@ -10,7 +10,6 @@ package org.jboss.tools.rsp.server.model.internal.publishing;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -29,6 +28,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
 import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
+import org.jboss.tools.rsp.server.model.internal.publishing.DeploymentAssemblyDiscovery.IDeploymentAssembler;
 import org.jboss.tools.rsp.server.spi.filewatcher.FileWatcherEvent;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherEventListener;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
@@ -39,12 +39,9 @@ import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-
 public class ServerPublishStateModel implements IServerPublishModel, IFileWatcherEventListener {
 	static final Logger LOG = LoggerFactory.getLogger(ServerPublishStateModel.class);
-
+	
 	private final Map<String, DeployableState> states;
 	private final Map<String, Map<String,Object>> deploymentOptions;
 	private final Map<String, DeployableDelta> deltas = new HashMap<>();
@@ -102,26 +99,20 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		deployableState.setServer(delegate.getServerHandle());
 		return deployableState;
 	}
-
+	
 	private IStatus cacheAssemblies(DeployableReference reference) {
-		Map<String, Object>  opts = reference.getOptions();
-		String assemblyFileS = opts == null ? null : (String)opts.get(ServerManagementAPIConstants.DEPLOYMENT_OPTION_ASSEMBLY_FILE);
-		File assemblyFile = assemblyFileS == null || assemblyFileS.isEmpty() ? null : new File(assemblyFileS);
-		boolean optionEmpty = (assemblyFileS == null || assemblyFileS.isEmpty());
-		if( optionEmpty) {
-			assemblyFile = findRspAssemblyJson(reference.getPath());
-		}
-		boolean useAssembly = assemblyFile != null && assemblyFile.exists();
-		if( useAssembly ) {
+		IDeploymentAssembler[] assemblers = DeploymentAssemblyDiscovery.getAssemblers(reference);
+		for( int i = 0; i < assemblers.length; i++ ) {
 			try {
-				String contents = readFile(assemblyFile);
-				Map<String, Object> assemblyAsJson = new Gson().fromJson(contents, Map.class);
-				DeploymentAssemblyFile asObj = new DeploymentAssemblyFile(assemblyAsJson);
-				assembly.put(getKey(reference), asObj);
-			} catch( JsonSyntaxException jse ) {
+				DeploymentAssemblyFile file = assemblers[i].getAssemblerFile(reference);
+				if( file != null ) {
+					assembly.put(getKey(reference), file);
+					return Status.OK_STATUS;
+				}
+			} catch( IOException ioe) {
 				return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, IStatus.ERROR, 
-						NLS.bind("Could not add deployable with path {0}: Error parsing deployment assembly file.", 
-								getKey(reference)), jse);
+						NLS.bind("Could not add deployable with path {0}: Error configuring assembly / packaging", 
+								getKey(reference)), ioe);
 			}
 		}
 		return Status.OK_STATUS;
@@ -141,7 +132,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 				File asFile = sourcePathToWatch.toFile();
 				if( asFile.exists()) {
 					boolean recursive = asFile.exists() && asFile.isDirectory();
-					System.out.println("  Source to watch: " + sourcePathToWatch.toString());
+					//System.out.println("  Source to watch: " + sourcePathToWatch.toString());
 					fileWatcher.addFileWatcherListener(sourcePathToWatch, this, recursive);
 				}
 			}
@@ -177,27 +168,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		}
 		return ret;
 	}
-	
-	public static String readFile(File file) {
-		String content = "";
-		try {
-			content = new String(Files.readAllBytes(file.toPath()));
-		} catch (IOException e) {
-		}
-		return content;
-	}
 
-	private File findRspAssemblyJson(String path) {
-		String needle = ServerManagementAPIConstants.DEPLOYMENT_OPTION_ASSEMBLY_FILE_DEFAULT;
-		try {
-			Object[] ret = Files.walk(new File(path).toPath()).filter(p2 -> p2.endsWith(needle)).toArray();
-			if( ret != null && ret.length > 0 ) {
-				return ((Path)ret[0]).toFile();
-			}
-		} catch(IOException ioe) {
-		}
-		return null;
-	}
 	/**
 	 * Adds the given deployable to this model.
 	 * 
@@ -237,10 +208,12 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 			deployableRemoved(reference);
 		}
 		ds.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_REMOVE);
-		String path = reference.getPath();
 		if (fileWatcher != null) {
-			// DEPLOY_ASSEMBLY TODO
-			fileWatcher.removeFileWatcherListener(new File(path).toPath(), this);
+			List<Path> sourcePaths = getDeploySourceFolders(reference);
+			for( int i = 0; i < sourcePaths.size(); i++ ) {
+				Path sourcePathToWatch = sourcePaths.get(i);
+				fileWatcher.removeFileWatcherListener(sourcePathToWatch, this);
+			}
 		}
 		updateServerPublishStateFromDeployments();
 		fireState();
