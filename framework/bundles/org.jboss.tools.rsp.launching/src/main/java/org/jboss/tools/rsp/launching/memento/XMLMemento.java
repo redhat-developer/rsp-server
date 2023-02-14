@@ -439,8 +439,16 @@ public final class XMLMemento implements IMemento {
 
 	private static DocumentBuilderFactory createDocumentBuilderFactory() {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+		try {
+			factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		} catch(IllegalArgumentException iae) {
+			// Ignore this
+		}
+		try {
+			factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+		} catch(IllegalArgumentException iae) {
+			// Ignore this
+		}
 		return factory;
 	}
 
