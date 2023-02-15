@@ -24,7 +24,7 @@ public interface DefaultServerAttributes {
 	public static final String AUTOPUBLISH_ENABLEMENT = "server.autopublish.enabled";
 	public static final String AUTOPUBLISH_INACTIVITY_LIMIT = "server.autopublish.inactivity.limit";
 	public static final boolean AUTOPUBLISH_ENABLEMENT_DEFAULT = true;
-	public static final int AUTOPUBLISH_INACTIVITY_LIMIT_DEFAULT = 5000;
+	public static final int AUTOPUBLISH_INACTIVITY_LIMIT_DEFAULT = 1000;
 	
 	public static final String SERVER_TIMEOUT_STARTUP = "server.timeout.startup";
 	public static final String SERVER_TIMEOUT_SHUTDOWN = "server.timeout.shutdown";

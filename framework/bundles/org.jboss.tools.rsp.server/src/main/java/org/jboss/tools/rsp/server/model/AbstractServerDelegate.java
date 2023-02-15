@@ -619,6 +619,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	public void setDefaults(IServerWorkingCopy server) {
 		server.setAttribute(DefaultServerAttributes.SERVER_TIMEOUT_STARTUP, 2*60*1000);
 		server.setAttribute(DefaultServerAttributes.SERVER_TIMEOUT_SHUTDOWN, 2*60*1000);
+		server.setAttribute(DefaultServerAttributes.AUTOPUBLISH_INACTIVITY_LIMIT, DefaultServerAttributes.AUTOPUBLISH_INACTIVITY_LIMIT_DEFAULT);
 	}
 	
 	@Override
