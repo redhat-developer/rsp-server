@@ -45,7 +45,7 @@ public class GenericServerSuffixPublishController extends AbstractFilesystemPubl
 				"Customize the output name including extension for this deployment. Example: sample.war (Leave blank for default)", null);
 		util.addAttribute(ServerManagementAPIConstants.DEPLOYMENT_OPTION_ASSEMBLY_FILE, 
 				ServerManagementAPIConstants.ATTR_TYPE_STRING,
-				"Optionally set a deployment assembly file for more control. See documentation for details. (Leave blank for auto-detection of 'rsp.assembly.json' or default behavior.)", null);
+				"Optionally set a deployment assembly file for more control. See documentation for details. (Leave blank for auto-detection of '.rsp/rsp.assembly.json' or default behavior.)", null);
 		return util.toPojo();
 	}
 	
