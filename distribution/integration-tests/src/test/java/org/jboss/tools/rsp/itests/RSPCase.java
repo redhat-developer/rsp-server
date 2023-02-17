@@ -197,6 +197,7 @@ public abstract class RSPCase {
 		ServerBean bean = serverProxy.findServerBeans(new DiscoveryPath(location)).get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS).get(0);
 		Map<String, Object> attr = new HashMap<>();
 		attr.put("server.home.dir", bean.getLocation());
+		attr.put("server.autopublish.inactivity.limit", 5000);
 		ServerAttributes serverAttr = new ServerAttributes(bean.getServerAdapterTypeId(), id, attr);
 		return timeConsumption(new Callable<Status>() {
 			public Status call() throws InterruptedException, ExecutionException, TimeoutException {

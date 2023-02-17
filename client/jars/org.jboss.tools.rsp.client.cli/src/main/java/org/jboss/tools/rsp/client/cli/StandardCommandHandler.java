@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -35,6 +36,7 @@ import org.jboss.tools.rsp.api.dao.JobProgress;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ListDeployablesResponse;
+import org.jboss.tools.rsp.api.dao.ListDeploymentOptionsResponse;
 import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
 import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
@@ -279,10 +281,10 @@ public class StandardCommandHandler implements InputHandler {
 						printAttr(attr);
 					}
 				} catch(InterruptedException ie ) {
-					ie.printStackTrace();
+					ie.printStackTrace(); // NOSONAR
 					Thread.currentThread().interrupt();
 				} catch( ExecutionException ioe) {
-					ioe.printStackTrace();
+					ioe.printStackTrace(); // NOSONAR
 				}			
 			}
 		},
@@ -568,10 +570,19 @@ public class StandardCommandHandler implements InputHandler {
 						String filePath = assistant.nextLine().trim();
 						if( new File(filePath).exists()) {
 							Map<String, Object> opts = new HashMap<>();
-							System.out.println("Please set an output name for this deployment (blank line for default):");
-							String outputName = assistant.nextLine().trim();
-							if( !outputName.isEmpty()) {
-								opts.put(ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME, outputName);
+							ListDeploymentOptionsResponse optResp = assistant.listDeploymentOptions(server);
+							Set<String> keys = optResp.getAttributes().getAttributes().keySet();
+							System.out.println("Deployment Options:");
+							for( Iterator<String> i = keys.iterator(); i.hasNext(); ) {
+								String key = i.next();
+								Attribute atr = optResp.getAttributes().getAttributes().get(key);
+								System.out.println("Key: " + key);
+								System.out.println("Type: " + atr.getType());
+								System.out.println("Description: " + atr.getDescription());
+								String userInput = assistant.nextLine().trim();
+								if( !userInput.isEmpty()) {
+									opts.put(key, userInput);
+								}
 							}
 							DeployableReference ref = new DeployableReference(filePath, filePath);
 							ref.setOptions(opts);

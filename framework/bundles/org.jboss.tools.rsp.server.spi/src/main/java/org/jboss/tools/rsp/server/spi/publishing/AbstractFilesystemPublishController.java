@@ -32,7 +32,10 @@ import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.server.spi.SPIActivator;
+import org.jboss.tools.rsp.server.spi.servertype.IDeployableDelta;
 import org.jboss.tools.rsp.server.spi.servertype.IDeployableResourceDelta;
+import org.jboss.tools.rsp.server.spi.servertype.IDeploymentAssemblyMapping;
+import org.jboss.tools.rsp.server.spi.servertype.IDeployableResourceDelta.DELTA_TYPE;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
@@ -190,7 +193,7 @@ public abstract class AbstractFilesystemPublishController implements IPublishCon
 	
 	private int incrementalPublishCopyModule(DeployableReference opts, 
 			int serverPublishRequest, int modulePublishState) throws CoreException {
-		IDeployableResourceDelta delta = getDelegate().getServerPublishModel()
+		IDeployableDelta delta = getDelegate().getServerPublishModel()
 				.getDeployableResourceDelta(opts);
 		
 		File src = new File(opts.getPath());
@@ -258,39 +261,60 @@ public abstract class AbstractFilesystemPublishController implements IPublishCon
 		}
 	}
 
-	protected int fullPublishCopyExplodedModule(DeployableReference opts, int publishType, int modulePublishType) throws CoreException {
-		File dest = getDestinationPath(opts).toFile();
-		Path src = new File(opts.getPath()).toPath();
+	protected int fullPublishCopyExplodedModule(DeployableReference ref, int publishType, int modulePublishType) throws CoreException {
+		File dest = getDestinationPath(ref).toFile();
+		Path src = new File(ref.getPath()).toPath();
 		try {
 			completeDelete(dest.toPath());
 			dest.mkdirs();
-			Files.walkFileTree(src, new CopyFileVisitor(dest.toPath()));
-			return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 		} catch(IOException ioe) {
-			String errMsg = NLS.bind("Error publishing module {0} to server {1}", opts.getLabel(), getServer().getName());
+			String errMsg = NLS.bind("Error publishing module {0} to server {1}: error deleting or creating directory {2}", 
+					new String[] {ref.getLabel(), getServer().getName(), dest.toString()});
 			LOG.error(errMsg, ioe);
-			return delegate.getServerPublishModel().getDeployableState(opts).getPublishState();
+			return delegate.getServerPublishModel().getDeployableState(ref).getPublishState();
 		}
+		IDeploymentAssemblyMapping[] mappings = delegate.getServerPublishModel().getDeployableResourceMappings(ref);
+		for( int i = 0; i < mappings.length; i++ ) {
+			
+			Path mappingSource = src.resolve(mappings[i].getSource());
+			Path mappingDest = Paths.get(dest.getAbsolutePath(), mappings[i].getDeployPath());
+			// If the source folder doesn't exist, silently ignore it. Maybe it's temporary. 
+			if( mappingSource.toFile().exists()) {
+				try {
+					//System.out.println("Copying mapping " + mappingSource.toString() + " to " + mappingDest.toString());
+					Files.walkFileTree(mappingSource, new CopyFileVisitor(mappingDest));
+				} catch(IOException ioe) {
+					String errMsg = NLS.bind("Error publishing module {0} to server {1}: error copying mapping {2} to {3}", 
+							new String[] {ref.getLabel(), getServer().getName(), mappingSource.toString(), mappingDest.toString()});
+					LOG.error(errMsg, ioe);
+					return delegate.getServerPublishModel().getDeployableState(ref).getPublishState();
+				}
+			}
+		}
+		return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 	}
 	
 	protected int incrementalPublishCopyExplodedModule(DeployableReference opts,
-			IDeployableResourceDelta delta) throws CoreException {
+			IDeployableDelta delta) throws CoreException {
 		File dest = getDestinationPath(opts).toFile();
 		Path src = new File(opts.getPath()).toPath();
 		
 		List<String> errors = new ArrayList<>();
-		Map<Path, Integer> deltaVals = delta.getResourceDeltaMap();
-		for( Map.Entry<Path, Integer> entry : deltaVals.entrySet()) {
-			int change = entry.getValue();
-			Path fileSrc = src.resolve(entry.getKey());
+		Map<Path, IDeployableResourceDelta> deltaVals = delta.getResourceDeltaMap();
+		for( Map.Entry<Path, IDeployableResourceDelta> entry : deltaVals.entrySet()) {
+			IDeployableResourceDelta entryVal = entry.getValue();
+			DELTA_TYPE change = entryVal.getDeltaType();
+			Path fileSrc = entryVal.getSourcePath();
 			Path fileDest = dest.toPath().resolve(entry.getKey());
 
-			if( change == IDeployableResourceDelta.DELETED) {
+			if( change == DELTA_TYPE.DELETED) {
+				System.out.println("Deleting " + fileDest.toString());
 				if( !fileDest.toFile().delete() ) {
 					LOG.debug("Error: Cannot delete file " + fileDest.toFile().getAbsolutePath());
 				}
-			} else if( change == IDeployableResourceDelta.CREATED || 
-					change == IDeployableResourceDelta.MODIFIED) {
+			} else if( change == DELTA_TYPE.CREATED || 
+					change == DELTA_TYPE.MODIFIED) {
+				//System.out.println("Copying " + fileDest.toString());
 				incrementalPublishCopySingleFile(fileSrc, fileDest, errors);
 			}
 		}
@@ -441,7 +465,7 @@ public abstract class AbstractFilesystemPublishController implements IPublishCon
 	    public FileVisitResult visitFile(final Path file,
 	    final BasicFileAttributes attrs) throws IOException {
 	    Files.copy(file,
-	        targetPath.resolve(sourcePath.relativize(file)));
+	        targetPath.resolve(sourcePath.relativize(file)), StandardCopyOption.REPLACE_EXISTING);
 	    return FileVisitResult.CONTINUE;
 	    }
 	}

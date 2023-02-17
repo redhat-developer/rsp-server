@@ -82,7 +82,7 @@ public class ListenerList<E> implements Iterable<E> {
 	 * to an array of size capacity the first time a listener is added.
 	 * Maintains invariant: listeners != null
 	 */
-	private volatile Object[] listeners = EmptyArray;
+	private volatile Object[] listeners = EmptyArray; // NOSONAR
 
 	/**
 	 * Creates a listener list in which listeners are compared using equality.

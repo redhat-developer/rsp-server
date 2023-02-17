@@ -94,13 +94,23 @@ public class WildFlyPublishingTest extends RSPCase {
 				ServerManagementAPIConstants.PUBLISH_STATE_NONE);
 	}
 
+	private void touchFile(File warFile, int delay) {
+		new Thread("test") {
+			public void run() {
+				try {
+					Thread.sleep(1000);
+				} catch(InterruptedException ie) {}
+				warFile.setLastModified(System.currentTimeMillis());
+			}
+		}.start();
+	}
 	@Test
 	public void testChangedDeployment() throws Exception {
 		sendPublishRequest(handle, ServerManagementAPIConstants.PUBLISH_FULL);
 		ServerState state = waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_NONE, 10, client);
 		assertDeployableState(state, ServerManagementAPIConstants.STATE_STARTED,
 				ServerManagementAPIConstants.PUBLISH_STATE_NONE);
-		warFile.setLastModified(System.currentTimeMillis());
+		touchFile(warFile, 1500);
 		state = waitForDeployablePublishState(ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL, 10, client);
 		assertDeployableState(state, ServerManagementAPIConstants.STATE_STARTED,
 				ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL);

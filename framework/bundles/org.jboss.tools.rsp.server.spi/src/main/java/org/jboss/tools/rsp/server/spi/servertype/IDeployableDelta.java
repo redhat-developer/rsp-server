@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
  * All rights reserved. This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v20.html
@@ -9,14 +9,14 @@
 package org.jboss.tools.rsp.server.spi.servertype;
 
 import java.nio.file.Path;
+import java.util.Map;
 
-public interface IDeployableResourceDelta {
-	public static enum DELTA_TYPE {
-		CREATED,
-		MODIFIED,
-		DELETED,
-		UNKNOWN
-	}
-	public DELTA_TYPE getDeltaType();
-	public Path getSourcePath();
+public interface IDeployableDelta {
+	/**
+	 * Returns a map of changed resources within this deployable.
+	 * The key is a relative path to the deployment's source directory.
+	 * @return
+	 */
+	public Map<Path, IDeployableResourceDelta> getResourceDeltaMap();
+
 }

@@ -467,7 +467,11 @@ public class FileWatcherService implements IFileWatcherService {
 		Set<IFileWatcherEventListener> nonRecursive = findListenersForExactPath(context, false);
 		// and fire their simple events
 		for(IFileWatcherEventListener one : nonRecursive  ) {
-			one.fileChanged(toFire);
+			try {
+				one.fileChanged(toFire);
+			} catch( RuntimeException re ) {
+				LOG.error("Error handling changed files via Watchservice: " + re.getMessage());
+			}
 		}
 		
 		// Find all recursive listeners at level 'context' or above
@@ -477,7 +481,11 @@ public class FileWatcherService implements IFileWatcherService {
 		
 		// Now let's fire this item's event to all recursive listeners
 		for(IFileWatcherEventListener one : recursiveListeners  ) {
-			one.fileChanged(toFire);
+			try {
+				one.fileChanged(toFire);
+			} catch( RuntimeException re ) {
+				LOG.error("Error handling changed files via Watchservice: " + re.getMessage());
+			}
 		}
 		
 		/* 

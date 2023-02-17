@@ -8,15 +8,9 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.spi.servertype;
 
-import java.nio.file.Path;
+public interface IDeploymentAssemblyMapping {
+	public String getSource();
 
-public interface IDeployableResourceDelta {
-	public static enum DELTA_TYPE {
-		CREATED,
-		MODIFIED,
-		DELETED,
-		UNKNOWN
-	}
-	public DELTA_TYPE getDeltaType();
-	public Path getSourcePath();
+	public String getDeployPath();
+
 }

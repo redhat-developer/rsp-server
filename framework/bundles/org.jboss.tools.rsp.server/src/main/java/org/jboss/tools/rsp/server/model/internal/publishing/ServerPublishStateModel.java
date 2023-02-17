@@ -9,7 +9,9 @@
 package org.jboss.tools.rsp.server.model.internal.publishing;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -26,21 +28,24 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
 import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
+import org.jboss.tools.rsp.server.model.internal.publishing.DeploymentAssemblyDiscovery.IDeploymentAssembler;
 import org.jboss.tools.rsp.server.spi.filewatcher.FileWatcherEvent;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherEventListener;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
 import org.jboss.tools.rsp.server.spi.publishing.IFullPublishRequiredCallback;
-import org.jboss.tools.rsp.server.spi.servertype.IDeployableResourceDelta;
+import org.jboss.tools.rsp.server.spi.servertype.IDeployableDelta;
+import org.jboss.tools.rsp.server.spi.servertype.IDeploymentAssemblyMapping;
 import org.jboss.tools.rsp.server.spi.servertype.IServerPublishModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ServerPublishStateModel implements IServerPublishModel, IFileWatcherEventListener {
 	static final Logger LOG = LoggerFactory.getLogger(ServerPublishStateModel.class);
-
+	
 	private final Map<String, DeployableState> states;
 	private final Map<String, Map<String,Object>> deploymentOptions;
 	private final Map<String, DeployableDelta> deltas = new HashMap<>();
+	private final Map<String, DeploymentAssemblyFile> assembly = new HashMap<>();
 	
 	private AbstractServerDelegate delegate;
 	private IFileWatcherService fileWatcher;
@@ -71,7 +76,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		fireState();
 	}
 	
-	private void addDeployableImpl(DeployableReference reference, int publishState) {
+	private IStatus addDeployableImpl(DeployableReference reference, int publishState) {
 		DeployableState deployableState = 
 				createDeployableState(reference, publishState, ServerManagementAPIConstants.STATE_UNKNOWN);
 		
@@ -79,7 +84,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		getStates().put(key, deployableState);
 		deploymentOptions.put(getKey(reference), reference.getOptions());
 
-		registerFileWatcher(reference);
+		return registerFileWatcher(reference);
 	}
 
 	private DeployableState cloneDeployableState(DeployableReference reference, DeployableState state) {
@@ -95,13 +100,73 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		return deployableState;
 	}
 	
-	private void registerFileWatcher(DeployableReference reference) {
-		if( fileWatcher != null ) {
-			File f = new File(reference.getPath());
-			boolean recursive = f.exists() && f.isDirectory();
-			String path = reference.getPath();
-			fileWatcher.addFileWatcherListener(new File(path).toPath(), this, recursive);
+	private IStatus cacheAssemblies(DeployableReference reference) {
+		IDeploymentAssembler[] assemblers = DeploymentAssemblyDiscovery.getAssemblers(reference);
+		for( int i = 0; i < assemblers.length; i++ ) {
+			try {
+				DeploymentAssemblyFile file = assemblers[i].getAssemblerFile(reference);
+				if( file != null ) {
+					assembly.put(getKey(reference), file);
+					return Status.OK_STATUS;
+				}
+			} catch( IOException ioe) {
+				return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, IStatus.ERROR, 
+						NLS.bind("Could not add deployable with path {0}: Error configuring assembly / packaging", 
+								getKey(reference)), ioe);
+			}
 		}
+		return Status.OK_STATUS;
+	}
+	
+	private IStatus registerFileWatcher(DeployableReference reference) {
+		if( fileWatcher != null ) {
+			// DEPLOY_ASSEMBLY
+			IStatus ret = cacheAssemblies(reference);
+			if( !ret.isOK()) {
+				return ret;
+			}
+			
+			List<Path> sourcePaths = getDeploySourceFolders(reference);
+			for( int i = 0; i < sourcePaths.size(); i++ ) {
+				Path sourcePathToWatch = sourcePaths.get(i);
+				File asFile = sourcePathToWatch.toFile();
+				if( asFile.exists()) {
+					boolean recursive = asFile.exists() && asFile.isDirectory();
+					//System.out.println("  Source to watch: " + sourcePathToWatch.toString());
+					fileWatcher.addFileWatcherListener(sourcePathToWatch, this, recursive);
+				}
+			}
+		}
+		return Status.OK_STATUS;
+	}
+	
+	private List<Path> getDeploySourceFolders(DeployableReference ref) {
+		DeploymentAssemblyFile assemblyData = assembly.get(getKey(ref));
+		if( assemblyData == null ) {
+			File f = new File(ref.getPath());
+			ArrayList<Path> al = new ArrayList<Path>();
+			al.add(f.toPath());
+			return al;
+		} else {
+			return getAssemblySourceFolders(ref);
+		}
+	}
+	private List<Path> getAssemblySourceFolders(DeployableReference ref) {
+		List<Path> ret = new ArrayList<Path>();
+		DeploymentAssemblyFile assemblyData = assembly.get(getKey(ref));
+		IDeploymentAssemblyMapping[] mappings = assemblyData.getMappings();
+		if( mappings != null ) {
+			for( int i = 0; i < mappings.length; i++ ) {
+				IDeploymentAssemblyMapping singleMapping = mappings[i];
+				String source = singleMapping.getSource();
+				Path sourcePathToWatch = Paths.get(ref.getPath(), source);
+				File sourcePathFileToWatch = sourcePathToWatch.toFile();
+				if( sourcePathFileToWatch.exists()) {
+					ret.add(sourcePathToWatch);
+				}
+			}
+		}
+		return ret;
 	}
 
 	/**
@@ -114,7 +179,7 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		DeployableState ds = getStates().get(getKey(withOptions));
 		if (ds != null && ds.getPublishState() != ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) {
 			return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, IStatus.ERROR, 
-					NLS.bind("Could not add deploybale with path {0}: it already exists.", 
+					NLS.bind("Could not add deployable with path {0}: it already exists.", 
 							getKey(withOptions)), null);
 		}
 
@@ -143,9 +208,12 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 			deployableRemoved(reference);
 		}
 		ds.setPublishState(ServerManagementAPIConstants.PUBLISH_STATE_REMOVE);
-		String path = reference.getPath();
 		if (fileWatcher != null) {
-			fileWatcher.removeFileWatcherListener(new File(path).toPath(), this);
+			List<Path> sourcePaths = getDeploySourceFolders(reference);
+			for( int i = 0; i < sourcePaths.size(); i++ ) {
+				Path sourcePathToWatch = sourcePaths.get(i);
+				fileWatcher.removeFileWatcherListener(sourcePathToWatch, this);
+			}
 		}
 		updateServerPublishStateFromDeployments();
 		fireState();
@@ -209,6 +277,17 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		return deltas;
 	}
 
+	public IDeploymentAssemblyMapping[] getDeployableResourceMappings(DeployableReference reference) {
+		DeploymentAssemblyFile file = assembly.get(getKey(reference));
+		if( file != null ) {
+			return file.getMappings();
+		}
+		return new IDeploymentAssemblyMapping[] {
+				new DeploymentAssemblyMapping(reference.getPath(), "/")
+		};
+	}
+
+	
 	@Override
 	public synchronized void setDeployablePublishState(DeployableReference reference, int publishState) {
 		DeployableState ds = getDeployableState(reference);
@@ -271,26 +350,17 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	 */
 	@Override
 	public synchronized void fileChanged(FileWatcherEvent event) {
+		// DEPLOY_ASSEMBLY
 		Path affected = event.getPath();
+		//System.out.println("File changed: " + affected.toString());
 		List<DeployableState> ds = new ArrayList<>(getStates().values());
 		boolean changed = false;
 		for( DeployableState d : ds ) {
-			Path deploymentPath = new File(d.getReference().getPath()).toPath();
-			if( affected.startsWith(deploymentPath)) {
-				int currentPubState = d.getPublishState();
-				if( currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_NONE
-						|| currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL) {
-					int newState = getRequiredPublishStateOnFileChange(event);
-					if( newState > currentPubState ) {
-						d.setPublishState(newState);
-						changed = true;
-					}
-				}
-				if( currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_NONE 
-						|| currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL
-						|| currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_FULL ) {
-					registerSingleDelta(event, d.getReference());
-				}
+			DeploymentAssemblyFile assemblyObj = assembly.get(getKey(d.getReference()));
+			if( assemblyObj == null ) {
+				changed = fileChangedNoAssembly(event, affected, d);
+			} else {
+				changed = fileChangedWithAssembly(event, affected, d);
 			}
 		}
 		updateServerPublishStateFromDeployments();
@@ -299,6 +369,46 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 		launchOrUpdateAutopublishThread();
 	}
 
+	private boolean fileChangedNoAssembly(FileWatcherEvent event, Path affected, DeployableState d) {
+		boolean changed = false;
+		Path deploymentPath = new File(d.getReference().getPath()).toPath();
+		changed |= fileChangedSinglePath(event,  affected, d, deploymentPath);
+		return changed;
+	}
+	
+
+	private boolean fileChangedWithAssembly(FileWatcherEvent event, Path affected, DeployableState d) {
+		boolean changed = false;
+		List<Path> sourcePaths = getAssemblySourceFolders(d.getReference());
+		for( int i = 0; i < sourcePaths.size(); i++ ) {
+			Path deploymentPath = sourcePaths.get(i);
+			changed |= fileChangedSinglePath(event, affected, d, deploymentPath);
+		}
+		return changed;		
+	}
+	
+	private boolean fileChangedSinglePath(FileWatcherEvent event, Path affected, 
+			DeployableState d, Path deploymentPath) {
+		boolean changed = false;
+		if( affected.startsWith(deploymentPath)) {
+			int currentPubState = d.getPublishState();
+			if( currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_NONE
+					|| currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL) {
+				int newState = getRequiredPublishStateOnFileChange(event);
+				if( newState > currentPubState ) {
+					d.setPublishState(newState);
+					changed = true;
+				}
+			}
+			if( currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_NONE 
+					|| currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL
+					|| currentPubState == ServerManagementAPIConstants.PUBLISH_STATE_FULL ) {
+				registerSingleDelta(event, d.getReference());
+			}
+		}
+		return changed;
+	}
+	
 	protected int getRequiredPublishStateOnFileChange(FileWatcherEvent event) {
 		if( fullPublishRequired != null && 
 				fullPublishRequired.requiresFullPublish(event)) {
@@ -310,7 +420,12 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	private void registerSingleDelta(FileWatcherEvent event, DeployableReference reference) {
 		String key = getKey(reference);
 		DeployableDelta dd = getDeltas().computeIfAbsent(key, k ->  new DeployableDelta(new DeployableReference(reference.getLabel(), reference.getPath())));
-		dd.registerChange(event);
+		DeploymentAssemblyFile assemblyMap = assembly.get(getKey(reference));
+		if( assemblyMap == null ) {
+			dd.registerChange(event);
+		} else {
+			dd.registerChange(event, assemblyMap);
+		}
 	}
 
 	private void fireState() {
@@ -372,11 +487,11 @@ public class ServerPublishStateModel implements IServerPublishModel, IFileWatche
 	}
 
 	@Override
-	public synchronized IDeployableResourceDelta getDeployableResourceDelta(DeployableReference reference) {
+	public synchronized IDeployableDelta getDeployableResourceDelta(DeployableReference reference) {
 		return cloneDelta(deltas.get(getKey(reference)));
 	}
 	
-	private IDeployableResourceDelta cloneDelta(DeployableDelta delta) {
+	private IDeployableDelta cloneDelta(DeployableDelta delta) {
 		if( delta == null )
 			return null;
 		DeployableReference ref = cloneReference(delta.getReference());

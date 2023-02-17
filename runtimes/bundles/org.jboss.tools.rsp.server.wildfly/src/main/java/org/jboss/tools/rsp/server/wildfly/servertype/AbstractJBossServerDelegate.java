@@ -139,8 +139,33 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		String max = props2.getMaximumJavaVersionString();
 		String vmiVersion = vmi.getJavaVersion();
 		if( !isJavaCompatible(vmiVersion, min, max)) {
-			String msg = "Server {0} is not compatible with discovered java version {1}";
-			return NLS.bind(msg, getServer().getId(), vmiVersion);
+			String removeLastDotMin = min == null ? null : min.endsWith(".") ? min.substring(0,min.length() - 1) : min;
+			String removeLastDotMax = max == null ? null : max.endsWith(".") ? max.substring(0,max.length() - 1) : max;
+			
+			StringBuilder sb = new StringBuilder();
+			
+			String notCompat = "Server {0} is not compatible with discovered java version {1}. ";
+			String notCompat2 = NLS.bind(notCompat, getServer().getId(), vmiVersion);
+			sb.append(notCompat2);
+			
+			if( min == null ) {
+				sb.append("This server requires a java version <= ");
+				sb.append(removeLastDotMax);
+				sb.append(".");
+			} else if( max == null ) {
+				sb.append("This server requires a java version >= ");
+				sb.append(removeLastDotMin);
+				sb.append(".");
+			} else {
+				sb.append("This server requires a java version between ");
+				sb.append(removeLastDotMin);
+				sb.append(" and ");
+				sb.append(removeLastDotMax);
+				sb.append(" inclusive. ");
+			}
+
+			sb.append("You may change a server's launch vm by setting the 'vm.install.path' property in a server's rsp configuration file.");
+			return sb.toString();
 		}
 		return null;
 	}
@@ -376,6 +401,9 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 		util.addAttribute(ServerManagementAPIConstants.DEPLOYMENT_OPTION_OUTPUT_NAME, 
 				ServerManagementAPIConstants.ATTR_TYPE_STRING,
 				"Customize the output name including extension for this deployment. Example: sample.war (Leave blank for default)", null);
+		util.addAttribute(ServerManagementAPIConstants.DEPLOYMENT_OPTION_ASSEMBLY_FILE, 
+				ServerManagementAPIConstants.ATTR_TYPE_STRING,
+				"Optionally set a deployment assembly file for more control. See documentation for details. (Leave blank for auto-detection of '.rsp/rsp.assembly.json' or default behavior.)", null);
 		return util.toPojo();
 	}
 
