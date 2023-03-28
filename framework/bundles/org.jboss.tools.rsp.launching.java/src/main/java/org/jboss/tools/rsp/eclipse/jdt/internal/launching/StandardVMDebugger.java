@@ -157,9 +157,9 @@ public class StandardVMDebugger extends StandardVMRunner {
 		//format: <jdk path>/jre/bin
 		String[] envp = prependJREPath(config.getEnvironment(), new Path(program));
 
-		String[] newenvp = checkClasspath(arguments, cp, envp);
-		if(newenvp != null) {
-			envp = newenvp;
+		String[] tmpEnvp = checkClasspath(arguments, cp, envp);
+		if(tmpEnvp != null) {
+			envp = tmpEnvp;
 			arguments.remove(cpidx);
 			arguments.remove(cpidx);
 		}
@@ -181,7 +181,7 @@ public class StandardVMDebugger extends StandardVMRunner {
 		subMonitor.worked(1);
 		subMonitor.subTask(StandardVMDebugger_Starting_virtual_machine____4);
 		Map<String,String> debugFlagMap = generateDebugFlagMap(transport, server, suspend, host, port);
-		return new LaunchingCommandLineDetails(cmdLine, wd, newenvp, debugFlagMap);
+		return new LaunchingCommandLineDetails(cmdLine, wd, envp, debugFlagMap);
 	}
 	
 	
