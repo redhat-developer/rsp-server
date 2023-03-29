@@ -700,7 +700,8 @@ public class StandardCommandHandler implements InputHandler {
 									"The action '" + actionToRun.getActionLabel() + "' is running.");
 							if( !continueWorklow )
 								return;
-							toSend = displayPromptsSeekWorkflowInput(actionToRun.getActionWorkflow(), assistant);
+							Map<String, Object> tmp = displayPromptsSeekWorkflowInput(workflowResp, assistant);
+							toSend.putAll(tmp);
 							
 							serverActionReq = new ServerActionRequest();
 							serverActionReq.setActionId(actionToRun.getActionId());
