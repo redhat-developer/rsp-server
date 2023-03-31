@@ -32,7 +32,7 @@ fi
 echo "Here are the commits since last release"
 
 commits=`git lg | grep -n -m 1 "Upversion to " |sed  's/\([0-9]*\).*/\1/' | tail -n 1`
-commitMsgs=`git log --color --pretty=format:'%s' --abbrev-commit | head -n $commits | head -n $commits | awk '{ print " * " $0;}'`
+commitMsgs=`git log --color --pretty=format:'%s' --abbrev-commit | head -n $commits`
 echo "$commitMsgs"
 read -p "Press enter to continue"
 
@@ -114,7 +114,9 @@ read -p "Press enter to continue"
 
 
 echo "Make sure to go create a release on github"
-createReleasePayload="{\"tag_name\":\"v$newVerUnderscore\",\"target_commitish\":\"master\",\"name\":\"v$newverFinal\",\"body\":\"Release of $newverFinal:\n$commitMsgs\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false}"
+commitMsgsClean=`git log --color --pretty=format:'%s' --abbrev-commit | head -n $commits | awk '{ print " * " $0;}' | awk '{printf "%s\\\\n", $0}' | sed 's/"/\\"/g'`
+createReleasePayload="{\"tag_name\":\"v$newVerUnderscore\",\"target_commitish\":\"master\",\"name\":\"v$newverFinal\",\"body\":\"Release of $newverFinal:\n\n"$commitMsgsClean"\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false}"
+  
 if [ "$debug" -eq 0 ]; then
 	curl -L \
 	  -X POST \
@@ -133,7 +135,7 @@ else
 	  -d "$createReleasePayload"
 fi
 
-echo "You need to act on the above. In the future we'll automate it. Do it NOW"
+echo "Please go verify the release looks correct"
 read -p "Press enter to continue"
 
 echo "We are released. It's time to move the repo to next-SNAPSHOT"
