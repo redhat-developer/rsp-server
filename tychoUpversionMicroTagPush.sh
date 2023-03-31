@@ -6,7 +6,7 @@ echo "  2) runs a build, commits, and pushes to master"
 echo "  3) Reminds you to wait for a green build"
 echo "  4) Runs mvn clean deploy to nexus, and instructs you to follow up immediately"
 echo "  5) creates a repo tag, and instructs you to do a release build on jenkins"
-echo "  6) Instructs you to create a github release"
+echo "  6) Create a github release with changelog details, but asks you to attach the binary"
 echo "  7) Upversions to next-SNAPSHOT, and commits"
 echo "  8) Creates a milestone on github for next version"
 
@@ -32,7 +32,7 @@ fi
 echo "Here are the commits since last release"
 
 commits=`git lg | grep -n -m 1 "Upversion to " |sed  's/\([0-9]*\).*/\1/' | tail -n 1`
-commitMsgs=`git log --color --pretty=format:'%s' --abbrev-commit | head -n $commits`
+commitMsgs=`git log --color --pretty=format:'%h - %s' --abbrev-commit | head -n $commits`
 echo "$commitMsgs"
 read -p "Press enter to continue"
 
@@ -113,7 +113,7 @@ echo "Go kick another jenkins job with a release flag."
 read -p "Press enter to continue"
 
 
-echo "Make sure to go create a release on github"
+echo "Making a release on github for $newverFinal"
 commitMsgsClean=`git log --color --pretty=format:'%s' --abbrev-commit | head -n $commits | awk '{ print " * " $0;}' | awk '{printf "%s\\\\n", $0}' | sed 's/"/\\"/g'`
 createReleasePayload="{\"tag_name\":\"v$newVerUnderscore\",\"target_commitish\":\"master\",\"name\":\"v$newverFinal\",\"body\":\"Release of $newverFinal:\n\n"$commitMsgsClean"\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false}"
   
@@ -124,7 +124,7 @@ if [ "$debug" -eq 0 ]; then
 	  -H "Authorization: Bearer $ghtoken"\
 	  -H "X-GitHub-Api-Version: 2022-11-28" \
 	  https://api.github.com/repos/redhat-developer/rsp-server/releases \
-	  -d "$createReleasePayload"
+	  -d "$createReleasePayload" | tee createReleaseResponse.json
 else 
 	echo curl -L \
 	  -X POST \
@@ -135,7 +135,34 @@ else
 	  -d "$createReleasePayload"
 fi
 
-echo "Please go verify the release looks correct"
+
+
+echo "Please go verify the release looks correct. We will add the asset next"
+read -p "Press enter to continue"
+
+assetUrl=`cat createReleaseResponse.json | grep assets_url | cut -c 1-17 --complement | rev | cut -c3- | rev | sed 's/api.github.com/uploads.github.com/g'`
+rm createReleaseResponse.json
+zipFileName=`ls -1 distribution/distribution/target/ | grep zip`
+if [ "$debug" -eq 0 ]; then
+	curl -L \
+	  -X POST \
+	  -H "Accept: application/vnd.github+json" \
+	  -H "Authorization: Bearer $ghtoken"\
+	  -H "X-GitHub-Api-Version: 2022-11-28" \
+	  -H "Content-Type: application/octet-stream" \
+	  $assetUrl?name=$zipFileName \
+	  --data-binary "@distribution/distribution/target/$zipFileName"
+else 
+	echo curl -L \
+	  -X POST \
+	  -H "Accept: application/vnd.github+json" \
+	  -H "Authorization: Bearer $ghtoken"\
+	  -H "X-GitHub-Api-Version: 2022-11-28" \
+	  -H "Content-Type: application/octet-stream" \
+	  $assetUrl?name=$zipFileName \
+	  --data-binary "@distribution/distribution/target/$zipFileName"
+fi
+echo "Please go verify the release looks correct and the distribution was added correctly."
 read -p "Press enter to continue"
 
 echo "We are released. It's time to move the repo to next-SNAPSHOT"
