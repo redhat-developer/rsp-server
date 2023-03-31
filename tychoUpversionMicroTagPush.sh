@@ -1,12 +1,22 @@
 #!/bin/sh
+# Pass any argument to enable debug mode
+argsPassed=$#
+echo "args: " $argsPassed
+if [ "$argsPassed" -eq 1 ]; then
+	debug=1
+	echo "YOU ARE IN DEBUG MODE. Changes will NOT be pushed upstream"
+else
+	echo "The script is live. All changes will be pushed, deployed, etc. Live."
+	debug=0
+fi
+read -p "Press enter to continue"
+
 apiStatus=`git status -s | wc -l`
 if [ $apiStatus -ne 0 ]; then
    echo "This repository has changes and we won't be able to auto upversion. Please commit or stash your changes and try again"
    exit 1
 fi
 
-# Change to debug=1 if you want to skip any pushes to gh, tags, milestone creation, etc
-debug=0
 
 oldverRaw=`cat pom.xml  | grep "version" | head -n 2 | tail -n 1 | cut -f 2 -d ">" | cut -f 1 -d "<" |  awk '{$1=$1};1'`
 oldver=`echo $oldverRaw | sed 's/\.Final//g' | sed 's/-SNAPSHOT//g'`
