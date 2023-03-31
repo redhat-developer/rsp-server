@@ -1,5 +1,16 @@
 #!/bin/sh
 # Pass any argument to enable debug mode
+echo "This script performs the following: "
+echo "  1) upversions all bundles and tp to a .Final version"
+echo "  2) runs a build, commits, and pushes to master"
+echo "  3) Reminds you to wait for a green build"
+echo "  4) Runs mvn clean deploy to nexus, and instructs you to follow up immediately"
+echo "  5) creates a repo tag, and instructs you to do a release build on jenkins"
+echo "  6) Instructs you to create a github release"
+echo "  7) Upversions to next-SNAPSHOT, and commits"
+echo "  8) Creates a milestone on github for next version"
+
+ghtoken=`cat ~/.keys/gh_access_token`
 argsPassed=$#
 echo "args: " $argsPassed
 if [ "$argsPassed" -eq 1 ]; then
@@ -16,6 +27,15 @@ if [ $apiStatus -ne 0 ]; then
    echo "This repository has changes and we won't be able to auto upversion. Please commit or stash your changes and try again"
    exit 1
 fi
+
+
+echo "Here are the commits since last release"
+
+commits=`git lg | grep -n -m 1 "Upversion to " |sed  's/\([0-9]*\).*/\1/' | tail -n 1`
+commitMsgs=`git log --color --pretty=format:'%s' --abbrev-commit | head -n $commits | head -n $commits | awk '{ print " * " $0;}'`
+echo "$commitMsgs"
+read -p "Press enter to continue"
+
 
 
 oldverRaw=`cat pom.xml  | grep "version" | head -n 2 | tail -n 1 | cut -f 2 -d ">" | cut -f 1 -d "<" |  awk '{$1=$1};1'`
@@ -94,10 +114,24 @@ read -p "Press enter to continue"
 
 
 echo "Make sure to go create a release on github"
-echo "Here are the commits since last release"
-
-commits=`git lg | grep -n -m 2 "Upversion to " |sed  's/\([0-9]*\).*/\1/' | tail -n 1`
-git lg | head -n $commits
+createReleasePayload="{\"tag_name\":\"v$newVerUnderscore\",\"target_commitish\":\"master\",\"name\":\"v$newverFinal\",\"body\":\"Release of $newverFinal:\n$commitMsgs\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false}"
+if [ "$debug" -eq 0 ]; then
+	curl -L \
+	  -X POST \
+	  -H "Accept: application/vnd.github+json" \
+	  -H "Authorization: Bearer $ghtoken"\
+	  -H "X-GitHub-Api-Version: 2022-11-28" \
+	  https://api.github.com/repos/redhat-developer/rsp-server/releases \
+	  -d "$createReleasePayload"
+else 
+	echo curl -L \
+	  -X POST \
+	  -H "Accept: application/vnd.github+json" \
+	  -H "Authorization: Bearer $ghtoken"\
+	  -H "X-GitHub-Api-Version: 2022-11-28" \
+	  https://api.github.com/repos/redhat-developer/rsp-server/releases \
+	  -d "$createReleasePayload"
+fi
 
 echo "You need to act on the above. In the future we'll automate it. Do it NOW"
 read -p "Press enter to continue"
@@ -143,13 +177,12 @@ fi
 
 echo "Creating a milestone on gh for $nextver. Ready?"
 read -p "Press enter to continue"
-token=`cat ~/.keys/gh_access_token`
 createMilestonePayload="{\"title\":\"v$nextver\",\"state\":\"open\",\"description\":\"Tracking milestone for version $nextver\"}"
 if [ "$debug" -eq 0 ]; then
 	curl -L \
 	  -X POST \
 	  -H "Accept: application/vnd.github+json" \
-	  -H "Authorization: Bearer $token"\
+	  -H "Authorization: Bearer $ghtoken"\
 	  -H "X-GitHub-Api-Version: 2022-11-28" \
 	  https://api.github.com/repos/redhat-developer/rsp-server/milestones \
 	  -d "$createMilestonePayload"
@@ -157,7 +190,7 @@ else
 	echo curl -L \
   -X POST \
   -H "Accept: application/vnd.github+json" \
-  -H "Authorization: Bearer $token"\
+  -H "Authorization: Bearer $ghtoken"\
   -H "X-GitHub-Api-Version: 2022-11-28" \
   https://api.github.com/repos/redhat-developer/rsp-server/milestones \
   -d "$createMilestonePayload"
