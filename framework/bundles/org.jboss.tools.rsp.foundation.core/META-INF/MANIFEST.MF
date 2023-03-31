@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: org.jboss.tools.rsp.foundation.core
 Bundle-SymbolicName: org.jboss.tools.rsp.foundation.core
-Bundle-Version: 0.26.1.Final
+Bundle-Version: 0.26.2.qualifier
 Bundle-Activator: org.jboss.tools.rsp.foundation.core.FoundationCoreActivator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: org.jboss.tools.rsp.api.dao,
