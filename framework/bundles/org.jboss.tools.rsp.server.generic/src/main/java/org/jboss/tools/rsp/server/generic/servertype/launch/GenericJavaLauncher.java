@@ -242,11 +242,16 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 	}
 	
 	private String[] convertStringToClasspathEntries(String serverHome, String postSub) {
-		String[] relatives = postSub.split(";");
+		String[] entriesToAdd = postSub.split(";");
 		List<String> ret = new ArrayList<String>();
 		File absolute = null;
-		for (int i = 0; i < relatives.length; i++) {
-			absolute = new File(serverHome, relatives[i]);
+		for (int i = 0; i < entriesToAdd.length; i++) {
+			Path p = new Path(entriesToAdd[i]);
+			if( p.isAbsolute()) {
+				absolute = p.toFile();
+			} else {
+				absolute = new File(serverHome, entriesToAdd[i]);
+			}
 			if( absolute.isFile()) {
 				ret.add(absolute.getAbsolutePath());
 			} else if( absolute.isDirectory()) {
