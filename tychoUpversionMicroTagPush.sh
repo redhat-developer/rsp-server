@@ -56,7 +56,7 @@ echo "Old version is $oldverRaw"
 echo "New version is $newverFinal"
 echo "Updating pom.xml and target platform with new version"
 read -p "Press enter to continue"
-mvn org.eclipse.tycho:tycho-versions-plugin:set-version -DnewVersion=$newverFinal
+mvn org.eclipse.tycho:tycho-versions-plugin:1.3.0:set-version -DnewVersion=$newverFinal
 
 # Handle target platform
 tpFile=`ls -1 targetplatform | grep target`
@@ -178,7 +178,7 @@ echo "New version is $newver"
 echo "Next version is $nextver"
 echo "Updating pom.xml and target platform with next version snapshot. Ready?"
 read -p "Press enter to continue"
-mvn org.eclipse.tycho:tycho-versions-plugin:set-version -DnewVersion=$nextverWithSnapshot
+mvn org.eclipse.tycho:tycho-versions-plugin:1.3.0:set-version -DnewVersion=$nextverWithSnapshot
 
 # Handle target platform
 tpFile=`ls -1 targetplatform | grep target`
