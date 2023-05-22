@@ -21,6 +21,8 @@ import org.jboss.tools.rsp.server.wildfly.impl.util.IJBossRuntimeConstants;
 import org.jboss.tools.rsp.server.wildfly.impl.util.IJBossRuntimeResourceConstants;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
 import org.jboss.tools.rsp.server.wildfly.servertype.JBossVMRegistryDiscovery;
+import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.ExtendedServerPropertiesAdapterFactory;
+import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.ServerExtendedProperties;
 import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.util.IP6Util;
 import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.util.JavaUtils;
 import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.util.PortalUtil;
@@ -105,7 +107,12 @@ public class JBossDefaultLaunchArguments implements IDefaultLaunchArguments, IJB
 	}
 	
 	protected boolean isIP6() {
-		return IP6Util.matchesIP6t("localhost");
+		String attr = this.server.getAttribute(IJBossServerAttributes.JBOSS_SERVER_HOST, (String)null);
+		String host = (attr == null ? "localhost" : attr);
+		if( "localhost".equals(host)) {
+			return false;
+		}
+		return IP6Util.matchesIP6t(host);
 	}
 	
 	
