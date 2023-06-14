@@ -161,7 +161,9 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 		if( flagMode == GenericServerBehavior.FLAG_MODE_START ) {
 			return getServer().getAttribute(GenericServerType.LAUNCH_OVERRIDE_PROGRAM_ARGS, def);
 		}
-		// TODO allow users to override shutdown args 
+		if( flagMode == GenericServerBehavior.FLAG_MODE_STOP ) {
+			return getServer().getAttribute(GenericServerType.LAUNCH_OVERRIDE_SHUTDOWN_PROGRAM_ARGS, def);
+		}
 		return def;
 	}
 
@@ -169,7 +171,9 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 		if( flagMode == GenericServerBehavior.FLAG_MODE_START ) {
 			return getServer().getAttribute(GenericServerType.JAVA_LAUNCH_OVERRIDE_VM_ARGS, def);
 		}
-		// TODO allow users to override shutdown vm args 
+		if( flagMode == GenericServerBehavior.FLAG_MODE_STOP ) {
+			return getServer().getAttribute(GenericServerType.JAVA_LAUNCH_OVERRIDE_SHUTDOWN_VM_ARGS, def);
+		}
 		return def;
 	}
 

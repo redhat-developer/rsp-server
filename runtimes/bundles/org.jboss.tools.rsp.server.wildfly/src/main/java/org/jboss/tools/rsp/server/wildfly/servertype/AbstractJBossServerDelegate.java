@@ -61,6 +61,7 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractJBossServerDelegate.class);
 	public static final String START_LAUNCH_SHARED_DATA = "AbstractJBossServerDelegate.startLaunch";
+	public static final String STOP_LAUNCH_SHARED_DATA = "AbstractJBossServerDelegate.stopLaunch";
 	
 	private IPublishController publishController;
 	
@@ -321,7 +322,15 @@ public abstract class AbstractJBossServerDelegate extends AbstractServerDelegate
 	protected void setStartLaunch(ILaunch launch) {
 		putSharedData(START_LAUNCH_SHARED_DATA, launch);
 	}
+
+	protected ILaunch getStopLaunch() {
+		return (ILaunch)getSharedData(STOP_LAUNCH_SHARED_DATA);
+	}
 	
+	protected void setStopLaunch(ILaunch launch) {
+		putSharedData(START_LAUNCH_SHARED_DATA, launch);
+	}
+
 	@Override
 	public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params) {
 		try {

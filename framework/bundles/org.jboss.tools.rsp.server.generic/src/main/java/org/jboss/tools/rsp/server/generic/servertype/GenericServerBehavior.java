@@ -35,6 +35,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.debug.core.DebugException;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
+import org.jboss.tools.rsp.foundation.core.launchers.IStartLauncher;
 import org.jboss.tools.rsp.launching.memento.JSONMemento;
 import org.jboss.tools.rsp.server.discovery.serverbeans.ServerBeanLoader;
 import org.jboss.tools.rsp.server.generic.GenericServerActivator;
@@ -47,6 +48,8 @@ import org.jboss.tools.rsp.server.generic.servertype.variables.ServerStringVaria
 import org.jboss.tools.rsp.server.generic.servertype.variables.ServerStringVariableManager.IExternalVariableResolver;
 import org.jboss.tools.rsp.server.generic.servertype.variables.StringSubstitutionEngine;
 import org.jboss.tools.rsp.server.model.AbstractServerDelegate;
+import org.jboss.tools.rsp.server.model.RemoteEventManager;
+import org.jboss.tools.rsp.server.spi.launchers.AbstractJavaLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
 import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
 import org.jboss.tools.rsp.server.spi.model.polling.AbstractPoller;
@@ -68,6 +71,8 @@ public class GenericServerBehavior extends AbstractServerDelegate
 								implements IStringSubstitutionProvider {
 	private static final Logger LOG = LoggerFactory.getLogger(GenericServerBehavior.class);
 	public static final String START_LAUNCH_SHARED_DATA = "GenericServerBehavior.startLaunch";
+	public static final String STOP_LAUNCH_SHARED_DATA = "GenericServerBehavior.stopLaunch";
+
 	public static final boolean FLAG_MODE_START = true;
 	public static final boolean FLAG_MODE_STOP = false;
 	
@@ -92,7 +97,15 @@ public class GenericServerBehavior extends AbstractServerDelegate
 	protected void setStartLaunch(ILaunch launch) {
 		putSharedData(START_LAUNCH_SHARED_DATA, launch);
 	}
+
+	protected ILaunch getStopLaunch() {
+		return (ILaunch)getSharedData(STOP_LAUNCH_SHARED_DATA);
+	}
 	
+	protected void setStopLaunch(ILaunch launch) {
+		putSharedData(STOP_LAUNCH_SHARED_DATA, launch);
+	}
+
 	@Override
 	public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params) {
 		try {
@@ -150,6 +163,7 @@ public class GenericServerBehavior extends AbstractServerDelegate
 		launchPoller(IServerStatePoller.SERVER_STATE.DOWN);
 		try {
 			stopLaunch = getStopLauncher().launch(force);
+			setStopLaunch(stopLaunch);
 			if( stopLaunch != null)
 				registerLaunch(stopLaunch);
 		} catch(CoreException ce) {
@@ -485,6 +499,22 @@ public class GenericServerBehavior extends AbstractServerDelegate
 				}
 			}
 		}
+		
+		// If shutdown command fails, assume server is still started?
+		if( l == getStopLaunch() ) {
+			IProcess p1 = l.getProcesses().length > 0 ? l.getProcesses()[0] : null;
+			if( p1 != null ) {
+				try {
+					int exVal = p1.getExitValue();
+					if( exVal != 0 ) {
+						setServerState(ServerManagementAPIConstants.STATE_STARTED);
+					}
+				} catch(DebugException de) {
+					// should never happen
+				}
+			}
+		}
+
 		fireServerProcessTerminated(getProcessId(p));
 	}
 
@@ -590,5 +620,43 @@ public class GenericServerBehavior extends AbstractServerDelegate
 	 */
 	public String[] getDeploymentUrls(String strat, String deployableOutputName, String deployableOutputName2, DeployableState ds) {
 		return null;
+	}
+	
+	/**
+	 * A utility function for subclasses that want to set 
+	 * java launch flags in the server adapter's properties
+	 * @param server
+	 */
+	protected void setJavaLaunchDependentDefaults(IServerWorkingCopy server) {
+		// Do nothing
+		try {
+			// default start args
+			IServerStartLauncher startupLauncher = getStartLauncher();
+			CommandLineDetails det = startupLauncher.getLaunchCommand("run");
+			String progArgs = det.getProperties().get(AbstractJavaLauncher.PROPERTY_PROGRAM_ARGS);
+			String vmArgs = det.getProperties().get(AbstractJavaLauncher.PROPERTY_VM_ARGS);
+
+			server.setAttribute(GenericServerType.LAUNCH_OVERRIDE_BOOLEAN, false);
+			server.setAttribute(GenericServerType.LAUNCH_OVERRIDE_PROGRAM_ARGS, emptyStringDefault(progArgs));
+			server.setAttribute(GenericServerType.JAVA_LAUNCH_OVERRIDE_VM_ARGS, emptyStringDefault(vmArgs));
+			
+			// default stop args
+			IServerShutdownLauncher shutdownLauncher = getStopLauncher();
+			String stopArgs = null;
+			String stopVmArgs = null;
+			if( shutdownLauncher instanceof IStartLauncher) {
+				CommandLineDetails stopDet = ((IStartLauncher)shutdownLauncher).getLaunchCommand("run");
+				stopArgs = stopDet.getProperties().get(AbstractJavaLauncher.PROPERTY_PROGRAM_ARGS);
+				stopVmArgs = stopDet.getProperties().get(AbstractJavaLauncher.PROPERTY_VM_ARGS);
+				server.setAttribute(GenericServerType.LAUNCH_OVERRIDE_SHUTDOWN_PROGRAM_ARGS, emptyStringDefault(stopArgs));
+				server.setAttribute(GenericServerType.JAVA_LAUNCH_OVERRIDE_SHUTDOWN_VM_ARGS, emptyStringDefault(stopVmArgs));
+			}
+		} catch(CoreException ce) {
+			ce.printStackTrace();
+		}
+	}
+	
+	private String emptyStringDefault(String s) {
+		return s == null || s.isEmpty() ? "" : s;
 	}
 }

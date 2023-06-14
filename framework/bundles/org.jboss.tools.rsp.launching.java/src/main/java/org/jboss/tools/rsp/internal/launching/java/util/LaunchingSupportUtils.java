@@ -7,12 +7,12 @@
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
 package org.jboss.tools.rsp.internal.launching.java.util;
-import javax.xml.XMLConstants;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
@@ -117,12 +118,24 @@ public class LaunchingSupportUtils {
 			if( !destination.exists() || destination.length() <= 0 ) {
 				ClassLoader classLoader = getClass().getClassLoader();
 				InputStream is = classLoader.getResourceAsStream("launchingsupport.jar");
-				try {
-					Files.copy(is, destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
-				} catch(IOException ioe) {
-					log(ioe);
-				}
+
+//				Debugging only. For some reason when running as standalone java app, cant find the jar				
+//				if( is == null ) {
+//					String url = "https://raw.githubusercontent.com/redhat-developer/rsp-server/v0_26_2/framework/bundles/org.jboss.tools.rsp.launching.java/src/main/resources/launchingsupport.jar";
+//					try {
+//						is = new URL(url).openStream();
+//					} catch( IOException err) {
+//						log(err);
+//					}
+//				}
 				
+				if( is != null ) {
+					try {
+						Files.copy(is, destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+					} catch(IOException ioe) {
+						log(ioe);
+					}
+				}				
 			}
 			return destination;
 		}

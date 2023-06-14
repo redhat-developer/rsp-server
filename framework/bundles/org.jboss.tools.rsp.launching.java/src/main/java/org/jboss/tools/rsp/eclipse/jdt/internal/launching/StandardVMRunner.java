@@ -467,6 +467,7 @@ public class StandardVMRunner extends AbstractVMRunner {
 			boolean destroyAtEnd, IProgressMonitor subMonitor) throws CoreException {
 		Process p= null;
 		File workingDir = (det.getWorkingDir() == null ? null : new File(det.getWorkingDir()));
+		//System.out.println(String.join(" ", det.getCmdLine()));
 		p= exec(det.getCmdLine(), workingDir, det.getEnvp());
 		if (p == null) {
 			return;
