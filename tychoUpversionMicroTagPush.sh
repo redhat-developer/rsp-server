@@ -60,7 +60,7 @@ mvn org.eclipse.tycho:tycho-versions-plugin:1.3.0:set-version -DnewVersion=$newv
 
 # Handle target platform
 tpFile=`ls -1 targetplatform | grep target`
-cat targetplatform/$tpFile | sed "s/-target-$oldver/-target-$newver/g" > targetplatform/$tpFile.bak
+cat targetplatform/$tpFile | sed "s/-target-$oldverRaw/-target-$newverFinal/g" > targetplatform/$tpFile.bak
 mv targetplatform/$tpFile.bak targetplatform/$tpFile
 
 echo "Running a quick build to make sure everything's ok..."
