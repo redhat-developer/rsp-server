@@ -11,6 +11,8 @@
 package org.jboss.tools.rsp.runtime.core.extract;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
@@ -79,11 +81,22 @@ public class ExtractUtility {
 			return new UntarGZUtility(file);
 		} else if (name.endsWith(TAR_XZ_SUFFIX)) {
 			return new UntarXZUtility(file);
-		} else {
-			return null;
+		} else if(isArchive(file)) {
+			return new UnzipUtility(file);
 		}
+		return null;
 	}
 
+	private static boolean isArchive(File f) {
+	    int fileSignature = 0;
+	    try (RandomAccessFile raf = new RandomAccessFile(f, "r")) {
+	        fileSignature = raf.readInt();
+	    } catch (IOException e) {
+	        // handle if you like
+	    }
+	    return fileSignature == 0x504B0304 || fileSignature == 0x504B0506 || fileSignature == 0x504B0708;
+	}
+	
 	public File getOriginalFile() {
 		return file;
 	}
