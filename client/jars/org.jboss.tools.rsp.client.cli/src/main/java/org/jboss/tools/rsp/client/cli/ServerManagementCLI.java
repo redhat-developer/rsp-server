@@ -168,7 +168,8 @@ public class ServerManagementCLI implements InputProvider, IClientConnectionClos
 
 	private void printUserPrompt(InputHandler handler) {
 		String prompt = handler.getPrompt();
-		if (prompt != null && !prompt.isEmpty()) {
+		if (prompt != null && !prompt.isEmpty() && !handler.isPromptShown()) {
+			handler.setPromptShown();
 			System.out.println(prompt);
 		}
 	}

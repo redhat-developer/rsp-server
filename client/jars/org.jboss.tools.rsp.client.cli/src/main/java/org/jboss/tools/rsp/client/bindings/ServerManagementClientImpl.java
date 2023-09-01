@@ -201,6 +201,7 @@ public class ServerManagementClientImpl implements RSPClient {
 		private String prompt;
 		private boolean isSecret;
 		private boolean done = false;
+		private boolean shown = false;
 		public PromptStringHandler(String prompt) {
 			this(prompt, false);
 		}
@@ -209,6 +210,15 @@ public class ServerManagementClientImpl implements RSPClient {
 			this.isSecret = secret;
 		}
 
+		@Override
+		public void setPromptShown() {
+			this.shown = true;
+		}
+		
+		@Override
+		public boolean isPromptShown() {
+			return this.shown;
+		}
 		@Override
 		public String getPrompt() {
 			return prompt;

@@ -119,15 +119,15 @@ public class LaunchingSupportUtils {
 				ClassLoader classLoader = getClass().getClassLoader();
 				InputStream is = classLoader.getResourceAsStream("launchingsupport.jar");
 
-//				Debugging only. For some reason when running as standalone java app, cant find the jar				
-//				if( is == null ) {
-//					String url = "https://raw.githubusercontent.com/redhat-developer/rsp-server/v0_26_2/framework/bundles/org.jboss.tools.rsp.launching.java/src/main/resources/launchingsupport.jar";
-//					try {
-//						is = new URL(url).openStream();
-//					} catch( IOException err) {
-//						log(err);
-//					}
-//				}
+				//Debugging only. For some reason when running as standalone java app, cant find the jar				
+				if( is == null ) {
+					String url = "https://raw.githubusercontent.com/redhat-developer/rsp-server/v0_26_2/framework/bundles/org.jboss.tools.rsp.launching.java/src/main/resources/launchingsupport.jar";
+					try {
+						is = new URL(url).openStream();
+					} catch( IOException err) {
+						log(err);
+					}
+				}
 				
 				if( is != null ) {
 					try {

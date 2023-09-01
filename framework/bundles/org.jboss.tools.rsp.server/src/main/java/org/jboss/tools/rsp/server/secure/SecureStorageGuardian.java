@@ -34,14 +34,14 @@ public class SecureStorageGuardian implements ISecureStorageProvider {
 	
 	private File file;
 	private Map<RSPClient, byte[]> permissions;
-	private List<RSPClient> maxTriesReached;
+	private Map<RSPClient, Integer> maxTriesReached;
 	private ISecureStorage storage = null;
 	private ICapabilityManagement capabilities;
 	public SecureStorageGuardian(File file, ICapabilityManagement capabilities) {
 		this.file = file;
 		this.capabilities = capabilities;
 		this.permissions = new HashMap<>();
-		this.maxTriesReached = new ArrayList<>();
+		this.maxTriesReached = new HashMap<>();
 	}
 	
 	public void addClient(RSPClient client, byte[] key) throws CryptoException {
@@ -80,20 +80,25 @@ public class SecureStorageGuardian implements ISecureStorageProvider {
 	private void authenticateClient(RSPClient client, int maxTries) throws InterruptedException, ExecutionException {
 		if( canPromptClient(client, capabilities)) {
 			String msg = "Please provide a secure-storage password to either create a new, or load an existing, secure storage."; 
-			StringPrompt prompt = new StringPrompt(100, msg, true);
-			int tries = 0;
+			String failedMsg = "The provided password did not decrypt the secure storage. ";
+			int tries = maxTriesReached.get(client) == null ? 0 : maxTriesReached.get(client);
 			while(tries < maxTries) {
+				String msgToUse = (tries == 0 ? msg : failedMsg + msg);
+				StringPrompt prompt = new StringPrompt(100, msgToUse, true);
 				String secureKey = client.promptString(prompt).get();
-				if( secureKey != null && secureKey.length() != 0 && secureKey.trim().length() != 0) {
-					try {
-						addClient(client, secureKey.getBytes());
-						// success at decrypting the file, or, file didn't exist yet
-						return;
-					} catch(CryptoException ce) {
-						LOG.error(ce.getMessage(), ce);
-					}
+				tries = tries + 1;
+				maxTriesReached.put(client, tries);
+				boolean empty = secureKey == null || secureKey.length() == 0 || secureKey.trim().length() == 0;
+				if( empty ) {
+					return;
 				}
-				tries += 1;
+				try {
+					addClient(client, secureKey.getBytes());
+					// success at decrypting the file, or, file didn't exist yet
+					return;
+				} catch(CryptoException ce) {
+					LOG.error(ce.getMessage(), ce);
+				}
 			}
 		}
 	}
@@ -131,9 +136,11 @@ public class SecureStorageGuardian implements ISecureStorageProvider {
 	public ISecureStorage getSecureStorage(boolean prompt) {
 		ISecureStorage storage = getSecureStorage();
 		RSPClient rspc = ClientThreadLocal.getActiveClient();
-		if( rspc != null && storage == null && prompt && !maxTriesReached.contains(rspc)) {
+		int maxTries = 4;
+		int tries = maxTriesReached.get(rspc) == null ? 0 : maxTriesReached.get(rspc);
+		if( rspc != null && storage == null && prompt && tries <= maxTries) {
 			try {
-				authenticateClient(rspc, 4);
+				authenticateClient(rspc, maxTries);
 				if( getSecureStorage() != null ) {
 					return getSecureStorage();
 				}
@@ -142,9 +149,6 @@ public class SecureStorageGuardian implements ISecureStorageProvider {
 					Thread.currentThread().interrupt();
 				}
 				LOG.error(ie.getMessage(), ie);
-			}
-			if( storage == null ) {
-				maxTriesReached.add(rspc);
 			}
 		}
 		return storage;

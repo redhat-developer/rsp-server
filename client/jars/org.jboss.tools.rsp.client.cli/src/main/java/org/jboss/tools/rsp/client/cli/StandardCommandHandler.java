@@ -932,6 +932,7 @@ public class StandardCommandHandler implements InputHandler {
 	private InputProvider provider;
 	private PromptAssistant assistant;
 	private boolean done = false;
+	private boolean shown = false;
 
 	public StandardCommandHandler(ServerManagementClientLauncher launcher, InputProvider provider) {
 		this.launcher = launcher;
@@ -992,5 +993,15 @@ public class StandardCommandHandler implements InputHandler {
 	@Override
 	public String getPrompt() {
 		return "Please enter a command.\n";
+	}
+
+	@Override
+	public void setPromptShown() {
+		this.shown = true;
+	}
+
+	@Override
+	public boolean isPromptShown() {
+		return this.shown;
 	}
 }

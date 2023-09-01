@@ -48,6 +48,8 @@ public interface IServerModel {
 	Attributes getRequiredAttributes(IServerType serverType);
 
 	Attributes getOptionalAttributes(IServerType serverType);
+	
+	boolean hasSecureAttributes(IServerType type);
 
 	List<ServerLaunchMode> getLaunchModes(IServerType serverType);
 	

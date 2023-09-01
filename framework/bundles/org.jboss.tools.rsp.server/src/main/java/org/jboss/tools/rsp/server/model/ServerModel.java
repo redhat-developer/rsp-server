@@ -561,19 +561,20 @@ public class ServerModel implements IServerModel {
 			all.add(st);
 		}
 		
-		if (all.size() > free.size()
-				&& !hasPermissions()) {
-			return free.toArray(new ServerType[free.size()]);
-		}
-		
+//		if (all.size() > free.size()
+//				&& !hasPermissions()) {
+//			return free.toArray(new ServerType[free.size()]);
+//		}
+//		
 		return all.toArray(new ServerType[all.size()]);
 	}
-	
-	private boolean hasPermissions() {
-		return managementModel.getSecureStorageProvider().getSecureStorage(true) != null;
-	}
+//	
+//	private boolean hasPermissions() {
+//		return managementModel.getSecureStorageProvider().getSecureStorage(true) != null;
+//	}
 
-	private boolean hasSecureAttributes(IServerType type) {
+	@Override
+	public boolean hasSecureAttributes(IServerType type) {
 		Attributes a = type.getRequiredAttributes();
 		Attributes b = type.getOptionalAttributes();
 		Set<String> all = new HashSet<>();
