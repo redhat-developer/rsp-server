@@ -8,6 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.model.internal.publishing;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
@@ -24,7 +25,6 @@ import org.jboss.tools.rsp.server.spi.servertype.IDeploymentAssemblyMapping;
 
 public class DeployableDelta implements IDeployableDelta {
 	
-	private static final int UNKNOWN_KIND = -1;
 	private DeployableReference reference;
 	private Map<Path, IDeployableResourceDelta> changes;
 
@@ -99,7 +99,7 @@ public class DeployableDelta implements IDeployableDelta {
 			Path relativeToSource = mappingSourcePath.relativize(changedFile);
 			
 			String depPath = matchedMapping.getDeployPath();
-			depPath = depPath.startsWith("/") ? depPath.substring(1) : depPath;
+			depPath = depPath.startsWith(File.separator) ? depPath.substring(1) : depPath;
 			Path mappingDestPath = Paths.get(depPath);
 			Path relativeToOutput = mappingDestPath.resolve(relativeToSource);
 			registerChange(event, relativeToOutput);
