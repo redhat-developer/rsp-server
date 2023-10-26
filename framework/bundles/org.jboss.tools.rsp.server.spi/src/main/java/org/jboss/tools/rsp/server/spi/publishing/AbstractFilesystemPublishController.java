@@ -297,8 +297,6 @@ public abstract class AbstractFilesystemPublishController implements IPublishCon
 	protected int incrementalPublishCopyExplodedModule(DeployableReference opts,
 			IDeployableDelta delta) throws CoreException {
 		File dest = getDestinationPath(opts).toFile();
-		Path src = new File(opts.getPath()).toPath();
-		
 		List<String> errors = new ArrayList<>();
 		Map<Path, IDeployableResourceDelta> deltaVals = delta.getResourceDeltaMap();
 		for( Map.Entry<Path, IDeployableResourceDelta> entry : deltaVals.entrySet()) {
