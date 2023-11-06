@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.jboss.tools.rsp</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.26.6.Final</version>
+		<version>0.26.7-SNAPSHOT</version>
 	</parent>
 	<groupId>org.jboss.tools.rsp</groupId>
 	<artifactId>site</artifactId>
