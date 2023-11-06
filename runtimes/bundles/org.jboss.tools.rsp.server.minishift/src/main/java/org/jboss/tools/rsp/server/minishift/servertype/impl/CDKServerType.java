@@ -26,6 +26,10 @@ public class CDKServerType extends BaseMinishiftServerType {
 	public CDKServerType(String id, String name, String desc) {
 		super(id, name, desc);
 	}
+
+	public boolean hasSecureAttributes() {
+		return true;
+	}
 	
 	private IServerManagementModel getServerManagementModel() {
 		if( LauncherSingleton.getDefault() == null )
