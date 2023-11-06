@@ -178,7 +178,7 @@ pipeline {
 
                 // find rsp distribution zip and create symlink with word latest in the file name
                 dir('distribution/distribution/target') {
-                    sh "ln -s org.jboss.tools.rsp.distribution-${distroVersion}.zip org.jboss.tools.rsp.distribution-latest.zip"
+                    sh "cp org.jboss.tools.rsp.distribution-${distroVersion}.zip org.jboss.tools.rsp.distribution-latest.zip"
                 }
                 // Upload distributions / zips
                 def filesToPush = findFiles(glob: '**/*.zip')
