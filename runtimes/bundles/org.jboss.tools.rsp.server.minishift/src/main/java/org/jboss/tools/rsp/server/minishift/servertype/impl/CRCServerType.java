@@ -26,6 +26,10 @@ public class CRCServerType extends BaseMinishiftServerType{
 		return new CRCServerDelegate(server);
 	}
 	
+	public boolean hasSecureAttributes() {
+		return true;
+	}
+
 	@Override
 	protected void fillRequiredAttributes(CreateServerAttributesUtility attrs) {
 		attrs.addAttribute(IMinishiftServerAttributes.MINISHIFT_BINARY, 

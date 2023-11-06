@@ -21,6 +21,7 @@ public interface IServerType {
 	public IServerDelegate createServerDelegate(IServer server);
 	public Attributes getRequiredAttributes();
 	public Attributes getOptionalAttributes();
+	public boolean hasSecureAttributes();
 	public Attributes getRequiredLaunchAttributes();
 	public Attributes getOptionalLaunchAttributes();
 	public ServerLaunchMode[] getLaunchModes();

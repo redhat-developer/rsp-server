@@ -575,16 +575,7 @@ public class ServerModel implements IServerModel {
 
 	@Override
 	public boolean hasSecureAttributes(IServerType type) {
-		Attributes a = type.getRequiredAttributes();
-		Attributes b = type.getOptionalAttributes();
-		Set<String> all = new HashSet<>();
-		all.addAll(a.getAttributes().keySet());
-		all.addAll(b.getAttributes().keySet());
-		for( Iterator<String> i = all.iterator(); i.hasNext(); ) {
-			if( i.next().startsWith(IServerModel.SECURE_ATTRIBUTE_PREFIX)) 
-				return true;
-		}
-		return false;
+		return type.hasSecureAttributes();
 	}
 
 	@Override

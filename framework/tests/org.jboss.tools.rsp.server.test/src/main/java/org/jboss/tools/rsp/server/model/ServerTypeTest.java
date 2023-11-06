@@ -313,5 +313,10 @@ public class ServerTypeTest {
 			return null;
 		}
 
+		@Override
+		public boolean hasSecureAttributes() {
+			return false;
+		}
+
 	}
 }

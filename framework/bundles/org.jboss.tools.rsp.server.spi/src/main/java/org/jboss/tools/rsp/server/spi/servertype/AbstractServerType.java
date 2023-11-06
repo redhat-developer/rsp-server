@@ -9,9 +9,11 @@
 package org.jboss.tools.rsp.server.spi.servertype;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -30,6 +32,7 @@ import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.server.spi.SPIActivator;
+import org.jboss.tools.rsp.server.spi.model.IServerModel;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 
 public abstract class AbstractServerType implements IServerType {
@@ -186,6 +189,19 @@ public abstract class AbstractServerType implements IServerType {
 		// The ok-status indicates the workflow is done and the results can be submitted
 		workflow.setStatus(StatusConverter.convert(new Status(IStatus.INFO, SPIActivator.BUNDLE_ID, "")));
 		return workflow;
+	}
+	
+	public boolean hasSecureAttributes() {
+		Attributes a = getRequiredAttributes();
+		Attributes b = getOptionalAttributes();
+		Set<String> all = new HashSet<>();
+		all.addAll(a.getAttributes().keySet());
+		all.addAll(b.getAttributes().keySet());
+		for( Iterator<String> i = all.iterator(); i.hasNext(); ) {
+			if( i.next().startsWith(IServerModel.SECURE_ATTRIBUTE_PREFIX)) 
+				return true;
+		}
+		return false;
 	}
 	
 	public ServerLaunchMode[] getLaunchModes() {
