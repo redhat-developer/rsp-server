@@ -168,6 +168,15 @@ public class ServerModel implements IServerModel {
 		}
 	}
 	
+	private void saveServerLogError(IServer s) {
+		try {
+			((IServerWorkingCopy)s).save(new NullProgressMonitor());
+		} catch(CoreException ce) {
+			LOG.error(ce.getMessage(), ce);
+		}
+	}
+
+	
 	@Override
 	public void loadServers() throws CoreException {
 		File data = this.managementModel.getDataStoreModel().getDataLocation();
@@ -635,7 +644,9 @@ public class ServerModel implements IServerModel {
 		if(!canAdd.isOK()) {
 			return canAdd;
 		}
-		return s.getServerPublishModel().addDeployable(ref);
+		IStatus ret = s.getServerPublishModel().addDeployable(ref);
+		saveServerLogError(server);
+		return ret;
 	}
 
 	@Override
@@ -649,7 +660,9 @@ public class ServerModel implements IServerModel {
 		if (!canRemove.isOK()) {
 			return canRemove;
 		}
-		return s.getServerPublishModel().removeDeployable(reference);
+		IStatus ret = s.getServerPublishModel().removeDeployable(reference);
+		saveServerLogError(server);
+		return ret;
 	}
 
 	@Override
