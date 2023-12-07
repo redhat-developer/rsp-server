@@ -8,6 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.wildfly.servertype.impl;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,13 +77,30 @@ public class WildFlyServerDelegate extends AbstractJBossServerDelegate {
 			return vd;
 		}
 		String home = server.getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
+		IPath homePath = new Path(home);
+		if( !homePath.toFile().exists()) {
+			return validationErrorResponse("Server's Home Directory must exist", IJBossServerAttributes.SERVER_HOME, Activator.BUNDLE_ID);
+		}
+
+		String baseDir = server.getAttribute(IJBossServerAttributes.SERVER_BASE_DIR, IJBossServerAttributes.SERVER_BASE_DIR_DEFAULT);
+		baseDir = baseDir == null || baseDir.trim().isEmpty() ? IJBossServerAttributes.SERVER_BASE_DIR_DEFAULT : baseDir;
+		IPath baseDirPath = !isRelativePath(baseDir) ? new Path(baseDir) : homePath.append(baseDir);
+		if( !baseDirPath.toFile().exists()) {
+			return validationErrorResponse("Server's Base Directory must exist: " + baseDirPath.toString(), IJBossServerAttributes.SERVER_BASE_DIR, Activator.BUNDLE_ID);
+		}
+
 		String configFile = server.getAttribute(IJBossServerAttributes.WILDFLY_CONFIG_FILE, 
 				IJBossServerAttributes.WILDFLY_CONFIG_FILE_DEFAULT);
-		IPath configFilePath = new Path(home).append("standalone").append("configuration").append(configFile);
+		IPath configFilePath = baseDirPath.append("configuration").append(configFile);
 		if( !configFilePath.toFile().exists()) {
-			return validationErrorResponse("Configuration file must exist", IJBossServerAttributes.WILDFLY_CONFIG_FILE, Activator.BUNDLE_ID);
+			return validationErrorResponse("Configuration file must exist: " + configFilePath, IJBossServerAttributes.WILDFLY_CONFIG_FILE, Activator.BUNDLE_ID);
 		}
 		return new CreateServerValidation(Status.OK_STATUS, null);
+	}
+	
+	public static boolean isRelativePath(String s) {
+		Path p = new org.jboss.tools.rsp.eclipse.core.runtime.Path(s);
+		return !p.isAbsolute();
 	}
 	
 	@Override

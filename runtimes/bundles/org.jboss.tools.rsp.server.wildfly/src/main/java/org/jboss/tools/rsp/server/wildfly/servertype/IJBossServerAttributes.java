@@ -10,13 +10,13 @@ package org.jboss.tools.rsp.server.wildfly.servertype;
 
 import org.jboss.tools.rsp.api.DefaultServerAttributes;
 import org.jboss.tools.rsp.server.spi.launchers.AbstractJavaLauncher;
+import org.jboss.tools.rsp.server.wildfly.impl.util.IJBossRuntimeResourceConstants;
 
 public interface IJBossServerAttributes extends DefaultServerAttributes {
 	/*
 	 * Required attributes
 	 */
 	public static final String SERVER_HOME = DefaultServerAttributes.SERVER_HOME_DIR;
-	
 	
 	
 	/*
@@ -31,7 +31,9 @@ public interface IJBossServerAttributes extends DefaultServerAttributes {
 	public static final String WILDFLY_CONFIG_FILE_DEFAULT = "standalone.xml";
 	public static final String WILDFLY_CONFIG_FILE = "wildfly.server.config.file";
 	public static final String WILDFLY_DEPLOY_DIR = "wildfly.server.deploy.directory";
-	
+	public static final String SERVER_BASE_DIR = "server.base.dir";
+	public static final String SERVER_BASE_DIR_DEFAULT = IJBossRuntimeResourceConstants.AS7_STANDALONE;
+
 	
 	public static final String WILDFLY_PUBLISH_RESTART_PATTERN_KEY = "wildfly.publish.restart.pattern";
 	public static final String WILDFLY_PUBLISH_RESTART_PATTERN_DEFAULT = "\\.class$|\\.jar$";

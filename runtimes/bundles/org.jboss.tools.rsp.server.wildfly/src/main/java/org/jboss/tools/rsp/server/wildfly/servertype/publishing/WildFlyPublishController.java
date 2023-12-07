@@ -24,6 +24,7 @@ import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.wildfly.impl.Activator;
 import org.jboss.tools.rsp.server.wildfly.servertype.AbstractJBossServerDelegate;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
+import org.jboss.tools.rsp.server.wildfly.servertype.impl.WildFlyServerDelegate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,30 +47,27 @@ public class WildFlyPublishController extends StandardJBossPublishController {
 	}
 
 	protected Path getDefaultDeploymentFolder() {
-		// TODO this may need to be abstracted out eventually if we 
-		// support things like custom config folders etc. 
 		String home = getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
-		return new File(home).toPath().resolve("standalone").resolve("deployments");
+		String base = getServer().getAttribute(IJBossServerAttributes.SERVER_BASE_DIR, (String)null);
+		base = (base == null || base.isEmpty()) ? IJBossServerAttributes.SERVER_BASE_DIR_DEFAULT : base;
+		Path basePath = WildFlyServerDelegate.isRelativePath(base) ?  
+				new File(home).toPath().resolve(base) :
+				new File(base).toPath(); 
+		return basePath.resolve("deployments");
 	}
 
 	protected Path getDeploymentFolderFromServer() {
-		// TODO this may need to be abstracted out eventually if we 
-		// support things like custom config folders etc. 
+		// TODO This is a bit repetitive for user, as deploy path may include base path within it
 		String deploy = getServer().getAttribute(IJBossServerAttributes.WILDFLY_DEPLOY_DIR, (String)null);
 		if( deploy == null || deploy.isEmpty())
 			return null;
 		// Absolute
-		if( !isRelativePath(deploy)) {
+		if( !WildFlyServerDelegate.isRelativePath(deploy)) {
 			return new File(deploy).toPath();
 		}
 		// Relative
 		String home = getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
 		return new File(home).toPath().resolve(deploy);
-	}
-	
-	private boolean isRelativePath(String s) {
-		org.jboss.tools.rsp.eclipse.core.runtime.Path p = new org.jboss.tools.rsp.eclipse.core.runtime.Path(s);
-		return !p.isAbsolute();
 	}
 
 	@Override

@@ -11,15 +11,17 @@
 package org.jboss.tools.rsp.server.wildfly.servertype.launch;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
+import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.wildfly.impl.util.IJBossRuntimeResourceConstants;
+import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
 
 public class JBoss70DefaultLaunchArguments extends JBossDefaultLaunchArguments {
 
 	public JBoss70DefaultLaunchArguments(IServer s) {
 		super(s);
 	}
-
+	
 	@Override
 	public String getStartDefaultProgramArgs() {
 		String ret = DASH + JB7_MP_ARG + SPACE + QUOTE 
@@ -59,9 +61,15 @@ public class JBoss70DefaultLaunchArguments extends JBossDefaultLaunchArguments {
 	}
 
 	protected IPath getBaseDirectory() {
-		IPath serverHome = getServerHome();
-		IPath base = serverHome.append(IJBossRuntimeResourceConstants.AS7_STANDALONE);
-		return base;		
+		String baseDir = server.getAttribute(IJBossServerAttributes.SERVER_BASE_DIR, (String) null);
+		if( baseDir == null || baseDir.isEmpty() ) {
+			baseDir = IJBossServerAttributes.SERVER_BASE_DIR_DEFAULT;
+		}
+		IPath bdPath = new Path(baseDir);
+		if( !bdPath.isAbsolute()) {
+			bdPath = getServerHome().append(bdPath);
+		}
+		return bdPath;
 	}
 	
 	@Override
@@ -77,7 +85,8 @@ public class JBoss70DefaultLaunchArguments extends JBossDefaultLaunchArguments {
 			SPACE + QUOTE + SYSPROP + JB7_BOOT_LOG_ARG + EQ + bootLog.toOSString() + QUOTE + 
 			SPACE + QUOTE + SYSPROP + JB7_LOGGING_CONFIG_FILE + EQ + 
 			"file:" + logConfig.toOSString() + QUOTE + //$NON-NLS-1$  
-			SPACE + QUOTE + SYSPROP + JBOSS_HOME_DIR + EQ + serverHome.toOSString() + QUOTE + SPACE;
+			SPACE + QUOTE + SYSPROP + JBOSS_HOME_DIR + EQ + serverHome.toOSString() + QUOTE + 
+			SPACE + QUOTE + SYSPROP + JBOSS_SERVER_BASE_DIR + EQ + base.toOSString() + QUOTE + SPACE;
 		return ret;
 	}
 	
