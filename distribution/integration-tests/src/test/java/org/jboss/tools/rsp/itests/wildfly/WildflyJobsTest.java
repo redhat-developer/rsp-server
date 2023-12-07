@@ -97,11 +97,15 @@ public class WildflyJobsTest extends RSPCase {
 		double actualProgress = jobProgress.getPercent();
 		assertTrue(actualProgress >= 0.0);
 		// check that there is progress in bits downloading. wait for a while
-		sleep(3000);
-		jobs = serverProxy.getJobs().get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
-		jobProgress = jobs.stream().filter(job -> job.getHandle().getId().equals(downloadJobId)).findAny().orElse(null);
-		assertNotNull(jobProgress);
-		assertTrue(jobProgress.getPercent() > 0.0 && jobProgress.getPercent() != actualProgress);
+		JobProgress jobProgress2 = null;
+		int i = 0;
+		while(i++ < 3 && jobProgress2 == null) {
+			sleep(2000);
+			jobs = serverProxy.getJobs().get(REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
+			jobProgress2 = jobs.stream().filter(job -> job.getHandle().getId().equals(downloadJobId)).findAny().orElse(null);
+		}
+		assertNotNull(jobProgress2);
+		assertTrue(jobProgress2.getPercent() > 0.0 && jobProgress2.getPercent() != actualProgress);
 		// Cancel downloading
 		Status cancelStatus = serverProxy.cancelJob(jobProgress.getHandle()).get(SERVER_OPERATION_TIMEOUT, TimeUnit.MILLISECONDS);
 		assertEquals(Status.OK, cancelStatus.getSeverity());
