@@ -161,10 +161,16 @@ public class WildFlyServerModelTest extends RSPCase {
 					"Set the port you want your JBoss / WildFly instance to bind to", 
 					IJBossServerAttributes.JBOSS_SERVER_PORT_DEFAULT)
         		);
+        expected.put(IJBossServerAttributes.SERVER_BASE_DIR, 
+        		new Attribute(
+					ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE, 
+					"Set the base directory you want your WildFly instance to use. Path may be relative to the server home, or absolute.", 
+					IJBossServerAttributes.SERVER_BASE_DIR_DEFAULT)
+        		);
         expected.put(IJBossServerAttributes.WILDFLY_CONFIG_FILE, 
         		new Attribute(
 					ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE, 
-					"Set the configuration file you want your WildFly instance to use.", 
+					"Set the configuration file you want your WildFly instance to use. Path must be relative to base directory's configuration folder.", 
 					IJBossServerAttributes.WILDFLY_CONFIG_FILE_DEFAULT)
         		);
 		for( String k : expected.keySet()) {
