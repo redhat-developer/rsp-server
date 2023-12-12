@@ -39,7 +39,7 @@ def stageClosure(String os_label, String java) {
                     withEnv(["JAVA_HOME=${tool java}", "MAVEN=${tool 'maven3-latest'}/bin"]) {
                         deleteDir()
                         unstash 'source'
-                        runCommand("${MAVEN}/mvn clean verify -fae -B -Pintegration-tests -DskipTests=true -Dmaven.test.failure.ignore=true")
+                        runCommand("${MAVEN}/mvn clean verify -U -fae -B -Pintegration-tests -DskipTests=true -Dmaven.test.failure.ignore=true")
                     }
                 } catch (e) {
                     echo "${e.getMessage()}"
@@ -87,7 +87,7 @@ pipeline {
                         stage('Build & unit tests') {
                             steps {
                                 unstash 'source'
-                                sh 'mvn clean install -fae -B'
+                                sh 'mvn clean install -U -fae -B'
                                 archiveArtifacts artifacts: 'distribution/distribution*/target/org.jboss.tools.rsp.distribution*.zip,api/docs/org.jboss.tools.rsp.schema/target/*.jar,site/target/repository/**', allowEmptyArchive: true
                                 stash includes: 'distribution/distribution*/target/org.jboss.tools.rsp.distribution*.zip,api/docs/org.jboss.tools.rsp.schema/target/*.jar', name: 'zips'
                                 stash includes: 'site/target/repository/**', name: 'site'
@@ -96,7 +96,7 @@ pipeline {
 
                        stage('Integration tests') {
                            steps {
-                               sh 'mvn verify -B -Pintegration-tests -DskipTests=true -Dmaven.test.failure.ignore=true'
+                               sh 'mvn verify -U -B -Pintegration-tests -DskipTests=true -Dmaven.test.failure.ignore=true'
                                archiveArtifacts artifacts: 'distribution/integration-tests/target/quickstarts/*/build.log', allowEmptyArchive: true
                            }
                        }
