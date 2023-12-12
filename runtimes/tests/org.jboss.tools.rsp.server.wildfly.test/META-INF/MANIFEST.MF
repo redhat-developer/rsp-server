@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: org.jboss.tools.rsp.server.wildfly.test
 Bundle-SymbolicName: org.jboss.tools.rsp.server.wildfly.test
 Automatic-Module-Name: org.jboss.tools.rsp.server.wildfly.test
-Bundle-Version: 0.26.8.qualifier
+Bundle-Version: 0.26.8.Final
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: org.assertj.core.api,
  org.eclipse.lsp4j.jsonrpc,
