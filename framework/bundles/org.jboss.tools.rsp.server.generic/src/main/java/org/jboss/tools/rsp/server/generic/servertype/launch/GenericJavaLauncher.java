@@ -22,13 +22,12 @@ import org.jboss.tools.rsp.server.generic.IStringSubstitutionProvider;
 import org.jboss.tools.rsp.server.generic.servertype.GenericServerBehavior;
 import org.jboss.tools.rsp.server.generic.servertype.GenericServerType;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
-import org.jboss.tools.rsp.server.spi.launchers.IServerStartLauncher;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.util.VersionComparisonUtility;
 
 public class GenericJavaLauncher extends AbstractGenericJavaLauncher
-		implements IServerStartLauncher, IServerShutdownLauncher {
+		implements IServerShutdownLauncher {
 
 	private JSONMemento memento;
 	private boolean flagMode;
@@ -58,13 +57,13 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 		
 		return launch("run");
 	}
-
-	private String getDefaultWorkingDirectory() {
-		String serverHome = getDelegate().getServer().getAttribute(DefaultServerAttributes.SERVER_HOME_DIR,(String) null);
+	
+	public static String getDefaultWorkingDirectory(IServerDelegate delegate) {
+		String serverHome = delegate.getServer().getAttribute(DefaultServerAttributes.SERVER_HOME_DIR,(String) null);
 		if( serverHome != null )
 			return serverHome;
 		
-		String serverHomeFile = getDelegate().getServer().getAttribute(DefaultServerAttributes.SERVER_HOME_FILE,(String) null);
+		String serverHomeFile = delegate.getServer().getAttribute(DefaultServerAttributes.SERVER_HOME_FILE,(String) null);
 		if( serverHomeFile != null )
 			return new File(serverHomeFile).getParent();
 
@@ -73,32 +72,35 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 	
 	@Override
 	protected String getWorkingDirectory() {
+		return getWorkingDirectory(memento, getDelegate());
+	}
+
+	public static String getWorkingDirectory(JSONMemento memento, IServerDelegate delegate) {
 		JSONMemento launchProperties = memento.getChild("launchProperties");
 		if (launchProperties != null) {
 			String wd = launchProperties.getString("workingDirectory");
 			if( wd == null ) {
-				return getDefaultWorkingDirectory();
+				return getDefaultWorkingDirectory(delegate);
 			}
 			
 			String postSub = null;
 			try {
-				postSub = applySubstitutions(wd);
+				postSub = applySubstitutions(wd, delegate);
 			} catch(CoreException ce) {
-				return getDefaultWorkingDirectory();
+				return getDefaultWorkingDirectory(delegate);
 			}
 			
 			Path p = new Path(postSub);
 			if( p.isAbsolute())
 				return p.toOSString();
 			
-			String serverHome = getDelegate().getServer().getAttribute(DefaultServerAttributes.SERVER_HOME_DIR,(String) null);
+			String serverHome = delegate.getServer().getAttribute(DefaultServerAttributes.SERVER_HOME_DIR,(String) null);
 			if (serverHome != null && !serverHome.trim().isEmpty()) {
 				return new Path(serverHome).append(p).toOSString();
 			}
 		}
 		return null;
 	}
-
 	@Override
 	protected String getMainTypeName() {
 		JSONMemento launchProperties = memento.getChild("launchProperties");
@@ -271,7 +273,11 @@ public class GenericJavaLauncher extends AbstractGenericJavaLauncher
 	}
 
 	private String applySubstitutions(String input) throws CoreException {
-		IServerDelegate del = getDelegate();
+		return applySubstitutions(input, getDelegate());
+	}
+	
+
+	public static String applySubstitutions(String input, IServerDelegate del) throws CoreException {
 		return (del instanceof IStringSubstitutionProvider) ? 
 				((IStringSubstitutionProvider)del).applySubstitutions(input) : input;
 	}
