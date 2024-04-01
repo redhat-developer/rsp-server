@@ -24,10 +24,14 @@ public class MessageBoxNotification {
 	private String message;
 	private Map<String, Object> properties;
 	
+	public MessageBoxNotification() {
+		// required 0-arg for beans
+	}
+
 	public MessageBoxNotification(String message) {
 		this(message, Status.INFO, 0);
 	}
-	
+
 	public MessageBoxNotification(String message, int code) {
 		this(message, Status.INFO, code);
 		this.message = message;
