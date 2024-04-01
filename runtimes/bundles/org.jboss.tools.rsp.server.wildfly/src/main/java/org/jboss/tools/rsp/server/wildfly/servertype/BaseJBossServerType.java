@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * Copyright (c) 2018, 2024 Red Hat, Inc. Distributed under license by Red Hat, Inc.
  * All rights reserved. This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v20.html
@@ -8,11 +8,13 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.wildfly.servertype;
 
+import org.jboss.tools.rsp.api.DefaultServerAttributes;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.launching.java.ILaunchModes;
+import org.jboss.tools.rsp.server.spi.model.polling.PollThreadUtils;
 import org.jboss.tools.rsp.server.spi.servertype.AbstractServerType;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
@@ -77,6 +79,17 @@ public abstract class BaseJBossServerType extends AbstractServerType {
 				ServerManagementAPIConstants.ATTR_TYPE_INT, 
 				"Set the port you want your JBoss / WildFly instance to bind to", 
 				IJBossServerAttributes.JBOSS_SERVER_PORT_DEFAULT);
+
+		attrs.addAttribute(DefaultServerAttributes.SERVER_TIMEOUT_STARTUP, 
+				ServerManagementAPIConstants.ATTR_TYPE_INT, 
+				"Set the timeout (ms) to wait for a server to start before aborting.", 
+				DefaultServerAttributes.DEFAULT_SERVER_TRANSITION_TIMEOUT);
+
+		attrs.addAttribute(DefaultServerAttributes.SERVER_TIMEOUT_SHUTDOWN, 
+				ServerManagementAPIConstants.ATTR_TYPE_INT, 
+				"Set the timeout (ms) to wait for a server to stop before aborting.", 
+				DefaultServerAttributes.DEFAULT_SERVER_TRANSITION_TIMEOUT);
+		
 	}
 	@Override
 	public Attributes getRequiredLaunchAttributes() {
