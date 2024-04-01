@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * Copyright (c) 2018, 2024 Red Hat, Inc. Distributed under license by Red Hat, Inc.
  * All rights reserved. This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v20.html
@@ -21,7 +21,7 @@ public class PollThreadUtils {
 
 	public static final String PROP_POLL_THREAD_KEY = "org.jboss.tools.rsp.server.spi.model.polling.PollThreadKey";
 
-	private static final int DEFAULT_TIMEOUT = 2*60*1000;
+	private static final int DEFAULT_TIMEOUT = DefaultServerAttributes.DEFAULT_SERVER_TRANSITION_TIMEOUT;
 
 	private PollThreadUtils() {
 	}

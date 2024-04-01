@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * Copyright (c) 2018, 2024 Red Hat, Inc. Distributed under license by Red Hat, Inc.
  * All rights reserved. This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v20.html
@@ -22,6 +22,7 @@ import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
+import org.jboss.tools.rsp.api.dao.MessageBoxNotification;
 import org.jboss.tools.rsp.api.dao.ServerActionRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
@@ -45,6 +46,7 @@ import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.launching.RuntimeProcessEventManager;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
+import org.jboss.tools.rsp.server.model.internal.MessageBoxNotificationManager;
 import org.jboss.tools.rsp.server.model.internal.ServerStreamListener;
 import org.jboss.tools.rsp.server.model.internal.publishing.ServerPublishStateModel;
 import org.jboss.tools.rsp.server.spi.filewatcher.IFileWatcherService;
@@ -389,6 +391,11 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 			@Override
 			public void stateNotAsserted(IServerStatePoller.SERVER_STATE expectedState, IServerStatePoller.SERVER_STATE currentState) {
 				stop(true);
+				MessageBoxNotificationManager.messageAllClients(
+						new MessageBoxNotification("Server " + AbstractServerDelegate.this.getServer().getName() + " did not start within timeout.",
+								Status.WARNING,
+								MessageBoxNotification.SYSTEM_STARTUP + 100)
+				);
 			}
 
 			@Override
@@ -407,6 +414,11 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 			@Override
 			public void stateNotAsserted(IServerStatePoller.SERVER_STATE expectedState, IServerStatePoller.SERVER_STATE currentState) {
 				setServerState(STATE_STARTED);
+				MessageBoxNotificationManager.messageAllClients(
+						new MessageBoxNotification("Server " + AbstractServerDelegate.this.getServer().getName() + " did not stop within timeout.",
+								Status.WARNING,
+								MessageBoxNotification.SYSTEM_SHUTDOWN + 100)
+				);
 			}
 
 			@Override
