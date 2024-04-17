@@ -11,6 +11,7 @@
 package org.jboss.tools.rsp.server.wildfly.beans.impl;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Properties;
 
 import org.jboss.tools.rsp.api.dao.ServerBean;
@@ -65,7 +66,25 @@ public abstract class ServerBeanTypeEnterprise extends JBossServerBeanType {
 		}
 		return null;
 	}
-	
+
+	public String getEAP8xVersion(File location, String versionPrefix) {
+		IPath versionText = new Path(location.getAbsolutePath()).append("version.txt");
+		if( versionText.toFile().exists()) {
+			try {
+				String s = FileUtil.getContents(versionText.toFile());
+				String prefix = "Red Hat JBoss Enterprise Application Platform - Version ";
+				if( s.startsWith(prefix)) {
+					String v = s.substring(prefix.length()).trim();
+					if( v.startsWith(versionPrefix)) {
+						return v;
+					}
+				}
+			} catch( IOException ioe) {
+				// ignore, return null
+			}
+		}
+		return null;
+	}
 	public String getServerAdapterTypeEAPLegacy(String version) {
 		// TODO this needs to be split up, does not belong here
 		if( version.startsWith("4.2")) return IServerConstants.SERVER_EAP_43;
