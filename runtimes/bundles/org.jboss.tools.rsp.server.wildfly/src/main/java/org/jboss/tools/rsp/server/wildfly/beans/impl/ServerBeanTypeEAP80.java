@@ -21,9 +21,23 @@ public class ServerBeanTypeEAP80 extends ServerBeanTypeEnterprise {
 		return IServerConstants.SERVER_EAP_80;
 	}
 	public boolean isServerRoot(File location) {
-		return getEAP6xVersion(location, EAP_LAYERED_PRODUCT_META_INF, "8.0", "eap", RELEASE_NAME_JBOSS_EAP) != null; //$NON-NLS-1$
+		String s1 = getEAP6xVersion(location, EAP_LAYERED_PRODUCT_META_INF, "8.0", "eap", RELEASE_NAME_JBOSS_EAP); //$NON-NLS-1$
+		if( s1 != null )
+			return true;
+		String s2 = getEAP8xVersion(location, "8."); //$NON-NLS-1$
+		if( s2 != null )
+			return true;
+		return false;
 	}
+	
 	public String getFullVersion(File location, File systemJarFile) {
-		return getEAP6xVersion(location, EAP_LAYERED_PRODUCT_META_INF, "8.0", "eap", RELEASE_NAME_JBOSS_EAP); //$NON-NLS-1$
+		String s1 = getEAP6xVersion(location, EAP_LAYERED_PRODUCT_META_INF, "8.0", "eap", RELEASE_NAME_JBOSS_EAP); //$NON-NLS-1$
+		if( s1 != null ) {
+			return s1;
+		}
+		String s2 = getEAP8xVersion(location, "8."); //$NON-NLS-1$
+		if( s2 != null )
+			return s2;
+		return null;
 	}
 }
