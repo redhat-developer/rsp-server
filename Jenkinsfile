@@ -1,14 +1,14 @@
 #!/usr/bin/env groovy
  
-def default_java = "openjdk-11"
+def default_java = "openjdk-17"
 def default_os = "rhel7"
 def java_axes = []
 def os_axes = []
 if (params.SIMPLE_MATRIX) {
-    java_axes = ["openjdk-11"]
+    java_axes = ["openjdk-17"]
     os_axes = ["rhel7"]
 } else {
-    java_axes = ["openjdk-11"]
+    java_axes = ["openjdk-17"]
     os_axes = ["rhel7", "win10"]
 }
 
@@ -66,7 +66,7 @@ pipeline {
     }
 
     tools {
-        jdk 'openjdk-11'
+        jdk 'openjdk-17'
     }
     
     stages {
