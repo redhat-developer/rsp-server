@@ -15,18 +15,18 @@
 
 	<properties>
 		<skipITests>true</skipITests>
-            <server.id>install-wildfly-27.0.1.Final</server.id>
-            <server.url>https://github.com/wildfly/wildfly/releases/download/27.0.1.Final/wildfly-27.0.1.Final.zip</server.url>
-            <server.sha1>9f3047d9a5560b4e07ba848f977a08ad59e74608</server.sha1>
+            <server.id>install-wildfly-30.0.1.Final</server.id>
+            <server.url>https://github.com/wildfly/wildfly/releases/download/30.0.1.Final/wildfly-30.0.1.Final.zip</server.url>
+            <server.sha1>cd9c13350d775abcc728259b24b8bfabdf2b90a3</server.sha1>
             <server.type.id>org.jboss.ide.eclipse.as.wildfly.270</server.type.id>
-            <server.version>27.0.1.Final</server.version>
+            <server.version>30.0.1.Final</server.version>
 		<server.path>${project.build.directory}/wildfly-${server.version}</server.path>
 		<!-- Sonar report property for code coverage -->
 		<sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 		<!-- Quickstarts properties -->
 		<quickstarts.server>wildfly</quickstarts.server>
-		<quickstarts.url>https://github.com/wildfly/quickstart/archive/27.0.1.Final.zip</quickstarts.url>
-		<quickstarts.dir>quickstart-27.0.1.Final</quickstarts.dir>
+		<quickstarts.url>https://github.com/wildfly/quickstart/archive/30.0.1.Final.zip</quickstarts.url>
+		<quickstarts.dir>quickstart-30.0.1.Final</quickstarts.dir>
 	</properties>
 
 	<name>Runtime Server Protocol : Integration Tests</name>
@@ -364,7 +364,7 @@
 			<activation>
 				<property>
 					<name>wildfly</name>
-					<value>26</value>
+					<value>27</value>
 				</property>
 			</activation>
 			<properties>
@@ -373,6 +373,54 @@
 				<server.sha1>9f3047d9a5560b4e07ba848f977a08ad59e74608</server.sha1>
 				<server.type.id>org.jboss.ide.eclipse.as.wildfly.270</server.type.id>
 				<server.version>27.0.1.Final</server.version>
+			</properties>
+		</profile>
+		<profile>
+			<id>wildfly-28</id>
+			<activation>
+				<property>
+					<name>wildfly</name>
+					<value>28</value>
+				</property>
+			</activation>
+			<properties>
+				<server.id>install-wildfly-28.0.1.Final</server.id>
+				<server.url>https://github.com/wildfly/wildfly/releases/download/28.0.1.Final/wildfly-28.0.1.Final.zip</server.url>
+				<server.sha1>f9923e17933006d958a12cb4e1c137ac2f6c33e7</server.sha1>
+				<server.type.id>org.jboss.ide.eclipse.as.wildfly.270</server.type.id>
+				<server.version>28.0.1.Final</server.version>
+			</properties>
+		</profile>
+		<profile>
+			<id>wildfly-29</id>
+			<activation>
+				<property>
+					<name>wildfly</name>
+					<value>29</value>
+				</property>
+			</activation>
+			<properties>
+				<server.id>install-wildfly-29.0.1.Final</server.id>
+				<server.url>https://github.com/wildfly/wildfly/releases/download/29.0.1.Final/wildfly-29.0.1.Final.zip</server.url>
+				<server.sha1>bc46b52e37980730fcb8debb5ad438ab8290a9eb</server.sha1>
+				<server.type.id>org.jboss.ide.eclipse.as.wildfly.270</server.type.id>
+				<server.version>29.0.1.Final</server.version>
+			</properties>
+		</profile>
+		<profile>
+			<id>wildfly-30</id>
+			<activation>
+				<property>
+					<name>wildfly</name>
+					<value>30</value>
+				</property>
+			</activation>
+			<properties>
+				<server.id>install-wildfly-30.0.1.Final</server.id>
+				<server.url>https://github.com/wildfly/wildfly/releases/download/30.0.1.Final/wildfly-30.0.1.Final.zip</server.url>
+				<server.sha1>cd9c13350d775abcc728259b24b8bfabdf2b90a3</server.sha1>
+				<server.type.id>org.jboss.ide.eclipse.as.wildfly.270</server.type.id>
+				<server.version>30.0.1.Final</server.version>
 			</properties>
 		</profile>
 		<profile>
