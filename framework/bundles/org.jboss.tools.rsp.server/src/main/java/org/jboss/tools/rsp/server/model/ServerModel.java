@@ -774,6 +774,9 @@ public class ServerModel implements IServerModel {
 		
 		DummyServer ds = null;
 		try {
+			if( req.getServerJson() == null ) {
+				throw new Exception("Error while reading server string: null");
+			}
 			ds = DummyServer.createDummyServer(req.getServerJson(), this);
 		} catch(Exception ce) {
 			resp.getValidation().setStatus(errorStatus("Update Failed: " + ce.getMessage(), ce));
