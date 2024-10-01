@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: org.jboss.tools.rsp.launching.java
 Bundle-SymbolicName: org.jboss.tools.rsp.launching.java
 Automatic-Module-Name: org.jboss.tools.rsp.launching.java
-Bundle-Version: 0.26.11.Final
+Bundle-Version: 0.26.12.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Activator: org.jboss.tools.rsp.launching.java.JavaLaunchingActivator
 Bundle-ClassPath: .
