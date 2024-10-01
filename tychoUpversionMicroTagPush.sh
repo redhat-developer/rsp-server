@@ -80,21 +80,7 @@ else
 fi
 
 
-echo "Go kick a Jenkins Job please. Let me know when it's DONE and green."
-read -p "Press enter to continue"
-
-
-echo "Time to deploy to nexus. The release process begins NOW. ARE YOU READY?"
-read -p "Press enter to continue"
-if [ "$debug" -eq 0 ]; then
-	mvn clean deploy
-else 
-	echo mvn clean deploy
-fi
-
-
-echo "Go to nexus https://repository.jboss.org/nexus/#stagingRepositories and find the repo"
-echo "Then do close and release on that repository!"
+echo "Go kick a build at https://github.com/redhat-developer/rsp-server/actions/workflows/gh-actions.yml"
 read -p "Press enter to continue"
 
 
@@ -109,8 +95,65 @@ else
 	echo git push origin v$newVerUnderscore
 fi
 
-echo "Go kick another jenkins job with a release flag."
+echo "Go kick another build at https://github.com/redhat-developer/rsp-server/actions/workflows/gh-actions.yml"
 read -p "Press enter to continue"
+
+echo "Let's start with the target platform"
+jbang repoflattener.java site
+echo "Did jbang work? If not, cancel, debug, and start over."
+read -p "Press enter to continue"
+
+
+echo "Making a release on github for $newverFinal TargetPlatform"
+createReleasePayload="{\"target_commitish\":\"master\",\"name\":\"$newverFinal.targetplatform\",\"body\":\"Release of target platform for $newverFinal\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false}"
+
+if [ "$debug" -eq 0 ]; then
+	curl -L \
+	  -X POST \
+	  -H "Accept: application/vnd.github+json" \
+	  -H "Authorization: Bearer $ghtoken"\
+	  -H "X-GitHub-Api-Version: 2022-11-28" \
+	  https://api.github.com/repos/redhat-developer/rsp-server/releases \
+	  -d "$createReleasePayload" | tee createReleaseResponse.json
+else 
+	echo curl -L \
+	  -X POST \
+	  -H "Accept: application/vnd.github+json" \
+	  -H "Authorization: Bearer $ghtoken"\
+	  -H "X-GitHub-Api-Version: 2022-11-28" \
+	  https://api.github.com/repos/redhat-developer/rsp-server/releases \
+	  -d "$createReleasePayload"
+fi
+echo "Please go verify the target platform release looks correct. We will add the asset next"
+read -p "Press enter to continue"
+
+assetUrl=`cat createReleaseResponse.json | grep assets_url | cut -c 1-17 --complement | rev | cut -c3- | rev | sed 's/api.github.com/uploads.github.com/g'`
+rm createReleaseResponse.json
+for filename in site/target/flat-repository/*; do
+  nameOnly=`echo $filename | rev | cut -f 1 -d "/" | rev`
+  echo $nameOnly
+  if [ "$debug" -eq 0 ]; then
+	curl -L \
+	  -X POST \
+	  -H "Accept: application/vnd.github+json" \
+	  -H "Authorization: Bearer $ghtoken"\
+	  -H "X-GitHub-Api-Version: 2022-11-28" \
+	  -H "Content-Type: application/octet-stream" \
+	  $assetUrl?name=$nameOnly \
+	  --data-binary "@$filename"
+ else 
+	echo curl -L \
+	  -X POST \
+	  -H "Accept: application/vnd.github+json" \
+	  -H "Authorization: Bearer $ghtoken"\
+	  -H "X-GitHub-Api-Version: 2022-11-28" \
+	  -H "Content-Type: application/octet-stream" \
+	  $assetUrl?name=$nameOnly \
+	  --data-binary "@$filename"
+ fi
+done
+
+
 
 
 echo "Making a release on github for $newverFinal"

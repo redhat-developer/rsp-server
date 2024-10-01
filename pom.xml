@@ -186,8 +186,8 @@
 			</activation>
 			<properties>
 				<moduleProperties>--add-modules=ALL-SYSTEM</moduleProperties>
-            </properties>
-         </profile>
+			</properties>
+		</profile>
 		<profile>
 			<id>sonar</id>
 			<properties>
