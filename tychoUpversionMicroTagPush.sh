@@ -215,6 +215,13 @@ fi
 echo "Please go verify the release looks correct and the distribution was added correctly."
 read -p "Press enter to continue"
 
+echo "Need to update the LATEST file"
+newLatestContent="org.jboss.tools.rsp.distribution.latest.version=$newverFinal\norg.jboss.tools.rsp.distribution.latest.url=https://github.com/redhat-developer/rsp-server/releases/download/v$newVerUnderscore/$zipFileName"
+echo $newLatestContent > LATEST
+echo "Updating LATEST release to $newverFinal"
+git commit -a -m "Updating LATEST release to $newverFinal" --signoff
+read -p "Press enter to continue"
+
 echo "We are released. It's time to move the repo to next-SNAPSHOT"
 read -p "Press enter to continue"
 
