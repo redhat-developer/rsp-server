@@ -1,1 +1,2 @@
-org.jboss.tools.rsp.distribution.latest.version=0.26.12.Final\norg.jboss.tools.rsp.distribution.latest.url=https://github.com/redhat-developer/rsp-server/releases/download/v0_26_12/org.jboss.tools.rsp.distribution-0.26.12.Final.zip
+org.jboss.tools.rsp.distribution.latest.version=0.26.12.Final
+org.jboss.tools.rsp.distribution.latest.url=https://github.com/redhat-developer/rsp-server/releases/download/v0_26_12/org.jboss.tools.rsp.distribution-0.26.12.Final.zip
