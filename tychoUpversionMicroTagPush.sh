@@ -212,6 +212,29 @@ else
 	  $assetUrl?name=$zipFileName \
 	  --data-binary "@distribution/distribution/target/$zipFileName"
 fi
+
+
+zipFileNameWFly=`ls -1 distribution/distribution.wildfly/target/ | grep zip`
+if [ "$debug" -eq 0 ]; then
+	curl -L \
+	  -X POST \
+	  -H "Accept: application/vnd.github+json" \
+	  -H "Authorization: Bearer $ghtoken"\
+	  -H "X-GitHub-Api-Version: 2022-11-28" \
+	  -H "Content-Type: application/octet-stream" \
+	  $assetUrl?name=$zipFileNameWFly \
+	  --data-binary "@distribution/distribution.wildfly/target/$zipFileNameWFly"
+else 
+	echo curl -L \
+	  -X POST \
+	  -H "Accept: application/vnd.github+json" \
+	  -H "Authorization: Bearer $ghtoken"\
+	  -H "X-GitHub-Api-Version: 2022-11-28" \
+	  -H "Content-Type: application/octet-stream" \
+	  $assetUrl?name=$zipFileNameWFly \
+	  --data-binary "@distribution/distribution.wildfly/target/$zipFileNameWFly"
+fi
+
 echo "Please go verify the release looks correct and the distribution was added correctly."
 read -p "Press enter to continue"
 
