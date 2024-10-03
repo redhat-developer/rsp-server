@@ -1,5 +1,5 @@
 /******************************************************************************* 
- * Copyright (c) 2015 Red Hat, Inc. 
+ * Copyright (c) 2024 Red Hat, Inc. 
  * Distributed under license by Red Hat, Inc. All rights reserved. 
  * This program is made available under the terms of the 
  * Eclipse Public License v2.0 which accompanies this distribution, 
@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import org.jboss.tools.rsp.server.wildfly.impl.util.JBossManifestUtility;
+import org.jboss.tools.rsp.server.wildfly.impl.util.LayeredModulePathFactory;
 
 public class ServerBeanTypeWildflyPlus extends JBossServerBeanType {
 	private boolean web;
@@ -75,11 +76,31 @@ public class ServerBeanTypeWildflyPlus extends JBossServerBeanType {
 	
 	public static String getFullVersion(File location, 
 			File systemFile, int majorVersion, String myPrefix) {
+		File[] roots = new File[]{new File(location, MODULES)};
+		String moduleId = "org.jboss.as.product";
 		String found = JBossManifestUtility.getManifestPropFromJBossModulesFolder(
-				new File[]{new File(location, MODULES)}, 
-				"org.jboss.as.product", "main/dir/META-INF", 
+				roots,  
+				moduleId, "main/dir/META-INF", 
 				MANIFEST_PROD_RELEASE_VERS);
-		return fullVersionIfResponsible(myPrefix, majorVersion, found);
+		if( found != null )
+			return fullVersionIfResponsible(myPrefix, majorVersion, found);
+		return getFullVersionWfly32PlusLayout(roots, moduleId, myPrefix, majorVersion);
+	}
+	
+	public static String getFullVersionWfly32PlusLayout(File[] roots, String moduleId, String myPrefix, int majorVersion) {
+		File[] layeredRoots = LayeredModulePathFactory.resolveLayeredModulePath(roots);
+		for( int i = 0; i < layeredRoots.length; i++ ) {
+			File[] jars = JBossManifestUtility.getFilesForModule(layeredRoots[i], moduleId, "main", ManifestUtility.jarFilter());
+			for( int j = 0; j < jars.length; j++ ) {
+				File f = jars[j];
+				String found2 = ManifestUtility.getFullServerVersionFromZipLegacy(f, new String[]{
+						"Implementation-Version", "JBoss-Product-Release-Version", "JBossAS-Release-Version"});
+				if( found2 != null ) {
+					return fullVersionIfResponsible(myPrefix, majorVersion, found2);
+				}
+			}
+		}
+		return null;
 	}
 
 	private static String fullVersionIfResponsible(String myPrefix, int majorVersion, String found) {
