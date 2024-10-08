@@ -28,6 +28,17 @@ if [ $apiStatus -ne 0 ]; then
    exit 1
 fi
 
+echo "Your JAVA_HOME is $JAVA_HOME"
+if [[ -n "$JAVA_HOME" ]]; then
+  # Determine if a (working) JDK is available in JAVA_HOME
+  if [ -x "$(command -v "$JAVA_HOME"/bin/javac)" ]; then
+    JAVA_EXEC="$JAVA_HOME/bin/java"
+  else
+    echo "JAVA_HOME is set but does not seem to point to a valid Java JDK" 1>&2
+  fi
+fi
+read -p "Press enter to continue"
+
 
 echo "Here are the commits since last release"
 
@@ -102,17 +113,27 @@ else
 	echo git push origin v$newVerUnderscore
 fi
 
-echo "Go kick another build at https://github.com/redhat-developer/rsp-server/actions/workflows/gh-actions.yml"
+echo "Time to make the release on github..."
+echo "Let's start with the target platform"
 read -p "Press enter to continue"
 
-echo "Let's start with the target platform"
+
 jbang repoflattener.java site
 echo "Did jbang work? If not, cancel, debug, and start over."
 read -p "Press enter to continue"
 
 
-echo "Making a release on github for $newverFinal TargetPlatform"
+echo -e "\nMaking a release on github for $newverFinal TargetPlatform"
 createReleasePayload="{\"tag_name\":\"tp$newVerUnderscore\",\"target_commitish\":\"master\",\"name\":\"$newverFinal.targetplatform\",\"body\":\"Release of target platform for $newverFinal\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false}"
+
+
+	echo curl -L \
+	  -X POST \
+	  -H "Accept: application/vnd.github+json" \
+	  -H "Authorization: Bearer $ghtoken"\
+	  -H "X-GitHub-Api-Version: 2022-11-28" \
+	  https://api.github.com/repos/redhat-developer/rsp-server/releases \
+	  -d "$createReleasePayload"
 
 if [ "$debug" -eq 0 ]; then
 	curl -L \
@@ -122,14 +143,6 @@ if [ "$debug" -eq 0 ]; then
 	  -H "X-GitHub-Api-Version: 2022-11-28" \
 	  https://api.github.com/repos/redhat-developer/rsp-server/releases \
 	  -d "$createReleasePayload" | tee createReleaseResponse.json
-else 
-	echo curl -L \
-	  -X POST \
-	  -H "Accept: application/vnd.github+json" \
-	  -H "Authorization: Bearer $ghtoken"\
-	  -H "X-GitHub-Api-Version: 2022-11-28" \
-	  https://api.github.com/repos/redhat-developer/rsp-server/releases \
-	  -d "$createReleasePayload"
 fi
 echo "Please go verify the target platform release looks correct. We will add the asset next"
 read -p "Press enter to continue"
@@ -138,7 +151,7 @@ assetUrl=`cat createReleaseResponse.json | grep assets_url | cut -c 1-17 --compl
 rm createReleaseResponse.json
 for filename in site/target/flat-repository/*; do
   nameOnly=`echo $filename | rev | cut -f 1 -d "/" | rev`
-  echo $nameOnly
+  echo -e "\n\n$nameOnly\n"
   if [ "$debug" -eq 0 ]; then
 	curl -L \
 	  -X POST \
@@ -163,10 +176,20 @@ done
 
 
 
-echo "Making a release on github for $newverFinal"
-commitMsgsClean=`git log --color --pretty=format:'%s' --abbrev-commit | head -n $commits | awk '{ print " * " $0;}' | awk '{printf "%s\\\\n", $0}' | sed 's/"/\\"/g'`
-createReleasePayload="{\"tag_name\":\"v$newVerUnderscore\",\"target_commitish\":\"master\",\"name\":\"v$newverFinal\",\"body\":\"Release of $newverFinal:\n\n"$commitMsgsClean"\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false}"
+echo "\n\nMaking a release on github for $newverFinal"
+read -p "Press enter to continue"
+commitMsgsClean=`git log --color --pretty=format:'%s' --abbrev-commit | head -n $commits | awk '{ print " * " $0;}' | awk '{printf "%s\\\\n", $0}' | sed 's/"/\\\"/g'`
+createReleasePayload="{\"tag_name\":\"v$newVerUnderscore\",\"target_commitish\":\"master\",\"name\":\"v$newverFinal\",\"body\":\"Release of $newverFinal:\n\n$commitMsgsClean\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false}"
   
+  
+  	echo curl -L \
+	  -X POST \
+	  -H "Accept: application/vnd.github+json" \
+	  -H "Authorization: Bearer $ghtoken"\
+	  -H "X-GitHub-Api-Version: 2022-11-28" \
+	  https://api.github.com/repos/redhat-developer/rsp-server/releases \
+	  -d "$createReleasePayload"
+	  
 if [ "$debug" -eq 0 ]; then
 	curl -L \
 	  -X POST \
@@ -175,14 +198,6 @@ if [ "$debug" -eq 0 ]; then
 	  -H "X-GitHub-Api-Version: 2022-11-28" \
 	  https://api.github.com/repos/redhat-developer/rsp-server/releases \
 	  -d "$createReleasePayload" | tee createReleaseResponse.json
-else 
-	echo curl -L \
-	  -X POST \
-	  -H "Accept: application/vnd.github+json" \
-	  -H "Authorization: Bearer $ghtoken"\
-	  -H "X-GitHub-Api-Version: 2022-11-28" \
-	  https://api.github.com/repos/redhat-developer/rsp-server/releases \
-	  -d "$createReleasePayload"
 fi
 
 
