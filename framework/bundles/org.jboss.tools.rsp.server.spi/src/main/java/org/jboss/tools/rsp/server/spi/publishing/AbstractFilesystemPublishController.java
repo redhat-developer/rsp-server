@@ -452,6 +452,7 @@ public abstract class AbstractFilesystemPublishController implements IPublishCon
 	    final BasicFileAttributes attrs) throws IOException {
 	        if (sourcePath == null) {
 	            sourcePath = dir;
+		    Files.createDirectories(targetPath);
 	        } else {
 	        Files.createDirectories(targetPath.resolve(sourcePath
 	                    .relativize(dir)));
