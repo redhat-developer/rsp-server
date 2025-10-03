@@ -51,7 +51,7 @@
 	</developers>
 
 	<properties>
-		<tycho-version>1.3.0</tycho-version>
+		<tycho-version>5.0.0</tycho-version>
 		<jacoco.version>0.8.4</jacoco.version>
 		<sonar.code.codeCoveragePlugin>jacoco</sonar.code.codeCoveragePlugin>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
