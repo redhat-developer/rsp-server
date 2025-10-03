@@ -39,16 +39,22 @@
 			<unit id="org.eclipse.lsp4j.jsonrpc" version="0.10.0.v20201105-1103" />
 		</location>
 
-
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer"
-			includeSource="true" type="InstallableUnit">
-			<repository
-				location="http://repository.jboss.org/nexus/content/unzip/unzip/org/jboss/tools/locus/jbosstools-locus/1.8.0/jbosstools-locus-1.8.0-updatesite.zip-unzip" />
-			<!-- Test dependencies -->
-			<unit id="org.apache.felix.log" version="1.2.0" />
-			<unit id="org.everit.osgi.bundles.org.apache.xmlcommons.full" version="1.4.1.20150918" />
-		</location>
+			includeSource="true" type="Maven">
+			<dependencies>
+				<dependency>
+					<groupId>org.apache.felix</groupId>
+					<artifactId>org.apache.felix.log</artifactId>
+					<version>1.2.0</version>
+				</dependency>
+				<dependency>
+					<groupId>org.everit.osgi.bundles</groupId>
+					<artifactId>org.everit.osgi.bundles.org.apache.xmlcommons.full</artifactId>
+					<version>1.4.1-20150918</version>
+				</dependency>
+			</dependencies>
 
+		</location>
 		<!-- SimRel -->
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer"
 			type="InstallableUnit" includeSource="true">
