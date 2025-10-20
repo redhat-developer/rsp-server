@@ -77,9 +77,20 @@ public class EditServerConfigurationActionHandler {
 		// this may need changing if we allow them to set their configuration folder
 		// but for now it is ok
 		String home = wildFlyServerDelegate.getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
+		String base = wildFlyServerDelegate.getServer().getAttribute(IJBossServerAttributes.SERVER_BASE_DIR, (String)null);
 		String configFile = wildFlyServerDelegate.getServer().getAttribute(IJBossServerAttributes.WILDFLY_CONFIG_FILE, 
 				IJBossServerAttributes.WILDFLY_CONFIG_FILE_DEFAULT);
-		IPath configFilePath = new Path(home).append("standalone").append("configuration").append(configFile);
+		IPath homePath = new Path(home);
+		IPath baseToUse = homePath.append("standalone");
+		if( base != null ) {
+			IPath basePath = new Path(base);
+			if( basePath.isAbsolute()) {
+				baseToUse = basePath;
+			} else {
+				baseToUse = homePath.append(base);
+			}
+		}
+		IPath configFilePath = baseToUse.append("configuration").append(configFile);
 		return configFilePath.toOSString();
 	}
 
