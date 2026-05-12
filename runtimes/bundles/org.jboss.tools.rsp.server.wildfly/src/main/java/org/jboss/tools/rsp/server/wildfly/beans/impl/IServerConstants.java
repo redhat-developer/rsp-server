@@ -48,6 +48,8 @@ public interface IServerConstants {
 	public static final String SERVER_WILDFLY_230 = "org.jboss.ide.eclipse.as.wildfly.230"; //$NON-NLS-1$
 	public static final String SERVER_WILDFLY_240 = "org.jboss.ide.eclipse.as.wildfly.240"; //$NON-NLS-1$
 	public static final String SERVER_WILDFLY_270 = "org.jboss.ide.eclipse.as.wildfly.270"; //$NON-NLS-1$
+	public static final String SERVER_WILDFLY_350 = "org.jboss.ide.eclipse.as.wildfly.350"; //$NON-NLS-1$
+	public static final String SERVER_WILDFLY_380 = "org.jboss.ide.eclipse.as.wildfly.380"; //$NON-NLS-1$
 	// NEW_SERVER_ADAPTER
 	
 	public static final String SERVER_EAP_43 = "org.jboss.ide.eclipse.as.eap.43"; //$NON-NLS-1$
@@ -67,12 +69,13 @@ public interface IServerConstants {
 			SERVER_AS_60,SERVER_AS_70,SERVER_AS_71,
 			SERVER_WILDFLY_80,SERVER_WILDFLY_90,SERVER_WILDFLY_100,
 			SERVER_WILDFLY_110,SERVER_WILDFLY_120,SERVER_WILDFLY_130,
-			SERVER_WILDFLY_140, SERVER_WILDFLY_150, SERVER_WILDFLY_160, 
+			SERVER_WILDFLY_140, SERVER_WILDFLY_150, SERVER_WILDFLY_160,
 			SERVER_WILDFLY_170, SERVER_WILDFLY_180,SERVER_WILDFLY_190,
 			SERVER_WILDFLY_200,SERVER_WILDFLY_210,SERVER_WILDFLY_220,
 			SERVER_WILDFLY_230,SERVER_WILDFLY_240,SERVER_WILDFLY_270,
-			SERVER_EAP_43,SERVER_EAP_50,SERVER_EAP_60, SERVER_EAP_61, 
-			SERVER_EAP_70, SERVER_EAP_71, SERVER_EAP_72, 
+			SERVER_WILDFLY_350,SERVER_WILDFLY_380,
+			SERVER_EAP_43,SERVER_EAP_50,SERVER_EAP_60, SERVER_EAP_61,
+			SERVER_EAP_70, SERVER_EAP_71, SERVER_EAP_72,
 			SERVER_EAP_73, SERVER_EAP_74, SERVER_EAP_80
 		};
 		// NEW_SERVER_ADAPTER Add the new server id above this line
@@ -112,6 +115,8 @@ public interface IServerConstants {
 	public static final String RUNTIME_WILDFLY_230 = "org.jboss.ide.eclipse.as.runtime.wildfly.230"; //$NON-NLS-1$
 	public static final String RUNTIME_WILDFLY_240 = "org.jboss.ide.eclipse.as.runtime.wildfly.240"; //$NON-NLS-1$
 	public static final String RUNTIME_WILDFLY_270 = "org.jboss.ide.eclipse.as.runtime.wildfly.270"; //$NON-NLS-1$
+	public static final String RUNTIME_WILDFLY_350 = "org.jboss.ide.eclipse.as.runtime.wildfly.350"; //$NON-NLS-1$
+	public static final String RUNTIME_WILDFLY_380 = "org.jboss.ide.eclipse.as.runtime.wildfly.380"; //$NON-NLS-1$
 	// NEW_SERVER_ADAPTER
 	public static final String RUNTIME_EAP_43 = "org.jboss.ide.eclipse.as.runtime.eap.43"; //$NON-NLS-1$
 	public static final String RUNTIME_EAP_50 = "org.jboss.ide.eclipse.as.runtime.eap.50"; //$NON-NLS-1$
@@ -155,6 +160,8 @@ public interface IServerConstants {
 		myMap.put(RUNTIME_WILDFLY_230, SERVER_WILDFLY_230);
 		myMap.put(RUNTIME_WILDFLY_240, SERVER_WILDFLY_240);
 		myMap.put(RUNTIME_WILDFLY_270, SERVER_WILDFLY_270);
+		myMap.put(RUNTIME_WILDFLY_350, SERVER_WILDFLY_350);
+		myMap.put(RUNTIME_WILDFLY_380, SERVER_WILDFLY_380);
 		myMap.put(RUNTIME_EAP_43, SERVER_EAP_43);
 		myMap.put(RUNTIME_EAP_50, SERVER_EAP_50);
 		myMap.put(RUNTIME_EAP_60, SERVER_EAP_60);
