@@ -67,7 +67,7 @@ echo "Old version is $oldverRaw"
 echo "New version is $newverFinal"
 echo "Updating pom.xml and target platform with new version"
 read -p "Press enter to continue"
-mvn org.eclipse.tycho:tycho-versions-plugin:1.3.0:set-version -DnewVersion=$newverFinal
+MAVEN_OPTS="-Djdk.xml.maxGeneralEntitySizeLimit=0 -Djdk.xml.totalEntitySizeLimit=0 -Djdk.xml.entityExpansionLimit=0" mvn org.eclipse.tycho:tycho-versions-plugin:1.3.0:set-version -DnewVersion=$newverFinal
 
 # Handle target platform
 tpFile=`ls -1 targetplatform | grep target`
@@ -76,7 +76,7 @@ mv targetplatform/$tpFile.bak targetplatform/$tpFile
 
 echo "Running a quick build to make sure everything's ok..."
 read -p "Press enter to continue"
-mvn clean install -DskipTests
+MAVEN_OPTS="-Djdk.xml.maxGeneralEntitySizeLimit=0 -Djdk.xml.totalEntitySizeLimit=0 -Djdk.xml.entityExpansionLimit=0" mvn clean install -DskipTests
 
 echo "Did it succeed?"
 read -p "Press enter to continue"
@@ -273,7 +273,7 @@ echo "New version is $newver"
 echo "Next version is $nextver"
 echo "Updating pom.xml and target platform with next version snapshot. Ready?"
 read -p "Press enter to continue"
-mvn org.eclipse.tycho:tycho-versions-plugin:1.3.0:set-version -DnewVersion=$nextverWithSnapshot
+MAVEN_OPTS="-Djdk.xml.maxGeneralEntitySizeLimit=0 -Djdk.xml.totalEntitySizeLimit=0 -Djdk.xml.entityExpansionLimit=0" mvn org.eclipse.tycho:tycho-versions-plugin:1.3.0:set-version -DnewVersion=$nextverWithSnapshot
 
 # Handle target platform
 tpFile=`ls -1 targetplatform | grep target`
@@ -283,7 +283,7 @@ mv targetplatform/$tpFile.bak targetplatform/$tpFile
 
 echo "Running a quick build to make sure everything's ok..."
 read -p "Press enter to continue"
-mvn clean install -DskipTests
+MAVEN_OPTS="-Djdk.xml.maxGeneralEntitySizeLimit=0 -Djdk.xml.totalEntitySizeLimit=0 -Djdk.xml.entityExpansionLimit=0" mvn clean install -DskipTests
 
 echo "Did it succeed?"
 read -p "Press enter to continue"
