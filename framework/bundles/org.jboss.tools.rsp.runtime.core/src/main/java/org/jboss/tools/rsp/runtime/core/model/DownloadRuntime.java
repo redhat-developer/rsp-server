@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.HashMap;
 
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
@@ -66,13 +67,16 @@ public class DownloadRuntime extends DownloadRuntimeDescription {
 		try(ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 			if (getLicenseURL() == null)
 				return null;
-			
+
 			URL url = new URL(getLicenseURL());
-			InputStream in = url.openStream();
+			URLConnection conn = url.openConnection();
+			conn.setConnectTimeout(2500);  // 2.5 second connection timeout
+			conn.setReadTimeout(5000);     // 5 second read timeout
+			InputStream in = conn.getInputStream();
 			copyWithSize(in, out, monitor, 0);
 			return new String(out.toByteArray());
 		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, 
+			throw new CoreException(new Status(IStatus.ERROR,
 					RuntimeCoreActivator.PLUGIN_ID, 0,
 					NLS.bind(Messages.DownloadRuntime_Unable_to_fetch_license, e.getLocalizedMessage()), e));
 		}
