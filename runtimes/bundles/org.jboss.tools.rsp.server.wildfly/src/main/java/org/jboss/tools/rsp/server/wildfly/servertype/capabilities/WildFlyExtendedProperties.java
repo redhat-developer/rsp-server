@@ -13,6 +13,7 @@ package org.jboss.tools.rsp.server.wildfly.servertype.capabilities;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.wildfly.servertype.launch.Wildfly100DefaultLaunchArguments;
 import org.jboss.tools.rsp.server.wildfly.servertype.launch.Wildfly110DefaultLaunchArguments;
+import org.jboss.tools.rsp.server.wildfly.servertype.launch.Wildfly340DefaultLaunchArguments;
 import org.jboss.tools.rsp.server.wildfly.servertype.launch.Wildfly80DefaultLaunchArguments;
 
 public class WildFlyExtendedProperties {
@@ -114,12 +115,12 @@ public class WildFlyExtendedProperties {
 	}
 	public static class Wildfly350ExtendedProperties extends AbstractWildflyExtendedProperties {
 		public Wildfly350ExtendedProperties(IServer server) {
-			super("35.0", "17", "21.", HTTP_REMOTING_JMX_NEW, new Wildfly110DefaultLaunchArguments(server), server);
+			super("35.0", "17", "21.", HTTP_REMOTING_JMX_NEW, new Wildfly340DefaultLaunchArguments(server), server);
 		}
 	}
 	public static class Wildfly380ExtendedProperties extends AbstractWildflyExtendedProperties {
 		public Wildfly380ExtendedProperties(IServer server) {
-			super("38.0", "17", "25.", HTTP_REMOTING_JMX_NEW, new Wildfly110DefaultLaunchArguments(server), server);
+			super("38.0", "17", "25.", HTTP_REMOTING_JMX_NEW, new Wildfly340DefaultLaunchArguments(server), server);
 		}
 	}
 	// NEW_SERVER_ADAPTER
