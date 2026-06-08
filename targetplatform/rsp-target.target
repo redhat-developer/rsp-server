@@ -69,7 +69,6 @@
 			<unit id="org.eclipse.equinox.server.core.feature.group" version="1.9.0.v20190218-2100" />
 			<unit id="org.eclipse.equinox.server.jetty.feature.group" version="1.8.0.v20190223-1328" />
 			<unit id="org.eclipse.help.feature.group" version="2.2.500.v20190301-0040" />
-			<unit id="org.eclipse.jdt.feature.group" version="3.17.0.v20190301-0040" />
 			<unit id="org.eclipse.pde.feature.group" version="3.13.400.v20190301-0538" />
 			<unit id="org.eclipse.platform.feature.group" version="4.11.0.v20190301-0040" />
 			<unit id="org.eclipse.rcp.feature.group" version="4.11.0.v20190301-0040" />
