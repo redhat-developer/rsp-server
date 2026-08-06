@@ -112,6 +112,9 @@ public class JBossServerBeanLoaderTest extends TestCase {
 		expected.put(MockServerCreationUtilities.TEST_SERVER_TYPE_JPP_60, new Data(JBossServerBeanTypeProvider.JPP6, "6.0."));
 		expected.put(MockServerCreationUtilities.TEST_SERVER_TYPE_JPP_61, new Data(JBossServerBeanTypeProvider.JPP61, "6.1.", "JPP"));
 		expected.put(MockServerCreationUtilities.TEST_SERVER_TYPE_WONKA_1, new Data(JBossServerBeanTypeProvider.UNKNOWN_AS72_PRODUCT, "1.0.", "WONKA"));
+		expected.put(MockServerCreationUtilities.TEST_SERVER_TYPE_WILDFLY_390, new Data(JBossServerBeanTypeProvider.WILDFLY380, "39.0."));
+		expected.put(MockServerCreationUtilities.TEST_SERVER_TYPE_WILDFLY_400, new Data(JBossServerBeanTypeProvider.WILDFLY380, "40.0."));
+		expected.put(MockServerCreationUtilities.TEST_SERVER_TYPE_WILDFLY_410, new Data(JBossServerBeanTypeProvider.WILDFLY380, "41.0."));
 		// NEW_SERVER_ADAPTER
 	}
 
