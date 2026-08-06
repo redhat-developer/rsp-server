@@ -35,8 +35,8 @@ import org.junit.After;
 import org.junit.Test;
 
 public class WildflyDownloadRuntimesTest extends RSPCase {
-	private static final String WILDFLY_RUNTIME_ID = "wildfly-1801finalruntime";
-	private static final String WILDFLY_DOWNLOADED_ID = "wildfly-18.0.1.Final";
+	private static final String WILDFLY_RUNTIME_ID = "wildfly-3801finalruntime";
+	private static final String WILDFLY_DOWNLOADED_ID = "wildfly-38.0.1.Final";
 	
 	private static final String DOWNLOAD_REQUEST_EMPTY = "Unable to find an executor for the given download runtime";
 	private static final String INFO_REQUIRED_MESSAGE = "Please fill the requried information";
@@ -65,7 +65,7 @@ public class WildflyDownloadRuntimesTest extends RSPCase {
 		assertNotNull(response);
 		List<DownloadRuntimeDescription> runtimes = response.getRuntimes();
 		DownloadRuntimeDescription rtm = getRuntimeById(runtimes, WILDFLY_RUNTIME_ID);
-		assertTrue(rtm.getName().contains("WildFly 18.0.1 Final"));
+		assertTrue(rtm.getName().contains("WildFly 38.0.1 Final"));
 		assertTrue(rtm.getHumanUrl().contains("http"));
 		assertTrue(rtm.getSize().equals("?"));
 	}
@@ -148,6 +148,6 @@ public class WildflyDownloadRuntimesTest extends RSPCase {
 	}
 	
 	private DownloadRuntimeDescription getRuntimeById(List<DownloadRuntimeDescription> runtimes, String id) {
-		return runtimes.stream().filter(runtime -> runtime.getId().equals("wildfly-1801finalruntime")).findAny().orElse(null);
+		return runtimes.stream().filter(runtime -> runtime.getId().equals(id)).findAny().orElse(null);
 	}
 }
