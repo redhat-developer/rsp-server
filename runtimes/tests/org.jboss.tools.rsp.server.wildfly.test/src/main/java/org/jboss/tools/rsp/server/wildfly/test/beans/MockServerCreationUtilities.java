@@ -97,16 +97,22 @@ public class MockServerCreationUtilities extends Assert {
 	public static final String TEST_SERVER_TYPE_EAP_65 = "TEST_SERVER_TYPE_EAP_65";
 	
 	public static final String TEST_SERVER_TYPE_WONKA_1 = "TEST_SERVER_TYPE_WONKA_1_MISMATCH";
-	
-	
-	public static final String[] TEST_SERVER_TYPES_TO_MOCK = new String[] { 
-		TEST_SERVER_TYPE_GATEIN_34, 
+
+	public static final String TEST_SERVER_TYPE_WILDFLY_390 = "TEST_SERVER_TYPE_WILDFLY_390";
+	public static final String TEST_SERVER_TYPE_WILDFLY_400 = "TEST_SERVER_TYPE_WILDFLY_400";
+	public static final String TEST_SERVER_TYPE_WILDFLY_410 = "TEST_SERVER_TYPE_WILDFLY_410";
+
+	public static final String[] TEST_SERVER_TYPES_TO_MOCK = new String[] {
+		TEST_SERVER_TYPE_GATEIN_34,
 		TEST_SERVER_TYPE_GATEIN_35,
 		TEST_SERVER_TYPE_GATEIN_36,
 		TEST_SERVER_TYPE_JPP_60,
 		TEST_SERVER_TYPE_JPP_61,
 		TEST_SERVER_TYPE_EAP_65,
-		TEST_SERVER_TYPE_WONKA_1
+		TEST_SERVER_TYPE_WONKA_1,
+		TEST_SERVER_TYPE_WILDFLY_390,
+		TEST_SERVER_TYPE_WILDFLY_400,
+		TEST_SERVER_TYPE_WILDFLY_410
 	};
 	
 	static {
@@ -153,6 +159,9 @@ public class MockServerCreationUtilities extends Assert {
 		asSystemJar.put(TEST_SERVER_TYPE_JPP_61, jpp_server_6_1_jar);
 		asSystemJar.put(TEST_SERVER_TYPE_WONKA_1, eap_server_6_1_jar);
 		asSystemJar.put(TEST_SERVER_TYPE_GATEIN_34, gatein_3_4_0_jar);
+		asSystemJar.put(TEST_SERVER_TYPE_WILDFLY_390, wildfly_20_0_jar);
+		asSystemJar.put(TEST_SERVER_TYPE_WILDFLY_400, wildfly_20_0_jar);
+		asSystemJar.put(TEST_SERVER_TYPE_WILDFLY_410, wildfly_20_0_jar);
 		// NEW_SERVER_ADAPTER Add the new runtime constant above this line
 	}
 
@@ -282,6 +291,12 @@ public class MockServerCreationUtilities extends Assert {
 			serverDir = createAS72EAP65StyleMockServerDirectory(name, serverType, asSystemJar.get(serverType));
 		} else if (TEST_SERVER_TYPE_WONKA_1.equals(serverType)) {
 			serverDir = createAS72Wonka1MockServerDirectory(name, serverType, asSystemJar.get(serverType));
+		} else if (TEST_SERVER_TYPE_WILDFLY_390.equals(serverType)) {
+			serverDir = createWildfly390MockServerDirectory(name, serverType, asSystemJar.get(serverType));
+		} else if (TEST_SERVER_TYPE_WILDFLY_400.equals(serverType)) {
+			serverDir = createWildfly400MockServerDirectory(name, serverType, asSystemJar.get(serverType));
+		} else if (TEST_SERVER_TYPE_WILDFLY_410.equals(serverType)) {
+			serverDir = createWildfly410MockServerDirectory(name, serverType, asSystemJar.get(serverType));
 		}
 		// NEW_SERVER_ADAPTER add mock folder structure above
 		return serverDir;
@@ -444,6 +459,18 @@ public class MockServerCreationUtilities extends Assert {
 	private static File createWildfly380MockServerDirectory(String name, String serverTypeId, String serverJar) {
 		return createWildflyServerDirectory(name, serverTypeId, serverJar, "main",
 				"JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 38.0.0.Final\n");
+	}
+	private static File createWildfly390MockServerDirectory(String name, String serverTypeId, String serverJar) {
+		return createWildflyServerDirectory(name, serverTypeId, serverJar, "main",
+				"JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 39.0.1.Final\n");
+	}
+	private static File createWildfly400MockServerDirectory(String name, String serverTypeId, String serverJar) {
+		return createWildflyServerDirectory(name, serverTypeId, serverJar, "main",
+				"JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 40.0.1.Final\n");
+	}
+	private static File createWildfly410MockServerDirectory(String name, String serverTypeId, String serverJar) {
+		return createWildflyServerDirectory(name, serverTypeId, serverJar, "main",
+				"JBoss-Product-Release-Name: WildFly Full\nJBoss-Product-Release-Version: 41.0.0.Final\n");
 	}
 
 	private static File createWildflyServerDirectory(String name, String serverTypeId, String serverJar, String manString) {
