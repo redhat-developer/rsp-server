@@ -27,6 +27,7 @@
 		<quickstarts.server>wildfly</quickstarts.server>
 		<quickstarts.url>https://github.com/wildfly/quickstart/archive/38.0.1.Final.zip</quickstarts.url>
 		<quickstarts.dir>quickstart-38.0.1.Final</quickstarts.dir>
+		<invoker.javaHome>${java.home}</invoker.javaHome>
 	</properties>
 
 	<name>Runtime Server Protocol : Integration Tests</name>
@@ -122,11 +123,12 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-invoker-plugin</artifactId>
-				 	<version>3.2.0</version>
+				 	<version>3.8.1</version>
 				 	<configuration>
 					 	<cloneProjectsTo>${project.build.directory}/quickstarts</cloneProjectsTo>
 						<projectsDirectory>target/${quickstarts.dir}/</projectsDirectory>
 						<streamLogs>true</streamLogs>
+						<javaHome>${invoker.javaHome}</javaHome>
 						<pomIncludes>
 							<pomInclude>kitchensink/pom.xml</pomInclude>
 							<pomInclude>helloworld/pom.xml</pomInclude>
