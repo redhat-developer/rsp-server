@@ -33,4 +33,4 @@ jobs:
         java-version: ${{ matrix.java }}
         distribution: 'temurin'
     - name: Build & Verify using Maven
-      run: mvn clean verify -Pintegration-tests -Dinvoker.javaHome=$JAVA_HOME_17_X64 -U -fae -e -B
+      run: mvn clean verify -Pintegration-tests -Dinvoker.javaHome=$JAVA_HOME_17_X64 -Dserver.vm.install.path=$JAVA_HOME_17_X64 -U -fae -e -B

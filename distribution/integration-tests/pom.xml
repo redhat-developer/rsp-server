@@ -28,6 +28,7 @@
 		<quickstarts.url>https://github.com/wildfly/quickstart/archive/38.0.1.Final.zip</quickstarts.url>
 		<quickstarts.dir>quickstart-38.0.1.Final</quickstarts.dir>
 		<invoker.javaHome>${java.home}</invoker.javaHome>
+		<server.vm.install.path></server.vm.install.path>
 	</properties>
 
 	<name>Runtime Server Protocol : Integration Tests</name>
@@ -45,6 +46,7 @@
 							<server.version>${server.version}</server.version>
 							<server.path>${server.path}</server.path>
 							<quickstarts.server>${quickstarts.server}</quickstarts.server>
+							<server.vm.install.path>${server.vm.install.path}</server.vm.install.path>
 						</systemPropertyVariables>
 					</configuration>
 				</plugin>

@@ -55,6 +55,7 @@ public abstract class RSPCase {
 	protected static String WILDFLY_PATH;
 	protected static String WILDFLY_VERSION;
 	protected static String WILDFLY_ROOT;
+	protected static String VM_INSTALL_PATH;
 	protected static ServerType wildflyType;
 	protected static final String INVALID_PARAM = "Parameter is invalid. It may be null, missing required fields, or unacceptable values.";
 	protected static final String MISSING_SERVER_ID = "Invalid Request: Request must include server id.";
@@ -78,6 +79,7 @@ public abstract class RSPCase {
 		WILDFLY_PATH = getProperty("server.path");
 		WILDFLY_VERSION = getProperty("server.version");
 		WILDFLY_ROOT = Paths.get(WILDFLY_PATH).toAbsolutePath().toString();
+		VM_INSTALL_PATH = System.getProperty("server.vm.install.path");
 		wildflyType = RSPServerUtility.getServerType(WILDFLY_SERVER_ID);
 	}
 
@@ -159,6 +161,9 @@ public abstract class RSPCase {
 	protected void startServer(DummyClient client, String id) throws Exception {
 		Map<String, Object> attr = new HashMap<>();
 		attr.put("server.home.dir", WILDFLY_ROOT);
+		if (VM_INSTALL_PATH != null && !VM_INSTALL_PATH.isEmpty()) {
+			attr.put("vm.install.path", VM_INSTALL_PATH);
+		}
 		LaunchParameters params = new LaunchParameters(new ServerAttributes(wildflyType.getId(), id, attr), MODE_RUN);
 		
 		StartServerResponse response = timeConsumption(new Callable<StartServerResponse>() {
@@ -198,6 +203,9 @@ public abstract class RSPCase {
 		Map<String, Object> attr = new HashMap<>();
 		attr.put("server.home.dir", bean.getLocation());
 		attr.put("server.autopublish.inactivity.limit", 5000);
+		if (VM_INSTALL_PATH != null && !VM_INSTALL_PATH.isEmpty()) {
+			attr.put("vm.install.path", VM_INSTALL_PATH);
+		}
 		ServerAttributes serverAttr = new ServerAttributes(bean.getServerAdapterTypeId(), id, attr);
 		return timeConsumption(new Callable<Status>() {
 			public Status call() throws InterruptedException, ExecutionException, TimeoutException {
