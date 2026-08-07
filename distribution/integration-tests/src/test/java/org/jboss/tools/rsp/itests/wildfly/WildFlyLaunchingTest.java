@@ -233,15 +233,18 @@ public class WildFlyLaunchingTest extends RSPCase {
         createServer(WILDFLY_ROOT, "wildfly3");
         Map<String, Object> attr = new HashMap<>();
         attr.put("server.home.dir", WILDFLY_ROOT);
+        if (VM_INSTALL_PATH != null && !VM_INSTALL_PATH.isEmpty()) {
+            attr.put("vm.install.path", VM_INSTALL_PATH);
+        }
         LaunchParameters params = new LaunchParameters(
                 new ServerAttributes(wildflyType.getId(), "wildfly3", attr), MODE_RUN);
-        
+
         StartServerResponse response = serverProxy.startServerAsync(params).get(SERVER_OPERATION_TIMEOUT, TimeUnit.MILLISECONDS);
-        
+
         assertEquals(0, response.getStatus().getSeverity());
         assertEquals(STATUS_MESSAGE_OK, response.getStatus().getMessage());
         waitForServerState(ServerManagementAPIConstants.STATE_STARTED, 10, client);
-        
+
         serverProxy.stopServerAsync(new StopServerAttributes("wildfly3", true)).get();
         waitForServerState(ServerManagementAPIConstants.STATE_STOPPED, 10, client);
     }
@@ -252,15 +255,18 @@ public class WildFlyLaunchingTest extends RSPCase {
 
         Map<String, Object> attr = new HashMap<>();
         attr.put("server.home.dir", WILDFLY_ROOT);
+        if (VM_INSTALL_PATH != null && !VM_INSTALL_PATH.isEmpty()) {
+            attr.put("vm.install.path", VM_INSTALL_PATH);
+        }
         LaunchParameters params = new LaunchParameters(
                 new ServerAttributes(wildflyType.getId(), "wildfly4", attr), MODE_RUN);
-        
+
         serverProxy.startServerAsync(params).get(SERVER_OPERATION_TIMEOUT, TimeUnit.MILLISECONDS);
         waitForServerState(ServerManagementAPIConstants.STATE_STARTED, 10, client);
         StartServerResponse response = serverProxy.startServerAsync(params).get(SERVER_OPERATION_TIMEOUT, TimeUnit.MILLISECONDS);
-        
+
         assertEquals(Status.CANCEL, response.getStatus().getSeverity());
-        
+
         serverProxy.stopServerAsync(new StopServerAttributes("wildfly4", true)).get(SERVER_OPERATION_TIMEOUT, TimeUnit.MILLISECONDS);
         waitForServerState(ServerManagementAPIConstants.STATE_STOPPED, 10, client);
     }
@@ -271,6 +277,9 @@ public class WildFlyLaunchingTest extends RSPCase {
         assertEquals(Status.OK, status.getSeverity());
         Map<String, Object> attr = new HashMap<>();
         attr.put("server.home.dir", WILDFLY_ROOT);
+        if (VM_INSTALL_PATH != null && !VM_INSTALL_PATH.isEmpty()) {
+            attr.put("vm.install.path", VM_INSTALL_PATH);
+        }
         LaunchParameters params = new LaunchParameters(
                 new ServerAttributes(wildflyType.getId(), "wildfly5", attr), MODE_RUN);
         
