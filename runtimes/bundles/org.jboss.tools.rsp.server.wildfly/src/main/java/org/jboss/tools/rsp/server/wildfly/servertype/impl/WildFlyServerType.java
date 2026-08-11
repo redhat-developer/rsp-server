@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * Copyright (c) 2018, 2026 Red Hat, Inc. Distributed under license by Red Hat, Inc.
  * All rights reserved. This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v20.html
@@ -37,9 +37,14 @@ public class WildFlyServerType extends BaseJBossServerType {
 				"Set the configuration file you want your WildFly instance to use. Path must be relative to base directory's configuration folder.", 
 				IJBossServerAttributes.WILDFLY_CONFIG_FILE_DEFAULT);
 
-		attrs.addAttribute(IJBossServerAttributes.WILDFLY_DEPLOY_DIR, 
-				ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FOLDER, 
-				"Override the directory tools should deploy to. Path may be relative to the server home, or absolute.", 
+		attrs.addAttribute(IJBossServerAttributes.WILDFLY_DEPLOY_DIR,
+				ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FOLDER,
+				"Override the directory tools should deploy to. Path may be relative to the server home, or absolute.",
 				"");
+
+		attrs.addAttribute(IJBossServerAttributes.WILDFLY_MANAGEMENT_PORT,
+				ServerManagementAPIConstants.ATTR_TYPE_INT,
+				"Set the management port for WildFly (default 9990). Used when stopping the server via the management CLI.",
+				IJBossServerAttributes.WILDFLY_MANAGEMENT_PORT_DEFAULT);
 	}
 }
