@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * Copyright (c) 2020, 2026 Red Hat, Inc. Distributed under license by Red Hat, Inc.
  * All rights reserved. This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v20.html
@@ -8,6 +8,7 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.server.wildfly.test.servertype;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
@@ -36,6 +37,7 @@ import org.jboss.tools.rsp.server.spi.servertype.IServerWorkingCopy;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
 import org.jboss.tools.rsp.server.wildfly.servertype.impl.ServerTypeStringConstants;
 import org.jboss.tools.rsp.server.wildfly.servertype.impl.WildFlyServerDelegate;
+import org.jboss.tools.rsp.server.wildfly.servertype.launch.Wildfly340DefaultLaunchArguments;
 import org.junit.Test;
 
 public class WildFlyServerAttributesTest {
@@ -79,6 +81,46 @@ public class WildFlyServerAttributesTest {
 		String[] cmdLine = det.getCmdLine();
 		
 		assertTrue(isFound(cmdLine, "-Djboss.http.port=8500"));
+	}
+
+	@Test
+	public void testDefaultManagementPortOmitsController() throws IOException {
+		IServer server = mockServer();
+
+		File f = Files.createTempDirectory(System.currentTimeMillis() + "_wfly").toFile();
+		f.mkdirs();
+		new File(f, "modules").mkdirs();
+
+		doReturn(f.getAbsolutePath()).when(server).getAttribute(eq(IJBossServerAttributes.SERVER_HOME), anyString());
+		doReturn(f.getAbsolutePath()).when(server).getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
+
+		doReturn(9990).when(server).getAttribute(eq(IJBossServerAttributes.WILDFLY_MANAGEMENT_PORT), anyInt());
+
+		Wildfly340DefaultLaunchArguments args = new Wildfly340DefaultLaunchArguments(server);
+		String stopArgs = args.getDefaultStopArgs();
+
+		assertTrue(stopArgs.contains("command=:shutdown"));
+		assertFalse(stopArgs.contains("--controller"));
+	}
+
+	@Test
+	public void testCustomManagementPortIncludesController() throws IOException {
+		IServer server = mockServer();
+
+		File f = Files.createTempDirectory(System.currentTimeMillis() + "_wfly").toFile();
+		f.mkdirs();
+		new File(f, "modules").mkdirs();
+
+		doReturn(f.getAbsolutePath()).when(server).getAttribute(eq(IJBossServerAttributes.SERVER_HOME), anyString());
+		doReturn(f.getAbsolutePath()).when(server).getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
+
+		doReturn(49990).when(server).getAttribute(eq(IJBossServerAttributes.WILDFLY_MANAGEMENT_PORT), anyInt());
+
+		Wildfly340DefaultLaunchArguments args = new Wildfly340DefaultLaunchArguments(server);
+		String stopArgs = args.getDefaultStopArgs();
+
+		assertTrue(stopArgs.contains("--controller=localhost:49990"));
+		assertTrue(stopArgs.contains("command=:shutdown"));
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Red Hat, Inc. Distributed under license by Red Hat, Inc.
+ * Copyright (c) 2018, 2026 Red Hat, Inc. Distributed under license by Red Hat, Inc.
  * All rights reserved. This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v20.html
@@ -27,6 +27,8 @@ public interface IJBossServerAttributes extends DefaultServerAttributes {
 	public static final String JBOSS_SERVER_HOST_DEFAULT = "localhost";
 	public static final String JBOSS_SERVER_PORT = "jboss.server.port";
 	public static final int JBOSS_SERVER_PORT_DEFAULT = 8080;
+	public static final String WILDFLY_MANAGEMENT_PORT = "wildfly.management.port";
+	public static final int WILDFLY_MANAGEMENT_PORT_DEFAULT = 9990;
 
 	public static final String WILDFLY_CONFIG_FILE_DEFAULT = "standalone.xml";
 	public static final String WILDFLY_CONFIG_FILE = "wildfly.server.config.file";

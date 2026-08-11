@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 - 2013 Red Hat, Inc.
+ * Copyright (c) 2007 - 2013, 2026 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution,
@@ -13,7 +13,7 @@ package org.jboss.tools.rsp.server.wildfly.servertype.launch;
 import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 
-public class Wildfly80DefaultLaunchArguments extends JBoss71DefaultLaunchArguments {
+public class Wildfly80DefaultLaunchArguments extends AbstractWildFlyDefaultLaunchArguments {
 
 	public Wildfly80DefaultLaunchArguments(IServer s) {
 		super(s);
