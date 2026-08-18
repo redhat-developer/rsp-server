@@ -34,13 +34,30 @@ jobs:
         distribution: 'temurin'
     - name: Build & Verify using Maven
       run: mvn clean verify -Pintegration-tests -Dinvoker.javaHome=$JAVA_HOME_17_X64 -Dserver.vm.install.path=$JAVA_HOME_17_X64 -U -fae -e -B
-    - name: Generate JaCoCo reports
+    - name: Generate JaCoCo coverage report
       if: always()
-      run: mvn jacoco:report -fae -B
-    - name: Upload JaCoCo coverage reports
+      run: |
+        JACOCO_JAR=$(find ~/.m2/repository/org/jacoco/org.jacoco.cli -name "org.jacoco.cli-*-nodeps.jar" | sort -V | tail -1)
+        if [ -z "$JACOCO_JAR" ]; then
+          mvn dependency:copy -Dartifact=org.jacoco:org.jacoco.cli:${JACOCO_VERSION:-0.8.4}:jar:nodeps -DoutputDirectory=/tmp
+          JACOCO_JAR=$(ls /tmp/org.jacoco.cli-*-nodeps.jar)
+        fi
+        find . -name "jacoco.exec" -path "*/target/*" | head -20
+        EXEC_FILES=$(find . -name "jacoco.exec" -path "*/target/*" -printf "--add %p ")
+        if [ -n "$EXEC_FILES" ]; then
+          java -jar "$JACOCO_JAR" merge $EXEC_FILES --destfile /tmp/merged-jacoco.exec
+          CLASS_DIRS=$(find . -path "*/target/classes" -not -path "*/test*" | sed 's/^/--classfiles /' | tr '\n' ' ')
+          SRC_DIRS=$(find . -path "*/src/main/java" | sed 's/^/--sourcefiles /' | tr '\n' ' ')
+          mkdir -p /tmp/jacoco-report
+          java -jar "$JACOCO_JAR" report /tmp/merged-jacoco.exec $CLASS_DIRS $SRC_DIRS --html /tmp/jacoco-report --csv /tmp/jacoco-report/jacoco.csv --xml /tmp/jacoco-report/jacoco.xml
+          echo "Coverage report generated"
+        else
+          echo "No jacoco.exec files found"
+        fi
+    - name: Upload JaCoCo coverage report
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: jacoco-reports
-        path: '**/target/site/jacoco/'
+        name: jacoco-report
+        path: /tmp/jacoco-report/
         retention-days: 14
