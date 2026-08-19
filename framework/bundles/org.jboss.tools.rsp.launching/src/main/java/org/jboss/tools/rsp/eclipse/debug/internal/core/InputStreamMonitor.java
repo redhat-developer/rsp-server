@@ -13,7 +13,8 @@ package org.jboss.tools.rsp.eclipse.debug.internal.core;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Vector;
+import java.util.Queue;
+import java.util.concurrent.LinkedTransferQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,29 +32,29 @@ public class InputStreamMonitor {
 	/**
 	 * The stream which is being written to (connected to system in).
 	 */
-	private OutputStream fStream;
+	private final OutputStream fStream;
 	/**
 	 * The queue of output.
 	 */
-	private Vector<String> fQueue;
+	private final Queue<byte[]> fQueue;
 	/**
 	 * The thread which writes to the stream.
 	 */
-	private Thread fThread;
+	private volatile Thread fThread;
 	/**
 	 * A lock for ensuring that writes to the queue are contiguous
 	 */
-	private Object fLock;
+	private final Object fLock;
 
 	/**
 	 * Whether the underlying output stream has been closed
 	 */
-	private boolean fClosed = false;
+	private volatile boolean fClosed = false;
 
 	/**
 	 * The encoding of the input stream.
 	 */
-	private String fEncoding;
+	private final String fEncoding;
 
 	/**
 	 * Creates an input stream monitor which writes to system in via the given output stream.
@@ -71,10 +72,10 @@ public class InputStreamMonitor {
 	 * @param encoding stream encoding or <code>null</code> for system default
 	 */
 	public InputStreamMonitor(OutputStream stream, String encoding) {
-		fStream= stream;
-		fQueue = new Vector<String>();
-		fLock= new Object();
-		fEncoding= encoding;
+		fStream = stream;
+		fQueue = new LinkedTransferQueue<>();
+		fLock = new Object();
+		fEncoding = encoding;
 	}
 
 	/**
@@ -85,23 +86,26 @@ public class InputStreamMonitor {
 	 * @param text text to append
 	 */
 	public void write(String text) {
-		synchronized(fLock) {
-			fQueue.add(text);
-			fLock.notifyAll();
+		if (fClosed) {
+			return;
+		}
+		try {
+			byte[] data = fEncoding != null ? text.getBytes(fEncoding) : text.getBytes();
+			synchronized (fLock) {
+				fQueue.offer(data);
+				fLock.notifyAll();
+			}
+		} catch (IOException e) {
+			log(e);
 		}
 	}
 
 	/**
 	 * Starts a thread which writes the stream.
 	 */
-	public void startMonitoring() {
+	public synchronized void startMonitoring() {
 		if (fThread == null) {
-			fThread= new Thread(new Runnable() {
-				@Override
-				public void run() {
-					write();
-				}
-			}, "Input Stream Monitor"); //DebugCoreMessages.InputStreamMonitor_label);
+			fThread = new Thread((Runnable) this::writeLoop, "Input Stream Monitor");
 			fThread.setDaemon(true);
 			fThread.start();
 		}
@@ -112,9 +116,12 @@ public class InputStreamMonitor {
 	 * monitor and the underlying stream.
 	 */
 	public void close() {
-		if (fThread != null) {
-			Thread thread= fThread;
-			fThread= null;
+		Thread thread;
+		synchronized (this) {
+			thread = fThread;
+			fThread = null;
+		}
+		if (thread != null) {
 			thread.interrupt();
 		}
 	}
@@ -122,62 +129,59 @@ public class InputStreamMonitor {
 	/**
 	 * Continuously writes to the stream.
 	 */
-	protected void write() {
-		while (fThread != null) {
-			writeNext();
-		}
-		if (!fClosed) {
+	private void writeLoop() {
+		try {
 			try {
-			    fStream.close();
-			} catch (IOException e) {
-				log(e);
+				while (fThread != null) {
+					writeNext();
+				}
+			} finally {
+				if (!fClosed) {
+					fClosed = true;
+					fStream.close();
+				}
 			}
+		} catch (IOException e) {
+			fQueue.clear();
+			log(e);
 		}
 	}
 
 	/**
 	 * Write the text in the queue to the stream.
 	 */
-	protected void writeNext() {
+	private void writeNext() throws IOException {
 		while (!fQueue.isEmpty() && !fClosed) {
-			String text = fQueue.firstElement();
-			fQueue.removeElementAt(0);
-			try {
-				if (fEncoding != null) {
-					fStream.write(text.getBytes(fEncoding));
-				} else {
-					fStream.write(text.getBytes());
-				}
-				fStream.flush();
-			} catch (IOException e) {
-				log(e);
-			}
+			byte[] data = fQueue.poll();
+			fStream.write(data);
+			fStream.flush();
 		}
 		try {
-			synchronized(fLock) {
-				fLock.wait();
+			synchronized (fLock) {
+				while (fQueue.isEmpty() && !fClosed && fThread != null) {
+					fLock.wait();
+				}
 			}
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
-			close();
 		}
 	}
 
-    /**
-     * Closes the output stream attached to the standard input stream of this
-     * monitor's process.
-     *
-     * @exception IOException if an exception occurs closing the input stream
-     */
-    public void closeInputStream() throws IOException {
-        if (!fClosed) {
-            fClosed = true;
-            fStream.close();
-        } else {
-            throw new IOException();
-        }
+	/**
+	 * Closes the output stream attached to the standard input stream of this
+	 * monitor's process.
+	 *
+	 * @exception IOException if an exception occurs closing the input stream
+	 */
+	public void closeInputStream() throws IOException {
+		if (!fClosed) {
+			fClosed = true;
+			fStream.close();
+		} else {
+			throw new IOException();
+		}
+	}
 
-    }
 	private void log(Throwable t) {
 		String msg = (t == null || t.getMessage() == null ? "Unknown Error" : t.getMessage());
 		LOG.error(msg, t);
