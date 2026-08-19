@@ -61,3 +61,20 @@ jobs:
         name: jacoco-report
         path: /tmp/jacoco-report/
         retention-days: 14
+    - name: Run SpotBugs analysis
+      if: always()
+      run: |
+        mvn spotbugs:spotbugs -fn -B 2>&1 | tail -5
+        mkdir -p /tmp/spotbugs-report
+        find . -path "*/target/spotbugsXml.xml" | while read f; do
+          module=$(echo "$f" | sed 's|./||;s|/target/spotbugsXml.xml||;s|/|_|g')
+          cp "$f" "/tmp/spotbugs-report/${module}.xml"
+        done
+        echo "SpotBugs reports collected: $(ls /tmp/spotbugs-report/*.xml 2>/dev/null | wc -l) modules"
+    - name: Upload SpotBugs report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: spotbugs-report
+        path: /tmp/spotbugs-report/
+        retention-days: 14

@@ -53,6 +53,7 @@
 	<properties>
 		<tycho-version>1.3.0</tycho-version>
 		<jacoco.version>0.8.4</jacoco.version>
+		<spotbugs.version>4.8.6.6</spotbugs.version>
 		<sonar.code.codeCoveragePlugin>jacoco</sonar.code.codeCoveragePlugin>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<moduleProperties></moduleProperties>
@@ -174,6 +175,11 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>${spotbugs.version}</version>
 			</plugin>
 			<!-- Lock sonar maven plugin version -->
 			<plugin>
