@@ -43,7 +43,7 @@ jobs:
           JACOCO_JAR=$(ls /tmp/org.jacoco.cli-*-nodeps.jar)
         fi
         find . -name "jacoco.exec" -path "*/target/*" | head -20
-        EXEC_FILES=$(find . -name "jacoco.exec" -path "*/target/*" -printf "--add %p ")
+        EXEC_FILES=$(find . -name "jacoco.exec" -path "*/target/*")
         if [ -n "$EXEC_FILES" ]; then
           java -jar "$JACOCO_JAR" merge $EXEC_FILES --destfile /tmp/merged-jacoco.exec
           CLASS_DIRS=$(find . -path "*/target/classes" -not -path "*/test*" | sed 's/^/--classfiles /' | tr '\n' ' ')
