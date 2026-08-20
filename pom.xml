@@ -180,6 +180,9 @@
 				<groupId>com.github.spotbugs</groupId>
 				<artifactId>spotbugs-maven-plugin</artifactId>
 				<version>${spotbugs.version}</version>
+				<configuration>
+					<excludeFilterFile>${maven.multiModuleProjectDirectory}/spotbugs-exclude.xml</excludeFilterFile>
+				</configuration>
 			</plugin>
 			<!-- Lock sonar maven plugin version -->
 			<plugin>

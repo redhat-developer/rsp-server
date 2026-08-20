@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- DAO classes are JSON-RPC data transfer objects. Mutable field exposure
+         is by design: callers build up DTOs, hand them to the serializer, and
+         expect getters/setters to work with the same object references. -->
+    <Match>
+        <Package name="org.jboss.tools.rsp.api.dao" />
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2" />
+    </Match>
+</FindBugsFilter>
