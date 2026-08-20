@@ -16,12 +16,15 @@ import org.jboss.tools.rsp.eclipse.debug.core.IDebugEventSetListener;
 
 public class RuntimeProcessEventManager {
 
-	private static RuntimeProcessEventManager instance = new RuntimeProcessEventManager();
-	
+	private static final RuntimeProcessEventManager instance = new RuntimeProcessEventManager();
+
 	private List<IDebugEventSetListener> listeners = new ArrayList<>();
-	
+
 	public static RuntimeProcessEventManager getDefault() {
 		return instance;
+	}
+
+	private RuntimeProcessEventManager() {
 	}
 	
 	public synchronized void addListener(IDebugEventSetListener listener) {

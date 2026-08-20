@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 public class FileUtil {
@@ -20,7 +21,7 @@ public class FileUtil {
 	}
 
 	public static String getContents(File aFile) throws IOException {
-		return new String(getBytesFromFile(aFile));
+		return new String(getBytesFromFile(aFile), StandardCharsets.UTF_8);
 	}
 
 	public static byte[] getBytesFromFile(File file) throws IOException {

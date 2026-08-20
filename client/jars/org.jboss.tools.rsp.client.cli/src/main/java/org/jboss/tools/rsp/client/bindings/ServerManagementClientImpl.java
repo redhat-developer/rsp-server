@@ -123,7 +123,8 @@ public class ServerManagementClientImpl implements RSPClient {
 		case ServerManagementAPIConstants.STATE_STOPPING:
 			stateString = "stopping";
 			break;
-			
+		default:
+			break;
 		}
 		return stateString;
 	}
@@ -149,7 +150,8 @@ public class ServerManagementClientImpl implements RSPClient {
 		case ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN:
 			stateString = "unknown";
 			break;
-			
+		default:
+			break;
 		}
 		return stateString;
 	}

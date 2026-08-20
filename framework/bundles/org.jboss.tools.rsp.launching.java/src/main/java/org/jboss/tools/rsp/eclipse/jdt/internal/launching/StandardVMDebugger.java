@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -273,11 +272,10 @@ public class StandardVMDebugger extends StandardVMRunner {
 				if(env == null){
 					Map<String, String> map = NativeEnvironmentUtils.getDefault().getNativeEnvironment();
 					env = new String[map.size()];
-					String var = null;
 					int index = 0;
-					for(Iterator<String> iter = map.keySet().iterator(); iter.hasNext();) {
-						var = iter.next();
-						String value = map.get(var);
+					for(Map.Entry<String, String> entry : map.entrySet()) {
+						String var = entry.getKey();
+						String value = entry.getValue();
 						if (value == null) {
 							value = ""; //$NON-NLS-1$
 						}

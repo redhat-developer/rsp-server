@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -296,7 +297,7 @@ public class LaunchingSupportUtils {
 		HashMap<String, String> map = new HashMap<String, String>();
 		try {
 			DocumentBuilder parser = getParser();
-			Document document = parser.parse(new ByteArrayInputStream(text.getBytes()));
+			Document document = parser.parse(new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8)));
 			Element envs = document.getDocumentElement();
 			NodeList list = envs.getChildNodes();
 			int length = list.getLength();
