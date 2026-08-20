@@ -18,6 +18,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,7 +63,7 @@ public class JSONMemento implements IMemento {
 	
 	public static JSONMemento createReadRoot(InputStream in, boolean encode) {
 		Gson gson = createGson(encode);
-		try (Reader reader = new InputStreamReader(in)) {
+		try (Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
 			JsonElement rootElement = gson.fromJson(reader, JsonElement.class);
 			return new JSONMemento(rootElement.getAsJsonObject(), "");
 		} catch (IOException e) {
@@ -188,7 +189,7 @@ public class JSONMemento implements IMemento {
 		Gson gson = createGson(htmlEncode);
 		JsonElement jsonElement = gson.fromJson(this.jsonObject, JsonElement.class);
 		
-		try(BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os))) {
+		try(BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8))) {
 			gson.toJson(jsonElement, bw);
 			bw.flush();
 		}

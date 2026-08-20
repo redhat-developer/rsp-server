@@ -10,6 +10,7 @@ package org.jboss.tools.rsp.client.cli;
 
 import java.io.Console;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -113,7 +114,7 @@ public class ServerManagementCLI implements InputProvider, IClientConnectionClos
 			}
 		}
 		if (scanner == null) {
-			scanner = new Scanner(System.in);
+			scanner = new Scanner(System.in, StandardCharsets.UTF_8);
 		}
 		return scanner.nextLine();
 	}

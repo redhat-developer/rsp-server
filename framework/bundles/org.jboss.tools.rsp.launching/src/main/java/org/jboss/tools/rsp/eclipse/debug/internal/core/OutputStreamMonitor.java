@@ -14,6 +14,7 @@ package org.jboss.tools.rsp.eclipse.debug.internal.core;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.ISafeRunnable;
 import org.jboss.tools.rsp.eclipse.core.runtime.ListenerList;
@@ -155,7 +156,7 @@ public class OutputStreamMonitor implements IFlushableStreamMonitor {
 					if (fEncoding != null) {
 						text = new String(bytes, 0, read, fEncoding);
 					} else {
-						text = new String(bytes, 0, read);
+						text = new String(bytes, 0, read, StandardCharsets.UTF_8);
 					}
 					synchronized (this) {
 						if (isBuffered()) {

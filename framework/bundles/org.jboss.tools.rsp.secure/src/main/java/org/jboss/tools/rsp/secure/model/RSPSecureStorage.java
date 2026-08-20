@@ -12,6 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -53,7 +54,7 @@ public class RSPSecureStorage implements ISecureStorage {
 			try {
 				byte[] encrypted = util.getBytesFromFile(backingFile);
 				byte[] decrypted = util.decrypt(key, encrypted);
-				byte[] magicBytes = HASH_COMMENT.getBytes();
+				byte[] magicBytes = HASH_COMMENT.getBytes(StandardCharsets.UTF_8);
 				if (!startsWith(decrypted, magicBytes)) {
 					throw new CryptoException("Invalid key", null);
 				}
@@ -91,7 +92,7 @@ public class RSPSecureStorage implements ISecureStorage {
 				backingFile.getParentFile().mkdirs();
 				StringWriter sw = new StringWriter();
 				this.secretData.store(sw, COMMENT);
-				byte[] raw = sw.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
+				byte[] raw = sw.toString().getBytes(StandardCharsets.UTF_8);
 				byte[] encrypted = util.encrypt(key, raw);
 				util.writeBytesToFile(backingFile, encrypted);
 			} else if (!isInitialized()) {

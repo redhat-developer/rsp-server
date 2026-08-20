@@ -20,6 +20,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.HttpURLConnection;
+import java.nio.charset.StandardCharsets;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -473,8 +474,8 @@ public class URLTransportCache {
 		HttpURLConnection.setFollowRedirects(true);
 		if( user != null && pass != null ) {
 			String authString = user + ":" + pass;
-			byte[] authEncBytes = Base64.getEncoder().encode(authString.getBytes());
-			String authStringEnc = new String(authEncBytes);
+			byte[] authEncBytes = Base64.getEncoder().encode(authString.getBytes(StandardCharsets.UTF_8));
+			String authStringEnc = new String(authEncBytes, StandardCharsets.UTF_8);
 			urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);			
 		}
 		return urlConnection;
