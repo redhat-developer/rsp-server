@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -145,11 +144,8 @@ public class ProcessUtility {
 
 		// Convert the combined map into a form that can be used to launch process
 		ArrayList<String> ret = new ArrayList<>();
-		Iterator<String> it = original.keySet().iterator();
-		String working = null;
-		while (it.hasNext()) {
-			working = it.next();
-			ret.add(working + "=" + original.get(working)); //$NON-NLS-1$
+		for (Map.Entry<String, String> entry : original.entrySet()) {
+			ret.add(entry.getKey() + "=" + entry.getValue()); //$NON-NLS-1$
 		}
 		return ret.toArray(new String[ret.size()]);
 	}

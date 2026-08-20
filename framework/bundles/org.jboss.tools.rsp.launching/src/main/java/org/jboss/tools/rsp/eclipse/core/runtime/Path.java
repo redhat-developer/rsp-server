@@ -588,7 +588,7 @@ public class Path implements IPath, Cloneable {
 			if (!segments[i].equals(targetSegments[i]))
 				return false;
 		//check device last (least likely to differ)
-		return device == target.device || (device != null && device.equals(target.device));
+		return (device == null ? target.device == null : device.equals(target.device));
 	}
 
 	/* (Intentionally not included in javadoc)

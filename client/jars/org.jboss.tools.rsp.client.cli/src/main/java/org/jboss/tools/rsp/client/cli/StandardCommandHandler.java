@@ -825,11 +825,9 @@ public class StandardCommandHandler implements InputHandler {
 
 		protected void printAttr(Attributes attr) {
 			Map<String, Attribute> map = attr.getAttributes();
-			Iterator<String> kit = map.keySet().iterator();
-			while (kit.hasNext()) {
-				String key = kit.next();
-				Attribute val = map.get(key);
-				System.out.println(key);
+			for (Map.Entry<String, Attribute> entry : map.entrySet()) {
+				Attribute val = entry.getValue();
+				System.out.println(entry.getKey());
 				System.out.println("    type=" + val.getType());
 				System.out.println("    desc=" + val.getDescription());
 				System.out.println("    defaultVal=" + val.getDefaultVal());
@@ -929,14 +927,12 @@ public class StandardCommandHandler implements InputHandler {
 	}
 	
 	private ServerManagementClientLauncher launcher;
-	private InputProvider provider;
 	private PromptAssistant assistant;
 	private boolean done = false;
 	private boolean shown = false;
 
 	public StandardCommandHandler(ServerManagementClientLauncher launcher, InputProvider provider) {
 		this.launcher = launcher;
-		this.provider = provider;
 		this.assistant = new PromptAssistant(launcher, provider);
 	}
 

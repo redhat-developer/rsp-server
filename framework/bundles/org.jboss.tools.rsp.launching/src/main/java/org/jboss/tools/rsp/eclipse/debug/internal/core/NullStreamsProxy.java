@@ -56,7 +56,7 @@ public class NullStreamsProxy implements IStreamsProxy2 {
 	public void write(String input) throws IOException {
     }
 
-    private class NullStreamMonitor implements IStreamMonitor {
+    private static class NullStreamMonitor implements IStreamMonitor {
         private InputStream fStream;
 
         public NullStreamMonitor(InputStream stream) {
