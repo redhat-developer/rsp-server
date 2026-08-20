@@ -9,6 +9,10 @@ The protocol is based on LSP4J, though the messages that can be sent or received
 The base protocol of LSP can be found [here](https://microsoft.github.io/language-server-protocol/specification). 
 The RSP Extensions to the base protocol can be found [here](https://github.com/redhat-developer/rsp-server/blob/master/api/docs/org.jboss.tools.rsp.schema/src/main/resources/schemaMD/specification.md)
 
+## Supported Runtimes
+
+See [SUPPORTED_RUNTIMES.md](SUPPORTED_RUNTIMES.md) for the full list of supported server types, versions, and Java compatibility.
+
 ## Install
 
 This client / server code can be found for the time being at this location:  https://github.com/redhat-developer/rsp-server
