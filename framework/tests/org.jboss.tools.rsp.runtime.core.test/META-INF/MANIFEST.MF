@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Runtime Core Test
 Bundle-SymbolicName: org.jboss.tools.rsp.runtime.core.test
 Bundle-Version: 0.26.22.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: org.jboss.tools.rsp.runtime.core.test
 Import-Package: org.osgi.framework
 Require-Bundle: org.jboss.tools.rsp.runtime.core;bundle-version="0.11.0",

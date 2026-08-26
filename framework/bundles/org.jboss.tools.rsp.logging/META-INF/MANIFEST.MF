@@ -4,7 +4,7 @@ Bundle-Name: org.jboss.tools.rsp.logging
 Bundle-SymbolicName: org.jboss.tools.rsp.logging
 Bundle-Version: 0.26.22.qualifier
 Bundle-Activator: org.jboss.tools.rsp.logging.LoggingActivator
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: ch.qos.logback.classic,
  ch.qos.logback.core.spi,
  org.jboss.tools.rsp.eclipse.osgi.util,

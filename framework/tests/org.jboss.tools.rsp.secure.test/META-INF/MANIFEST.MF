@@ -4,7 +4,7 @@ Bundle-Name: Secure Storage Test
 Bundle-SymbolicName: org.jboss.tools.rsp.secure.test
 Bundle-Version: 0.26.22.qualifier
 Bundle-Activator: org.jboss.tools.rsp.secure.test.Activator
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: org.jboss.tools.rsp.secure.test
 Import-Package: org.osgi.framework
 Require-Bundle: org.junit;bundle-version="4.8.1",
