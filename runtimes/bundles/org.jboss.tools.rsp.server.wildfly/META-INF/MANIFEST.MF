@@ -5,7 +5,7 @@ Bundle-SymbolicName: org.jboss.tools.rsp.server.wildfly
 Bundle-Activator: org.jboss.tools.rsp.server.wildfly.impl.Activator
 Automatic-Module-Name: org.jboss.tools.rsp.server.wildfly
 Bundle-Version: 0.26.22.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: org.eclipse.lsp4j.jsonrpc,
  org.eclipse.lsp4j.jsonrpc.json,
  org.eclipse.lsp4j.jsonrpc.json.adapters,

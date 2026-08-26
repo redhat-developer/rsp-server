@@ -4,7 +4,7 @@ Bundle-Name: org.jboss.tools.rsp.api
 Bundle-SymbolicName: org.jboss.tools.rsp.api
 Bundle-Version: 0.26.22.qualifier
 Automatic-Module-Name: org.jboss.tools.rsp.api
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ClassPath: .
 Import-Package: org.osgi.framework,
  org.eclipse.lsp4j.jsonrpc,

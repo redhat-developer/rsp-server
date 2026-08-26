@@ -5,7 +5,7 @@ Bundle-SymbolicName: org.jboss.tools.rsp.server.spi
 Automatic-Module-Name: org.jboss.tools.rsp.server.spi
 Bundle-Activator: org.jboss.tools.rsp.server.spi.SPIActivator
 Bundle-Version: 0.26.22.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: org.jboss.tools.rsp.api,
  org.jboss.tools.rsp.api.dao,
  org.jboss.tools.rsp.api.dao.util,
