@@ -411,6 +411,54 @@ public class GenericServerBehavior extends AbstractServerDelegate
 		}
 	}
 
+	private static final long PROCESS_CLEANUP_DELAY_MS = 120_000;
+
+	@Override
+	protected IPollResultListener shutdownServerResultListener() {
+		IPollResultListener delegate = super.shutdownServerResultListener();
+		return new IPollResultListener() {
+			@Override
+			public void stateNotAsserted(IServerStatePoller.SERVER_STATE expectedState,
+					IServerStatePoller.SERVER_STATE currentState) {
+				delegate.stateNotAsserted(expectedState, currentState);
+			}
+
+			@Override
+			public void stateAsserted(IServerStatePoller.SERVER_STATE expectedState,
+					IServerStatePoller.SERVER_STATE currentState) {
+				ILaunch launch = getStartLaunch();
+				delegate.stateAsserted(expectedState, currentState);
+				if (currentState == IServerStatePoller.SERVER_STATE.DOWN && launch != null) {
+					scheduleProcessTermination(launch);
+				}
+			}
+		};
+	}
+
+	private void scheduleProcessTermination(ILaunch launch) {
+		Thread t = new Thread(() -> {
+			try {
+				Thread.sleep(PROCESS_CLEANUP_DELAY_MS);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				return;
+			}
+			for (IProcess p : launch.getProcesses()) {
+				if (!p.isTerminated()) {
+					try {
+						LOG.info("Terminating lingering server process for {}",
+								getServer().getName());
+						p.terminate();
+					} catch (DebugException e) {
+						LOG.error("Failed to terminate lingering server process", e);
+					}
+				}
+			}
+		}, "Process cleanup: " + getServer().getName());
+		t.setDaemon(true);
+		t.start();
+	}
+
 	@Override
 	public IStatus clientSetServerStarted(LaunchParameters attr) {
 		setServerState(STATE_STARTED, true);
