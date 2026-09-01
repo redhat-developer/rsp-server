@@ -9,15 +9,25 @@
 package org.jboss.tools.rsp.client.cli;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attribute;
@@ -497,6 +507,139 @@ public class StandardCommandHandler implements InputHandler {
 				}
 			}
 		},
+		EXPORT_SERVER("export server") {
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
+				ServerHandle sh = assistant.selectServer();
+				if (sh == null) {
+					System.out.println("No server selected.");
+					return;
+				}
+
+				GetServerJsonResponse resp = launcher.getServerProxy().getServerAsJson(sh).get();
+				if (!resp.getStatus().isOK()) {
+					System.out.println("Error: " + resp.getStatus().getMessage());
+					return;
+				}
+
+				Gson gson = new GsonBuilder().setPrettyPrinting().create();
+				java.lang.reflect.Type mapType = new TypeToken<LinkedHashMap<String, Object>>() {}.getType();
+				Map<String, Object> attrs = gson.fromJson(resp.getServerJson(), mapType);
+
+				Map<String, Object> exported = ServerDescriptorUtil.substitutePathsForExport(attrs);
+
+				String defaultName = sh.getId().replaceAll("[^a-zA-Z0-9_.-]", "_") + ".server.json";
+				System.out.println("Enter file path to export to [" + defaultName + "]: ");
+				String filePath = assistant.nextLine().trim();
+				if (filePath.isEmpty()) {
+					filePath = defaultName;
+				}
+				if (filePath.startsWith("~")) {
+					filePath = System.getProperty("user.home") + filePath.substring(1);
+				}
+
+				String content = gson.toJson(exported);
+				Files.write(Paths.get(filePath), content.getBytes(StandardCharsets.UTF_8));
+				System.out.println("Server descriptor exported to " + filePath);
+			}
+		},
+
+		IMPORT_SERVER("import server") {
+			@Override
+			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) throws Exception {
+				System.out.println("Enter path to server descriptor file: ");
+				String filePath = assistant.nextLine().trim();
+				if (filePath.isEmpty()) {
+					System.out.println("No file specified.");
+					return;
+				}
+				if (filePath.startsWith("~")) {
+					filePath = System.getProperty("user.home") + filePath.substring(1);
+				}
+
+				Path path = Paths.get(filePath);
+				if (!Files.exists(path)) {
+					System.out.println("File not found: " + filePath);
+					return;
+				}
+
+				String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+				Gson gson = new GsonBuilder().setPrettyPrinting().create();
+				java.lang.reflect.Type mapType = new TypeToken<LinkedHashMap<String, Object>>() {}.getType();
+				Map<String, Object> attrs = gson.fromJson(content, mapType);
+
+				String serverTypeId = (String) attrs.get(ServerDescriptorUtil.TYPE_ID_KEY);
+				if (serverTypeId == null) {
+					System.out.println("Descriptor file does not contain a server type ID.");
+					return;
+				}
+
+				List<ServerType> serverTypes = launcher.getServerProxy().getServerTypes().get();
+				ServerType serverType = null;
+				for (ServerType st : serverTypes) {
+					if (st.getId().equals(serverTypeId)) {
+						serverType = st;
+						break;
+					}
+				}
+				if (serverType == null) {
+					System.out.println("Server type \"" + serverTypeId + "\" not supported by this RSP.");
+					return;
+				}
+
+				List<String> variables = ServerDescriptorUtil.findVariables(attrs);
+				Map<String, String> variableValues = new HashMap<>();
+				if (!variables.isEmpty()) {
+					System.out.println("The descriptor contains " + variables.size() + " path variable(s) that need local values:");
+					for (String varKey : variables) {
+						System.out.println("Enter local path for '" + varKey + "': ");
+						String val = assistant.nextLine().trim();
+						if (val.startsWith("~")) {
+							val = System.getProperty("user.home") + val.substring(1);
+						}
+						if (val.isEmpty()) {
+							System.out.println("Path cannot be empty. Aborting import.");
+							return;
+						}
+						variableValues.put(varKey, val);
+					}
+				}
+
+				Map<String, Object> resolved = ServerDescriptorUtil.resolveVariables(attrs, variableValues);
+
+				System.out.println("Enter a name for the new server: ");
+				String serverName = assistant.nextLine().trim();
+				if (serverName.isEmpty()) {
+					System.out.println("Server name cannot be empty.");
+					return;
+				}
+
+				Map<String, Object> serverAttrs = new LinkedHashMap<>();
+				for (Map.Entry<String, Object> entry : resolved.entrySet()) {
+					String key = entry.getKey();
+					if (ServerDescriptorUtil.TYPE_ID_KEY.equals(key)
+							|| "id".equals(key)
+							|| ServerDescriptorUtil.FORMAT_VERSION_KEY.equals(key)) {
+						continue;
+					}
+					Object val = entry.getValue();
+					if (val instanceof Boolean || val instanceof Number) {
+						serverAttrs.put(key, String.valueOf(val));
+					} else {
+						serverAttrs.put(key, val);
+					}
+				}
+
+				ServerAttributes csa = new ServerAttributes(serverTypeId, serverName, serverAttrs);
+				CreateServerResponse result = launcher.getServerProxy().createServer(csa).get();
+				if (result.getStatus().isOK()) {
+					System.out.println("Server \"" + serverName + "\" created from descriptor.");
+				} else {
+					System.out.println("Error creating server: " + result.getStatus().getMessage());
+				}
+			}
+		},
+
 		LIST_DEPLOYMENTS("list deployments") {
 			@Override
 			public void execute(String command, ServerManagementClientLauncher launcher, PromptAssistant assistant) {
