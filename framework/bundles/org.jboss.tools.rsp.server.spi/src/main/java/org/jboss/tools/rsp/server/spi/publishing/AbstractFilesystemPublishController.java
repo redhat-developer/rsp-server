@@ -463,8 +463,9 @@ public abstract class AbstractFilesystemPublishController implements IPublishCon
 	    @Override
 	    public FileVisitResult visitFile(final Path file,
 	    final BasicFileAttributes attrs) throws IOException {
-	    Files.copy(file,
-	        targetPath.resolve(sourcePath.relativize(file)), StandardCopyOption.REPLACE_EXISTING);
+	    Path target = targetPath.resolve(sourcePath.relativize(file));
+	    Files.createDirectories(target.getParent());
+	    Files.copy(file, target, StandardCopyOption.REPLACE_EXISTING);
 	    return FileVisitResult.CONTINUE;
 	    }
 	}
