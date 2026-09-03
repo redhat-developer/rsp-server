@@ -9,6 +9,16 @@ The protocol is based on LSP4J, though the messages that can be sent or received
 The base protocol of LSP can be found [here](https://microsoft.github.io/language-server-protocol/specification). 
 The RSP Extensions to the base protocol can be found [here](https://github.com/redhat-developer/rsp-server/blob/master/api/docs/org.jboss.tools.rsp.schema/src/main/resources/schemaMD/specification.md)
 
+## For Users
+
+If you are using RSP through the VSCode extensions, see the following for end-user documentation (server configuration, parameters, commands, and troubleshooting):
+
+   * [VSCode RSP UI](https://github.com/redhat-developer/vscode-rsp-ui#readme) - commands, settings, and global server parameters shared by all server types
+   * [JBoss Toolkit (WildFly/EAP)](https://github.com/redhat-developer/vscode-server-connector#readme) - WildFly and EAP specific parameters and FAQ
+   * [Community Server Connector](https://github.com/redhat-developer/rsp-server-community/blob/master/vscode/README.md) - Tomcat, Karaf, Felix, Jetty, Glassfish, and Liberty specific parameters and FAQ
+
+The remainder of this README is for developers building or contributing to the RSP framework itself.
+
 ## Supported Runtimes
 
 See [SUPPORTED_RUNTIMES.md](SUPPORTED_RUNTIMES.md) for the full list of supported server types, versions, and Java compatibility.
