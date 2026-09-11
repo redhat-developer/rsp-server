@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,6 +42,7 @@ import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.launching.utils.IStatusRunnableWithProgress;
 import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
+import org.jboss.tools.rsp.server.RSPFlags;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
 import org.jboss.tools.rsp.server.model.internal.DaoUtilities;
 import org.jboss.tools.rsp.server.model.internal.DummyServer;
@@ -179,9 +179,8 @@ public class ServerModel implements IServerModel {
 	
 	@Override
 	public void loadServers() throws CoreException {
-		File data = this.managementModel.getDataStoreModel().getDataLocation();
-		File servers = new File(data, SERVERS_DIRECTORY);
-		loadServers(servers);
+		File serversDirectory = getServersDirectory();
+		loadServers(serversDirectory);
 		new Thread("Initialize Server State") {
 			public void run() {
 				ArrayList<IServerDelegate> servers = new ArrayList<>(serverDelegates.values());
@@ -417,9 +416,21 @@ public class ServerModel implements IServerModel {
 		return new Server(serverFile, serverType, id, attributes, managementModel);
 	}
 	
-	private File getServerFile(String id) {
+	private File getServersDirectory() {
 		File data = this.managementModel.getDataStoreModel().getDataLocation();
-		File serversDirectory = new File(data, SERVERS_DIRECTORY);
+		String possibleFolder = System.getProperty(RSPFlags.SYSPROP_DATA_LOCATION_SERVERS_FOLDER);
+		File serversDirectory = new File(data, SERVERS_DIRECTORY); // default value
+		if( possibleFolder != null ) {
+			File pf1 = new File(possibleFolder);
+			if( pf1.isAbsolute() ) {
+				serversDirectory = pf1;
+			}
+		}
+		return serversDirectory;
+	}
+	
+	private File getServerFile(String id) {
+		File serversDirectory = getServersDirectory();
 		if( !serversDirectory.exists()) {
 			serversDirectory.mkdirs();
 		}

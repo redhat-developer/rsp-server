@@ -70,6 +70,18 @@ Next, run the following command to launch the server:
 
 To customize the hosts or ports, you can either edit the pom.xml for these modules or pass flags. See https://www.mojohaus.org/exec-maven-plugin/usage.html  for more information. 
 
+### System Properties
+
+The following system properties can be passed to the RSP server JVM (via `-D` flags) to configure its behavior:
+
+| Property | Default | Description |
+|---|---|---|
+| `rsp.server.port` | `27511` | The port the RSP server listens on |
+| `org.jboss.tools.rsp.id` | *(none)* | An identifier for this RSP instance, used to isolate its data directory under `~/.rsp/<id>/` |
+| `org.jboss.tools.rsp.data` | `~/.rsp/<id>/` or `~/.org.jboss.tools.rsp.data` | Override the root data storage directory |
+| `org.jboss.tools.rsp.data.servers` | *(none)* | Absolute path to an alternative directory for server definitions. When set, server JSON files are read from and written to this folder instead of the default `servers/` subdirectory under the data root |
+| `rsp.log.level` | *(none)* | Log level override |
+
 ## Using the CLI
 
 The CLI is a proof-of-concept only, currently demonstrating only that the RSP connection and ability to pass communications back and forth works as expected. 
