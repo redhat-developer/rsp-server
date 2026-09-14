@@ -252,6 +252,9 @@ public abstract class AbstractFilesystemPublishController implements IPublishCon
 		File dest = getDestinationPath(opts).toFile();
 		Path src = new File(opts.getPath()).toPath();
 		try {
+			if (dest.exists() && dest.isDirectory()) {
+				completeDelete(dest.toPath());
+			}
 			Files.copy(src, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			return ServerManagementAPIConstants.PUBLISH_STATE_NONE;
 		} catch(IOException ioe) {
