@@ -12,6 +12,10 @@ import org.jboss.tools.rsp.server.wildfly.beans.impl.IServerConstants;
 
 public interface ServerTypeStringConstants {
 	// NEW_SERVER_ADAPTER
+	public static final String WF41_ID = IServerConstants.SERVER_WILDFLY_410;
+	public static final String WF41_NAME = "WildFly 41+";
+	public static final String WF41_DESC = "A server adapter capable of discovering and controlling a WildFly 41.x runtime instance.";
+
 	public static final String WF38_ID = IServerConstants.SERVER_WILDFLY_380;
 	public static final String WF38_NAME = "WildFly 38+";
 	public static final String WF38_DESC = "A server adapter capable of discovering and controlling a WildFly 38.x runtime instance.";

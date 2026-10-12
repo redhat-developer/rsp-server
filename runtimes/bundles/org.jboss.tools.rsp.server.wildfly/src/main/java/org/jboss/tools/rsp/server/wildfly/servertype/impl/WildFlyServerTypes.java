@@ -13,6 +13,8 @@ import org.jboss.tools.rsp.server.wildfly.servertype.EapXpServerType;
 
 public class WildFlyServerTypes implements ServerTypeStringConstants{
 	// NEW_SERVER_ADAPTER
+	public static final BaseJBossServerType WF41_SERVER_TYPE =
+			new WildFlyServerType(WF41_ID, WF41_NAME, WF41_DESC);
 	public static final BaseJBossServerType WF38_SERVER_TYPE =
 			new WildFlyServerType(WF38_ID, WF38_NAME, WF38_DESC);
 	public static final BaseJBossServerType WF35_SERVER_TYPE =

@@ -21,7 +21,7 @@ public class JBossEAP72DefaultLaunchArguments extends JBossEAP70DefaultLaunchArg
 	@Override
 	public String getStartDefaultVMArgs() {
 		return super.getStartDefaultVMArgs() 
-		        + getJava9VMArgs();
+		        + getJavaVMArgs();
 	}
 
 

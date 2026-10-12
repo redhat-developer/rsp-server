@@ -13,20 +13,37 @@ package org.jboss.tools.rsp.server.wildfly.servertype.launch;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstall;
 import org.jboss.tools.rsp.server.wildfly.servertype.capabilities.util.JavaUtils;
 
-public class Java9LaunchArgUtil {
+public class JavaLaunchArgUtil {
 
-	private Java9LaunchArgUtil() {
+	private JavaLaunchArgUtil() {
 		// prevent instantiation
 	}
 	
-	public static String getJava9VMArgs(IVMInstall vm) {
+	public static String getJavaVMArgs(IVMInstall vm) {
 		String suffix = "";
 		if( vm == null )
 			return suffix;
 
 		int[] versionIDs = JavaUtils.getMajorMinorVersion(vm.getJavaVersion());
 		if (versionIDs.length > 0 ) {
-			if (versionIDs[0] >= 17) {
+			if (versionIDs[0] >= 25) {
+				suffix = " --add-exports=java.desktop/sun.awt=ALL-UNNAMED"
+						+ " --add-exports=java.naming/com.sun.jndi.ldap=ALL-UNNAMED"
+						+ " --add-exports=java.naming/com.sun.jndi.url.ldap=ALL-UNNAMED"
+						+ " --add-exports=java.naming/com.sun.jndi.url.ldaps=ALL-UNNAMED"
+						+ " --add-exports=jdk.naming.dns/com.sun.jndi.dns=ALL-UNNAMED"
+						+ " --add-opens=java.base/com.sun.net.ssl.internal.ssl=ALL-UNNAMED"
+						+ " --add-opens=java.base/java.lang=ALL-UNNAMED"
+						+ " --add-opens=java.base/java.lang.invoke=ALL-UNNAMED"
+						+ " --add-opens=java.base/java.lang.reflect=ALL-UNNAMED"
+						+ " --add-opens=java.base/java.io=ALL-UNNAMED"
+						+ " --add-opens=java.base/java.net=ALL-UNNAMED"
+						+ " --add-opens=java.base/java.security=ALL-UNNAMED"
+						+ " --add-opens=java.base/java.util=ALL-UNNAMED"
+						+ " --add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
+						+ " --add-opens=java.management/javax.management=ALL-UNNAMED"
+						+ " --add-opens=java.naming/javax.naming=ALL-UNNAMED";
+			} else if (versionIDs[0] >= 17) {
 				suffix = " --add-exports=java.desktop/sun.awt=ALL-UNNAMED --add-exports=java.naming/com.sun.jndi.ldap=ALL-UNNAMED --add-exports=java.naming/com.sun.jndi.url.ldap=ALL-UNNAMED --add-exports=java.naming/com.sun.jndi.url.ldaps=ALL-UNNAMED --add-exports=jdk.naming.dns/com.sun.jndi.dns=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.security=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.management/javax.management=ALL-UNNAMED --add-opens=java.naming/javax.naming=ALL-UNNAMED";
 			} else if (versionIDs[0] >= 9) {
 				suffix = " --add-exports=java.base/sun.nio.ch=ALL-UNNAMED"

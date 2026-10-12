@@ -37,7 +37,9 @@ import org.jboss.tools.rsp.server.spi.servertype.IServerWorkingCopy;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
 import org.jboss.tools.rsp.server.wildfly.servertype.impl.ServerTypeStringConstants;
 import org.jboss.tools.rsp.server.wildfly.servertype.impl.WildFlyServerDelegate;
+import org.jboss.tools.rsp.server.wildfly.servertype.launch.JavaLaunchArgUtil;
 import org.jboss.tools.rsp.server.wildfly.servertype.launch.Wildfly340DefaultLaunchArguments;
+import org.jboss.tools.rsp.server.wildfly.servertype.launch.Wildfly410DefaultLaunchArguments;
 import org.junit.Test;
 
 public class WildFlyServerAttributesTest {
@@ -141,6 +143,44 @@ public class WildFlyServerAttributesTest {
 		String[] cmdLine = det.getCmdLine();
 		
 		assertTrue(isFound(cmdLine, "--server-config=standalone-ha.xml"));
+	}
+
+	@Test
+	public void testJava25LaunchArgs() {
+		IVMInstall vm = mock(IVMInstall.class);
+		doReturn("25.0.4.1").when(vm).getJavaVersion();
+		String vmArgs = JavaLaunchArgUtil.getJavaVMArgs(vm);
+		assertTrue(vmArgs.contains("--add-opens=java.base/java.util=ALL-UNNAMED"));
+		assertTrue(vmArgs.contains("--add-opens=java.base/com.sun.net.ssl.internal.ssl=ALL-UNNAMED"));
+		assertTrue(vmArgs.contains("--add-exports=java.desktop/sun.awt=ALL-UNNAMED"));
+	}
+
+	@Test
+	public void testWildfly340LaunchArgs() throws IOException {
+		IServer server = mockServer();
+		File f = Files.createTempDirectory(System.currentTimeMillis() + "_wfly").toFile();
+		f.mkdirs();
+		doReturn(f.getAbsolutePath()).when(server).getAttribute(eq(IJBossServerAttributes.SERVER_HOME), anyString());
+		doReturn(f.getAbsolutePath()).when(server).getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
+
+		Wildfly340DefaultLaunchArguments args = new Wildfly340DefaultLaunchArguments(server);
+		String vmArgs = args.getStartDefaultVMArgs();
+		assertTrue(vmArgs.contains("-Djdk.serialFilter="));
+		assertTrue(vmArgs.contains("-Dorg.jboss.logmanager.nocolor=true"));
+	}
+
+	@Test
+	public void testWildfly410LaunchArgsIncludesJavaVMArgs() throws IOException {
+		IServer server = mockServer();
+		File f = Files.createTempDirectory(System.currentTimeMillis() + "_wfly").toFile();
+		f.mkdirs();
+		doReturn(f.getAbsolutePath()).when(server).getAttribute(eq(IJBossServerAttributes.SERVER_HOME), anyString());
+		doReturn(f.getAbsolutePath()).when(server).getAttribute(IJBossServerAttributes.SERVER_HOME, (String)null);
+
+		Wildfly410DefaultLaunchArguments args = new Wildfly410DefaultLaunchArguments(server);
+		String vmArgs = args.getStartDefaultVMArgs();
+		assertTrue(vmArgs.contains("-Djdk.serialFilter="));
+		assertTrue(vmArgs.contains("-Dorg.jboss.logmanager.nocolor=true"));
 	}
 
 	

@@ -20,7 +20,7 @@ public class Wildfly110DefaultLaunchArguments extends Wildfly100DefaultLaunchArg
 	@Override
 	public String getStartDefaultVMArgs() {
 		return super.getStartDefaultVMArgs() 
-		        + getJava9VMArgs();
+		        + getJavaVMArgs();
 	}
 
 }

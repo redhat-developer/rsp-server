@@ -217,7 +217,7 @@ public class JBossDefaultLaunchArguments implements IDefaultLaunchArguments, IJB
 		return "";
 	}
 	
-	protected String getJava9VMArgs() {
-		return Java9LaunchArgUtil.getJava9VMArgs(getVM());
+	protected String getJavaVMArgs() {
+		return JavaLaunchArgUtil.getJavaVMArgs(getVM());
 	}
 }

@@ -95,6 +95,7 @@ public class JBossServerBeanLoaderTest extends TestCase {
 		expected.put(IServerConstants.SERVER_WILDFLY_270, new Data(JBossServerBeanTypeProvider.WILDFLY270, "27.0."));
 		expected.put(IServerConstants.SERVER_WILDFLY_350, new Data(JBossServerBeanTypeProvider.WILDFLY350, "35.0."));
 		expected.put(IServerConstants.SERVER_WILDFLY_380, new Data(JBossServerBeanTypeProvider.WILDFLY380, "38.0."));
+		expected.put(IServerConstants.SERVER_WILDFLY_410, new Data(JBossServerBeanTypeProvider.WILDFLY410, "41.0."));
 		expected.put(IServerConstants.SERVER_EAP_43, new Data(JBossServerBeanTypeProvider.EAP_STD, "4.3."));
 		expected.put(IServerConstants.SERVER_EAP_50, new Data(JBossServerBeanTypeProvider.EAP_STD, "5.1."));
 		expected.put(IServerConstants.SERVER_EAP_60, new Data(JBossServerBeanTypeProvider.EAP6, "6.0."));
@@ -114,7 +115,7 @@ public class JBossServerBeanLoaderTest extends TestCase {
 		expected.put(MockServerCreationUtilities.TEST_SERVER_TYPE_WONKA_1, new Data(JBossServerBeanTypeProvider.UNKNOWN_AS72_PRODUCT, "1.0.", "WONKA"));
 		expected.put(MockServerCreationUtilities.TEST_SERVER_TYPE_WILDFLY_390, new Data(JBossServerBeanTypeProvider.WILDFLY380, "39.0."));
 		expected.put(MockServerCreationUtilities.TEST_SERVER_TYPE_WILDFLY_400, new Data(JBossServerBeanTypeProvider.WILDFLY380, "40.0."));
-		expected.put(MockServerCreationUtilities.TEST_SERVER_TYPE_WILDFLY_410, new Data(JBossServerBeanTypeProvider.WILDFLY380, "41.0."));
+		expected.put(MockServerCreationUtilities.TEST_SERVER_TYPE_WILDFLY_410, new Data(JBossServerBeanTypeProvider.WILDFLY410, "41.0."));
 		// NEW_SERVER_ADAPTER
 	}
 

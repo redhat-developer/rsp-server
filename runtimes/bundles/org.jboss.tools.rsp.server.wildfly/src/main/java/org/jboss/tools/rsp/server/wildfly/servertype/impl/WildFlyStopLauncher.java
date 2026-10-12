@@ -22,7 +22,7 @@ import org.jboss.tools.rsp.server.wildfly.servertype.AbstractLauncher;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
 import org.jboss.tools.rsp.server.wildfly.servertype.JBossVMRegistryDiscovery;
 import org.jboss.tools.rsp.server.wildfly.servertype.launch.IDefaultLaunchArguments;
-import org.jboss.tools.rsp.server.wildfly.servertype.launch.Java9LaunchArgUtil;
+import org.jboss.tools.rsp.server.wildfly.servertype.launch.JavaLaunchArgUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +66,7 @@ public class WildFlyStopLauncher extends AbstractLauncher implements IServerShut
 			}
 		}
 
-		String ret = Java9LaunchArgUtil.getJava9VMArgs(new JBossVMRegistryDiscovery().findVMInstall(getDelegate()));
+		String ret = JavaLaunchArgUtil.getJavaVMArgs(new JBossVMRegistryDiscovery().findVMInstall(getDelegate()));
 		if (shouldOverride) {
 			saveProperty(IJBossServerAttributes.LAUNCH_OVERRIDE_SHUTDOWN_VM_ARGS, ret);
 		}
